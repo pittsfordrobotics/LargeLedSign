@@ -8,7 +8,6 @@
 #include "TwoColorStyle.h"
 #include "RainbowStyle.h"
 #include "Bluetooth.h"
-#include "ManualSelection.h"
 
 // Function prototypes
 void initializeIO();
