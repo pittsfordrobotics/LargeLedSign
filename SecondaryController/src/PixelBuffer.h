@@ -1,6 +1,6 @@
+#include "Arduino.h"
 #include <Adafruit_NeoPixel.h>
 #include <vector>
-#include "Arduino.h"
 
 #ifndef PIXEL_BUFFER_H
 #define PIXEL_BUFFER_H
