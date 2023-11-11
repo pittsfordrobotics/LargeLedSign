@@ -3,10 +3,10 @@
 #include <ArduinoBLE.h>
 #include <vector>
 #include "PixelBuffer.h"
-#include "LightStyle.h"
-#include "SingleColorStyle.h"
-#include "TwoColorStyle.h"
-#include "RainbowStyle.h"
+#include "LightStyles/LightStyle.h"
+#include "LightStyles/SingleColorStyle.h"
+#include "LightStyles/TwoColorStyle.h"
+#include "LightStyles/RainbowStyle.h"
 #include "Bluetooth.h"
 
 // Function prototypes

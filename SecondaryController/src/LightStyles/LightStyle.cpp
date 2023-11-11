@@ -1,6 +1,6 @@
-#import "Arduino.h"
-#import "LightStyle.h"
-#import "PixelBuffer.h"
+#include "Arduino.h"
+#include "LightStyle.h"
+#include "PixelBuffer.h"
 
 std::vector<String> LightStyle::knownPatterns;
 
@@ -71,7 +71,7 @@ void LightStyle::shiftColorUsingPattern(uint32_t newColor) {
       return;
     case 5: // Digit -- no more digit, just use solid for now.
       //m_pixelBuffer->shiftDigitsRight(newColor);
-      for (int i = 0; i < m_pixelBuffer->getPixelCount(); i++) {
+      for (uint i = 0; i < m_pixelBuffer->getPixelCount(); i++) {
         m_pixelBuffer->setPixel(i, newColor);
       }
       return;
@@ -80,7 +80,7 @@ void LightStyle::shiftColorUsingPattern(uint32_t newColor) {
       return;
     default:
       // Default to Solid (ie, all lights the same color)
-      for (int i = 0; i < m_pixelBuffer->getPixelCount(); i++) {
+      for (uint i = 0; i < m_pixelBuffer->getPixelCount(); i++) {
         m_pixelBuffer->setPixel(i, newColor);
       }
   }
