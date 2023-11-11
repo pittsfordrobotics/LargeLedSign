@@ -6,7 +6,16 @@
 #ifndef BLUETOOTH_H
 #define BLUETOOTH_H
 
-# define BLUETOOTH_H_MAXSTRINGLENGTH 250
+#define BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID "5eccb54e-465f-47f4-ac50-6735bfc0e730"
+#define BTCOMMON_STYLECHARACTERISTIC_UUID "c99db9f7-1719-43db-ad86-d02d36b191b3"
+#define BTCOMMON_STYLENAMESCHARACTERISTIC_UUID "9022a1e0-3a1f-428a-bad6-3181a4d010a5"
+#define BTCOMMON_SPEEDCHARACTERISTIC_UUID "b975e425-62e4-4b08-a652-d64ad5097815"
+#define BTCOMMON_STEPCHARACTERISTIC_UUID "70e51723-0771-4946-a5b3-49693e9646b5"
+#define BTCOMMON_PATTERNCHARACTERISTIC_UUID "6b503d25-f643-4823-a8a6-da51109e713f"
+#define BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID "348195d1-e237-4b0b-aea4-c818c3eb5e2a"
+#define BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID "ea0a95bc-7561-4b1e-8925-7973b3ad7b9a"
+
+#define BLUETOOTH_H_MAXSTRINGLENGTH 250
 
 class Bluetooth {
   public:
@@ -31,14 +40,14 @@ class Bluetooth {
 
   private:
     BLEService* m_ledService;
-    BLEByteCharacteristic m_brightnessCharacteristic{ "5eccb54e-465f-47f4-ac50-6735bfc0e730", BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_styleCharacteristic{ "c99db9f7-1719-43db-ad86-d02d36b191b3", BLERead | BLENotify | BLEWrite };
-    BLEStringCharacteristic m_styleNamesCharacteristic{ "9022a1e0-3a1f-428a-bad6-3181a4d010a5", BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
-    BLEByteCharacteristic m_speedCharacteristic{ "b975e425-62e4-4b08-a652-d64ad5097815", BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_stepCharacteristic{ "70e51723-0771-4946-a5b3-49693e9646b5", BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_patternCharacteristic{ "6b503d25-f643-4823-a8a6-da51109e713f", BLERead | BLENotify | BLEWrite };
-    BLEStringCharacteristic m_patternNamesCharacteristic{ "348195d1-e237-4b0b-aea4-c818c3eb5e2a", BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
-    BLEFloatCharacteristic m_batteryVoltageCharacteristic{ "ea0a95bc-7561-4b1e-8925-7973b3ad7b9a", BLERead | BLENotify };
+    BLEByteCharacteristic m_brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
+    BLEByteCharacteristic m_styleCharacteristic{ BTCOMMON_STYLECHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
+    BLEStringCharacteristic m_styleNamesCharacteristic{ BTCOMMON_STYLENAMESCHARACTERISTIC_UUID, BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
+    BLEByteCharacteristic m_speedCharacteristic{BTCOMMON_SPEEDCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
+    BLEByteCharacteristic m_stepCharacteristic{ BTCOMMON_STEPCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
+    BLEByteCharacteristic m_patternCharacteristic{ BTCOMMON_PATTERNCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
+    BLEStringCharacteristic m_patternNamesCharacteristic{ BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID, BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
+    BLEFloatCharacteristic m_batteryVoltageCharacteristic{ BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID, BLERead | BLENotify };
 
     byte m_currentBrightness{0};
     byte m_currentStyle{0};
