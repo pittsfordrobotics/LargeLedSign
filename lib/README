@@ -22,22 +22,7 @@ For example, see a structure of the following two libraries `Foo` and `Bar`:
 |  |  |- Foo.h
 |  |
 |  |- README --> THIS FILE
-|
-|- platformio.ini
-|--src
-   |- main.c
 
-and a contents of `src/main.c`:
-```
-#include <Foo.h>
-#include <Bar.h>
-
-int main (void)
-{
-  ...
-}
-
-```
 
 PlatformIO Library Dependency Finder will find automatically dependent
 libraries scanning project source files.
