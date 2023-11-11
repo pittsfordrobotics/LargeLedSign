@@ -1,7 +1,7 @@
-#include "BLETypedCharacteristics.h"
+#include <Arduino.h>
+#include <BLETypedCharacteristics.h>
 #include <ArduinoBLE.h>
 #include <vector>
-#include "Arduino.h"
 
 #ifndef BLUETOOTH_H
 #define BLUETOOTH_H
@@ -17,7 +17,7 @@
 
 #define BLUETOOTH_H_MAXSTRINGLENGTH 250
 
-class Bluetooth {
+class BluetoothCommon {
   public:
     void initialize(String uuid, String localName);
     void stop();

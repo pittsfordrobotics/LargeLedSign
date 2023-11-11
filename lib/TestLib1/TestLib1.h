@@ -1,1 +1,0 @@
-#define TESTLIB_DATA 0
