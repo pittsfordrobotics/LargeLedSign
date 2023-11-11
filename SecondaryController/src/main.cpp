@@ -114,7 +114,6 @@ void startBLE() {
   Serial.println(signOrder);
 
   // Use a common uuid
-  String uuid = "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0";
   String localName;
   // Longer term - read sign position and digit from inputs,
   // set local name to "3181 LED Controller <position>-<digit>"
@@ -131,7 +130,7 @@ void startBLE() {
       return;
   }
 
-  btService.initialize(uuid, localName);
+  btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
 
   std::vector<String> styleNames;
   for (uint i = 0; i < lightStyles.size(); i++) {

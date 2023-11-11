@@ -1,38 +1,13 @@
-#include "Arduino.h"
-#include "BLETypedCharacteristics.h"
-#include <ArduinoBLE.h>
-#include <vector>
-
-#define PrimaryControllerUuid "99be4fac-c708-41e5-a149-74047f554cc1"
-#define SecondaryControllerUuid "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0"
-
-// Function prototypes
-void brightnessCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic);
-void blePeripheralConnectHandler(BLEDevice central); 
-void blePeripheralDisconnectHandler(BLEDevice central); 
-void populateSecondaries();
-BLEDevice* scanForSecondary();
+#include "main.h"
 
 // Global variables
-BLEService ledService{ PrimaryControllerUuid };
-BLEByteCharacteristic brightnessCharacteristic{ "e680b85f-f928-48d5-ac9e-948701da053c", BLERead | BLENotify | BLEWrite };
+BLEService ledService{ BTCOMMON_PRIMARYCONTROLLER_UUID };
+BLEByteCharacteristic brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
 BLECharacteristic* remoteBrightnessCharacteristic1;
 BLECharacteristic* remoteBrightnessCharacteristic2;
 
 std::vector<BLEDevice*> allSecondaries;
 ulong nextUpdate = 0;
-
-/*
-    BLEService m_ledService{ "99be4fac-c708-41e5-a149-74047f554cc1" };
-    BLEByteCharacteristic m_brightnessCharacteristic{ "5eccb54e-465f-47f4-ac50-6735bfc0e730", BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_styleCharacteristic{ "c99db9f7-1719-43db-ad86-d02d36b191b3", BLERead | BLENotify | BLEWrite };
-    BLEStringCharacteristic m_styleNamesCharacteristic{ "9022a1e0-3a1f-428a-bad6-3181a4d010a5", BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
-    BLEByteCharacteristic m_speedCharacteristic{ "b975e425-62e4-4b08-a652-d64ad5097815", BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_stepCharacteristic{ "70e51723-0771-4946-a5b3-49693e9646b5", BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_patternCharacteristic{ "6b503d25-f643-4823-a8a6-da51109e713f", BLERead | BLENotify | BLEWrite };
-    BLEStringCharacteristic m_patternNamesCharacteristic{ "348195d1-e237-4b0b-aea4-c818c3eb5e2a", BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
-    BLEFloatCharacteristic m_batteryVoltageCharacteristic{ "ea0a95bc-7561-4b1e-8925-7973b3ad7b9a", BLERead | BLENotify };
-*/
 
 void setup() {
   delay(500);
@@ -44,7 +19,7 @@ void setup() {
     while(true) {}
   }
   
-  // startBLEService();
+  startBLEService();
   populateSecondaries();
 }
 
@@ -95,8 +70,8 @@ void loop() {
 
 BLEDevice* scanForSecondary() {
   Serial.print("Scanning for peripherals with uuid = ");
-  Serial.println(SecondaryControllerUuid);
-  BLE.scanForUuid(SecondaryControllerUuid, true);
+  Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
+  BLE.scanForUuid(BTCOMMON_SECONDARYCONTROLLER_UUID, true);
 
   BLEDevice peripheral = BLE.available();
   while (!peripheral) {
