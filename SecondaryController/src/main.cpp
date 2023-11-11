@@ -7,7 +7,7 @@
 // Ex:
 // std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS };
 // std::vector<int> signTypeSelectorPins = { SIGN_TYPE_SELECTOR_PINS };
-int orderSelectorPins[] = {7, 8}; // Tells the controller which digit it's controlling (only the first pin is used so far)
+std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
 
 // Main BLE service wrapper
 Bluetooth btService;
@@ -74,8 +74,8 @@ void loop()
 // Initialize all input/output pins
 void initializeIO() {
   Serial.println("Initializing I/O pins.");
-  for (int i = 0; i < 2; i++) {
-    pinMode(orderSelectorPins[i], INPUT_PULLUP);
+  for (uint i = 0; i < orderSelectorPins.size(); i++) {
+    pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
   }
 
   Serial.println("Initializing the analog input to monitor battery voltage.");
@@ -103,13 +103,15 @@ void initializeLightStyles() {
 
 // Set the initial BLE characteristic values and start the BLE service.
 void startBLE() {
-  int signType = 0;
-  if (digitalRead(orderSelectorPins[0]) == HIGH) {
-    signType = 1;
+  // Dummy ordering for now -- just first or second.
+  // TBD: loop through the selector pins and "rotate left" a 1 or 0 per pin.
+  int signOrder = 0;
+  if (digitalRead(orderSelectorPins.at(0)) == HIGH) {
+    signOrder = 1;
   }
 
-  Serial.print("Initializing for sign type ");
-  Serial.println(signType);
+  Serial.print("Initializing for sign in position ");
+  Serial.println(signOrder);
 
   // Use a common uuid
   String uuid = "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0";
@@ -117,7 +119,7 @@ void startBLE() {
   // Longer term - read sign position and digit from inputs,
   // set local name to "3181 LED Controller <position>-<digit>"
   // Digits can be 0-9, with the gear logo being 10.
-  switch (signType) {
+  switch (signOrder) {
     case 0:
       localName = "3181 LED Controller 1-3";
       break;
