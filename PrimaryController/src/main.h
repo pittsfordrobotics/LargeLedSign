@@ -5,10 +5,8 @@
 #include "BluetoothCommon.h"
 
 // Function prototypes
-void brightnessCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic);
-void blePeripheralConnectHandler(BLEDevice central); 
-void blePeripheralDisconnectHandler(BLEDevice central); 
 void populateSecondaries();
 void startBLEService();
+void startBLEService_Common();
 BLEDevice* scanForSecondary();
 

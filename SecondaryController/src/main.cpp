@@ -130,12 +130,17 @@ void startBLE() {
       return;
   }
 
+  // Start the actual BLE
+  if (!BLE.begin()) {
+    indicateBleFailure();
+  }
+
   btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
 
   std::vector<String> styleNames;
   for (uint i = 0; i < lightStyles.size(); i++) {
-    styleNames.push_back(lightStyles[i]->getName());    
-  }  
+    styleNames.push_back(lightStyles[i]->getName());
+  }
 
   btService.setStyleNames(styleNames);
   btService.setPatternNames(LightStyle::knownPatterns);
@@ -333,5 +338,22 @@ void emitTelemetry()
     Serial.print(rawLevel);
     Serial.print("; calculated voltage: ");
     Serial.println(voltage);
+  }
+}
+
+void indicateBleFailure() {
+  // Infinite loop here -- we can't continue with the rest of the service, so never return. 
+  Serial.println("Could not start BLE service!");
+  while(true) {
+    // Turn all LEDs off except for the first one, which will blink red/blue.
+    pixelBuffer.setBrightness(255);
+    pixelBuffer.clearBuffer();
+    pixelBuffer.setPixel(0, Adafruit_NeoPixel::Color(0, 0, 255));
+    pixelBuffer.displayPixels();
+    delay(500);
+
+    pixelBuffer.setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
+    pixelBuffer.displayPixels();
+    delay(500);
   }
 }

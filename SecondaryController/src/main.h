@@ -49,5 +49,6 @@ byte isInRange(byte value, byte minValue, byte maxValue);
 float getCalculatedBatteryVoltage();
 int getVoltageInputLevel();
 void emitTelemetry();
+void indicateBleFailure();
 
 #endif

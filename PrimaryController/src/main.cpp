@@ -5,6 +5,7 @@ BLEService ledService{ BTCOMMON_PRIMARYCONTROLLER_UUID };
 BLEByteCharacteristic brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
 BLECharacteristic* remoteBrightnessCharacteristic1;
 BLECharacteristic* remoteBrightnessCharacteristic2;
+BluetoothCommon btService;
 
 std::vector<BLEDevice*> allSecondaries;
 ulong nextUpdate = 0;
@@ -16,11 +17,12 @@ void setup() {
     
   if (!BLE.begin()) {
     Serial.println("BLE initialization failed!");
+    // todo: set the status display
     while(true) {}
   }
   
-  startBLEService();
   populateSecondaries();
+  startBLEService_Common();
 }
 
 void populateSecondaries() {
@@ -28,12 +30,10 @@ void populateSecondaries() {
   for (int i = 0; i < numberExpected; i++) {
     allSecondaries.push_back(scanForSecondary());
   }
+  // todo: order the secondaries by sign order (read from the BT peripheral)
 }
 
 void loop() {
-  // poll BLE to enable callbacks
-  //BLE.poll();
-
   bool atLeastOneDisconnected = false;
 
   if (nextUpdate < millis()) {
@@ -71,7 +71,8 @@ void loop() {
 BLEDevice* scanForSecondary() {
   Serial.print("Scanning for peripherals with uuid = ");
   Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
-  BLE.scanForUuid(BTCOMMON_SECONDARYCONTROLLER_UUID, true);
+  bool allowDuplicateAdvertisements = true;
+  BLE.scanForUuid(BTCOMMON_SECONDARYCONTROLLER_UUID, allowDuplicateAdvertisements);
 
   BLEDevice peripheral = BLE.available();
   while (!peripheral) {
@@ -119,49 +120,23 @@ BLEDevice* scanForSecondary() {
 }
 
 void startBLEService() {
-  Serial.println("Setting up Peripheral service.");
-  BLE.setEventHandler(BLEConnected, blePeripheralConnectHandler);
-  BLE.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
-
+  Serial.println("Setting up Peripheral service using old logic.");
+  
   BLE.setLocalName("Primary POC");
   BLE.setAdvertisedService(ledService);
+  // todo: read characteristics from sign #1, set characteristics accordingly
   brightnessCharacteristic.setValue(0);
-  brightnessCharacteristic.setEventHandler(BLEWritten, brightnessCharacteristicWritten);
   ledService.addCharacteristic(brightnessCharacteristic);
   BLE.addService(ledService);
   BLE.advertise();
+
   Serial.println("Peripheral service started.");
 }
 
-void debugCheckCentral()
-{
-  BLEDevice central = BLE.central();
-  if (central) {
-    Serial.println("Connected to central.");
-    int value = brightnessCharacteristic.value();
-    Serial.print("Brightness: ");
-    Serial.println(value);
-  }
-}
+void startBLEService_Common() {
+  Serial.println("Setting up Peripheral service using common logic.");
+  
+  btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, "Primary POC");
 
-void brightnessCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic) {
-  // central wrote new value to characteristic, update LED
-  byte value = brightnessCharacteristic.value();
-  Serial.print("Brightness value written: ");
-  Serial.println(value);
-
-  remoteBrightnessCharacteristic1->writeValue(value);
-  remoteBrightnessCharacteristic2->writeValue(value);
-}
-
-void blePeripheralConnectHandler(BLEDevice central) {
-  // central connected event handler
-  Serial.print("Connected event, central: ");
-  Serial.println(central.address());
-}
-
-void blePeripheralDisconnectHandler(BLEDevice central) {
-  // central disconnected event handler
-  Serial.print("Disconnected event, central: ");
-  Serial.println(central.address());
+  Serial.println("Peripheral service started.");
 }

@@ -1,12 +1,22 @@
 #include "BluetoothCommon.h"
 
-void BluetoothCommon::initialize(String uuid, String localName) {
-  Serial.println("Starting BLE...");
-  
-  if (!BLE.begin()) {
-    Serial.println("BLE initialization failed!");
-  }
+std::vector<BLECharacteristic> emptyCharacteristicList;
 
+void BluetoothCommon::initialize(String uuid, String localName) {
+  initialize(uuid, localName, emptyCharacteristicList);
+}
+
+void BluetoothCommon::initialize(String uuid, String localName, std::vector<BLECharacteristic> additionalCharacteristics) {
+  // if (!BLE.begin())
+  // {
+  //   Serial.println("Failed to start BLE!");
+  //   return;
+  // }
+
+  Serial.print("Initializing BLE peripheral service for UUID ");
+  Serial.print(uuid);
+  Serial.println(".");
+  
   m_ledService = new BLEService(uuid.c_str());
   BLE.setLocalName(localName.c_str());
   BLE.setAdvertisedService(*m_ledService);
@@ -18,6 +28,11 @@ void BluetoothCommon::initialize(String uuid, String localName) {
   m_ledService->addCharacteristic(m_patternCharacteristic);
   m_ledService->addCharacteristic(m_patternNamesCharacteristic);
   m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
+
+  for(uint i = 0; i < additionalCharacteristics.size(); i++) {
+    m_ledService->addCharacteristic(additionalCharacteristics.at(i));
+  }
+
   BLE.addService(*m_ledService);
   BLE.advertise();
 }

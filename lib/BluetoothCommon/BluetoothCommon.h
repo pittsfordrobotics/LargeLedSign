@@ -23,6 +23,7 @@
 class BluetoothCommon {
   public:
     void initialize(String uuid, String localName);
+    void initialize(String uuid, String localName, std::vector<BLECharacteristic> additionalCharacteristics);
     void stop();
     void resume();
 
