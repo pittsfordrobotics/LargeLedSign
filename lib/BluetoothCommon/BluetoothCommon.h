@@ -23,7 +23,7 @@
 class BluetoothCommon {
   public:
     void initialize(String uuid, String localName);
-    void initialize(String uuid, String localName, std::vector<BLECharacteristic> additionalCharacteristics);
+    void initialize(String uuid, String localName, std::vector<BLECharacteristic*> additionalCharacteristics);
     void stop();
     void resume();
 
@@ -52,6 +52,8 @@ class BluetoothCommon {
     BLEByteCharacteristic m_patternCharacteristic{ BTCOMMON_PATTERNCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
     BLEStringCharacteristic m_patternNamesCharacteristic{ BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID, BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
     BLEFloatCharacteristic m_batteryVoltageCharacteristic{ BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID, BLERead | BLENotify };
+    std::vector<BLECharacteristic*> m_emptyCharacteristicList;
+    std::vector<BLECharacteristic*> m_additionalCharacteristics;
 
     byte m_currentBrightness{0};
     byte m_currentStyle{0};

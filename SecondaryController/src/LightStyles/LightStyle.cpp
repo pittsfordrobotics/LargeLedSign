@@ -14,7 +14,7 @@ LightStyle::LightStyle(String name, PixelBuffer* pixelBuffer) {
     knownPatterns.push_back("Up");
     knownPatterns.push_back("Down");
     knownPatterns.push_back("Digit");
-    knownPatterns.push_back("Random");
+    knownPatterns.push_back("Linear");
   }
 }
 
@@ -45,13 +45,16 @@ int LightStyle::getNumberOfBlocksForPattern() {
     case 5: // Digit
       //return m_pixelBuffer->getDigitCount(); // No more digits - just solid.
       return 1;
-    case 6: // "Random" (linear)
+    case 6: // Linear
       return m_pixelBuffer->getPixelCount();
     default: // 0 = solid
       // Default to Solid (ie, all lights the same color)
       return 1;
   }
 }
+
+// TODO:
+// getNumberOfBlocksToDrain()
 
 void LightStyle::shiftColorUsingPattern(uint32_t newColor) {
   // Stick with integer values here instead of doing a bunch

@@ -11,8 +11,11 @@ class PixelBuffer {
 
     void initialize(uint8_t signStyle);
 
-    void setRowsToLeft(uint16_t rowsToLeft) { m_rowsToLeft = rowsToLeft; }
-    uint16_t getRowsToLeft() { return m_rowsToLeft; }
+    void setColsToLeft(uint16_t colsToLeft) { m_colsToLeft = colsToLeft; }
+    uint16_t getColsToLeft() { return m_colsToLeft; }
+
+    void setColsToRight(uint16_t colsToRight) { m_colsToRight = colsToRight; }
+    uint16_t getColsToRight() { return m_colsToRight; }
 
     void setBrightness(uint8_t brightess);
 
@@ -65,11 +68,11 @@ class PixelBuffer {
     Adafruit_NeoPixel* m_neoPixels;
     unsigned int m_numPixels;
     uint32_t* m_pixelColors;
-    uint16_t m_rowsToLeft;
+    uint16_t m_colsToLeft;
+    uint16_t m_colsToRight;
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     
-    void initializeSignBuffer(int16_t gpioPin);
     void initializeTestRingBuffer(int16_t gpioPin);
     void initializeTestMatrixBuffer(int16_t gpioPin, uint8_t signStyle);
     void setColorForMappedPixels(std::vector<int>* destination, uint32_t newColor);

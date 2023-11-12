@@ -22,7 +22,9 @@ void setup() {
   }
   
   populateSecondaries();
-  startBLEService_Common();
+  // todo:
+  // Calculate all the digit/column/pixel offsets and write them back to the peripherals.
+  startBLEService();
 }
 
 void populateSecondaries() {
@@ -120,20 +122,6 @@ BLEDevice* scanForSecondary() {
 }
 
 void startBLEService() {
-  Serial.println("Setting up Peripheral service using old logic.");
-  
-  BLE.setLocalName("Primary POC");
-  BLE.setAdvertisedService(ledService);
-  // todo: read characteristics from sign #1, set characteristics accordingly
-  brightnessCharacteristic.setValue(0);
-  ledService.addCharacteristic(brightnessCharacteristic);
-  BLE.addService(ledService);
-  BLE.advertise();
-
-  Serial.println("Peripheral service started.");
-}
-
-void startBLEService_Common() {
   Serial.println("Setting up Peripheral service using common logic.");
   
   btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, "Primary POC");

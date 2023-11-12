@@ -1,18 +1,10 @@
 #include "BluetoothCommon.h"
 
-std::vector<BLECharacteristic> emptyCharacteristicList;
-
 void BluetoothCommon::initialize(String uuid, String localName) {
-  initialize(uuid, localName, emptyCharacteristicList);
+  initialize(uuid, localName, m_emptyCharacteristicList);
 }
 
-void BluetoothCommon::initialize(String uuid, String localName, std::vector<BLECharacteristic> additionalCharacteristics) {
-  // if (!BLE.begin())
-  // {
-  //   Serial.println("Failed to start BLE!");
-  //   return;
-  // }
-
+void BluetoothCommon::initialize(String uuid, String localName, std::vector<BLECharacteristic*> additionalCharacteristics) {
   Serial.print("Initializing BLE peripheral service for UUID ");
   Serial.print(uuid);
   Serial.println(".");
@@ -29,8 +21,9 @@ void BluetoothCommon::initialize(String uuid, String localName, std::vector<BLEC
   m_ledService->addCharacteristic(m_patternNamesCharacteristic);
   m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
 
+  m_additionalCharacteristics = additionalCharacteristics;
   for(uint i = 0; i < additionalCharacteristics.size(); i++) {
-    m_ledService->addCharacteristic(additionalCharacteristics.at(i));
+    m_ledService->addCharacteristic(*(additionalCharacteristics.at(i)));
   }
 
   BLE.addService(*m_ledService);
@@ -142,7 +135,7 @@ byte BluetoothCommon::readByteFromCharacteristic(BLEByteCharacteristic character
 
 String* BluetoothCommon::joinStrings(std::vector<String> strings) {
   String* joinedStrings = new String();
-  for (int i = 0; i < strings.size(); i++) {
+  for (uint i = 0; i < strings.size(); i++) {
     joinedStrings->concat(strings.at(i));
     if (i < strings.size()-1) {
       joinedStrings->concat(";");

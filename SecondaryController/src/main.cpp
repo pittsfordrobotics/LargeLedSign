@@ -108,13 +108,13 @@ void initializeLightStyles() {
 void initializePixelBuffer() {
   pixelBuffer.initialize(signStyle);
 
-  // Will need to call "setRowsToLeft" after the offset data has been set by the primary.
+  // Will need to call "setColsToRight" (and other offsets) after the offset data has been set by the primary.
   // Doing it here for testing.
-  uint16_t rowsToLeft = 0;
-  if (signStyle == 1) {
-    rowsToLeft = 64;
+  uint16_t colsToRight = 0;
+  if (signStyle == 0) {
+    colsToRight = 64;
   }
-  pixelBuffer.setRowsToLeft(rowsToLeft);
+  pixelBuffer.setColsToRight(colsToRight);
 
   pixelBuffer.setBrightness(DEFAULTBRIGHTNESS);
 }

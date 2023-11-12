@@ -7,6 +7,5 @@
 // Function prototypes
 void populateSecondaries();
 void startBLEService();
-void startBLEService_Common();
 BLEDevice* scanForSecondary();
 

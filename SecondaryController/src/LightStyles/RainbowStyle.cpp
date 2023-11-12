@@ -23,9 +23,9 @@ void RainbowStyle::reset()
 {
   int numBlocks = getNumberOfBlocksForPattern();
 
-  // skip the number of rows on the left.
-  // should try to figure out if we need to shift by rows or leds (or digits)
-  for (uint16_t i = 0; i < m_pixelBuffer->getRowsToLeft(); i++) {
+  // "Drain out" the number of columns on the right.
+  // should try to figure out if we need to shift by rows or pixels (or digits)
+  for (uint16_t i = 0; i < m_pixelBuffer->getColsToRight(); i++) {
     incrementHue();
   }
 
