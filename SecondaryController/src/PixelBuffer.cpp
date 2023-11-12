@@ -4,19 +4,27 @@
 #include "PixelBuffer.h"
 
 PixelBuffer::PixelBuffer(int16_t gpioPin) {
+  m_gpioPin = gpioPin;
+}
+
+void PixelBuffer::initialize(uint8_t signStyle) {
   //initializeTestRingBuffer(gpioPin);
-  initializeTestMatrixBuffer(gpioPin);
+  initializeTestMatrixBuffer(m_gpioPin, signStyle);
   //initializeSignBuffer(gpioPin);
+
+  clearBuffer();
+  m_neoPixels->begin();
+  m_neoPixels->clear();
 }
 
 void PixelBuffer::clearBuffer() {
-  for (int i = 0; i < m_numPixels; i++) {
+  for (uint i = 0; i < m_numPixels; i++) {
     m_pixelColors[i] = 0;
   }
 }
 
 void PixelBuffer::displayPixels() {
-  for (int i = 0; i < m_numPixels; i++)
+  for (uint i = 0; i < m_numPixels; i++)
   {
     m_neoPixels->setPixelColor(i, m_pixelColors[i]);
   }
@@ -45,12 +53,6 @@ unsigned int PixelBuffer::getRowCount() {
 
 unsigned int PixelBuffer::getPixelCount() {
   return m_numPixels;
-}
-
-void PixelBuffer::initialize() {
-  clearBuffer();
-  m_neoPixels->begin();
-  m_neoPixels->clear();
 }
 
 void PixelBuffer::setBrightness(uint8_t brightness) {
@@ -163,8 +165,10 @@ void PixelBuffer::initializeTestRingBuffer(int16_t gpioPin) {
   m_rows.push_back(new std::vector<int>{9});
 }
 
-void PixelBuffer::initializeTestMatrixBuffer(int16_t gpioPin) {
-  m_numPixels = 64;  // Set for the NEO PIXEL 12-LED ring for testing
+void PixelBuffer::initializeTestMatrixBuffer(int16_t gpioPin, uint8_t signStyle) {
+  // signStyle = 0 will be the "first" in the sequence
+  //           = 1 will be the "second" in the sequence
+  m_numPixels = 64;  // Set for the NEO PIXEL 8x8 matrix
   m_pixelColors = new uint32_t[m_numPixels];
   m_neoPixels = new Adafruit_NeoPixel(m_numPixels, gpioPin, NEO_GRB + NEO_KHZ800);
 

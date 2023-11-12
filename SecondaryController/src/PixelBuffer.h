@@ -8,8 +8,13 @@
 class PixelBuffer {
   public:
     PixelBuffer(int16_t gpioPin);
+
+    void initialize(uint8_t signStyle);
+
+    void setRowsToLeft(uint16_t rowsToLeft) { m_rowsToLeft = rowsToLeft; }
+    uint16_t getRowsToLeft() { return m_rowsToLeft; }
+
     void setBrightness(uint8_t brightess);
-    void initialize();
 
     // Sets the first pixel in the buffer to the new color,
     // shifting all the pixels in the buffer to the right by one.
@@ -56,15 +61,17 @@ class PixelBuffer {
     void clearBuffer();
 
   private:
+    int m_gpioPin;
     Adafruit_NeoPixel* m_neoPixels;
     unsigned int m_numPixels;
     uint32_t* m_pixelColors;
+    uint16_t m_rowsToLeft;
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     
     void initializeSignBuffer(int16_t gpioPin);
     void initializeTestRingBuffer(int16_t gpioPin);
-    void initializeTestMatrixBuffer(int16_t gpioPin);
+    void initializeTestMatrixBuffer(int16_t gpioPin, uint8_t signStyle);
     void setColorForMappedPixels(std::vector<int>* destination, uint32_t newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);

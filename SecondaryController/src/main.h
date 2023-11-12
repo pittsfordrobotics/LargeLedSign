@@ -26,7 +26,7 @@
 #define DEFAULTSTYLE 0        // The default style to start with. This is an index into the lightStyles vector.
 #define DEFAULTBRIGHTNESS 20  // Brightness should be between 0 and 255.
 #define DEFAULTSPEED 90       // Speed should be between 1 and 100.
-#define DEFAULTSTEP  5        // Step should be between 1 and 100.
+#define DEFAULTSTEP  50       // Step should be between 1 and 100.
 #define DEFAULTPATTERN 6      // Default pattern (ie, Row/Column/Digit/etc). This is an index into the LightStyle::knownPatterns vector.
 
 // Batter power monitoring
@@ -50,5 +50,8 @@ float getCalculatedBatteryVoltage();
 int getVoltageInputLevel();
 void emitTelemetry();
 void indicateBleFailure();
+byte getSignStyle();
+byte getSignOrder();
+void initializePixelBuffer();
 
 #endif

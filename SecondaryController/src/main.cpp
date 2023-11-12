@@ -27,6 +27,8 @@ byte currentStep = DEFAULTSTEP;
 byte newStep = DEFAULTSTEP;
 byte currentPattern = DEFAULTPATTERN;
 byte newPattern = DEFAULTPATTERN;
+byte signStyle;
+byte signOrder;
 
 // Other internal state
 int loopCounter = 0;              // Records the number of times the main loop ran since the last timing calculation.
@@ -43,12 +45,14 @@ void setup() {
   lastTelemetryTimestamp = millis();
 
   // Initialize components
-  pixelBuffer.initialize();
-  pixelBuffer.setBrightness(DEFAULTBRIGHTNESS);
   initializeIO();
+  signStyle = getSignStyle();
+  signOrder = getSignOrder();
   initializeLightStyles();
+  initializePixelBuffer();
   startBLE();
 }
+
 
 // Main loop --
 // This metod is called continously.
@@ -101,15 +105,38 @@ void initializeLightStyles() {
   //lightStyles.push_back(new SingleColorStyle("White", white, &pixelBuffer));
 }
 
-// Set the initial BLE characteristic values and start the BLE service.
-void startBLE() {
+void initializePixelBuffer() {
+  pixelBuffer.initialize(signStyle);
+
+  // Will need to call "setRowsToLeft" after the offset data has been set by the primary.
+  // Doing it here for testing.
+  uint16_t rowsToLeft = 0;
+  if (signStyle == 1) {
+    rowsToLeft = 64;
+  }
+  pixelBuffer.setRowsToLeft(rowsToLeft);
+
+  pixelBuffer.setBrightness(DEFAULTBRIGHTNESS);
+}
+
+byte getSignStyle() {
+  // TEST mode - we really only have 1 style (test matrix), but treat the order as the style.
+  return getSignOrder();
+}
+
+byte getSignOrder() {
   // Dummy ordering for now -- just first or second.
   // TBD: loop through the selector pins and "rotate left" a 1 or 0 per pin.
-  int signOrder = 0;
+  byte order = 0;
   if (digitalRead(orderSelectorPins.at(0)) == HIGH) {
-    signOrder = 1;
+    order = 1;
   }
 
+  return order;
+}
+
+// Set the initial BLE characteristic values and start the BLE service.
+void startBLE() {
   Serial.print("Initializing for sign in position ");
   Serial.println(signOrder);
 

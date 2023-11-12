@@ -21,18 +21,16 @@ void RainbowStyle::update() {
 
 void RainbowStyle::reset()
 {
-   int numBlocks = getNumberOfBlocksForPattern();
-  if (numBlocks > 100) {
-    // The only patterns with this many blocks are the line patterns.
-    // Instead of shifting tons of times, just set the pixels directly.
-    for (int i = numBlocks - 1; i >= 0; i--) {
-      m_pixelBuffer->setPixel(i, Adafruit_NeoPixel::ColorHSV(m_currentHue));
-      incrementHue();
-    }
+  int numBlocks = getNumberOfBlocksForPattern();
 
-    return;
+  // skip the number of rows on the left.
+  // should try to figure out if we need to shift by rows or leds (or digits)
+  for (uint16_t i = 0; i < m_pixelBuffer->getRowsToLeft(); i++) {
+    incrementHue();
   }
 
+  // This loop goes through "numBlocks - 1" because one of the first things done
+  // after a reset is to call "update", which will immediately shift it one last time.
   for (int i = 0; i < numBlocks - 1; i++) {
     shiftColorUsingPattern(Adafruit_NeoPixel::ColorHSV(m_currentHue));
     incrementHue();
