@@ -17,6 +17,10 @@ void CommonPeripheral::initialize(String uuid, String localName) {
   m_ledService->addCharacteristic(m_patternNamesCharacteristic);
   m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
 
+  for (uint i = 0; i < m_additionalCharacteristics.size(); i++) {
+    m_ledService->addCharacteristic(m_additionalCharacteristics.at(i));
+  }
+
   BLE.addService(*m_ledService);
   BLE.advertise();
 }
@@ -124,6 +128,21 @@ byte CommonPeripheral::readByteFromCharacteristic(BLEByteCharacteristic characte
       Serial.print(". Byte received: ");
       Serial.println(valByte, HEX);
       return valByte;
+    }
+  }
+
+  return defaultValue;
+}
+
+String CommonPeripheral::readStringFromCharacteristic(BLEStringCharacteristic characteristic, String defaultValue, String name) {
+  if (isConnected()) {
+    if (characteristic.written()) {
+      Serial.print("Reading new value for ");
+      Serial.print(name);
+      String value = characteristic.value();
+      Serial.print(". Value received: ");
+      Serial.println(value);
+      return value;
     }
   }
 

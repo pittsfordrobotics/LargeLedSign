@@ -2,9 +2,9 @@
 #define COMMON_PERIPHERAL_H
 
 #include <Arduino.h>
-#include <BLETypedCharacteristics.h>
-#include <ArduinoBLE.h>
 #include <vector>
+#include <ArduinoBLE.h>
+#include <BLETypedCharacteristics.h>
 #include <BluetoothCommon.h>
 
 class CommonPeripheral {
@@ -29,6 +29,11 @@ class CommonPeripheral {
 
     void emitBatteryVoltage(float voltage);
 
+  protected:
+    std::vector<BLECharacteristic> m_additionalCharacteristics;
+    byte readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name);
+    String readStringFromCharacteristic(BLEStringCharacteristic characteristic, String defaultValue, String name);
+
   private:
     BLEService* m_ledService;
     BLEByteCharacteristic m_brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
@@ -47,7 +52,6 @@ class CommonPeripheral {
     byte m_currentStep{0};
 
     String* joinStrings(std::vector<String> strings);
-    byte readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name);
 };
 
 #endif

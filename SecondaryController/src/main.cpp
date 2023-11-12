@@ -10,7 +10,7 @@
 std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
 
 // Main BLE service wrapper
-CommonPeripheral btService;
+SecondaryPeripheral btService;
 
 // Pixel and color data
 PixelBuffer pixelBuffer(DATA_OUT);
@@ -176,6 +176,9 @@ void startBLE() {
   btService.setSpeed(DEFAULTSPEED);
   btService.setPattern(DEFAULTPATTERN);
   btService.setStep(DEFAULTSTEP);
+  String signData = signOrder + ";";
+  signData.concat(pixelBuffer.getColumnCount() + ";" + pixelBuffer.getPixelCount());
+  btService.setSignData(signData);
 }
 
 // Read the BLE settings to see if any have been changed.

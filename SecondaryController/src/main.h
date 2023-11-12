@@ -1,3 +1,6 @@
+#ifndef SECONDARYCONTROLLER_MAIN_H
+#define SECONDARYCONTROLLER_MAIN_H
+
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoBLE.h>
@@ -7,11 +10,8 @@
 #include "LightStyles/SingleColorStyle.h"
 #include "LightStyles/TwoColorStyle.h"
 #include "LightStyles/RainbowStyle.h"
-#include "BluetoothCommon.h"
-#include "CommonPeripheral.h"
-
-#ifndef SECONDARYCONTROLLER_MAIN_H
-#define SECONDARYCONTROLLER_MAIN_H
+#include <BluetoothCommon.h>
+#include "Bluetooth\SecondaryPeripheral.h"
 
 // Input-Output pin assignments
 #define DATA_OUT 25           // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
