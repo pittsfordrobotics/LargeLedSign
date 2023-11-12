@@ -5,7 +5,7 @@ BLEService ledService{ BTCOMMON_PRIMARYCONTROLLER_UUID };
 BLEByteCharacteristic brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
 BLECharacteristic* remoteBrightnessCharacteristic1;
 BLECharacteristic* remoteBrightnessCharacteristic2;
-BluetoothCommon btService;
+CommonPeripheral btService;
 
 std::vector<BLEDevice*> allSecondaries;
 ulong nextUpdate = 0;

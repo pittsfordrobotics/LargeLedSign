@@ -1,10 +1,6 @@
-#include "BluetoothCommon.h"
+#include "CommonPeripheral.h"
 
-void BluetoothCommon::initialize(String uuid, String localName) {
-  initialize(uuid, localName, m_emptyCharacteristicList);
-}
-
-void BluetoothCommon::initialize(String uuid, String localName, std::vector<BLECharacteristic*> additionalCharacteristics) {
+void CommonPeripheral::initialize(String uuid, String localName) {
   Serial.print("Initializing BLE peripheral service for UUID ");
   Serial.print(uuid);
   Serial.println(".");
@@ -21,26 +17,29 @@ void BluetoothCommon::initialize(String uuid, String localName, std::vector<BLEC
   m_ledService->addCharacteristic(m_patternNamesCharacteristic);
   m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
 
-  m_additionalCharacteristics = additionalCharacteristics;
-  for(uint i = 0; i < additionalCharacteristics.size(); i++) {
-    m_ledService->addCharacteristic(*(additionalCharacteristics.at(i)));
-  }
-
   BLE.addService(*m_ledService);
   BLE.advertise();
 }
 
-void BluetoothCommon::stop() {
+void CommonPeripheral::stop() {
   // Disconnect any clients and stop advertising.
   BLE.disconnect();
   BLE.stopAdvertise();
 }
 
-void BluetoothCommon::resume() {
+void CommonPeripheral::resume() {
   BLE.advertise();
 }
 
-void BluetoothCommon::setStyleNames(std::vector<String> styleNames) {
+bool CommonPeripheral::isConnected() {
+  BLEDevice central = BLE.central();
+  if (central) {
+    return true;
+  }
+  return false;
+}
+
+void CommonPeripheral::setStyleNames(std::vector<String> styleNames) {
   String allStyles = *joinStrings(styleNames);
 
   Serial.print("All style names: ");
@@ -51,7 +50,7 @@ void BluetoothCommon::setStyleNames(std::vector<String> styleNames) {
   m_styleNamesCharacteristic.setValue(allStyles);
 }
 
-void BluetoothCommon::setPatternNames(std::vector<String> patternNames) {
+void CommonPeripheral::setPatternNames(std::vector<String> patternNames) {
   String allPatterns = *joinStrings(patternNames);
 
   Serial.print("All pattern names: ");
@@ -62,64 +61,62 @@ void BluetoothCommon::setPatternNames(std::vector<String> patternNames) {
   m_patternNamesCharacteristic.setValue(allPatterns);
 }
 
-byte BluetoothCommon::getBrightness() {
+byte CommonPeripheral::getBrightness() {
   m_currentBrightness = readByteFromCharacteristic(m_brightnessCharacteristic, m_currentBrightness, "brightness");
   return m_currentBrightness;
 }
 
-void BluetoothCommon::setBrightness(byte brightness) {
+void CommonPeripheral::setBrightness(byte brightness) {
   m_currentBrightness = brightness;
   m_brightnessCharacteristic.setValue(brightness);
 }
 
-byte BluetoothCommon::getStyle() {
+byte CommonPeripheral::getStyle() {
   m_currentStyle = readByteFromCharacteristic(m_styleCharacteristic, m_currentStyle, "style");
   return m_currentStyle;
 }
 
-void BluetoothCommon::setStyle(byte style) {
+void CommonPeripheral::setStyle(byte style) {
   m_currentStyle = style;
   m_styleCharacteristic.setValue(style);
 }
 
-byte BluetoothCommon::getSpeed() {
+byte CommonPeripheral::getSpeed() {
   m_currentSpeed = readByteFromCharacteristic(m_speedCharacteristic, m_currentSpeed, "speed");
   return m_currentSpeed;
 }
 
-void BluetoothCommon::setSpeed(byte speed) {
+void CommonPeripheral::setSpeed(byte speed) {
   m_currentSpeed = speed;
   m_speedCharacteristic.setValue(speed);
 }
 
-byte BluetoothCommon::getPattern() {
+byte CommonPeripheral::getPattern() {
   m_currentPattern = readByteFromCharacteristic(m_patternCharacteristic, m_currentPattern, "pattern");
   return m_currentPattern;
 }
 
-void BluetoothCommon::setPattern(byte pattern) {
+void CommonPeripheral::setPattern(byte pattern) {
   m_currentPattern = pattern;
   m_patternCharacteristic.setValue(pattern);
 }
 
-byte BluetoothCommon::getStep() {
+byte CommonPeripheral::getStep() {
   m_currentStep = readByteFromCharacteristic(m_stepCharacteristic, m_currentStep, "step");
   return m_currentStep;
 }
 
-void BluetoothCommon::setStep(byte step) {
+void CommonPeripheral::setStep(byte step) {
   m_currentStep = step;
   m_stepCharacteristic.setValue(step);
 }
 
-void BluetoothCommon::emitBatteryVoltage(float voltage) {
+void CommonPeripheral::emitBatteryVoltage(float voltage) {
   m_batteryVoltageCharacteristic.setValue(voltage);
 }
 
-byte BluetoothCommon::readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name) {
-  // We don't really care what central device is connected, just if there's one there.
-  BLEDevice central = BLE.central();
-  if (central) {
+byte CommonPeripheral::readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name) {
+  if (isConnected()) {
     if (characteristic.written()) {
       Serial.print("Reading new value for ");
       Serial.print(name);
@@ -133,7 +130,7 @@ byte BluetoothCommon::readByteFromCharacteristic(BLEByteCharacteristic character
   return defaultValue;
 }
 
-String* BluetoothCommon::joinStrings(std::vector<String> strings) {
+String* CommonPeripheral::joinStrings(std::vector<String> strings) {
   String* joinedStrings = new String();
   for (uint i = 0; i < strings.size(); i++) {
     joinedStrings->concat(strings.at(i));

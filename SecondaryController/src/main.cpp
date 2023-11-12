@@ -10,7 +10,7 @@
 std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
 
 // Main BLE service wrapper
-BluetoothCommon btService;
+CommonPeripheral btService;
 
 // Pixel and color data
 PixelBuffer pixelBuffer(DATA_OUT);

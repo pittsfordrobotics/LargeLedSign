@@ -8,6 +8,7 @@
 #include "LightStyles/TwoColorStyle.h"
 #include "LightStyles/RainbowStyle.h"
 #include "BluetoothCommon.h"
+#include "CommonPeripheral.h"
 
 #ifndef SECONDARYCONTROLLER_MAIN_H
 #define SECONDARYCONTROLLER_MAIN_H

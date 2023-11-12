@@ -1,10 +1,10 @@
+#ifndef BLUETOOTHCOMMON_H
+#define BLUETOOTHCOMMON_H
+
 #include <Arduino.h>
 #include <BLETypedCharacteristics.h>
 #include <ArduinoBLE.h>
 #include <vector>
-
-#ifndef BLUETOOTH_H
-#define BLUETOOTH_H
 
 #define BTCOMMON_PRIMARYCONTROLLER_UUID "99be4fac-c708-41e5-a149-74047f554cc1"
 #define BTCOMMON_SECONDARYCONTROLLER_UUID "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0"
@@ -18,51 +18,6 @@
 #define BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID "348195d1-e237-4b0b-aea4-c818c3eb5e2a"
 #define BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID "ea0a95bc-7561-4b1e-8925-7973b3ad7b9a"
 
-#define BLUETOOTH_H_MAXSTRINGLENGTH 250
-
-class BluetoothCommon {
-  public:
-    void initialize(String uuid, String localName);
-    void initialize(String uuid, String localName, std::vector<BLECharacteristic*> additionalCharacteristics);
-    void stop();
-    void resume();
-
-    void setStyleNames(std::vector<String> styleNames);
-    void setPatternNames(std::vector<String> patternNames);
-    void setBrightness(byte brightness);
-    byte getBrightness();
-    void setStyle(byte style);
-    byte getStyle();
-    void setPattern(byte pattern);
-    byte getPattern();
-    void setStep(byte step);
-    byte getStep();
-    void setSpeed(byte speed);
-    byte getSpeed();
-
-    void emitBatteryVoltage(float voltage);
-
-  private:
-    BLEService* m_ledService;
-    BLEByteCharacteristic m_brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_styleCharacteristic{ BTCOMMON_STYLECHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
-    BLEStringCharacteristic m_styleNamesCharacteristic{ BTCOMMON_STYLENAMESCHARACTERISTIC_UUID, BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
-    BLEByteCharacteristic m_speedCharacteristic{BTCOMMON_SPEEDCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_stepCharacteristic{ BTCOMMON_STEPCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
-    BLEByteCharacteristic m_patternCharacteristic{ BTCOMMON_PATTERNCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
-    BLEStringCharacteristic m_patternNamesCharacteristic{ BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID, BLERead, BLUETOOTH_H_MAXSTRINGLENGTH };
-    BLEFloatCharacteristic m_batteryVoltageCharacteristic{ BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID, BLERead | BLENotify };
-    std::vector<BLECharacteristic*> m_emptyCharacteristicList;
-    std::vector<BLECharacteristic*> m_additionalCharacteristics;
-
-    byte m_currentBrightness{0};
-    byte m_currentStyle{0};
-    byte m_currentPattern{0};
-    byte m_currentSpeed{0};
-    byte m_currentStep{0};
-
-    String* joinStrings(std::vector<String> strings);
-    byte readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name);
-};
+#define BTCOMMON_MAXSTRINGLENGTH 250
 
 #endif
