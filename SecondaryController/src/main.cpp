@@ -176,8 +176,14 @@ void startBLE() {
   btService.setSpeed(DEFAULTSPEED);
   btService.setPattern(DEFAULTPATTERN);
   btService.setStep(DEFAULTSTEP);
-  String signData = signOrder + ";";
-  signData.concat(pixelBuffer.getColumnCount() + ";" + pixelBuffer.getPixelCount());
+  String signData = "";
+  signData.concat(signOrder);
+  signData.concat(";");
+  signData.concat(pixelBuffer.getColumnCount());
+  signData.concat(";");
+  signData.concat(pixelBuffer.getPixelCount());
+  Serial.print("Sign data before sending to BLE: ");
+  Serial.println(signData);
   btService.setSignData(signData);
 }
 

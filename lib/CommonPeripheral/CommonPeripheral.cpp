@@ -51,7 +51,7 @@ void CommonPeripheral::setStyleNames(std::vector<String> styleNames) {
   Serial.print("Style name string length: ");
   Serial.println(allStyles.length());
 
-  m_styleNamesCharacteristic.setValue(allStyles);
+  m_styleNamesCharacteristic.writeValue(allStyles);
 }
 
 void CommonPeripheral::setPatternNames(std::vector<String> patternNames) {
@@ -62,7 +62,7 @@ void CommonPeripheral::setPatternNames(std::vector<String> patternNames) {
   Serial.print("Pattern name string length: ");
   Serial.println(allPatterns.length());
 
-  m_patternNamesCharacteristic.setValue(allPatterns);
+  m_patternNamesCharacteristic.writeValue(allPatterns);
 }
 
 byte CommonPeripheral::getBrightness() {
@@ -72,7 +72,7 @@ byte CommonPeripheral::getBrightness() {
 
 void CommonPeripheral::setBrightness(byte brightness) {
   m_currentBrightness = brightness;
-  m_brightnessCharacteristic.setValue(brightness);
+  m_brightnessCharacteristic.writeValue(brightness);
 }
 
 byte CommonPeripheral::getStyle() {
@@ -82,7 +82,7 @@ byte CommonPeripheral::getStyle() {
 
 void CommonPeripheral::setStyle(byte style) {
   m_currentStyle = style;
-  m_styleCharacteristic.setValue(style);
+  m_styleCharacteristic.writeValue(style);
 }
 
 byte CommonPeripheral::getSpeed() {
@@ -92,7 +92,7 @@ byte CommonPeripheral::getSpeed() {
 
 void CommonPeripheral::setSpeed(byte speed) {
   m_currentSpeed = speed;
-  m_speedCharacteristic.setValue(speed);
+  m_speedCharacteristic.writeValue(speed);
 }
 
 byte CommonPeripheral::getPattern() {
@@ -102,7 +102,7 @@ byte CommonPeripheral::getPattern() {
 
 void CommonPeripheral::setPattern(byte pattern) {
   m_currentPattern = pattern;
-  m_patternCharacteristic.setValue(pattern);
+  m_patternCharacteristic.writeValue(pattern);
 }
 
 byte CommonPeripheral::getStep() {
@@ -112,11 +112,11 @@ byte CommonPeripheral::getStep() {
 
 void CommonPeripheral::setStep(byte step) {
   m_currentStep = step;
-  m_stepCharacteristic.setValue(step);
+  m_stepCharacteristic.writeValue(step);
 }
 
 void CommonPeripheral::emitBatteryVoltage(float voltage) {
-  m_batteryVoltageCharacteristic.setValue(voltage);
+  m_batteryVoltageCharacteristic.writeValue(voltage);
 }
 
 byte CommonPeripheral::readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name) {

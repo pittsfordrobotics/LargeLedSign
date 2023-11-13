@@ -170,10 +170,10 @@ void PixelBuffer::initializeTestMatrixBuffer(int16_t gpioPin, uint8_t signStyle)
   m_numPixels = 64;  // Set for the NEO PIXEL 8x8 matrix
 
   // TESTING
-  if (signStyle == 1) {
-    // For sign "1", let it think it has 1000 pixels.
-    m_numPixels = 1000;
-  }
+  // if (signStyle == 1) {
+  //   // For sign "1", let it think it has 1000 pixels.
+  //   m_numPixels = 1000;
+  // }
   m_pixelColors = new uint32_t[m_numPixels];
   m_neoPixels = new Adafruit_NeoPixel(m_numPixels, gpioPin, NEO_GRB + NEO_KHZ800);
 

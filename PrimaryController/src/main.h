@@ -4,9 +4,10 @@
 #include <vector>
 #include "BluetoothCommon.h"
 #include "CommonPeripheral.h"
+#include "SecondaryClient.h"
 
 // Function prototypes
 void populateSecondaries();
 void startBLEService();
-BLEDevice* scanForSecondary();
+SecondaryClient* scanForSecondary();
 

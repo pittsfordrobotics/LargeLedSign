@@ -7,7 +7,7 @@ BLECharacteristic* remoteBrightnessCharacteristic1;
 BLECharacteristic* remoteBrightnessCharacteristic2;
 CommonPeripheral btService;
 
-std::vector<BLEDevice*> allSecondaries;
+std::vector<SecondaryClient*> allSecondaries;
 ulong nextUpdate = 0;
 
 void setup() {
@@ -41,16 +41,16 @@ void loop() {
   if (nextUpdate < millis()) {
     for (uint i = 0; i < allSecondaries.size(); i++) {
       Serial.print("Secondary [");
-      Serial.print(allSecondaries.at(i)->localName());
+      Serial.print(allSecondaries.at(i)->getLocalName());
       Serial.print("]");
-      if (allSecondaries.at(i)->connected()) {
+      if (allSecondaries.at(i)->isConnected()) {
         Serial.println(" is connected.");
       } else {
         Serial.println(" has been disconnected.");
         atLeastOneDisconnected = true;
       }
     }
-    nextUpdate = millis() + 1000;
+    nextUpdate = millis() + 2000;
   }
 
   if (atLeastOneDisconnected) {
@@ -60,7 +60,8 @@ void loop() {
     // we'll just disconnect all secondaries and reconnect all of them.
     Serial.println("Resetting all secondary devices and reconnecting...");
     for (uint i = 0; i < allSecondaries.size(); i++) {
-      if (allSecondaries.at(i)->connected()) {
+      if (allSecondaries.at(i)->isConnected()) {
+        // deleting the secondary will disconnect the peripheral automatically, but do it here anyways.
         allSecondaries.at(i)->disconnect();
       }
       delete allSecondaries.at(i);
@@ -70,7 +71,7 @@ void loop() {
   }
 }
 
-BLEDevice* scanForSecondary() {
+SecondaryClient* scanForSecondary() {
   Serial.print("Scanning for peripherals with uuid = ");
   Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
   bool allowDuplicateAdvertisements = true;
@@ -100,25 +101,7 @@ BLEDevice* scanForSecondary() {
     Serial.println("Failed to connect!");
   }
 
-  if (peripheral.discoverAttributes()) {
-    //Serial.println("Attributes discovered");
-  } else {
-    Serial.println("Attribute discovery failed!");
-    peripheral.disconnect();
-  }
-
-  // Verify characteristics are available (likely not needed, just testing for now.)
-  BLECharacteristic characteristic = peripheral.characteristic("5eccb54e-465f-47f4-ac50-6735bfc0e730");
-
-  if (!characteristic) {
-    Serial.println("Peripheral does not have brightness characteristic!");
-    peripheral.disconnect();
-  } else if (!characteristic.canWrite()) {
-    Serial.println("Peripheral does not have a writable brightness characteristic!");
-    peripheral.disconnect();
-  }
-
-  return new BLEDevice(peripheral);
+  return new SecondaryClient(new BLEDevice(peripheral));
 }
 
 void startBLEService() {
