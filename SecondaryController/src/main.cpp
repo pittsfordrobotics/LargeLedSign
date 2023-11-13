@@ -176,7 +176,12 @@ void startBLE() {
   btService.setSpeed(DEFAULTSPEED);
   btService.setPattern(DEFAULTPATTERN);
   btService.setStep(DEFAULTSTEP);
+  // Initial sign data is of the format:
+  // type;order;numCols;numPix
+  // todo: order should be 1-based?
   String signData = "";
+  signData.concat(signStyle);
+  signData.concat(";");
   signData.concat(signOrder);
   signData.concat(";");
   signData.concat(pixelBuffer.getColumnCount());

@@ -1,20 +1,22 @@
 #include "SecondaryClient.h"
 
-SecondaryClient::SecondaryClient(BLEDevice *peripheral)
+SecondaryClient::SecondaryClient(BLEDevice peripheral)
 {
-    m_peripheral = peripheral;
+    m_peripheral = BLEDevice(peripheral);
     initialize();
 }
 
 void SecondaryClient::initialize()
 {
-    if (!m_peripheral->discoverAttributes())
+    m_isValid = false;
+    if (!m_peripheral.discoverAttributes())
     {
         Serial.println("Attribute discovery failed!");
         disconnect();
+        return;
     }
 
-    BLECharacteristic signDataCharacteristic = m_peripheral->characteristic(BTCOMMON_SIGNDATACHARACTERISTIC_UUID);
+    BLECharacteristic signDataCharacteristic = m_peripheral.characteristic(BTCOMMON_SIGNDATACHARACTERISTIC_UUID);
 
     if (!signDataCharacteristic)
     {
@@ -25,43 +27,50 @@ void SecondaryClient::initialize()
         return;
     }
 
-    if (!signDataCharacteristic.canRead()) {
-        Serial.println("Can't read characteristic!");
-        return;
-    }
-
-    signDataCharacteristic.read();
-
     String signData = getStringValue(signDataCharacteristic);
     Serial.println("Sign data from peripheral: " + signData);
-    // Sign data should be of the form <position>;<numColumns>;<numPixels>
+    // Sign data should be of the form <style/type>;<position/order>;<numColumns>;<numPixels>
     std::vector<String> splitSignData = splitString(signData,';');
     Serial.println("Split data:");
     for (uint i = 0; i < splitSignData.size(); i++) {
         Serial.println(" -" + splitSignData.at(i));
     }
+
+    if (splitSignData.size() < 4) {
+        // Too little data!
+        disconnect();
+        return;
+    }
+
+    m_signType = splitSignData.at(0).toInt();
+    m_signOrder = splitSignData.at(1).toInt();
+    m_columnCount = splitSignData.at(2).toInt();
+    m_pixelCount = splitSignData.at(3).toInt();
+    m_isValid = true;
 }
 
 bool SecondaryClient::isConnected()
 {
-    return m_peripheral->connected();
+    return m_peripheral.connected();
 }
 
 void SecondaryClient::disconnect()
 {
-    if (m_peripheral->connected())
+    if (m_peripheral.connected())
     {
-        m_peripheral->disconnect();
+        m_peripheral.disconnect();
     }
 }
 
 String SecondaryClient::getLocalName()
 {
-    return m_peripheral->localName();
+    return m_peripheral.localName();
 }
 
 String SecondaryClient::getStringValue(BLECharacteristic characteristic)
 {
+    characteristic.read();
+
     // Code taken from the ArduinoBLE source code for
     // how a BLEStringCharacteristic reads a String value.
     String str;
@@ -75,11 +84,6 @@ String SecondaryClient::getStringValue(BLECharacteristic characteristic)
         str += (char)val[i];
     }
 
-    Serial.print("String char length: ");
-    Serial.println(length);
-    Serial.print("String: ");
-    Serial.println(str);
-
     return str;
 }
 
@@ -88,7 +92,8 @@ std::vector<String> SecondaryClient::splitString(String input, char delimiter) {
     int lastPos = 0;
     int nextPos = input.indexOf(delimiter);
     while (nextPos > 0) {
-        splitResults.push_back(input.substring(lastPos, nextPos - 1));
+        // String::substring takes the slice starting at the first argument up to the character before the second argument.
+        splitResults.push_back(input.substring(lastPos, nextPos));
         lastPos = nextPos + 1;
         nextPos = input.indexOf(delimiter, nextPos + 1);
     }
@@ -100,5 +105,4 @@ std::vector<String> SecondaryClient::splitString(String input, char delimiter) {
 SecondaryClient::~SecondaryClient()
 {
     disconnect();
-    delete m_peripheral;
 }

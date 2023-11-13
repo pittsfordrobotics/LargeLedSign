@@ -28,11 +28,16 @@ void setup() {
 }
 
 void populateSecondaries() {
-  int numberExpected = 2;
-  for (int i = 0; i < numberExpected; i++) {
-    allSecondaries.push_back(scanForSecondary());
+  uint numberExpected = 2;
+  while (allSecondaries.size() < numberExpected) {
+    SecondaryClient* secondary = scanForSecondary();
+    if (secondary->isValidClient()) {
+      allSecondaries.push_back(secondary);
+    }
   }
-  // todo: order the secondaries by sign order (read from the BT peripheral)
+
+  // We found all we were looking for. Order them by position.
+  std::sort(allSecondaries.begin(), allSecondaries.end(), [](SecondaryClient* &a, SecondaryClient* &b){ return a->getSignOrder() < b->getSignOrder(); });
 }
 
 void loop() {
@@ -101,7 +106,7 @@ SecondaryClient* scanForSecondary() {
     Serial.println("Failed to connect!");
   }
 
-  return new SecondaryClient(new BLEDevice(peripheral));
+  return new SecondaryClient(peripheral);
 }
 
 void startBLEService() {
