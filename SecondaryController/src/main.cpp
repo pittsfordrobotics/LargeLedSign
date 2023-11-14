@@ -8,6 +8,7 @@
 // std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS };
 // std::vector<int> signTypeSelectorPins = { SIGN_TYPE_SELECTOR_PINS };
 std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
+std::vector<int> typeSelectorPins = { STYLE_TYPE_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
 
 // Main BLE service wrapper
 SecondaryPeripheral btService;
@@ -81,6 +82,10 @@ void initializeIO() {
     pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
   }
 
+  for (uint i = 0; i < typeSelectorPins.size(); i++) {
+    pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
+  }
+
   Serial.println("Initializing the analog input to monitor battery voltage.");
   pinMode(VOLTAGEINPUTPIN, INPUT);
 }
@@ -120,16 +125,26 @@ void initializePixelBuffer() {
 }
 
 byte getSignType() {
-  // TEST mode - we really only have 1 style (test matrix), but treat the order as the style.
-  return getSignPosition();
+  // Pull the pin low to indicate active.
+  byte type = 0;
+  for (uint i = 0; i < typeSelectorPins.size(); i++) {
+    type = type << 1;
+    if (digitalRead(typeSelectorPins.at(i)) == LOW) {
+      type++;
+    }
+  }
+
+  return type;
 }
 
 byte getSignPosition() {
-  // Dummy ordering for now -- just first or second.
-  // TBD: loop through the selector pins and "rotate left" a 1 or 0 per pin.
+  // Pull the pin low to indicate active.
   byte order = 0;
-  if (digitalRead(orderSelectorPins.at(0)) == HIGH) {
-    order = 1;
+  for (uint i = 0; i < orderSelectorPins.size(); i++) {
+    order = order << 1;
+    if (digitalRead(orderSelectorPins.at(i)) == LOW) {
+      order++;
+    }
   }
 
   return order;

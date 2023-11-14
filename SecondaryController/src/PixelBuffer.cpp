@@ -9,6 +9,8 @@ PixelBuffer::PixelBuffer(int16_t gpioPin) {
 
 void PixelBuffer::initialize(uint8_t signStyle) {
   //initializeTestRingBuffer(gpioPin);
+  Serial.print("Initializaing pixel buffer for style ");
+  Serial.println(signStyle);
   initializeTestMatrixBuffer(m_gpioPin, signStyle);
 
   clearBuffer();
