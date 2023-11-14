@@ -27,8 +27,8 @@ byte currentStep = DEFAULTSTEP;
 byte newStep = DEFAULTSTEP;
 byte currentPattern = DEFAULTPATTERN;
 byte newPattern = DEFAULTPATTERN;
-byte signStyle;
-byte signOrder;
+byte signType;
+byte signPosition;
 
 // Other internal state
 int loopCounter = 0;              // Records the number of times the main loop ran since the last timing calculation.
@@ -46,13 +46,12 @@ void setup() {
 
   // Initialize components
   initializeIO();
-  signStyle = getSignStyle();
-  signOrder = getSignOrder();
+  signType = getSignType();
+  signPosition = getSignPosition();
   initializeLightStyles();
   initializePixelBuffer();
   startBLE();
 }
-
 
 // Main loop --
 // This metod is called continously.
@@ -106,12 +105,13 @@ void initializeLightStyles() {
 }
 
 void initializePixelBuffer() {
-  pixelBuffer.initialize(signStyle);
+  pixelBuffer.initialize(signType);
 
+  // Todo:
   // Will need to call "setColsToRight" (and other offsets) after the offset data has been set by the primary.
   // Doing it here for testing.
   uint16_t colsToRight = 0;
-  if (signStyle == 0) {
+  if (signType == 0) {
     colsToRight = 64;
   }
   pixelBuffer.setColsToRight(colsToRight);
@@ -119,12 +119,12 @@ void initializePixelBuffer() {
   pixelBuffer.setBrightness(DEFAULTBRIGHTNESS);
 }
 
-byte getSignStyle() {
+byte getSignType() {
   // TEST mode - we really only have 1 style (test matrix), but treat the order as the style.
-  return getSignOrder();
+  return getSignPosition();
 }
 
-byte getSignOrder() {
+byte getSignPosition() {
   // Dummy ordering for now -- just first or second.
   // TBD: loop through the selector pins and "rotate left" a 1 or 0 per pin.
   byte order = 0;
@@ -138,26 +138,19 @@ byte getSignOrder() {
 // Set the initial BLE characteristic values and start the BLE service.
 void startBLE() {
   Serial.print("Initializing for sign in position ");
-  Serial.println(signOrder);
+  Serial.print(signPosition);
+  Serial.print(" and type ");
+  Serial.println(signType);
 
-  // Use a common uuid
-  String localName;
+  String localName = "3181 LED Controller ";
   // Longer term - read sign position and digit from inputs,
   // set local name to "3181 LED Controller <position>-<digit>"
   // Digits can be 0-9, with the gear logo being 10.
-  switch (signOrder) {
-    case 0:
-      localName = "3181 LED Controller 1-3";
-      break;
-    case 1:
-      localName = "3181 LED Controller 2-1";
-      break;
-    default:
-      Serial.println("Unrecognized sign type. BLE not configured.");
-      return;
-  }
-
-  // Start the actual BLE
+  localName.concat(signPosition);
+  localName.concat("-");
+  localName.concat(signType);
+  
+  // Start the actual BLE engine.
   if (!BLE.begin()) {
     indicateBleFailure();
   }
@@ -178,11 +171,10 @@ void startBLE() {
   btService.setStep(DEFAULTSTEP);
   // Initial sign data is of the format:
   // type;order;numCols;numPix
-  // todo: order should be 1-based?
   String signData = "";
-  signData.concat(signStyle);
+  signData.concat(signType);
   signData.concat(";");
-  signData.concat(signOrder);
+  signData.concat(signPosition);
   signData.concat(";");
   signData.concat(pixelBuffer.getColumnCount());
   signData.concat(";");

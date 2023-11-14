@@ -8,7 +8,10 @@
 #include "SecondaryClient.h"
 
 // Function prototypes
+void initializeIO();
 void populateSecondaries();
 void startBLEService();
+void readBLE();
+void readManualInputs();
 SecondaryClient* scanForSecondary();
-
+void consolidateTotalsAndWriteToSecondaries();

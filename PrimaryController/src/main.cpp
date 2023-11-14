@@ -22,22 +22,10 @@ void setup() {
   }
   
   populateSecondaries();
+  consolidateTotalsAndWriteToSecondaries();
   // todo:
   // Calculate all the digit/column/pixel offsets and write them back to the peripherals.
   startBLEService();
-}
-
-void populateSecondaries() {
-  uint numberExpected = 2;
-  while (allSecondaries.size() < numberExpected) {
-    SecondaryClient* secondary = scanForSecondary();
-    if (secondary->isValidClient()) {
-      allSecondaries.push_back(secondary);
-    }
-  }
-
-  // We found all we were looking for. Order them by position.
-  std::sort(allSecondaries.begin(), allSecondaries.end(), [](SecondaryClient* &a, SecondaryClient* &b){ return a->getSignOrder() < b->getSignOrder(); });
 }
 
 void loop() {
@@ -73,7 +61,37 @@ void loop() {
     }
     allSecondaries.clear();
     populateSecondaries();
+    // Not bothering to recalculate totals at this point...
+    // The assumption is that the connection was interrupted due to signal loss to the client,
+    // not power loss at the client.  The client should still retain all the sign data needed
+    // to properly operate.
+    // If it turns out that client power loss or client reset is an issue, we should recalculate
+    // the totals and republish them to all clients.
   }
+}
+
+void initialzeIO() {
+  // Initialize the manual IO pins
+  // Initialize the status screen pins
+}
+
+void populateSecondaries() {
+  // Todo:
+  // Read the number of expected secondaries based on input.
+  uint numberExpected = 2;
+  while (allSecondaries.size() < numberExpected) {
+    SecondaryClient* secondary = scanForSecondary();
+    if (secondary->isValidClient()) {
+      allSecondaries.push_back(secondary);
+      // Todo: update the status display
+    }
+  }
+
+  // We found all we were looking for. Order them by position.
+  std::sort(
+    allSecondaries.begin(),
+    allSecondaries.end(),
+    [](SecondaryClient* &a, SecondaryClient* &b){ return a->getSignOrder() < b->getSignOrder(); });
 }
 
 SecondaryClient* scanForSecondary() {
@@ -109,10 +127,27 @@ SecondaryClient* scanForSecondary() {
   return new SecondaryClient(peripheral);
 }
 
+void consolidateTotalsAndWriteToSecondaries() {
+  // Sum up the number of digits, columns, pixels.
+  // Format the extended sign data and emit it back to the secondaries.
+  // Extended sign data format:
+  // type;order;numberOfColumns;numberOfPixels;digitsL;columnsL;pixelsL;digitsR;columnsR;pixelsR
+}
+
 void startBLEService() {
   Serial.println("Setting up Peripheral service using common logic.");
   
   btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, "Primary POC");
 
   Serial.println("Peripheral service started.");
+}
+
+void readBLE() {
+  // Actually do something here to read characteristics and update the secondaries.
+}
+
+void readManualInputs() {
+  // Check the digital inputs to see if we need to change states.
+  // Phase 1 - single-state input. ie, pushing button A changes to state A. Pushing A a second time has no effect.
+  // Phase 2 (if needed) - dual-state. ie, pushing button A changes to state A1. Pushing A again changes to state A2, then back to A1.
 }

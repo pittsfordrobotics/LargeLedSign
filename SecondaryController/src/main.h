@@ -51,8 +51,8 @@ float getCalculatedBatteryVoltage();
 int getVoltageInputLevel();
 void emitTelemetry();
 void indicateBleFailure();
-byte getSignStyle();
-byte getSignOrder();
+byte getSignType();
+byte getSignPosition();
 void initializePixelBuffer();
 
 #endif
