@@ -6,18 +6,26 @@ BLEByteCharacteristic brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTI
 BLECharacteristic* remoteBrightnessCharacteristic1;
 BLECharacteristic* remoteBrightnessCharacteristic2;
 CommonPeripheral btService;
+TM1637Display statusDisplay(TM1637_CLOCK, TM1637_DIO);
 
 std::vector<SecondaryClient*> allSecondaries;
 ulong nextUpdate = 0;
+
+const byte DASH = SEG_G;
+const byte EMPTY = 0;
 
 void setup() {
   delay(500);
   Serial.begin(9600);
   Serial.println("Starting...");
-    
+  
+  statusDisplay.setBrightness(TM1637_BRIGHTNESS);
+  setStatusDisplay(DASH, DASH, DASH, DASH);
+  
   if (!BLE.begin()) {
     Serial.println("BLE initialization failed!");
-    // todo: set the status display
+    // Display E-1
+    setStatusDisplay(statusDisplay.encodeDigit(14), DASH, statusDisplay.encodeDigit(1), EMPTY);
     while(true) {}
   }
   
@@ -26,6 +34,13 @@ void setup() {
   // todo:
   // Calculate all the digit/column/pixel offsets and write them back to the peripherals.
   startBLEService();
+  statusDisplay.clear();
+
+  // TEST: see what "bA" looks like on the display for a battery level check
+  delay(500);
+  setStatusDisplay(statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(10), EMPTY, EMPTY);
+  delay(1000);
+  statusDisplay.clear();
 }
 
 void loop() {
@@ -75,15 +90,21 @@ void initialzeIO() {
   // Initialize the status screen pins
 }
 
+void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4) {
+  byte digits[] = {digit1, digit2, digit3, digit4};
+  statusDisplay.setSegments(digits);
+}
+
 void populateSecondaries() {
   // Todo:
   // Read the number of expected secondaries based on input.
-  uint numberExpected = 2;
+  byte numberExpected = 2;
+  setStatusDisplay(EMPTY, statusDisplay.encodeDigit(0), DASH, statusDisplay.encodeDigit(numberExpected));
   while (allSecondaries.size() < numberExpected) {
     SecondaryClient* secondary = scanForSecondary();
     if (secondary->isValidClient()) {
       allSecondaries.push_back(secondary);
-      // Todo: update the status display
+      setStatusDisplay(EMPTY, statusDisplay.encodeDigit(allSecondaries.size()), DASH, statusDisplay.encodeDigit(numberExpected));
     }
   }
 
@@ -92,6 +113,8 @@ void populateSecondaries() {
     allSecondaries.begin(),
     allSecondaries.end(),
     [](SecondaryClient* &a, SecondaryClient* &b){ return a->getSignOrder() < b->getSignOrder(); });
+
+  statusDisplay.clear();
 }
 
 SecondaryClient* scanForSecondary() {
@@ -138,6 +161,8 @@ void startBLEService() {
   Serial.println("Setting up Peripheral service using common logic.");
   
   btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, "Primary POC");
+
+  // Set the various characteristics based on what's read from one of the secondaries...
 
   Serial.println("Peripheral service started.");
 }
