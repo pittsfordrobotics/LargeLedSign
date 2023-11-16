@@ -1,15 +1,11 @@
 #include "main.h"
 
 // Global variables
-BLEService ledService{ BTCOMMON_PRIMARYCONTROLLER_UUID };
-BLEByteCharacteristic brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
-BLECharacteristic* remoteBrightnessCharacteristic1;
-BLECharacteristic* remoteBrightnessCharacteristic2;
 CommonPeripheral btService;
 TM1637Display statusDisplay(TM1637_CLOCK, TM1637_DIO);
 
 std::vector<SecondaryClient*> allSecondaries;
-ulong nextUpdate = 0;
+ulong nextConnectionCheck = 0;
 
 // Some non-standard display segments
 const byte DASH = SEG_G;
@@ -35,25 +31,27 @@ void setup() {
   // todo:
   // Calculate all the digit/column/pixel offsets and write them back to the peripherals.
   startBLEService();
-  statusDisplay.clear();
-
-  // TEST: see what "bA" looks like on the display for a battery level check
-  delay(500);
-  setStatusDisplay(statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(10), EMPTY, EMPTY);
-  delay(1000);
-  statusDisplay.clear();
 }
 
+byte lastBrightness = 0;
+byte currentBrightness = 0;
 void loop() {
-  if (nextUpdate < millis()) {
-    checkSecondaryConnections();
-    nextUpdate = millis() + CONNECTION_CHECK_INTERVAL;
+  if (btService.isConnected()) {
+    setStatusDisplay(EMPTY, DASH, DASH, EMPTY);
+  } else {
+    statusDisplay.clear();
   }
+
+  currentBrightness = btService.getBrightness();
+  if (currentBrightness != lastBrightness) {
+    Serial.println("Brightness was changed.");
+    lastBrightness = currentBrightness;
+  }
+  
 }
 
 void initialzeIO() {
   // Initialize the manual IO pins
-  // Initialize the status screen pins
 }
 
 void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4) {
@@ -166,13 +164,37 @@ void consolidateTotalsAndWriteToSecondaries() {
 }
 
 void startBLEService() {
+  // Status: B1
+  setStatusDisplay(EMPTY, EMPTY, statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(1));
   Serial.println("Setting up Peripheral service using common logic.");
-  
-  btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, "Primary POC");
+  String localName = "3181 LED Controller Primary";
+  btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, localName);
 
-  // Set the various characteristics based on what's read from one of the secondaries...
+  btService.setPatternNames("p1;p2");
+  btService.setStyleNames("s1;s2");
+  btService.setBrightness(1);
+  btService.setPattern(0);
+  btService.setSpeed(10);
+  btService.setStep(15);
+  btService.setStyle(1);
+
+  return;
+
+  // Set the various characteristics based on what's read from any one of the secondaries.
+  // Status: B2
+  setStatusDisplay(EMPTY, EMPTY, statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(2));
+  Serial.println("Proxying characteristics.");
+  
+  btService.setPatternNames(allSecondaries.at(0)->getStringValue(BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID));
+  btService.setStyleNames(allSecondaries.at(0)->getStringValue(BTCOMMON_STYLENAMESCHARACTERISTIC_UUID));
+  btService.setBrightness(allSecondaries.at(0)->getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
+  btService.setPattern(allSecondaries.at(0)->getByteValue(BTCOMMON_PATTERNCHARACTERISTIC_UUID));
+  btService.setSpeed(allSecondaries.at(0)->getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID));
+  btService.setStep(allSecondaries.at(0)->getByteValue(BTCOMMON_STEPCHARACTERISTIC_UUID));
+  btService.setStyle(allSecondaries.at(0)->getByteValue(BTCOMMON_STYLECHARACTERISTIC_UUID));
 
   Serial.println("Peripheral service started.");
+  statusDisplay.clear();
 }
 
 void readBLE() {

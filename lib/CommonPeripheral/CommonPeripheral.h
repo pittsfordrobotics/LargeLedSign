@@ -16,7 +16,9 @@ class CommonPeripheral {
     bool isConnected();
 
     void setStyleNames(std::vector<String> styleNames);
+    void setStyleNames(String styleNames);
     void setPatternNames(std::vector<String> patternNames);
+    void setPatternNames(String patternNames);
     void setBrightness(byte brightness);
     byte getBrightness();
     void setStyle(byte style);

@@ -18,6 +18,8 @@ void CommonPeripheral::initialize(String uuid, String localName) {
   m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
 
   for (uint i = 0; i < m_additionalCharacteristics.size(); i++) {
+    Serial.print("Adding additional characteristic ");
+    Serial.println(m_additionalCharacteristics.at(i).uuid());
     m_ledService->addCharacteristic(m_additionalCharacteristics.at(i));
   }
 
@@ -45,24 +47,30 @@ bool CommonPeripheral::isConnected() {
 
 void CommonPeripheral::setStyleNames(std::vector<String> styleNames) {
   String allStyles = StringUtils::joinStrings(styleNames, ';');
+  setStyleNames(allStyles);
+}
 
+void CommonPeripheral::setStyleNames(String styleNames) {
   Serial.print("All style names: ");
-  Serial.println(allStyles);
+  Serial.println(styleNames);
   Serial.print("Style name string length: ");
-  Serial.println(allStyles.length());
+  Serial.println(styleNames.length());
 
-  m_styleNamesCharacteristic.writeValue(allStyles);
+  m_styleNamesCharacteristic.writeValue(styleNames);
 }
 
 void CommonPeripheral::setPatternNames(std::vector<String> patternNames) {
   String allPatterns = StringUtils::joinStrings(patternNames, ';');
+  setPatternNames(allPatterns);
+}
 
+void CommonPeripheral::setPatternNames(String patternNames) {
   Serial.print("All pattern names: ");
-  Serial.println(allPatterns);
+  Serial.println(patternNames);
   Serial.print("Pattern name string length: ");
-  Serial.println(allPatterns.length());
+  Serial.println(patternNames.length());
 
-  m_patternNamesCharacteristic.writeValue(allPatterns);
+  m_patternNamesCharacteristic.writeValue(patternNames);
 }
 
 byte CommonPeripheral::getBrightness() {

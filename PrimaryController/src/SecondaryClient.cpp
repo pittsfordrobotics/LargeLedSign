@@ -67,6 +67,16 @@ String SecondaryClient::getLocalName()
     return m_peripheral.localName();
 }
 
+String SecondaryClient::getStringValue(String characteristicUuid) {
+    BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
+    return getStringValue(characteristic);
+}
+
+byte SecondaryClient::getByteValue(String characteristicUuid) {
+    BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
+    return getByteValue(characteristic);
+}
+
 String SecondaryClient::getStringValue(BLECharacteristic characteristic)
 {
     characteristic.read();
@@ -85,6 +95,14 @@ String SecondaryClient::getStringValue(BLECharacteristic characteristic)
     }
 
     return str;
+}
+
+byte SecondaryClient::getByteValue(BLECharacteristic characteristic) {
+    characteristic.read();
+    byte value;
+    characteristic.readValue(value);
+
+    return value;
 }
 
 SecondaryClient::~SecondaryClient()

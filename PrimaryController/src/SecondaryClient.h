@@ -20,6 +20,9 @@ class SecondaryClient {
         uint getColumnCount() { return m_columnCount; }
         uint getPixelCount() { return m_pixelCount; }
 
+        String getStringValue(String characteristicUuid);
+        byte getByteValue(String characteristicUuid);
+
     private:
         BLEDevice m_peripheral;
         uint m_signType;
@@ -30,6 +33,7 @@ class SecondaryClient {
 
         void initialize();
         String getStringValue(BLECharacteristic characteristic);
+        byte getByteValue(BLECharacteristic characteristic);
 };
 
 #endif
