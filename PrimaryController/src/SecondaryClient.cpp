@@ -30,7 +30,7 @@ void SecondaryClient::initialize()
     String signData = getStringValue(signDataCharacteristic);
     Serial.println("Sign data from peripheral: " + signData);
     // Sign data should be of the form <style/type>;<position/order>;<numColumns>;<numPixels>
-    std::vector<String> splitSignData = splitString(signData,';');
+    std::vector<String> splitSignData = StringUtils::splitString(signData, ';');
     Serial.println("Split data:");
     for (uint i = 0; i < splitSignData.size(); i++) {
         Serial.println(" -" + splitSignData.at(i));
@@ -85,21 +85,6 @@ String SecondaryClient::getStringValue(BLECharacteristic characteristic)
     }
 
     return str;
-}
-
-std::vector<String> SecondaryClient::splitString(String input, char delimiter) {
-    std::vector<String> splitResults;
-    int lastPos = 0;
-    int nextPos = input.indexOf(delimiter);
-    while (nextPos > 0) {
-        // String::substring takes the slice starting at the first argument up to the character before the second argument.
-        splitResults.push_back(input.substring(lastPos, nextPos));
-        lastPos = nextPos + 1;
-        nextPos = input.indexOf(delimiter, nextPos + 1);
-    }
-    splitResults.push_back(input.substring(lastPos));
-
-    return splitResults;
 }
 
 SecondaryClient::~SecondaryClient()

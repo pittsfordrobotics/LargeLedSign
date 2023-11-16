@@ -6,6 +6,7 @@
 #include <ArduinoBLE.h>
 #include <BLETypedCharacteristics.h>
 #include <BluetoothCommon.h>
+#include <StringUtils.h>
 
 class CommonPeripheral {
   public:
@@ -50,8 +51,6 @@ class CommonPeripheral {
     byte m_currentPattern{0};
     byte m_currentSpeed{0};
     byte m_currentStep{0};
-
-    String* joinStrings(std::vector<String> strings);
 };
 
 #endif

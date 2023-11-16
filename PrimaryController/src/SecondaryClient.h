@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include <BluetoothCommon.h>
+#include "StringUtils.h"
 
 class SecondaryClient {
     public:
@@ -29,7 +30,6 @@ class SecondaryClient {
 
         void initialize();
         String getStringValue(BLECharacteristic characteristic);
-        std::vector<String> splitString(String input, char delimiter);
 };
 
 #endif

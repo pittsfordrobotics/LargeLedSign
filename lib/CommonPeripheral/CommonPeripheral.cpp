@@ -44,7 +44,7 @@ bool CommonPeripheral::isConnected() {
 }
 
 void CommonPeripheral::setStyleNames(std::vector<String> styleNames) {
-  String allStyles = *joinStrings(styleNames);
+  String allStyles = StringUtils::joinStrings(styleNames, ';');
 
   Serial.print("All style names: ");
   Serial.println(allStyles);
@@ -55,7 +55,7 @@ void CommonPeripheral::setStyleNames(std::vector<String> styleNames) {
 }
 
 void CommonPeripheral::setPatternNames(std::vector<String> patternNames) {
-  String allPatterns = *joinStrings(patternNames);
+  String allPatterns = StringUtils::joinStrings(patternNames, ';');
 
   Serial.print("All pattern names: ");
   Serial.println(allPatterns);
@@ -147,16 +147,4 @@ String CommonPeripheral::readStringFromCharacteristic(BLEStringCharacteristic ch
   }
 
   return defaultValue;
-}
-
-String* CommonPeripheral::joinStrings(std::vector<String> strings) {
-  String* joinedStrings = new String();
-  for (uint i = 0; i < strings.size(); i++) {
-    joinedStrings->concat(strings.at(i));
-    if (i < strings.size()-1) {
-      joinedStrings->concat(";");
-    }
-  }
-
-  return joinedStrings;
 }
