@@ -15,7 +15,7 @@
 
 // Input-Output pin assignments
 #define DATA_OUT 25           // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
-#define VOLTAGEINPUTPIN 14    // The pin # for the analog input to detect battery voltage level.
+#define VOLTAGEINPUTPIN 17    // The pin # (Digital #) for the analog input to detect battery voltage level.
 
 // The order and styletype pinouts need to be updated.
 // Style type isn't yet used.

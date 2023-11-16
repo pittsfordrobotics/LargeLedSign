@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "BluetoothCommon.h"
 #include "CommonPeripheral.h"
-#include "SecondaryClient.h"
+#include "Bluetooth/SecondaryClient.h"
 #include <TM1637Display.h>
 
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
@@ -13,6 +13,11 @@
 #define TM1637_BRIGHTNESS 5  // Brightness of the TM1637, between 0 and 7
 
 #define CONNECTION_CHECK_INTERVAL 2000 // Number of milliseconds between checks to see if the secondaries are connected.
+#define MANUAL_INPUT_PINS 15, 9, 14, 10  // Digital pin #s for the manual input buttons.
+
+// Some shortcut definitions for the status display
+#define DISPLAY_DASH 0b01000000  // Segment G of the 7-segment display.
+#define DISPLAY_EMPTY 0
 
 // Function prototypes
 void initializeIO();

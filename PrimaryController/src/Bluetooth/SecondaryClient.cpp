@@ -33,11 +33,11 @@ void SecondaryClient::initialize()
     std::vector<String> splitSignData = StringUtils::splitString(signData, ';');
     Serial.println("Split data:");
     for (uint i = 0; i < splitSignData.size(); i++) {
-        Serial.println(" -" + splitSignData.at(i));
+        Serial.println(" :" + splitSignData.at(i));
     }
 
     if (splitSignData.size() < 4) {
-        // Too little data!
+        Serial.println("Too little data found for the sign data - disconnecting.");
         disconnect();
         return;
     }

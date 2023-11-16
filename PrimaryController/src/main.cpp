@@ -7,22 +7,18 @@ TM1637Display statusDisplay(TM1637_CLOCK, TM1637_DIO);
 std::vector<SecondaryClient*> allSecondaries;
 ulong nextConnectionCheck = 0;
 
-// Some non-standard display segments
-const byte DASH = SEG_G;
-const byte EMPTY = 0;
-
 void setup() {
   delay(500);
   Serial.begin(9600);
   Serial.println("Starting...");
   
   statusDisplay.setBrightness(TM1637_BRIGHTNESS);
-  setStatusDisplay(DASH, DASH, DASH, DASH);
+  setStatusDisplay(DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH);
   
   if (!BLE.begin()) {
     Serial.println("BLE initialization failed!");
     // Display E-1
-    setStatusDisplay(statusDisplay.encodeDigit(14), DASH, statusDisplay.encodeDigit(1), EMPTY);
+    setStatusDisplay(statusDisplay.encodeDigit(14), DISPLAY_DASH, statusDisplay.encodeDigit(1), DISPLAY_EMPTY);
     while(true) {}
   }
   
@@ -36,8 +32,9 @@ void setup() {
 byte lastBrightness = 0;
 byte currentBrightness = 0;
 void loop() {
+  BLE.poll();
   if (btService.isConnected()) {
-    setStatusDisplay(EMPTY, DASH, DASH, EMPTY);
+    setStatusDisplay(DISPLAY_EMPTY, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_EMPTY);
   } else {
     statusDisplay.clear();
   }
@@ -105,16 +102,16 @@ void populateSecondaries() {
   // Todo:
   // Read the number of expected secondaries based on input.
   byte numberExpected = 2;
-  setStatusDisplay(EMPTY, statusDisplay.encodeDigit(0), DASH, statusDisplay.encodeDigit(numberExpected));
+  setStatusDisplay(DISPLAY_EMPTY, statusDisplay.encodeDigit(0), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
   while (allSecondaries.size() < numberExpected) {
     SecondaryClient* secondary = scanForSecondary();
     if (secondary->isValidClient()) {
       allSecondaries.push_back(secondary);
-      setStatusDisplay(EMPTY, statusDisplay.encodeDigit(allSecondaries.size()), DASH, statusDisplay.encodeDigit(numberExpected));
+      setStatusDisplay(DISPLAY_EMPTY, statusDisplay.encodeDigit(allSecondaries.size()), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
     }
   }
 
-  // We found all we were looking for. Order them by position.
+  // We found all we were looking for. Order them by position, lowest position first.
   std::sort(
     allSecondaries.begin(),
     allSecondaries.end(),
@@ -165,24 +162,14 @@ void consolidateTotalsAndWriteToSecondaries() {
 
 void startBLEService() {
   // Status: B1
-  setStatusDisplay(EMPTY, EMPTY, statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(1));
+  setStatusDisplay(DISPLAY_EMPTY, DISPLAY_EMPTY, statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(1));
   Serial.println("Setting up Peripheral service using common logic.");
   String localName = "3181 LED Controller Primary";
   btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, localName);
 
-  btService.setPatternNames("p1;p2");
-  btService.setStyleNames("s1;s2");
-  btService.setBrightness(1);
-  btService.setPattern(0);
-  btService.setSpeed(10);
-  btService.setStep(15);
-  btService.setStyle(1);
-
-  return;
-
   // Set the various characteristics based on what's read from any one of the secondaries.
   // Status: B2
-  setStatusDisplay(EMPTY, EMPTY, statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(2));
+  setStatusDisplay(DISPLAY_EMPTY, DISPLAY_EMPTY, statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(2));
   Serial.println("Proxying characteristics.");
   
   btService.setPatternNames(allSecondaries.at(0)->getStringValue(BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID));
