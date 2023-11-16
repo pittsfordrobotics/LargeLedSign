@@ -11,6 +11,7 @@ TM1637Display statusDisplay(TM1637_CLOCK, TM1637_DIO);
 std::vector<SecondaryClient*> allSecondaries;
 ulong nextUpdate = 0;
 
+// Some non-standard display segments
 const byte DASH = SEG_G;
 const byte EMPTY = 0;
 
@@ -44,24 +45,42 @@ void setup() {
 }
 
 void loop() {
-  bool atLeastOneDisconnected = false;
-
   if (nextUpdate < millis()) {
-    for (uint i = 0; i < allSecondaries.size(); i++) {
-      Serial.print("Secondary [");
-      Serial.print(allSecondaries.at(i)->getLocalName());
-      Serial.print("]");
-      if (allSecondaries.at(i)->isConnected()) {
-        Serial.println(" is connected.");
-      } else {
-        Serial.println(" has been disconnected.");
-        atLeastOneDisconnected = true;
-      }
+    checkSecondaryConnections();
+    nextUpdate = millis() + CONNECTION_CHECK_INTERVAL;
+  }
+}
+
+void initialzeIO() {
+  // Initialize the manual IO pins
+  // Initialize the status screen pins
+}
+
+void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4) {
+  byte digits[] = {digit1, digit2, digit3, digit4};
+  statusDisplay.setSegments(digits);
+}
+
+void checkSecondaryConnections() {
+  bool atLeastOneDisconnected = false;
+  for (uint i = 0; i < allSecondaries.size(); i++) {
+    Serial.print("Secondary [");
+    Serial.print(allSecondaries.at(i)->getLocalName());
+    Serial.print("]");
+    if (allSecondaries.at(i)->isConnected()) {
+      Serial.println(" is connected.");
+    } else {
+      Serial.println(" has been disconnected.");
+      atLeastOneDisconnected = true;
     }
-    nextUpdate = millis() + 2000;
   }
 
   if (atLeastOneDisconnected) {
+    resetSecondaryConnections();
+  }
+}
+
+void resetSecondaryConnections() {
     // Taking the easy way out...
     // Rather than trying to pinpoint which one (or more) of the devices
     // dropped the connection and trying to only re-establish those connections,
@@ -82,17 +101,6 @@ void loop() {
     // to properly operate.
     // If it turns out that client power loss or client reset is an issue, we should recalculate
     // the totals and republish them to all clients.
-  }
-}
-
-void initialzeIO() {
-  // Initialize the manual IO pins
-  // Initialize the status screen pins
-}
-
-void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4) {
-  byte digits[] = {digit1, digit2, digit3, digit4};
-  statusDisplay.setSegments(digits);
 }
 
 void populateSecondaries() {

@@ -12,6 +12,8 @@
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line
 #define TM1637_BRIGHTNESS 5  // Brightness of the TM1637, between 0 and 7
 
+#define CONNECTION_CHECK_INTERVAL 2000 // Number of milliseconds between checks to see if the secondaries are connected.
+
 // Function prototypes
 void initializeIO();
 void populateSecondaries();
@@ -21,3 +23,5 @@ void readManualInputs();
 SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
 void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4);
+void checkSecondaryConnections();
+void resetSecondaryConnections();
