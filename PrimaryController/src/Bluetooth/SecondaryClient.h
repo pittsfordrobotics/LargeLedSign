@@ -26,6 +26,7 @@ class SecondaryClient {
         String getStringValue(String characteristicUuid);
         byte getByteValue(String characteristicUuid);
         ServiceStatus getServiceStatus();
+        void setDisplayParameters(byte brightness, byte pattern, byte style, byte speed, byte step);
 
     private:
         BLEDevice m_peripheral;

@@ -71,6 +71,16 @@ ServiceStatus SecondaryClient::getServiceStatus() {
     return status;
 }
 
+void SecondaryClient::setDisplayParameters(byte brightness, byte pattern, byte style, byte speed, byte step) {
+    m_peripheral.characteristic(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID).writeValue(brightness);
+    m_peripheral.characteristic(BTCOMMON_STYLECHARACTERISTIC_UUID).writeValue(style);
+    m_peripheral.characteristic(BTCOMMON_SPEEDCHARACTERISTIC_UUID).writeValue(speed);
+    m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
+    
+    // Update pattern last, since that's what causes the sign to reset.
+    m_peripheral.characteristic(BTCOMMON_PATTERNCHARACTERISTIC_UUID).writeValue(pattern);
+}
+
 String SecondaryClient::getStringValue(String characteristicUuid) {
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
     characteristic.read();

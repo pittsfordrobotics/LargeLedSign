@@ -53,3 +53,15 @@ bool ServiceStatus::operator==(const ServiceStatus& other) {
         && m_patternNames.equals(other.m_patternNames)
         && m_signData.equals(other.m_signData));
 }
+
+bool ServiceStatus::operator!=(const ServiceStatus& other) {
+    return (
+        m_brightness != other.m_brightness
+        || m_pattern != other.m_pattern
+        || m_speed != other.m_speed
+        || m_step != other.m_step
+        || m_style != other.m_style
+        || !m_styleNames.equals(other.m_styleNames)
+        || !m_patternNames.equals(other.m_patternNames)
+        || !m_signData.equals(other.m_signData));
+}

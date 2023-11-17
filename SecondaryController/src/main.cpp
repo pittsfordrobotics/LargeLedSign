@@ -7,8 +7,8 @@
 // Ex:
 // std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS };
 // std::vector<int> signTypeSelectorPins = { SIGN_TYPE_SELECTOR_PINS };
-std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
-std::vector<int> typeSelectorPins = { STYLE_TYPE_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
+std::vector<int> orderSelectorPins { ORDER_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
+std::vector<int> typeSelectorPins { STYLE_TYPE_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
 
 // Main BLE service wrapper
 SecondaryPeripheral btService;
@@ -147,6 +147,12 @@ byte getSignPosition() {
     }
   }
 
+  if (order == 7) {
+    // The circuit board for the logo doesn't have jumpers and will
+    // read as 0b111 (7). It really should be position #2.
+    order = 2;
+  }
+
   return order;
 }
 
@@ -158,9 +164,6 @@ void startBLE() {
   Serial.println(signType);
 
   String localName = "3181 LED Controller ";
-  // Longer term - read sign position and digit from inputs,
-  // set local name to "3181 LED Controller <position>-<digit>"
-  // Digits can be 0-9, with the gear logo being 10.
   localName.concat(signPosition);
   localName.concat("-");
   localName.concat(signType);
@@ -186,16 +189,14 @@ void startBLE() {
   btService.setStep(DEFAULTSTEP);
   // Initial sign data is of the format:
   // type;order;numCols;numPix
-  String signData = "";
-  signData.concat(signType);
-  signData.concat(";");
-  signData.concat(signPosition);
-  signData.concat(";");
-  signData.concat(pixelBuffer.getColumnCount());
-  signData.concat(";");
-  signData.concat(pixelBuffer.getPixelCount());
-  Serial.print("Sign data before sending to BLE: ");
-  Serial.println(signData);
+  String signData = StringUtils::joinStrings(
+    {
+      String(signType),
+      String(signPosition),
+      String(pixelBuffer.getColumnCount()),
+      String(pixelBuffer.getPixelCount())
+    }, ';');
+    
   btService.setSignData(signData);
 }
 

@@ -23,10 +23,11 @@
 void initializeIO();
 void populateSecondaries();
 void startBLEService();
-void readBLE();
-void readManualInputs();
+ServiceStatus readBLEInputs();
+ServiceStatus readManualInputs();
 SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
 void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4);
 void checkSecondaryConnections();
 void resetSecondaryConnections();
+void updateAllSecondaries();

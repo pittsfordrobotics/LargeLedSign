@@ -4,8 +4,12 @@
 CommonPeripheral btService;
 TM1637Display statusDisplay(TM1637_CLOCK, TM1637_DIO);
 
+std::vector<int> manualInputPins { MANUAL_INPUT_PINS };
 std::vector<SecondaryClient*> allSecondaries;
 ulong nextConnectionCheck = 0;
+
+ServiceStatus lastServiceStatus;
+ServiceStatus currentServiceStatus;
 
 void setup() {
   delay(500);
@@ -29,9 +33,6 @@ void setup() {
   startBLEService();
 }
 
-byte lastBrightness = 0;
-byte currentBrightness = 0;
-
 void loop() {
   BLE.poll();
   if (btService.isConnected()) {
@@ -41,16 +42,20 @@ void loop() {
     statusDisplay.clear();
   }
 
-  currentBrightness = btService.getBrightness();
-  if (currentBrightness != lastBrightness) {
-    Serial.println("Brightness was changed.");
-    lastBrightness = currentBrightness;
+  currentServiceStatus = readBLEInputs();
+  if (currentServiceStatus != lastServiceStatus) {
+    Serial.println("Status change detected.");
+    updateAllSecondaries();
+    lastServiceStatus = currentServiceStatus;
   }
-  
+
 }
 
 void initialzeIO() {
   // Initialize the manual IO pins
+  for (uint i = 0; i < manualInputPins.size(); i++) {
+    pinMode(manualInputPins[i], INPUT_PULLUP);
+  }
 }
 
 void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4) {
@@ -187,12 +192,33 @@ void startBLEService() {
   statusDisplay.clear();
 }
 
-void readBLE() {
-  // Actually do something here to read characteristics and update the secondaries.
+ServiceStatus readBLEInputs() {
+  ServiceStatus currentStatus;
+  currentStatus.setBrightness(btService.getBrightness());
+  currentStatus.setPattern(btService.getPattern());
+  currentStatus.setSpeed(btService.getSpeed());
+  currentStatus.setStep(btService.getStep());
+  currentStatus.setStyle(btService.getStyle());
+
+  return currentStatus;
 }
 
-void readManualInputs() {
+ServiceStatus readManualInputs() {
   // Check the digital inputs to see if we need to change states.
   // Phase 1 - single-state input. ie, pushing button A changes to state A. Pushing A a second time has no effect.
   // Phase 2 (if needed) - dual-state. ie, pushing button A changes to state A1. Pushing A again changes to state A2, then back to A1.
+  
+  ServiceStatus s;
+  return s;
+}
+
+void updateAllSecondaries() {
+  for (uint i = 0; i < allSecondaries.size(); i++) {
+    allSecondaries[i]->setDisplayParameters(
+      currentServiceStatus.getBrightness(),
+      currentServiceStatus.getPattern(),
+      currentServiceStatus.getStyle(),
+      currentServiceStatus.getSpeed(),
+      currentServiceStatus.getStep());
+  }
 }

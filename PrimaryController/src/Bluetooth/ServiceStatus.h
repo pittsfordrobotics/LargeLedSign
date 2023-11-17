@@ -34,6 +34,7 @@ class ServiceStatus {
         ServiceStatus(const ServiceStatus& other);
         ServiceStatus& operator=(const ServiceStatus& other);
         bool operator==(const ServiceStatus& other);
+        bool operator!=(const ServiceStatus& other);
 
     private:
         void copy(const ServiceStatus& other);
