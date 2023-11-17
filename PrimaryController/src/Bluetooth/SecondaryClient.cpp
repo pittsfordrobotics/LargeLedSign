@@ -27,25 +27,15 @@ void SecondaryClient::initialize()
         return;
     }
 
-    String signData = getStringValue(signDataCharacteristic);
-    Serial.println("Sign data from peripheral: " + signData);
-    // Sign data should be of the form <style/type>;<position/order>;<numColumns>;<numPixels>
-    std::vector<String> splitSignData = StringUtils::splitString(signData, ';');
-    Serial.println("Split data:");
-    for (uint i = 0; i < splitSignData.size(); i++) {
-        Serial.println(" :" + splitSignData.at(i));
-    }
-
-    if (splitSignData.size() < 4) {
-        Serial.println("Too little data found for the sign data - disconnecting.");
-        disconnect();
-        return;
-    }
-
-    m_signType = splitSignData.at(0).toInt();
-    m_signOrder = splitSignData.at(1).toInt();
-    m_columnCount = splitSignData.at(2).toInt();
-    m_pixelCount = splitSignData.at(3).toInt();
+    ServiceStatus status = getServiceStatus();
+    if (status.getSignOrder() < 0 || status.getSignType() < 0
+        || status.getColumnCount() < 0 || status.getPixelCount() < 0) {
+            Serial.println("Sign data is not valid - disconecting.");
+            disconnect();
+            return;
+        }
+    
+    m_signOrder = status.getSignOrder();
     m_isValid = true;
 }
 
@@ -67,18 +57,22 @@ String SecondaryClient::getLocalName()
     return m_peripheral.localName();
 }
 
+ServiceStatus SecondaryClient::getServiceStatus() {
+    ServiceStatus status;
+    status.setBrightness(getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
+    status.setPattern(getByteValue(BTCOMMON_PATTERNCHARACTERISTIC_UUID));
+    status.setPatternNames(getStringValue(BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID));
+    status.setSignData(getStringValue(BTCOMMON_SIGNDATACHARACTERISTIC_UUID));
+    status.setSpeed(getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID));
+    status.setStep(getByteValue(BTCOMMON_STEPCHARACTERISTIC_UUID));
+    status.setStyle(getByteValue(BTCOMMON_STYLECHARACTERISTIC_UUID));
+    status.setStyleNames(getStringValue(BTCOMMON_STYLENAMESCHARACTERISTIC_UUID));
+
+    return status;
+}
+
 String SecondaryClient::getStringValue(String characteristicUuid) {
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
-    return getStringValue(characteristic);
-}
-
-byte SecondaryClient::getByteValue(String characteristicUuid) {
-    BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
-    return getByteValue(characteristic);
-}
-
-String SecondaryClient::getStringValue(BLECharacteristic characteristic)
-{
     characteristic.read();
 
     // Code taken from the ArduinoBLE source code for
@@ -97,7 +91,8 @@ String SecondaryClient::getStringValue(BLECharacteristic characteristic)
     return str;
 }
 
-byte SecondaryClient::getByteValue(BLECharacteristic characteristic) {
+byte SecondaryClient::getByteValue(String characteristicUuid) {
+    BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
     characteristic.read();
     byte value;
     characteristic.readValue(value);

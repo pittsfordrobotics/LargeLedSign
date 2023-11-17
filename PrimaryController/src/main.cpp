@@ -172,13 +172,14 @@ void startBLEService() {
   setStatusDisplay(DISPLAY_EMPTY, DISPLAY_EMPTY, statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(2));
   Serial.println("Proxying characteristics.");
   
-  btService.setPatternNames(allSecondaries.at(0)->getStringValue(BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID));
-  btService.setStyleNames(allSecondaries.at(0)->getStringValue(BTCOMMON_STYLENAMESCHARACTERISTIC_UUID));
-  btService.setBrightness(allSecondaries.at(0)->getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
-  btService.setPattern(allSecondaries.at(0)->getByteValue(BTCOMMON_PATTERNCHARACTERISTIC_UUID));
-  btService.setSpeed(allSecondaries.at(0)->getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID));
-  btService.setStep(allSecondaries.at(0)->getByteValue(BTCOMMON_STEPCHARACTERISTIC_UUID));
-  btService.setStyle(allSecondaries.at(0)->getByteValue(BTCOMMON_STYLECHARACTERISTIC_UUID));
+  ServiceStatus status = allSecondaries.at(0)->getServiceStatus();
+  btService.setPatternNames(status.getPatternNames());
+  btService.setStyleNames(status.getStyleNames());
+  btService.setBrightness(status.getBrightness());
+  btService.setPattern(status.getPattern());
+  btService.setSpeed(status.getSpeed());
+  btService.setStep(status.getStep());
+  btService.setStyle(status.getStyle());
 
   Serial.println("Peripheral service started.");
   statusDisplay.clear();

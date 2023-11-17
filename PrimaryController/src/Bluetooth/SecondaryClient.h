@@ -5,6 +5,7 @@
 #include <ArduinoBLE.h>
 #include <BluetoothCommon.h>
 #include "StringUtils.h"
+#include "ServiceStatus.h"
 
 class SecondaryClient {
     public:
@@ -15,25 +16,23 @@ class SecondaryClient {
         void disconnect();
         bool isValidClient() { return m_isValid; }
         String getLocalName();
-        uint getSignType() { return m_signType; }
-        uint getSignOrder() { return m_signOrder; }
-        uint getColumnCount() { return m_columnCount; }
-        uint getPixelCount() { return m_pixelCount; }
+
+        // SignOrder is part of ServiceStatus, but it's used when
+        // initially sorting the clients. Expose it directly here
+        // so we don't end up hitting the BT service to get the status
+        // every time. It shouldn't ever change, so caching it here is fine.
+        int getSignOrder() { return m_signOrder; }
 
         String getStringValue(String characteristicUuid);
         byte getByteValue(String characteristicUuid);
+        ServiceStatus getServiceStatus();
 
     private:
         BLEDevice m_peripheral;
-        uint m_signType;
-        uint m_signOrder;
-        uint m_columnCount;
-        uint m_pixelCount;
         bool m_isValid;
+        int m_signOrder;
 
         void initialize();
-        String getStringValue(BLECharacteristic characteristic);
-        byte getByteValue(BLECharacteristic characteristic);
 };
 
 #endif
