@@ -31,9 +31,11 @@ void setup() {
 
 byte lastBrightness = 0;
 byte currentBrightness = 0;
+
 void loop() {
   BLE.poll();
   if (btService.isConnected()) {
+    // Set the display to "--" to show something connected to us.
     setStatusDisplay(DISPLAY_EMPTY, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_EMPTY);
   } else {
     statusDisplay.clear();

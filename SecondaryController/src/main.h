@@ -14,8 +14,9 @@
 #include "Bluetooth\SecondaryPeripheral.h"
 
 // Input-Output pin assignments
-#define DATA_OUT 25           // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
-#define VOLTAGEINPUTPIN 17    // The pin # (Digital #) for the analog input to detect battery voltage level.
+#define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
+#define VOLTAGEINPUTPIN 21     // The pin # (Digital #) for the analog input to detect battery voltage level.
+#define VOLTAGEINPUTPIN_ALT 14 // The alternate pin # (Digital #) for the battery voltage level for the Logo sign.
 
 // The order and styletype pinouts need to be updated.
 // Style type isn't yet used.
