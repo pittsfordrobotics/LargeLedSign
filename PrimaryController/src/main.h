@@ -12,7 +12,7 @@
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line
 #define TM1637_BRIGHTNESS 5  // Brightness of the TM1637, between 0 and 7
 
-#define CONNECTION_CHECK_INTERVAL 2000 // Number of milliseconds between checks to see if the secondaries are connected.
+#define CONNECTION_CHECK_INTERVAL 1500 // Number of milliseconds between checks to see if the secondaries are connected.
 #define MANUAL_INPUT_PINS 15, 9, 14, 10  // Digital pin #s for the manual input buttons.
 
 // Some shortcut definitions for the status display
@@ -23,8 +23,8 @@
 void initializeIO();
 void populateSecondaries();
 void startBLEService();
-ServiceStatus readBLEInputs();
-ServiceStatus readManualInputs();
+void readSettingsFromBLE();
+void readSettingsFromManualInputs();
 SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
 void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4);

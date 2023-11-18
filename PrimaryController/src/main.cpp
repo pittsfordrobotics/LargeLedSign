@@ -31,6 +31,7 @@ void setup() {
   // Calculate all the digit/column/pixel offsets and write them back to the peripherals.
   consolidateTotalsAndWriteToSecondaries();
   startBLEService();
+  nextConnectionCheck = millis() + CONNECTION_CHECK_INTERVAL;
 }
 
 void loop() {
@@ -42,10 +43,15 @@ void loop() {
     statusDisplay.clear();
   }
 
-  // Verify we're still connected to all secondaries.
-  checkSecondaryConnections();
+  if (millis() > nextConnectionCheck) {
+    if (!btService.isConnected()) {
+      // Verify we're still connected to all secondaries.
+      checkSecondaryConnections();
+      nextConnectionCheck = millis() + CONNECTION_CHECK_INTERVAL;
+    }
+  }
 
-  currentServiceStatus = readBLEInputs();
+  readSettingsFromBLE();
   if (currentServiceStatus != lastServiceStatus) {
     Serial.println("Status change detected.");
     updateAllSecondaries();
@@ -66,6 +72,7 @@ void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4) {
 }
 
 void checkSecondaryConnections() {
+  setStatusDisplay(0b10000000, DISPLAY_EMPTY, DISPLAY_EMPTY, DISPLAY_EMPTY);
   bool atLeastOneDisconnected = false;
   for (uint i = 0; i < allSecondaries.size(); i++) {
     Serial.print("Secondary [");
@@ -78,6 +85,7 @@ void checkSecondaryConnections() {
       atLeastOneDisconnected = true;
     }
   }
+  statusDisplay.clear();
 
   if (atLeastOneDisconnected) {
     resetSecondaryConnections();
@@ -194,24 +202,22 @@ void startBLEService() {
   statusDisplay.clear();
 }
 
-ServiceStatus readBLEInputs() {
-  ServiceStatus currentStatus;
-  currentStatus.setBrightness(btService.getBrightness());
-  currentStatus.setPattern(btService.getPattern());
-  currentStatus.setSpeed(btService.getSpeed());
-  currentStatus.setStep(btService.getStep());
-  currentStatus.setStyle(btService.getStyle());
-
-  return currentStatus;
+void readSettingsFromBLE() {
+  currentServiceStatus.setBrightness(btService.getBrightness());
+  currentServiceStatus.setPattern(btService.getPattern());
+  currentServiceStatus.setSpeed(btService.getSpeed());
+  currentServiceStatus.setStep(btService.getStep());
+  currentServiceStatus.setStyle(btService.getStyle());
 }
 
-ServiceStatus readManualInputs() {
+void readSettingsFromManualInputs() {
   // Check the digital inputs to see if we need to change states.
   // Phase 1 - single-state input. ie, pushing button A changes to state A. Pushing A a second time has no effect.
   // Phase 2 (if needed) - dual-state. ie, pushing button A changes to state A1. Pushing A again changes to state A2, then back to A1.
-  
-  ServiceStatus s;
-  return s;
+  bool someButtonPressed = false;
+  if (someButtonPressed) {
+    // reset currentServiceStatus properties...
+  }
 }
 
 void updateAllSecondaries() {
