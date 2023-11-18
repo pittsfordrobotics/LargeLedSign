@@ -27,9 +27,9 @@ void setup() {
   }
   
   populateSecondaries();
-  consolidateTotalsAndWriteToSecondaries();
   // todo:
   // Calculate all the digit/column/pixel offsets and write them back to the peripherals.
+  consolidateTotalsAndWriteToSecondaries();
   startBLEService();
 }
 
@@ -42,13 +42,15 @@ void loop() {
     statusDisplay.clear();
   }
 
+  // Verify we're still connected to all secondaries.
+  checkSecondaryConnections();
+
   currentServiceStatus = readBLEInputs();
   if (currentServiceStatus != lastServiceStatus) {
     Serial.println("Status change detected.");
     updateAllSecondaries();
     lastServiceStatus = currentServiceStatus;
   }
-
 }
 
 void initialzeIO() {
@@ -228,5 +230,4 @@ void updateAllSecondaries() {
   for (uint i = 0; i < allSecondaries.size(); i++) {
     allSecondaries[i]->setPattern(currentServiceStatus.getPattern());
   }
-
 }
