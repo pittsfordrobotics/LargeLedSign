@@ -73,7 +73,6 @@ class PixelBuffer {
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     
-    void initializeTestRingBuffer(int16_t gpioPin);
     void initializeTestMatrixBuffer(int16_t gpioPin, uint8_t signStyle);
     void setColorForMappedPixels(std::vector<int>* destination, uint32_t newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);

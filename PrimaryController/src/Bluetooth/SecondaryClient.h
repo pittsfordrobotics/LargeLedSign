@@ -23,10 +23,12 @@ class SecondaryClient {
         // every time. It shouldn't ever change, so caching it here is fine.
         int getSignOrder() { return m_signOrder; }
 
-        String getStringValue(String characteristicUuid);
-        byte getByteValue(String characteristicUuid);
         ServiceStatus getServiceStatus();
-        void setDisplayParameters(byte brightness, byte pattern, byte style, byte speed, byte step);
+        void setBrightness(byte brightness);
+        void setPattern(byte pattern);
+        void setStyle(byte style);
+        void setSpeed(byte speed);
+        void setStep(byte step);
 
     private:
         BLEDevice m_peripheral;
@@ -34,6 +36,8 @@ class SecondaryClient {
         int m_signOrder;
 
         void initialize();
+        String getStringValue(String characteristicUuid);
+        byte getByteValue(String characteristicUuid);
 };
 
 #endif

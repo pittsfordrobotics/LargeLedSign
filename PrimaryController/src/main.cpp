@@ -214,11 +214,19 @@ ServiceStatus readManualInputs() {
 
 void updateAllSecondaries() {
   for (uint i = 0; i < allSecondaries.size(); i++) {
-    allSecondaries[i]->setDisplayParameters(
-      currentServiceStatus.getBrightness(),
-      currentServiceStatus.getPattern(),
-      currentServiceStatus.getStyle(),
-      currentServiceStatus.getSpeed(),
-      currentServiceStatus.getStep());
+    allSecondaries[i]->setBrightness(currentServiceStatus.getBrightness());
   }
+  for (uint i = 0; i < allSecondaries.size(); i++) {
+    allSecondaries[i]->setSpeed(currentServiceStatus.getSpeed());
+  }
+  for (uint i = 0; i < allSecondaries.size(); i++) {
+    allSecondaries[i]->setStep(currentServiceStatus.getStep());
+  }
+  for (uint i = 0; i < allSecondaries.size(); i++) {
+    allSecondaries[i]->setStyle(currentServiceStatus.getStyle());
+  }
+  for (uint i = 0; i < allSecondaries.size(); i++) {
+    allSecondaries[i]->setPattern(currentServiceStatus.getPattern());
+  }
+
 }

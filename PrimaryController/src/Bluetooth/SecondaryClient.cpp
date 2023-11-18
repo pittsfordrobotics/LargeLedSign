@@ -71,15 +71,40 @@ ServiceStatus SecondaryClient::getServiceStatus() {
     return status;
 }
 
-void SecondaryClient::setDisplayParameters(byte brightness, byte pattern, byte style, byte speed, byte step) {
+void SecondaryClient::setBrightness(byte brightness) {
     m_peripheral.characteristic(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID).writeValue(brightness);
-    m_peripheral.characteristic(BTCOMMON_STYLECHARACTERISTIC_UUID).writeValue(style);
-    m_peripheral.characteristic(BTCOMMON_SPEEDCHARACTERISTIC_UUID).writeValue(speed);
-    m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
-    
-    // Update pattern last, since that's what causes the sign to reset.
+}
+
+void SecondaryClient::setPattern(byte pattern) {
     m_peripheral.characteristic(BTCOMMON_PATTERNCHARACTERISTIC_UUID).writeValue(pattern);
 }
+
+void SecondaryClient::setStyle(byte style) {
+    m_peripheral.characteristic(BTCOMMON_STYLECHARACTERISTIC_UUID).writeValue(style);
+}
+
+void SecondaryClient::setSpeed(byte speed) {
+    m_peripheral.characteristic(BTCOMMON_SPEEDCHARACTERISTIC_UUID).writeValue(speed);
+}
+
+void SecondaryClient::setStep(byte step) {
+    m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
+}
+
+// void SecondaryClient::setDisplayParameters(byte brightness, byte pattern, byte style, byte speed, byte step) {
+//     ulong start = millis();
+//     m_peripheral.characteristic(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID).writeValue(brightness);
+//     m_peripheral.characteristic(BTCOMMON_STYLECHARACTERISTIC_UUID).writeValue(style);
+//     m_peripheral.characteristic(BTCOMMON_SPEEDCHARACTERISTIC_UUID).writeValue(speed);
+//     m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
+    
+//     // Update pattern last, since that's what causes the sign to reset.
+//     m_peripheral.characteristic(BTCOMMON_PATTERNCHARACTERISTIC_UUID).writeValue(pattern);
+
+//     ulong timeTaken = millis() - start;
+//     Serial.print("Display parameters written to secondary. Time taken (msec): ");
+//     Serial.println(timeTaken);
+// }
 
 String SecondaryClient::getStringValue(String characteristicUuid) {
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
