@@ -151,28 +151,28 @@ void PixelBuffer::initializeTestMatrixBuffer(int16_t gpioPin) {
   // ROW 0 is at the TOP of the display.
   // COLUMN 0 is at the LEFT of the display.
 
-  // Establish the 8 columns
-  for (int col = 0; col < 8; col++) {
-    std::vector<int>* colVector = new std::vector<int>();
+  // Establish the 8 rows
+  for (int col = 8; col >= 0; col--) {
+    std::vector<int>* rowVector = new std::vector<int>();
     for (int row = 0; row < 8; row++) {
       if (row % 2 == 0) {
-        colVector->push_back(row * 8 + col);
+        rowVector->push_back(row * 8 + col);
       }
       else {
-        colVector->push_back(row * 8 + (7 - col));
+        rowVector->push_back(row * 8 + (7 - col));
       }
     }
-    m_columns.push_back(colVector);
+    m_rows.push_back(rowVector);
   }
 
-  // Establish the 8 rows
+  // Establish the 8 cols
   // The pixels count up from the bottom, but we want rows to count up from the top,
   // so go in reverse order.
-  for (int row = 7; row >= 0; row--) {
-    std::vector<int>* rowVector = new std::vector<int>();
-    for (int col = 0; col < 8; col++){
-      rowVector->push_back(row * 8 + col);
+  for (int col = 7; col >= 0; col--) {
+    std::vector<int>* colVector = new std::vector<int>();
+    for (int row = 0; row < 8; row++){
+      colVector->push_back(col * 8 + row);
     }
-    m_rows.push_back(rowVector);
+    m_columns.push_back(colVector);
   }
 }
