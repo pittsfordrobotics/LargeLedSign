@@ -10,7 +10,11 @@ PixelBuffer::PixelBuffer(int16_t gpioPin) {
 void PixelBuffer::initialize(uint8_t signStyle) {
   Serial.print("Initializaing pixel buffer for style ");
   Serial.println(signStyle);
-  initializeTestMatrixBuffer(m_gpioPin, signStyle);
+  
+  switch (signStyle) {
+    default:
+      initializeTestMatrixBuffer(m_gpioPin);
+  }
 
   clearBuffer();
   m_neoPixels->begin();
@@ -138,7 +142,7 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int>* destination, uint32_
   }
 }
 
-void PixelBuffer::initializeTestMatrixBuffer(int16_t gpioPin, uint8_t signStyle) {
+void PixelBuffer::initializeTestMatrixBuffer(int16_t gpioPin) {
   m_numPixels = 64;  // Set for the NEO PIXEL 8x8 matrix
   m_pixelColors = new uint32_t[m_numPixels];
   m_neoPixels = new Adafruit_NeoPixel(m_numPixels, gpioPin, NEO_GRB + NEO_KHZ800);

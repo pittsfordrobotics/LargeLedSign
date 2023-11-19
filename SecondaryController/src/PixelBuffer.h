@@ -66,14 +66,16 @@ class PixelBuffer {
   private:
     int m_gpioPin;
     Adafruit_NeoPixel* m_neoPixels;
-    unsigned int m_numPixels;
+    unsigned int m_numPixels{0};
     uint32_t* m_pixelColors;
-    uint16_t m_colsToLeft;
-    uint16_t m_colsToRight;
+    uint16_t m_colsToLeft{0};
+    uint16_t m_colsToRight{0};
+    uint16_t m_pixelsToLeft{0};
+    uint16_t m_pixelsToRight{0};
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     
-    void initializeTestMatrixBuffer(int16_t gpioPin, uint8_t signStyle);
+    void initializeTestMatrixBuffer(int16_t gpioPin);
     void setColorForMappedPixels(std::vector<int>* destination, uint32_t newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);

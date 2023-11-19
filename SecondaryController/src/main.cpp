@@ -129,7 +129,7 @@ byte getSignType() {
   byte type = 0;
   for (uint i = 0; i < typeSelectorPins.size(); i++) {
     type = type << 1;
-    if (digitalRead(typeSelectorPins.at(i)) == LOW) {
+    if (digitalRead(typeSelectorPins.at(i)) == HIGH) {
       type++;
     }
   }
@@ -142,7 +142,7 @@ byte getSignPosition() {
   byte order = 0;
   for (uint i = 0; i < orderSelectorPins.size(); i++) {
     order = order << 1;
-    if (digitalRead(orderSelectorPins.at(i)) == LOW) {
+    if (digitalRead(orderSelectorPins.at(i)) == HIGH) {
       order++;
     }
   }
