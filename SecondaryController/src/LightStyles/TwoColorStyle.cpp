@@ -40,6 +40,7 @@ void TwoColorStyle::update() {
 
 void TwoColorStyle::reset()
 {
+  m_iterationCount = 0;
   uint32_t primaryColor = m_color1;
   uint32_t secondaryColor = m_color2;
   int mod = getModulus();
@@ -50,19 +51,6 @@ void TwoColorStyle::reset()
   }
 
   int numBlocks = getNumberOfBlocksForPattern();
-  if (numBlocks > 100) {
-    // The only patterns with this many blocks are the line patterns.
-    // Instead of shifting tons of times, just set the pixels directly.
-    for (int i = 0; i < numBlocks; i++) {
-      if (mod > 0 && i % mod == 0) {
-        m_pixelBuffer->setPixel(i, secondaryColor);
-      } else {
-        m_pixelBuffer->setPixel(i, primaryColor);
-      }
-    }
-    return;
-  }
-
   for (int i = 0; i < numBlocks; i++) {
     if (mod > 0 && i % mod == 0) {
       shiftColorUsingPattern(secondaryColor);

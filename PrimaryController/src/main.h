@@ -15,9 +15,12 @@
 #define CONNECTION_CHECK_INTERVAL 1500 // Number of milliseconds between checks to see if the secondaries are connected.
 #define MANUAL_INPUT_PINS 15, 9, 14, 10  // Digital pin #s for the manual input buttons.
 
+#define DEBOUNCE_INTERVAL 100 // Interval (msec) to wait before re-reading manual input.
+
 // Some shortcut definitions for the status display
 #define DISPLAY_DASH 0b01000000  // Segment G of the 7-segment display.
 #define DISPLAY_EMPTY 0
+#define DISPLAY_DOT 0b10000000
 
 // Function prototypes
 void initializeIO();
@@ -25,6 +28,7 @@ void populateSecondaries();
 void startBLEService();
 void readSettingsFromBLE();
 void readSettingsFromManualInputs();
+void setManualStyle(uint style);
 SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
 void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4);

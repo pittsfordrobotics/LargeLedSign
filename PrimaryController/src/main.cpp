@@ -7,6 +7,7 @@ TM1637Display statusDisplay(TM1637_CLOCK, TM1637_DIO);
 std::vector<int> manualInputPins { MANUAL_INPUT_PINS };
 std::vector<SecondaryClient*> allSecondaries;
 ulong nextConnectionCheck = 0;
+ulong lastButtonPress = 0;
 
 ServiceStatus lastServiceStatus;
 ServiceStatus currentServiceStatus;
@@ -16,6 +17,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Starting...");
   
+  initializeIO();
   statusDisplay.setBrightness(TM1637_BRIGHTNESS);
   setStatusDisplay(DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH);
   
@@ -52,6 +54,9 @@ void loop() {
   }
 
   readSettingsFromBLE();
+  // Manual inputs will override BLE settings, so read them last.
+  readSettingsFromManualInputs();
+
   if (currentServiceStatus != lastServiceStatus) {
     Serial.println("Status change detected.");
     updateAllSecondaries();
@@ -59,7 +64,7 @@ void loop() {
   }
 }
 
-void initialzeIO() {
+void initializeIO() {
   // Initialize the manual IO pins
   for (uint i = 0; i < manualInputPins.size(); i++) {
     pinMode(manualInputPins[i], INPUT_PULLUP);
@@ -72,7 +77,7 @@ void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4) {
 }
 
 void checkSecondaryConnections() {
-  setStatusDisplay(0b10000000, DISPLAY_EMPTY, DISPLAY_EMPTY, DISPLAY_EMPTY);
+  setStatusDisplay(DISPLAY_DOT, DISPLAY_EMPTY, DISPLAY_EMPTY, DISPLAY_EMPTY);
   bool atLeastOneDisconnected = false;
   for (uint i = 0; i < allSecondaries.size(); i++) {
     Serial.print("Secondary [");
@@ -211,12 +216,24 @@ void readSettingsFromBLE() {
 }
 
 void readSettingsFromManualInputs() {
+  if ((lastButtonPress + DEBOUNCE_INTERVAL) > millis()) {
+    // In the de-bounce interval.
+    return;
+  }
+
   // Check the digital inputs to see if we need to change states.
-  // Phase 1 - single-state input. ie, pushing button A changes to state A. Pushing A a second time has no effect.
-  // Phase 2 (if needed) - dual-state. ie, pushing button A changes to state A1. Pushing A again changes to state A2, then back to A1.
-  bool someButtonPressed = false;
-  if (someButtonPressed) {
-    // reset currentServiceStatus properties...
+  // A button press is indicated by the input getting pulled low.
+  // At this point, we're not doing anything complicated such as
+  // looking for button combinations.
+  // Just look for the first button that's been pressed.
+  for (uint i = 0; i < manualInputPins.size(); i++) {
+    if (digitalRead(manualInputPins[i]) == LOW) {
+      Serial.print("Manual style selected: ");
+      Serial.println(i);
+      setManualStyle(i);
+      lastButtonPress = millis();
+      return;
+    }
   }
 }
 
@@ -236,4 +253,51 @@ void updateAllSecondaries() {
   for (uint i = 0; i < allSecondaries.size(); i++) {
     allSecondaries[i]->setPattern(currentServiceStatus.getPattern());
   }
+}
+
+void setManualStyle(uint style) {
+  // These style settings will need to change if the ordering of
+  // styles/patterns changes.
+  switch (style) {
+    case 0:
+      // Solid Pink
+      currentServiceStatus.setBrightness(10);
+      currentServiceStatus.setPattern(0);
+      currentServiceStatus.setSpeed(1);
+      currentServiceStatus.setStep(1);
+      currentServiceStatus.setStyle(1);
+      break;
+    case 1:
+      // Red-Pink
+      currentServiceStatus.setBrightness(10);
+      currentServiceStatus.setPattern(1);
+      currentServiceStatus.setSpeed(25);
+      currentServiceStatus.setStep(25);
+      currentServiceStatus.setStyle(4);
+      break;
+    case 2:
+      // Blue-Pink
+      currentServiceStatus.setBrightness(10);
+      currentServiceStatus.setPattern(1);
+      currentServiceStatus.setSpeed(25);
+      currentServiceStatus.setStep(25);
+      currentServiceStatus.setStyle(2);
+      break;
+    default:
+      // Rainbow
+      currentServiceStatus.setBrightness(10);
+      currentServiceStatus.setPattern(1);
+      currentServiceStatus.setSpeed(85);
+      currentServiceStatus.setStep(95);
+      currentServiceStatus.setStyle(0);
+  }
+  // TODO: if a button was pressed (even if it was the same style),
+  // update the "sync" signal to reset the secondaries.
+  
+  // Update the BLE settings to reflect the new manual settings.
+  btService.setBrightness(currentServiceStatus.getBrightness());
+  btService.setPattern(currentServiceStatus.getPattern());
+  btService.setSpeed(currentServiceStatus.getSpeed());
+  btService.setStep(currentServiceStatus.getStep());
+  btService.setStyle(currentServiceStatus.getStyle());
 }
