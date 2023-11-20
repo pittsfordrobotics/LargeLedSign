@@ -156,3 +156,16 @@ String CommonPeripheral::readStringFromCharacteristic(BLEStringCharacteristic ch
 
   return defaultValue;
 }
+
+ulong CommonPeripheral::readULongFromCharacteristic(BLEUnsignedLongCharacteristic characteristic, byte defaultValue, String name) {
+  if (isConnected()) {
+    if (characteristic.written()) {
+      Serial.print("Reading new value for ");
+      Serial.print(name);
+      ulong value = characteristic.value();
+      Serial.print(". Value received: ");
+      Serial.println(value);
+      return value;
+    }
+  }
+}

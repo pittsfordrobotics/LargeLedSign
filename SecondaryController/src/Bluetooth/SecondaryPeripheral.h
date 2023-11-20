@@ -11,10 +11,14 @@ class SecondaryPeripheral : public CommonPeripheral {
     SecondaryPeripheral();
     String getSignData();
     void setSignData(String signData);
+    ulong getSyncData();
+    void setSyncData(ulong syncData);
 
   private:
     String m_currentSignData;
+    ulong m_currentSyncData{0};
     BLEStringCharacteristic m_signDataCharacteristic{ BTCOMMON_SIGNDATACHARACTERISTIC_UUID, BLERead | BLEWrite, BTCOMMON_MAXSTRINGLENGTH };
+    BLEUnsignedLongCharacteristic m_syncDataCharacteristic{ BTCOMMON_SYNCDATA_CHARACTERISTIC_UUID, BLERead | BLEWrite };
 };
 
 #endif

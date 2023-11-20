@@ -18,3 +18,13 @@ void SecondaryPeripheral::setSignData(String signData)
     m_currentSignData = signData;
     m_signDataCharacteristic.writeValue(signData);
 }
+
+ulong SecondaryPeripheral::getSyncData() {
+    m_currentSyncData = readULongFromCharacteristic(m_syncDataCharacteristic, m_currentSyncData, "SyncData");
+    return m_currentSyncData;
+}
+
+void SecondaryPeripheral::setSyncData(ulong syncData) {
+    m_currentSyncData = syncData;
+    m_syncDataCharacteristic.writeValue(syncData);
+}
