@@ -32,6 +32,7 @@ void setup() {
   // todo:
   // Calculate all the digit/column/pixel offsets and write them back to the peripherals.
   consolidateTotalsAndWriteToSecondaries();
+  setManualStyle(0);
   startBLEService();
   nextConnectionCheck = millis() + CONNECTION_CHECK_INTERVAL;
 }
@@ -176,10 +177,41 @@ SecondaryClient* scanForSecondary() {
 }
 
 void consolidateTotalsAndWriteToSecondaries() {
-  // Sum up the number of digits, columns, pixels.
-  // Format the extended sign data and emit it back to the secondaries.
-  // Extended sign data format:
-  // type;order;numberOfColumns;numberOfPixels;digitsL;columnsL;pixelsL;digitsR;columnsR;pixelsR
+  uint numDigits = allSecondaries.size();
+
+  // Stash the sign config data for each secondary so we don't retrieve it every time.
+  std::vector<SignConfigurationData> signConfigurations;
+  for (uint i = 0; i < numDigits; i++) {
+    ServiceStatus status = allSecondaries[i]->getServiceStatus();
+    signConfigurations.push_back(status.getSignConfigurationData());
+  }
+
+  int numCols = 0;
+  int numPixels = 0;
+  for (uint i = 0; i < numDigits; i++) {
+    numCols += signConfigurations[i].getColumnCount();
+    numPixels += signConfigurations[i].getPixelCount();
+  }
+
+  int colsSoFar = 0;
+  int pixelsSoFar = 0;
+  for (uint i = 0; i < numDigits; i++) {
+    SignConfigurationData signConfigData(signConfigurations[i]);
+
+    // TODO:
+    // Add 'digitsToLeft', 'columnsToLeft', etc. to the config data class.
+    int digitsToTheLeft = i;
+    int digitsToTheRight = numDigits - i - 1;
+    int colsToTheLeft = colsSoFar;
+    int colsToTheRight = numCols - colsSoFar - signConfigData.getColumnCount();
+    colsSoFar += signConfigurations[i].getColumnCount();
+    int pixelsToTheLeft = pixelsSoFar;
+    int pixelsToTheRight = numPixels - pixelsSoFar - signConfigData.getPixelCount();
+    pixelsSoFar += signConfigurations[i].getPixelCount();
+    
+    // Write the data back to the secondary
+    allSecondaries[i]->setSignConfigurationData(signConfigData.getConfigurationString());
+  }
 }
 
 void startBLEService() {

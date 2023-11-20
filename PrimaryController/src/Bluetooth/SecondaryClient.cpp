@@ -28,14 +28,17 @@ void SecondaryClient::initialize()
     }
 
     ServiceStatus status = getServiceStatus();
-    if (status.getSignOrder() < 0 || status.getSignType() < 0
-        || status.getColumnCount() < 0 || status.getPixelCount() < 0) {
+    SignConfigurationData signConfigData = status.getSignConfigurationData();
+    if (signConfigData.getSignOrder() < 0 
+        || signConfigData.getSignType() < 0
+        || signConfigData.getColumnCount() < 0 
+        || signConfigData.getPixelCount() < 0) {
             Serial.println("Sign data is not valid - disconecting.");
             disconnect();
             return;
         }
     
-    m_signOrder = status.getSignOrder();
+    m_signOrder = signConfigData.getSignOrder();
     m_isValid = true;
 }
 
@@ -62,11 +65,12 @@ ServiceStatus SecondaryClient::getServiceStatus() {
     status.setBrightness(getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
     status.setPattern(getByteValue(BTCOMMON_PATTERNCHARACTERISTIC_UUID));
     status.setPatternNames(getStringValue(BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID));
-    status.setSignData(getStringValue(BTCOMMON_SIGNDATACHARACTERISTIC_UUID));
     status.setSpeed(getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID));
     status.setStep(getByteValue(BTCOMMON_STEPCHARACTERISTIC_UUID));
     status.setStyle(getByteValue(BTCOMMON_STYLECHARACTERISTIC_UUID));
     status.setStyleNames(getStringValue(BTCOMMON_STYLENAMESCHARACTERISTIC_UUID));
+    String signConfigData = getStringValue(BTCOMMON_SIGNDATACHARACTERISTIC_UUID);
+    status.setSignConfigurationData(SignConfigurationData(signConfigData));
 
     return status;
 }
@@ -91,20 +95,9 @@ void SecondaryClient::setStep(byte step) {
     m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
 }
 
-// void SecondaryClient::setDisplayParameters(byte brightness, byte pattern, byte style, byte speed, byte step) {
-//     ulong start = millis();
-//     m_peripheral.characteristic(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID).writeValue(brightness);
-//     m_peripheral.characteristic(BTCOMMON_STYLECHARACTERISTIC_UUID).writeValue(style);
-//     m_peripheral.characteristic(BTCOMMON_SPEEDCHARACTERISTIC_UUID).writeValue(speed);
-//     m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
+void SecondaryClient::setSignConfigurationData(String signConfigurationData) {
     
-//     // Update pattern last, since that's what causes the sign to reset.
-//     m_peripheral.characteristic(BTCOMMON_PATTERNCHARACTERISTIC_UUID).writeValue(pattern);
-
-//     ulong timeTaken = millis() - start;
-//     Serial.print("Display parameters written to secondary. Time taken (msec): ");
-//     Serial.println(timeTaken);
-// }
+}
 
 String SecondaryClient::getStringValue(String characteristicUuid) {
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());

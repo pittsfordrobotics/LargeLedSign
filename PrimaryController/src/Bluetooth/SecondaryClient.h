@@ -29,6 +29,7 @@ class SecondaryClient {
         void setStyle(byte style);
         void setSpeed(byte speed);
         void setStep(byte step);
+        void setSignConfigurationData(String signConfigurationData);
 
     private:
         BLEDevice m_peripheral;

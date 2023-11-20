@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <vector>
 #include "StringUtils.h"
+#include "SignConfigurationData.h"
 
 class ServiceStatus {
     public:
@@ -14,12 +15,7 @@ class ServiceStatus {
         byte getBrightness() { return m_brightness; }
         byte getStep() { return m_step; }
         byte getSpeed() { return m_speed; }
-        String getSignData() { return m_signData; }
-
-        int getSignType() { return m_signType; }
-        int getSignOrder() { return m_signOrder; }
-        int getColumnCount() { return m_columnCount; }
-        int getPixelCount() { return m_pixelCount; }
+        SignConfigurationData getSignConfigurationData() { return m_signConfigData; }
 
         void setStyleNames(String styleNames) { m_styleNames = styleNames; }
         void setPatternNames(String patternNames) { m_patternNames = patternNames; }
@@ -28,7 +24,7 @@ class ServiceStatus {
         void setBrightness(byte brightness) { m_brightness = brightness; }
         void setStep(byte step) { m_step = step; }
         void setSpeed(byte speed) { m_speed = speed; }
-        void setSignData(String signData);
+        void setSignConfigurationData(SignConfigurationData signConfigData) { m_signConfigData = signConfigData; }
 
         ServiceStatus();
         ServiceStatus(const ServiceStatus& other);
@@ -46,11 +42,7 @@ class ServiceStatus {
         byte m_brightness{0};
         byte m_step{0};
         byte m_speed{0};
-        String m_signData{""};
-        int m_signType{-1};
-        int m_signOrder{-1};
-        int m_columnCount{-1};
-        int m_pixelCount{-1};
+        SignConfigurationData m_signConfigData;
 };
 
 #endif
