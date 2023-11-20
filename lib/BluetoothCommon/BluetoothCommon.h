@@ -1,11 +1,6 @@
 #ifndef BLUETOOTHCOMMON_H
 #define BLUETOOTHCOMMON_H
 
-#include <Arduino.h>
-#include <BLETypedCharacteristics.h>
-#include <ArduinoBLE.h>
-#include <vector>
-
 #define BTCOMMON_PRIMARYCONTROLLER_UUID "99be4fac-c708-41e5-a149-74047f554cc1"
 #define BTCOMMON_SECONDARYCONTROLLER_UUID "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0"
 
