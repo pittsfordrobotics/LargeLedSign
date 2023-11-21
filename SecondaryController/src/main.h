@@ -12,6 +12,7 @@
 #include "LightStyles/RainbowStyle.h"
 #include <BluetoothCommon.h>
 #include "Bluetooth\SecondaryPeripheral.h"
+#include <SignConfigurationData.h>
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
@@ -44,7 +45,6 @@ void initializeLightStyles();
 void startBLE();
 void blinkLowPowerIndicator();
 void readBleSettings();
-void updateBrightness();
 void updateLEDs();
 byte isInRange(byte value, byte minValue, byte maxValue);
 float getCalculatedBatteryVoltage();
@@ -54,5 +54,6 @@ void indicateBleFailure();
 byte getSignType();
 byte getSignPosition();
 void initializePixelBuffer();
+void resetPixelBufferOffsets(SignConfigurationData configData);
 
 #endif

@@ -35,7 +35,7 @@ class CommonPeripheral {
   protected:
     std::vector<BLECharacteristic> m_additionalCharacteristics;
     byte readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name);
-    ulong readULongFromCharacteristic(BLEUnsignedLongCharacteristic characteristic, byte defaultValue, String name);
+    ulong readULongFromCharacteristic(BLEUnsignedLongCharacteristic characteristic, ulong defaultValue, String name);
     String readStringFromCharacteristic(BLEStringCharacteristic characteristic, String defaultValue, String name);
 
   private:

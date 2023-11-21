@@ -11,11 +11,14 @@ class PixelBuffer {
 
     void initialize(uint8_t signStyle);
 
-    void setColsToLeft(uint16_t colsToLeft) { m_colsToLeft = colsToLeft; }
-    uint16_t getColsToLeft() { return m_colsToLeft; }
+    void setDigitsToLeft(uint16_t digitsToLeft) { m_digitsToLeft = digitsToLeft; }
+    void setDigitsToRight(uint16_t digitsToRight) { m_digitsToRight = digitsToRight; }
 
+    void setColsToLeft(uint16_t colsToLeft) { m_colsToLeft = colsToLeft; }
     void setColsToRight(uint16_t colsToRight) { m_colsToRight = colsToRight; }
-    uint16_t getColsToRight() { return m_colsToRight; }
+
+    void setPixelsToLeft(uint16_t pixelsToLeft) { m_pixelsToLeft = pixelsToLeft; }
+    void setPixelsToRight(uint16_t pixelsToRight) { m_pixelsToRight = pixelsToRight; }
 
     void setBrightness(uint8_t brightess);
 
@@ -68,6 +71,8 @@ class PixelBuffer {
     Adafruit_NeoPixel* m_neoPixels;
     unsigned int m_numPixels{0};
     uint32_t* m_pixelColors;
+    uint16_t m_digitsToLeft{0};
+    uint16_t m_digitsToRight{0};
     uint16_t m_colsToLeft{0};
     uint16_t m_colsToRight{0};
     uint16_t m_pixelsToLeft{0};

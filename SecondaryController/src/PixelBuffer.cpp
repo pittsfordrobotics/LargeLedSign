@@ -136,7 +136,7 @@ void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlock
 }
 
 void PixelBuffer::setColorForMappedPixels(std::vector<int>* destination, uint32_t newColor) {
-  for (int i = 0; i < destination->size(); i++) {
+  for (uint i = 0; i < destination->size(); i++) {
     int pixelIndex = destination->at(i);
     m_pixelColors[pixelIndex] = newColor;
   }

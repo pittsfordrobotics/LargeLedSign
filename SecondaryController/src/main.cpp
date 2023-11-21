@@ -19,7 +19,6 @@ std::vector<LightStyle*> lightStyles;
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULTBRIGHTNESS;
-byte newBrightness = DEFAULTBRIGHTNESS;
 byte currentStyle = -1; // Force the style to "change" on the first iteration.
 byte newStyle = DEFAULTSTYLE;
 byte currentSpeed = DEFAULTSPEED;
@@ -28,6 +27,7 @@ byte currentStep = DEFAULTSTEP;
 byte newStep = DEFAULTSTEP;
 byte currentPattern = DEFAULTPATTERN;
 byte newPattern = DEFAULTPATTERN;
+SignConfigurationData currentConfigData;
 byte signType;
 byte signPosition;
 
@@ -71,7 +71,6 @@ void loop()
   readBleSettings();
 
   // Apply any updates that were received via BLE or manually
-  updateBrightness();
   updateLEDs();
 }
 
@@ -187,22 +186,29 @@ void startBLE() {
   btService.setSpeed(DEFAULTSPEED);
   btService.setPattern(DEFAULTPATTERN);
   btService.setStep(DEFAULTSTEP);
-  // Initial sign data is of the format:
-  // type;order;numCols;numPix
-  String signData = StringUtils::joinStrings(
-    {
-      String(signType),
-      String(signPosition),
-      String(pixelBuffer.getColumnCount()),
-      String(pixelBuffer.getPixelCount())
-    }, ';');
-    
-  btService.setSignData(signData);
+  btService.setSyncData(0);
+
+  currentConfigData.setSignType(signType);
+  currentConfigData.setSignOrder(signPosition);
+  currentConfigData.setColumnCount(pixelBuffer.getColumnCount());
+  currentConfigData.setPixelCount(pixelBuffer.getPixelCount());
+
+  btService.setSignData(currentConfigData.getConfigurationString());
 }
 
 // Read the BLE settings to see if any have been changed.
 void readBleSettings() {
-  newBrightness = btService.getBrightness();
+  SignConfigurationData newConfigData = btService.getSignData();
+  if (newConfigData != currentConfigData) {
+    resetPixelBufferOffsets(newConfigData);
+    currentConfigData = newConfigData;
+  }
+
+  byte newBrightness = btService.getBrightness();
+  if (newBrightness != currentBrightness) {
+    pixelBuffer.setBrightness(newBrightness);
+    currentBrightness = newBrightness;
+  }
 
   // Check the range on the characteristic values.
   // If out of range, ignore the update and reset the BLE characteristic to the old value.
@@ -245,16 +251,6 @@ void blinkLowPowerIndicator() {
   pixelBuffer.setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
   pixelBuffer.displayPixels();
   delay(500);
-}
-
-// Set the LEDs to a new brightness if the brightness has changed.
-void updateBrightness() {
-  if (currentBrightness != newBrightness) {
-    Serial.println("Brightness change detected.");
-    pixelBuffer.setBrightness(newBrightness);
-  }
-
-  currentBrightness = newBrightness;
 }
 
 // Set the style properties (speed, step, pattern, etc) if any have changed,
@@ -404,5 +400,26 @@ void indicateBleFailure() {
     pixelBuffer.setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
     pixelBuffer.displayPixels();
     delay(500);
+  }
+}
+
+void resetPixelBufferOffsets(SignConfigurationData configData) {
+  if (configData.getDigitsToLeft() >= 0) {
+    pixelBuffer.setDigitsToLeft(configData.getDigitsToLeft());
+  }
+  if (configData.getDigitsToRight() >= 0) {
+    pixelBuffer.setDigitsToRight(configData.getDigitsToRight());
+  }
+  if (configData.getColumnsToLeft() >= 0) {
+    pixelBuffer.setColsToLeft(configData.getColumnsToLeft());
+  }
+  if (configData.getColumnsToRight() >= 0) {
+    pixelBuffer.setColsToRight(configData.getColumnsToRight());
+  }
+  if (configData.getPixelsToLeft() >= 0) {
+    pixelBuffer.setPixelsToLeft(configData.getPixelsToLeft());
+  }
+  if (configData.getPixelsToRight() >= 0) {
+    pixelBuffer.setPixelsToRight(configData.getPixelsToRight());
   }
 }
