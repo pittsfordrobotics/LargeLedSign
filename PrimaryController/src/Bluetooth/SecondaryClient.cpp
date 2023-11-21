@@ -96,7 +96,11 @@ void SecondaryClient::setStep(byte step) {
 }
 
 void SecondaryClient::setSignConfigurationData(String signConfigurationData) {
-    
+    m_peripheral.characteristic(BTCOMMON_SIGNDATACHARACTERISTIC_UUID).writeValue(signConfigurationData.c_str());
+}
+
+void SecondaryClient::updateSyncData(ulong syncData) {
+    m_peripheral.characteristic(BTCOMMON_SYNCDATA_CHARACTERISTIC_UUID).writeValue(syncData);
 }
 
 String SecondaryClient::getStringValue(String characteristicUuid) {
