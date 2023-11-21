@@ -9,8 +9,8 @@
 class SecondaryPeripheral : public CommonPeripheral {
   public:
     SecondaryPeripheral();
-    String getSignData();
-    void setSignData(String signData);
+    String getSignConfigurationData();
+    void setSignConfigurationData(String signData);
     ulong getSyncData();
     void setSyncData(ulong syncData);
 

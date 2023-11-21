@@ -53,7 +53,6 @@ void emitTelemetry();
 void indicateBleFailure();
 byte getSignType();
 byte getSignPosition();
-void initializePixelBuffer();
 void resetPixelBufferOffsets(SignConfigurationData configData);
 
 #endif

@@ -19,6 +19,7 @@ std::vector<LightStyle*> lightStyles;
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULTBRIGHTNESS;
+byte newBrightness = DEFAULTBRIGHTNESS;
 byte currentStyle = -1; // Force the style to "change" on the first iteration.
 byte newStyle = DEFAULTSTYLE;
 byte currentSpeed = DEFAULTSPEED;
@@ -27,6 +28,8 @@ byte currentStep = DEFAULTSTEP;
 byte newStep = DEFAULTSTEP;
 byte currentPattern = DEFAULTPATTERN;
 byte newPattern = DEFAULTPATTERN;
+ulong currentSyncData = 0;
+ulong newSyncData = 0;
 SignConfigurationData currentConfigData;
 byte signType;
 byte signPosition;
@@ -50,7 +53,10 @@ void setup() {
   signType = getSignType();
   signPosition = getSignPosition();
   initializeLightStyles();
-  initializePixelBuffer();
+
+  pixelBuffer.initialize(signType);
+  pixelBuffer.setBrightness(DEFAULTBRIGHTNESS);
+
   startBLE();
 }
 
@@ -106,21 +112,6 @@ void initializeLightStyles() {
   lightStyles.push_back(new SingleColorStyle("Red", red, &pixelBuffer));
   lightStyles.push_back(new TwoColorStyle("Orange-Pink", orange, pink, &pixelBuffer));
   //lightStyles.push_back(new SingleColorStyle("White", white, &pixelBuffer));
-}
-
-void initializePixelBuffer() {
-  pixelBuffer.initialize(signType);
-
-  // Todo:
-  // Will need to call "setColsToRight" (and other offsets) after the offset data has been set by the primary.
-  // Doing it here for testing.
-  uint16_t colsToRight = 0;
-  if (signType == 0) {
-    colsToRight = 64;
-  }
-  pixelBuffer.setColsToRight(colsToRight);
-
-  pixelBuffer.setBrightness(DEFAULTBRIGHTNESS);
 }
 
 byte getSignType() {
@@ -193,22 +184,25 @@ void startBLE() {
   currentConfigData.setColumnCount(pixelBuffer.getColumnCount());
   currentConfigData.setPixelCount(pixelBuffer.getPixelCount());
 
-  btService.setSignData(currentConfigData.getConfigurationString());
+  btService.setSignConfigurationData(currentConfigData.getConfigurationString());
 }
 
 // Read the BLE settings to see if any have been changed.
 void readBleSettings() {
-  SignConfigurationData newConfigData = btService.getSignData();
+  SignConfigurationData newConfigData(btService.getSignConfigurationData());
   if (newConfigData != currentConfigData) {
     resetPixelBufferOffsets(newConfigData);
     currentConfigData = newConfigData;
   }
 
-  byte newBrightness = btService.getBrightness();
-  if (newBrightness != currentBrightness) {
-    pixelBuffer.setBrightness(newBrightness);
-    currentBrightness = newBrightness;
+  newSyncData = btService.getSyncData();
+  if (newSyncData > 0 && newSyncData == currentSyncData) {
+    // We're triggering changes based on the sync signal, and it hasn't changed.
+    // Do nothing.
+    return;
   }
+
+  newBrightness = btService.getBrightness();
 
   // Check the range on the characteristic values.
   // If out of range, ignore the update and reset the BLE characteristic to the old value.
@@ -257,6 +251,16 @@ void blinkLowPowerIndicator() {
 // and call the current style class to update the display.
 void updateLEDs() {
   int shouldResetStyle = false;
+  if (newSyncData > 0 && newSyncData != currentSyncData) {
+    // Sync data changed -- force a refresh even if nothing else changed.
+    shouldResetStyle = true;
+  }
+
+  if (newBrightness != currentBrightness) {
+    pixelBuffer.setBrightness(newBrightness);
+    currentBrightness = newBrightness;
+  }
+
   LightStyle *style = lightStyles[newStyle];
   if (currentStyle != newStyle)  
   {

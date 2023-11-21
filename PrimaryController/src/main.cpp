@@ -197,9 +197,6 @@ void consolidateTotalsAndWriteToSecondaries() {
   int pixelsSoFar = 0;
   for (uint i = 0; i < numDigits; i++) {
     SignConfigurationData signConfigData(signConfigurations[i]);
-
-    // TODO:
-    // Add 'digitsToLeft', 'columnsToLeft', etc. to the config data class.
     signConfigData.setDigitsToLeft(i);
     signConfigData.setDigitsToRight(numDigits - i - 1);
     signConfigData.setColumnsToLeft(colsSoFar);
