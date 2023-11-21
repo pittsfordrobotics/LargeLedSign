@@ -200,13 +200,13 @@ void consolidateTotalsAndWriteToSecondaries() {
 
     // TODO:
     // Add 'digitsToLeft', 'columnsToLeft', etc. to the config data class.
-    int digitsToTheLeft = i;
-    int digitsToTheRight = numDigits - i - 1;
-    int colsToTheLeft = colsSoFar;
-    int colsToTheRight = numCols - colsSoFar - signConfigData.getColumnCount();
+    signConfigData.setDigitsToLeft(i);
+    signConfigData.setDigitsToRight(numDigits - i - 1);
+    signConfigData.setColumnsToLeft(colsSoFar);
+    signConfigData.setColumnsToRight(numCols - colsSoFar - signConfigData.getColumnCount());
     colsSoFar += signConfigurations[i].getColumnCount();
-    int pixelsToTheLeft = pixelsSoFar;
-    int pixelsToTheRight = numPixels - pixelsSoFar - signConfigData.getPixelCount();
+    signConfigData.setPixelsToLeft(pixelsSoFar);
+    signConfigData.setPixelsToRight(numPixels - pixelsSoFar - signConfigData.getPixelCount());
     pixelsSoFar += signConfigurations[i].getPixelCount();
     
     // Write the data back to the secondary
