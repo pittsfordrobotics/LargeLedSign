@@ -23,12 +23,11 @@ void RainbowStyle::reset()
 {
   m_currentHue = 0;
   int numBlocks = getNumberOfBlocksForPattern();
+  int numBlocksToDrain = getNumberOfBlocksToDrain();
 
-  // "Drain out" the number of columns on the right.
-  // should try to figure out if we need to shift by rows or pixels (or digits)
-  // for (uint16_t i = 0; i < m_pixelBuffer->getColsToRight(); i++) {
-  //   incrementHue();
-  // }
+  for (int i = 0; i < numBlocksToDrain; i++) {
+    incrementHue();
+  }
 
   // This loop goes through "numBlocks - 1" because one of the first things done
   // after a reset is to call "update", which will immediately shift it one last time.

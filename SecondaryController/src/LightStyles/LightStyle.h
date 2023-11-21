@@ -41,6 +41,7 @@ class LightStyle {
 
     void shiftColorUsingPattern(uint32_t newColor);
     int getNumberOfBlocksForPattern();
+    int getNumberOfBlocksToDrain();
 };
    
 #endif

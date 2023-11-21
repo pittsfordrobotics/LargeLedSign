@@ -13,12 +13,17 @@ class PixelBuffer {
 
     void setDigitsToLeft(uint16_t digitsToLeft) { m_digitsToLeft = digitsToLeft; }
     void setDigitsToRight(uint16_t digitsToRight) { m_digitsToRight = digitsToRight; }
-
     void setColsToLeft(uint16_t colsToLeft) { m_colsToLeft = colsToLeft; }
     void setColsToRight(uint16_t colsToRight) { m_colsToRight = colsToRight; }
-
     void setPixelsToLeft(uint16_t pixelsToLeft) { m_pixelsToLeft = pixelsToLeft; }
     void setPixelsToRight(uint16_t pixelsToRight) { m_pixelsToRight = pixelsToRight; }
+
+    u_int16_t getDigitsToLeft() { return m_digitsToLeft; }
+    u_int16_t getDigitsToRight() { return m_digitsToRight; }
+    u_int16_t getColsToLeft() { return m_colsToLeft; }
+    u_int16_t getColsToRight() { return m_colsToRight; }
+    u_int16_t getPixelsToLeft() { return m_pixelsToLeft; }
+    u_int16_t getPixelsToRight() { return m_pixelsToRight; }
 
     void setBrightness(uint8_t brightess);
 

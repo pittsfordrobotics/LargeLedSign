@@ -73,7 +73,7 @@ void PixelBuffer::setPixel(unsigned int pixel, uint32_t color) {
 
 void PixelBuffer::shiftLineRight(uint32_t newColor)
 {
-  for (int i = m_numPixels - 1; i >= 1; i--)
+  for (uint i = m_numPixels - 1; i >= 1; i--)
   {
     m_pixelColors[i] = m_pixelColors[i - 1];
   }
@@ -83,7 +83,7 @@ void PixelBuffer::shiftLineRight(uint32_t newColor)
 
 void PixelBuffer::shiftLineLeft(uint32_t newColor)
 {
-  for (int i = 0; i < m_numPixels - 1; i++)
+  for (uint i = 0; i < m_numPixels - 1; i++)
   {
     m_pixelColors[i] = m_pixelColors[i + 1];
   }
@@ -112,7 +112,7 @@ void PixelBuffer::shiftRowsDown(uint32_t newColor)
 }
 
 void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor) {
-  for (int i = pixelBlocks.size() - 1; i >= 1; i--) {
+  for (uint i = pixelBlocks.size() - 1; i >= 1; i--) {
     std::vector<int>* source = pixelBlocks.at(i - 1);
     std::vector<int>* destination = pixelBlocks.at(i);
     // Find the color of the first pixel in the source column, and set the destination column to that color.
@@ -124,7 +124,7 @@ void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBloc
 }
 
 void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor) {
-  for (int i = 0; i < pixelBlocks.size() - 1; i++) {
+  for (uint i = 0; i < pixelBlocks.size() - 1; i++) {
     std::vector<int>* source = pixelBlocks.at(i + 1);
     std::vector<int>* destination = pixelBlocks.at(i);
     // Find the color of the first pixel in the source column, and set the destination column to that color.

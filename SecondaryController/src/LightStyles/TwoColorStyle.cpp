@@ -40,7 +40,8 @@ void TwoColorStyle::update() {
 
 void TwoColorStyle::reset()
 {
-  m_iterationCount = 0;
+  m_iterationCount = getNumberOfBlocksToDrain();
+
   uint32_t primaryColor = m_color1;
   uint32_t secondaryColor = m_color2;
   int mod = getModulus();

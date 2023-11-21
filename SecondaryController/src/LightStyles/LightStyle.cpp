@@ -42,19 +42,31 @@ int LightStyle::getNumberOfBlocksForPattern() {
     case 3: // Up
     case 4: // Down
       return m_pixelBuffer->getRowCount();
-    case 5: // Digit
-      //return m_pixelBuffer->getDigitCount(); // No more digits - just solid.
-      return 1;
     case 6: // Linear
       return m_pixelBuffer->getPixelCount();
-    default: // 0 = solid
-      // Default to Solid (ie, all lights the same color)
+    default: // 0 = solid; 5 = digit
+      // All lights in the sign use the same color
       return 1;
   }
 }
 
-// TODO:
-// getNumberOfBlocksToDrain()
+int LightStyle::getNumberOfBlocksToDrain() {
+  switch (m_pattern) {
+    case 1: // Right
+      return m_pixelBuffer->getColsToRight();
+    case 2: // Left
+      return m_pixelBuffer->getColsToLeft();
+    case 3: // Up
+    case 4: // Down
+      return 0;
+    case 5: // Digit
+      return m_pixelBuffer->getDigitsToRight();
+    case 6: // Linear
+      return m_pixelBuffer->getPixelsToRight();
+    default: // 0 = Solid
+      return 0;
+  }
+}
 
 void LightStyle::shiftColorUsingPattern(uint32_t newColor) {
   // Stick with integer values here instead of doing a bunch
