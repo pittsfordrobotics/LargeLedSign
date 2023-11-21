@@ -17,7 +17,7 @@ void PixelBuffer::initialize(uint8_t signStyle) {
   
   switch (signStyle) {
     default:
-      initializeTestMatrixBuffer();
+      initializeTestMatrix();
   }
 
   clearBuffer();
@@ -146,7 +146,7 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int>* destination, uint32_
   }
 }
 
-void PixelBuffer::initializeTestMatrixBuffer() {
+void PixelBuffer::initializeTestMatrix() {
   m_numPixels = std::max(minimumPixelsInBuffer, (uint)64);
   m_pixelColors = new uint32_t[m_numPixels];
   m_neoPixels = new Adafruit_NeoPixel(m_numPixels, m_gpioPin, NEO_GRB + NEO_KHZ800);
@@ -179,4 +179,20 @@ void PixelBuffer::initializeTestMatrixBuffer() {
     }
     m_columns.push_back(colVector);
   }
+}
+
+void PixelBuffer::initializeDigitOne() {
+  initializeTestMatrix();
+}
+
+void PixelBuffer::initializeDigitThree() {
+  initializeTestMatrix();
+}
+
+void PixelBuffer::initializeDigitEight() {
+  initializeTestMatrix();
+}
+
+void PixelBuffer::initializeLogo() {
+  initializeTestMatrix();
 }

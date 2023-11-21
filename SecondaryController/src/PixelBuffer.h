@@ -86,10 +86,14 @@ class PixelBuffer {
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     
-    void initializeTestMatrixBuffer();
     void setColorForMappedPixels(std::vector<int>* destination, uint32_t newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);
+    void initializeTestMatrix();
+    void initializeDigitOne();
+    void initializeDigitThree();
+    void initializeDigitEight();
+    void initializeLogo();
 };
 
 #endif
