@@ -14,7 +14,7 @@ void SingleColorStyle::update() {
 void SingleColorStyle::reset()
 {
   // Set all pixels to a single color.
-  for (int i = 0; i < m_pixelBuffer->getPixelCount(); i++) {
+  for (uint i = 0; i < m_pixelBuffer->getPixelCount(); i++) {
     m_pixelBuffer->setPixel(i, m_color);
   }
 }

@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include <Adafruit_NeoPixel.h>
 #include <vector>
+#include <algorithm>
 
 #ifndef PIXEL_BUFFER_H
 #define PIXEL_BUFFER_H
@@ -85,7 +86,7 @@ class PixelBuffer {
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     
-    void initializeTestMatrixBuffer(int16_t gpioPin);
+    void initializeTestMatrixBuffer();
     void setColorForMappedPixels(std::vector<int>* destination, uint32_t newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);

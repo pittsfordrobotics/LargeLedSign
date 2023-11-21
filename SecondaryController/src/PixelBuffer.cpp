@@ -3,6 +3,10 @@
 #include "Arduino.h"
 #include "PixelBuffer.h"
 
+// All pixel buffers will have at least this many pixels, even if not used.
+// This is done to help the signs stay in sync.
+uint minimumPixelsInBuffer = 360;
+
 PixelBuffer::PixelBuffer(int16_t gpioPin) {
   m_gpioPin = gpioPin;
 }
@@ -13,7 +17,7 @@ void PixelBuffer::initialize(uint8_t signStyle) {
   
   switch (signStyle) {
     default:
-      initializeTestMatrixBuffer(m_gpioPin);
+      initializeTestMatrixBuffer();
   }
 
   clearBuffer();
@@ -142,10 +146,10 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int>* destination, uint32_
   }
 }
 
-void PixelBuffer::initializeTestMatrixBuffer(int16_t gpioPin) {
-  m_numPixels = 64;  // Set for the NEO PIXEL 8x8 matrix
+void PixelBuffer::initializeTestMatrixBuffer() {
+  m_numPixels = std::max(minimumPixelsInBuffer, (uint)64);
   m_pixelColors = new uint32_t[m_numPixels];
-  m_neoPixels = new Adafruit_NeoPixel(m_numPixels, gpioPin, NEO_GRB + NEO_KHZ800);
+  m_neoPixels = new Adafruit_NeoPixel(m_numPixels, m_gpioPin, NEO_GRB + NEO_KHZ800);
 
   // Map the pixel indices to rows, columns.
   // ROW 0 is at the TOP of the display.
