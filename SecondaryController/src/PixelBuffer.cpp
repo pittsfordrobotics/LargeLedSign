@@ -7,11 +7,11 @@
 // This is done to help the signs stay in sync.
 uint minimumPixelsInBuffer = 360;
 
-PixelBuffer::PixelBuffer(int16_t gpioPin) {
+PixelBuffer::PixelBuffer(int gpioPin) {
   m_gpioPin = gpioPin;
 }
 
-void PixelBuffer::initialize(uint8_t signStyle) {
+void PixelBuffer::initialize(byte signStyle) {
   Serial.print("Initializaing pixel buffer for style ");
   Serial.println(signStyle);
   
@@ -51,23 +51,23 @@ void PixelBuffer::displayPixels() {
   }
 }
 
-unsigned int PixelBuffer::getColumnCount() {
+uint PixelBuffer::getColumnCount() {
   return m_columns.size();
 }
 
-unsigned int PixelBuffer::getRowCount() {
+uint PixelBuffer::getRowCount() {
   return m_rows.size();
 }
 
-unsigned int PixelBuffer::getPixelCount() {
+uint PixelBuffer::getPixelCount() {
   return m_numPixels;
 }
 
-void PixelBuffer::setBrightness(uint8_t brightness) {
+void PixelBuffer::setBrightness(byte brightness) {
   m_neoPixels->setBrightness(brightness);
 }
 
-void PixelBuffer::setPixel(unsigned int pixel, uint32_t color) {
+void PixelBuffer::setPixel(unsigned int pixel, ulong color) {
   if (pixel >= m_numPixels) {
     return;
   }
@@ -75,7 +75,7 @@ void PixelBuffer::setPixel(unsigned int pixel, uint32_t color) {
   m_pixelColors[pixel] = color;
 }
 
-void PixelBuffer::shiftLineRight(uint32_t newColor)
+void PixelBuffer::shiftLineRight(ulong newColor)
 {
   for (uint i = m_numPixels - 1; i >= 1; i--)
   {
@@ -85,7 +85,7 @@ void PixelBuffer::shiftLineRight(uint32_t newColor)
   m_pixelColors[0] = newColor;
 }
 
-void PixelBuffer::shiftLineLeft(uint32_t newColor)
+void PixelBuffer::shiftLineLeft(ulong newColor)
 {
   for (uint i = 0; i < m_numPixels - 1; i++)
   {
@@ -95,27 +95,27 @@ void PixelBuffer::shiftLineLeft(uint32_t newColor)
   m_pixelColors[m_numPixels - 1] = newColor;
 }
 
-void PixelBuffer::shiftColumnsRight(uint32_t newColor)
+void PixelBuffer::shiftColumnsRight(ulong newColor)
 {
   shiftPixelBlocksRight(m_columns, newColor);
 }
 
-void PixelBuffer::shiftColumnsLeft(uint32_t newColor)
+void PixelBuffer::shiftColumnsLeft(ulong newColor)
 {
   shiftPixelBlocksLeft(m_columns, newColor);
 }
 
-void PixelBuffer::shiftRowsUp(uint32_t newColor)
+void PixelBuffer::shiftRowsUp(ulong newColor)
 {
   shiftPixelBlocksLeft(m_rows, newColor);
 }
 
-void PixelBuffer::shiftRowsDown(uint32_t newColor)
+void PixelBuffer::shiftRowsDown(ulong newColor)
 {
   shiftPixelBlocksRight(m_rows, newColor);
 }
 
-void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor) {
+void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor) {
   for (uint i = pixelBlocks.size() - 1; i >= 1; i--) {
     std::vector<int>* source = pixelBlocks.at(i - 1);
     std::vector<int>* destination = pixelBlocks.at(i);
@@ -127,7 +127,7 @@ void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBloc
   setColorForMappedPixels(pixelBlocks.at(0), newColor);
 }
 
-void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor) {
+void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor) {
   for (uint i = 0; i < pixelBlocks.size() - 1; i++) {
     std::vector<int>* source = pixelBlocks.at(i + 1);
     std::vector<int>* destination = pixelBlocks.at(i);

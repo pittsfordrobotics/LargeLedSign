@@ -8,63 +8,63 @@
 
 class PixelBuffer {
   public:
-    PixelBuffer(int16_t gpioPin);
+    PixelBuffer(int gpioPin);
 
-    void initialize(uint8_t signStyle);
+    void initialize(byte signStyle);
 
-    void setDigitsToLeft(uint16_t digitsToLeft) { m_digitsToLeft = digitsToLeft; }
-    void setDigitsToRight(uint16_t digitsToRight) { m_digitsToRight = digitsToRight; }
-    void setColsToLeft(uint16_t colsToLeft) { m_colsToLeft = colsToLeft; }
-    void setColsToRight(uint16_t colsToRight) { m_colsToRight = colsToRight; }
-    void setPixelsToLeft(uint16_t pixelsToLeft) { m_pixelsToLeft = pixelsToLeft; }
-    void setPixelsToRight(uint16_t pixelsToRight) { m_pixelsToRight = pixelsToRight; }
+    void setDigitsToLeft(uint digitsToLeft) { m_digitsToLeft = digitsToLeft; }
+    void setDigitsToRight(uint digitsToRight) { m_digitsToRight = digitsToRight; }
+    void setColsToLeft(uint colsToLeft) { m_colsToLeft = colsToLeft; }
+    void setColsToRight(uint colsToRight) { m_colsToRight = colsToRight; }
+    void setPixelsToLeft(uint pixelsToLeft) { m_pixelsToLeft = pixelsToLeft; }
+    void setPixelsToRight(uint pixelsToRight) { m_pixelsToRight = pixelsToRight; }
 
-    u_int16_t getDigitsToLeft() { return m_digitsToLeft; }
-    u_int16_t getDigitsToRight() { return m_digitsToRight; }
-    u_int16_t getColsToLeft() { return m_colsToLeft; }
-    u_int16_t getColsToRight() { return m_colsToRight; }
-    u_int16_t getPixelsToLeft() { return m_pixelsToLeft; }
-    u_int16_t getPixelsToRight() { return m_pixelsToRight; }
+    uint getDigitsToLeft() { return m_digitsToLeft; }
+    uint getDigitsToRight() { return m_digitsToRight; }
+    uint getColsToLeft() { return m_colsToLeft; }
+    uint getColsToRight() { return m_colsToRight; }
+    uint getPixelsToLeft() { return m_pixelsToLeft; }
+    uint getPixelsToRight() { return m_pixelsToRight; }
 
-    void setBrightness(uint8_t brightess);
+    void setBrightness(byte brightess);
 
     // Sets the first pixel in the buffer to the new color,
     // shifting all the pixels in the buffer to the right by one.
-    void shiftLineRight(uint32_t newColor);
+    void shiftLineRight(ulong newColor);
 
     // Sets the last pixel in the buffer to the new color,
     // shifting all the pixels in the buffer to the left by one.
-    void shiftLineLeft(uint32_t newColor);
+    void shiftLineLeft(ulong newColor);
 
     // Sets the pixels in the first column to the new color,
     // shifting all the columns to the right by one.
-    void shiftColumnsRight(uint32_t newColor);
+    void shiftColumnsRight(ulong newColor);
 
     // Sets the pixels in the last column to the new color,
     // shifting all the columns to the left by one.
-    void shiftColumnsLeft(uint32_t newColor);
+    void shiftColumnsLeft(ulong newColor);
 
     // Sets the pixels in the bottom row to the new color,
     // shifting all the rows up by one.
-    void shiftRowsUp(uint32_t newColor);
+    void shiftRowsUp(ulong newColor);
 
     // Sets the pixels in the top row to the new color,
     // shifting all the rows down by one.
-    void shiftRowsDown(uint32_t newColor);
+    void shiftRowsDown(ulong newColor);
 
     // Gets the number of pixels in the buffer.
-    unsigned int getPixelCount();
+    uint getPixelCount();
 
     // Gets the number of columns in the buffer.
     // Might not be needed?
-    unsigned int getColumnCount();
+    uint getColumnCount();
 
     // Gets the number of Rows in the buffer.
     // Might not be needed?
-    unsigned int getRowCount();
+    uint getRowCount();
 
     // Set an individual pixel in the buffer to a color.
-    void setPixel(unsigned int pixel, uint32_t color);
+    void setPixel(uint pixel, ulong color);
 
     // Output the interal pixel buffer to the NeoPixel LEDs.
     void displayPixels();
@@ -75,20 +75,20 @@ class PixelBuffer {
   private:
     int m_gpioPin;
     Adafruit_NeoPixel* m_neoPixels;
-    unsigned int m_numPixels{0};
-    uint32_t* m_pixelColors;
-    uint16_t m_digitsToLeft{0};
-    uint16_t m_digitsToRight{0};
-    uint16_t m_colsToLeft{0};
-    uint16_t m_colsToRight{0};
-    uint16_t m_pixelsToLeft{0};
-    uint16_t m_pixelsToRight{0};
+    uint m_numPixels{0};
+    ulong* m_pixelColors;
+    uint m_digitsToLeft{0};
+    uint m_digitsToRight{0};
+    uint m_colsToLeft{0};
+    uint m_colsToRight{0};
+    uint m_pixelsToLeft{0};
+    uint m_pixelsToRight{0};
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     
-    void setColorForMappedPixels(std::vector<int>* destination, uint32_t newColor);
-    void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);
-    void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, uint32_t newColor);
+    void setColorForMappedPixels(std::vector<int>* destination, ulong newColor);
+    void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor);
+    void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor);
     void initializeTestMatrix();
     void initializeDigitOne();
     void initializeDigitThree();
