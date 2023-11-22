@@ -123,15 +123,30 @@ void resetSecondaryConnections() {
 }
 
 void populateSecondaries() {
-  // Todo:
-  // Read the number of expected secondaries based on input.
   byte numberExpected = 2;
+
+  // If manual button 1 is pressed (ie, LOW), don't look for the logo.
+  bool includeLogo = digitalRead(manualInputPins[0]) == HIGH;
+  if (!includeLogo) {
+    numberExpected -= 1;
+  }
+
   setStatusDisplay(statusDisplay.encodeDigit(12), statusDisplay.encodeDigit(0), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
   while (allSecondaries.size() < numberExpected) {
-    SecondaryClient* secondary = scanForSecondary();
+    bool secondaryAdded = false;
+    SecondaryClient* secondary = scanForSecondary(includeLogo);
     if (secondary->isValidClient()) {
-      allSecondaries.push_back(secondary);
-      setStatusDisplay(statusDisplay.encodeDigit(12), statusDisplay.encodeDigit(allSecondaries.size()), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
+      // Could use 'secondary->getServiceStatus().getSignConfigurationData().getSignType()',
+      // but it seems easier to rely on the fact that the local name ends with <position>-<type>.
+      if (includeLogo || secondary->getLocalName().endsWith("-15") > -1) {
+        allSecondaries.push_back(secondary);
+        setStatusDisplay(statusDisplay.encodeDigit(12), statusDisplay.encodeDigit(allSecondaries.size()), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
+        secondaryAdded = true;
+      }
+    }
+    if (!secondaryAdded) {
+      // Clean up the memory from the invalid peripheral
+      delete secondary;
     }
   }
 
@@ -144,7 +159,7 @@ void populateSecondaries() {
   statusDisplay.clear();
 }
 
-SecondaryClient* scanForSecondary() {
+SecondaryClient* scanForSecondary(bool includeLogo) {
   Serial.print("Scanning for peripherals with uuid = ");
   Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
   bool allowDuplicateAdvertisements = true;
