@@ -1,9 +1,10 @@
+#ifndef TWO_COLOR_STYLE_H
+#define TWO_COLOR_STYLE_H
+
 #include "LightStyle.h"
 #include "Arduino.h"
 #include "PixelBuffer.h"
-
-#ifndef TWO_COLOR_STYLE_H
-#define TWO_COLOR_STYLE_H
+#include "LightPatterns.h"
 
 class TwoColorStyle : public LightStyle {
   public:
@@ -15,6 +16,7 @@ class TwoColorStyle : public LightStyle {
   private:
     int getIterationDelay();
     int getModulus();
+    bool shouldShiftMultiple();
 
     uint32_t m_color1;
     uint32_t m_color2;

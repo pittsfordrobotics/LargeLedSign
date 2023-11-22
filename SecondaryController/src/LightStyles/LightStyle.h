@@ -1,8 +1,9 @@
-#include "Arduino.h"
-#include "PixelBuffer.h"
-
 #ifndef LIGHT_STYLE_H
 #define LIGHT_STYLE_H
+
+#include "Arduino.h"
+#include "PixelBuffer.h"
+#include "LightPatterns.h"
 
 class LightStyle {
   public:

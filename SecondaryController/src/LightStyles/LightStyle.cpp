@@ -8,6 +8,7 @@ LightStyle::LightStyle(String name, PixelBuffer* pixelBuffer) {
   m_pixelBuffer = pixelBuffer;
   m_name = name;
   if (knownPatterns.size() == 0) {
+    // These need to be in the same order as the  enum values in LightPatterns.h
     knownPatterns.push_back("Solid");
     knownPatterns.push_back("Right");
     knownPatterns.push_back("Left");
@@ -35,13 +36,13 @@ void LightStyle::setPattern(byte pattern) {
 
 int LightStyle::getNumberOfBlocksForPattern() {
   switch (m_pattern) {
-    case 1: // Right
-    case 2: // Left
+    case static_cast<int>(LightPatterns::Right):
+    case static_cast<int>(LightPatterns::Left):
       return m_pixelBuffer->getColumnCount();
-    case 3: // Up
-    case 4: // Down
+    case static_cast<int>(LightPatterns::Up):
+    case static_cast<int>(LightPatterns::Down):
       return m_pixelBuffer->getRowCount();
-    default: // 0 = solid; 5 = digit
+    default: // Solid, digit, or undfined
       // All lights in the sign use the same color
       return 1;
   }
@@ -49,16 +50,16 @@ int LightStyle::getNumberOfBlocksForPattern() {
 
 int LightStyle::getNumberOfBlocksToDrain() {
   switch (m_pattern) {
-    case 1: // Right
+    case static_cast<int>(LightPatterns::Right):
       return m_pixelBuffer->getColsToRight();
-    case 2: // Left
+    case static_cast<int>(LightPatterns::Left):
       return m_pixelBuffer->getColsToLeft();
-    case 3: // Up
-    case 4: // Down
+    case static_cast<int>(LightPatterns::Up):
+    case static_cast<int>(LightPatterns::Down):
       return 0;
-    case 5: // Digit
+    case static_cast<int>(LightPatterns::Digit):
       return m_pixelBuffer->getDigitsToRight();
-    default: // 0 = Solid
+    default: // Solid or undefined
       return 0;
   }
 }
@@ -67,16 +68,16 @@ void LightStyle::shiftColorUsingPattern(uint32_t newColor) {
   // Stick with integer values here instead of doing a bunch
   // of "ifs" to compare strings.  
   switch (m_pattern) {
-    case 1: // Right
+    case static_cast<int>(LightPatterns::Right):
       m_pixelBuffer->shiftColumnsRight(newColor);
       return;
-    case 2: // Left
+    case static_cast<int>(LightPatterns::Left):
       m_pixelBuffer->shiftColumnsLeft(newColor);
       return;
-    case 3: // Up
+    case static_cast<int>(LightPatterns::Up):
       m_pixelBuffer->shiftRowsUp(newColor);
       return;
-    case 4: // Down
+    case static_cast<int>(LightPatterns::Down):
       m_pixelBuffer->shiftRowsDown(newColor);
       return;
     default:

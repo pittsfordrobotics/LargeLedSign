@@ -30,7 +30,7 @@ void TwoColorStyle::update() {
   shiftColorUsingPattern(newColor);
   // If shifting rows or columns, do 2 at a time.
   // That is, if pattern = 1,2,3,4 -> right, left, up, down
-  if (m_pattern >=1 && m_pattern <=4) {
+  if (shouldShiftMultiple()) {
     shiftColorUsingPattern(newColor);
   }
   
@@ -42,8 +42,9 @@ void TwoColorStyle::reset()
 {
   m_iterationCount = getNumberOfBlocksToDrain();
 
-  if (m_pattern >= 1 && m_pattern <=4 ) {
-    // For patterns 1-4, we shift 2 blocks for every iteration.
+
+  if (shouldShiftMultiple()) {
+    // For Right/Left/Up/Down, shift 2 blocks for every iteration.
     m_iterationCount = (m_iterationCount + 1)/2;
   }
 
@@ -65,9 +66,8 @@ void TwoColorStyle::reset()
     }
         
     shiftColorUsingPattern(newColor);
-    // If shifting rows or columns, do 2 at a time.
-    // That is, if pattern = 1,2,3,4 -> right, left, up, down
-    if (m_pattern >=1 && m_pattern <=4) {
+    // For Right/Left/Up/Down, shift 2 blocks for every iteration.
+  if (shouldShiftMultiple()) {
       shiftColorUsingPattern(newColor);
     }
   }
@@ -106,6 +106,13 @@ int TwoColorStyle::getModulus() {
   double b = minMod;
   int mod = x*m + b;
   return mod;
+}
+
+bool TwoColorStyle::shouldShiftMultiple() {
+  return m_pattern == static_cast<int>(LightPatterns::Right)
+      || m_pattern == static_cast<int>(LightPatterns::Left)
+      || m_pattern == static_cast<int>(LightPatterns::Up)
+      || m_pattern == static_cast<int>(LightPatterns::Down);
 }
 
 
