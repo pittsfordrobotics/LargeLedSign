@@ -125,12 +125,12 @@ void populateSecondaries() {
   // Todo:
   // Read the number of expected secondaries based on input.
   byte numberExpected = 2;
-  setStatusDisplay(DISPLAY_EMPTY, statusDisplay.encodeDigit(0), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
+  setStatusDisplay(statusDisplay.encodeDigit(12), statusDisplay.encodeDigit(0), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
   while (allSecondaries.size() < numberExpected) {
     SecondaryClient* secondary = scanForSecondary();
     if (secondary->isValidClient()) {
       allSecondaries.push_back(secondary);
-      setStatusDisplay(DISPLAY_EMPTY, statusDisplay.encodeDigit(allSecondaries.size()), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
+      setStatusDisplay(statusDisplay.encodeDigit(12), statusDisplay.encodeDigit(allSecondaries.size()), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
     }
   }
 
@@ -177,6 +177,8 @@ SecondaryClient* scanForSecondary() {
 }
 
 void consolidateTotalsAndWriteToSecondaries() {
+  // Status C---
+  setStatusDisplay(statusDisplay.encodeDigit(12), DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH);
   uint numDigits = allSecondaries.size();
 
   // Stash the sign config data for each secondary so we don't retrieve it every time.
@@ -196,6 +198,7 @@ void consolidateTotalsAndWriteToSecondaries() {
   int colsSoFar = 0;
   int pixelsSoFar = 0;
   for (uint i = 0; i < numDigits; i++) {
+    setStatusDisplay(statusDisplay.encodeDigit(12), DISPLAY_DASH, DISPLAY_DASH, statusDisplay.encodeDigit(i+1));
     SignConfigurationData signConfigData(signConfigurations[i]);
     signConfigData.setDigitsToLeft(i);
     signConfigData.setDigitsToRight(numDigits - i - 1);
@@ -209,6 +212,8 @@ void consolidateTotalsAndWriteToSecondaries() {
     // Write the data back to the secondary
     allSecondaries[i]->setSignConfigurationData(signConfigData.getConfigurationString());
   }
+
+  statusDisplay.clear();
 }
 
 void startBLEService() {

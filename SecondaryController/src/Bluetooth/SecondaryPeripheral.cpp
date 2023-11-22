@@ -3,6 +3,7 @@
 SecondaryPeripheral::SecondaryPeripheral()
 {
     m_additionalCharacteristics.push_back(m_signDataCharacteristic);
+    m_additionalCharacteristics.push_back(m_syncDataCharacteristic);
 }
 
 String SecondaryPeripheral::getSignConfigurationData()

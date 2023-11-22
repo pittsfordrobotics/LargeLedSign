@@ -189,7 +189,11 @@ void startBLE() {
 
 // Read the BLE settings to see if any have been changed.
 void readBleSettings() {
-  SignConfigurationData newConfigData(btService.getSignConfigurationData());
+  String configString = btService.getSignConfigurationData();
+  Serial.print("Read config data string: ");
+  Serial.println(configString);
+  SignConfigurationData newConfigData(configString);
+  Serial.println("Created config data.");
   if (newConfigData != currentConfigData) {
     resetPixelBufferOffsets(newConfigData);
     currentConfigData = newConfigData;
@@ -253,7 +257,10 @@ void updateLEDs() {
   int shouldResetStyle = false;
   if (newSyncData > 0 && newSyncData != currentSyncData) {
     // Sync data changed -- force a refresh even if nothing else changed.
+    Serial.print("New sync data received: ");
+    Serial.println(newSyncData);
     shouldResetStyle = true;
+    currentSyncData = newSyncData;
   }
 
   if (newBrightness != currentBrightness) {
