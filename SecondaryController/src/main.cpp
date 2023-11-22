@@ -191,19 +191,16 @@ void startBLE() {
 
 // Read the BLE settings to see if any have been changed.
 void readBleSettings() {
-  // String configString = btService.getSignConfigurationData();
-  // Serial.print("Read config data string: ");
-  // Serial.println(configString);
-  // SignConfigurationData newConfigData(configString);
-  // Serial.println("Created config data.");
-  // if (newConfigData != currentConfigData) {
-  //   resetPixelBufferOffsets(newConfigData);
-  //   currentConfigData = newConfigData;
-  // }
+  String offsetString = btService.getSignOffsetData();
+  SignOffsetData newOffsetData(offsetString);
+  if (newOffsetData != currentOffsetData) {
+    resetPixelBufferOffsets(newOffsetData);
+    currentOffsetData = newOffsetData;
+  }
 
   newSyncData = btService.getSyncData();
   if (newSyncData > 0 && newSyncData == currentSyncData) {
-    // We're triggering changes based on the sync signal, and it hasn't changed.
+    // We're triggering changes based on the sync signal, but it hasn't changed.
     // Do nothing.
     return;
   }

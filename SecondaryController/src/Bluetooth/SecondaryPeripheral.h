@@ -9,14 +9,12 @@
 class SecondaryPeripheral : public CommonPeripheral {
   public:
     SecondaryPeripheral();
-    String getSignConfigurationData();
     void setSignConfigurationData(String signData);
     String getSignOffsetData();
     ulong getSyncData();
     void setSyncData(ulong syncData);
 
   private:
-    String m_currentSignData;
     String m_currentOffsetData;
     ulong m_currentSyncData{0};
     BLEStringCharacteristic m_signConfigurationCharacteristic{ BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
