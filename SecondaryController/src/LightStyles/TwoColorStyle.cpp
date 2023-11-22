@@ -42,6 +42,11 @@ void TwoColorStyle::reset()
 {
   m_iterationCount = getNumberOfBlocksToDrain();
 
+  if (m_pattern >= 1 && m_pattern <=4 ) {
+    // For patterns 1-4, we shift 2 blocks for every iteration.
+    m_iterationCount = (m_iterationCount + 1)/2;
+  }
+
   uint32_t primaryColor = m_color1;
   uint32_t secondaryColor = m_color2;
   int mod = getModulus();
@@ -53,10 +58,17 @@ void TwoColorStyle::reset()
 
   int numBlocks = getNumberOfBlocksForPattern();
   for (int i = 0; i < numBlocks; i++) {
-    if (mod > 0 && i % mod == 0) {
-      shiftColorUsingPattern(secondaryColor);
-    } else {
-      shiftColorUsingPattern(primaryColor);
+    m_iterationCount++;
+    ulong newColor = primaryColor;
+    if (mod > 0 && m_iterationCount % mod == 0) {
+      newColor = secondaryColor;
+    }
+        
+    shiftColorUsingPattern(newColor);
+    // If shifting rows or columns, do 2 at a time.
+    // That is, if pattern = 1,2,3,4 -> right, left, up, down
+    if (m_pattern >=1 && m_pattern <=4) {
+      shiftColorUsingPattern(newColor);
     }
   }
 }
