@@ -16,15 +16,11 @@ class PixelBuffer {
     void setDigitsToRight(uint digitsToRight) { m_digitsToRight = digitsToRight; }
     void setColsToLeft(uint colsToLeft) { m_colsToLeft = colsToLeft; }
     void setColsToRight(uint colsToRight) { m_colsToRight = colsToRight; }
-    void setPixelsToLeft(uint pixelsToLeft) { m_pixelsToLeft = pixelsToLeft; }
-    void setPixelsToRight(uint pixelsToRight) { m_pixelsToRight = pixelsToRight; }
 
     uint getDigitsToLeft() { return m_digitsToLeft; }
     uint getDigitsToRight() { return m_digitsToRight; }
     uint getColsToLeft() { return m_colsToLeft; }
     uint getColsToRight() { return m_colsToRight; }
-    uint getPixelsToLeft() { return m_pixelsToLeft; }
-    uint getPixelsToRight() { return m_pixelsToRight; }
 
     void setBrightness(byte brightess);
 
@@ -81,8 +77,6 @@ class PixelBuffer {
     uint m_digitsToRight{0};
     uint m_colsToLeft{0};
     uint m_colsToRight{0};
-    uint m_pixelsToLeft{0};
-    uint m_pixelsToRight{0};
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     

@@ -30,7 +30,7 @@
 #define DEFAULTBRIGHTNESS 20  // Brightness should be between 0 and 255.
 #define DEFAULTSPEED 90       // Speed should be between 1 and 100.
 #define DEFAULTSTEP  70       // Step should be between 1 and 100.
-#define DEFAULTPATTERN 6      // Default pattern (ie, Row/Column/Digit/etc). This is an index into the LightStyle::knownPatterns vector.
+#define DEFAULTPATTERN 1      // Default pattern (ie, Row/Column/Digit/etc). This is an index into the LightStyle::knownPatterns vector.
 
 // Batter power monitoring
 #define LOWPOWERTHRESHOLD 5.9     // The voltage below which the system will go into "low power" mode.

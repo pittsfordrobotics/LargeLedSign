@@ -14,7 +14,6 @@ LightStyle::LightStyle(String name, PixelBuffer* pixelBuffer) {
     knownPatterns.push_back("Up");
     knownPatterns.push_back("Down");
     knownPatterns.push_back("Digit");
-    knownPatterns.push_back("Linear");
   }
 }
 
@@ -42,8 +41,6 @@ int LightStyle::getNumberOfBlocksForPattern() {
     case 3: // Up
     case 4: // Down
       return m_pixelBuffer->getRowCount();
-    case 6: // Linear
-      return m_pixelBuffer->getPixelCount();
     default: // 0 = solid; 5 = digit
       // All lights in the sign use the same color
       return 1;
@@ -61,8 +58,6 @@ int LightStyle::getNumberOfBlocksToDrain() {
       return 0;
     case 5: // Digit
       return m_pixelBuffer->getDigitsToRight();
-    case 6: // Linear
-      return m_pixelBuffer->getPixelsToRight();
     default: // 0 = Solid
       return 0;
   }
