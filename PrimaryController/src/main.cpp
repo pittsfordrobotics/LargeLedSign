@@ -8,6 +8,7 @@ std::vector<int> manualInputPins { MANUAL_INPUT_PINS };
 std::vector<SecondaryClient*> allSecondaries;
 ulong nextConnectionCheck = 0;
 ulong lastButtonPress = 0;
+bool resetRequested = false;
 
 ServiceStatus lastServiceStatus;
 ServiceStatus currentServiceStatus;
@@ -58,8 +59,8 @@ void loop() {
   // Manual inputs will override BLE settings, so read them last.
   readSettingsFromManualInputs();
 
-  if (currentServiceStatus != lastServiceStatus) {
-    Serial.println("Status change detected.");
+  if (currentServiceStatus != lastServiceStatus || resetRequested) {
+    resetRequested = false;
     updateAllSecondaries();
     lastServiceStatus = currentServiceStatus;
   }
@@ -210,7 +211,9 @@ void consolidateTotalsAndWriteToSecondaries() {
     pixelsSoFar += signConfigurations[i].getPixelCount();
     
     // Write the data back to the secondary
-    allSecondaries[i]->setSignConfigurationData(signConfigData.getConfigurationString());
+    String configData = String(signConfigData.getConfigurationString());
+    Serial.println(configData);
+    allSecondaries[i]->setSignConfigurationData(configData);
   }
 
   statusDisplay.clear();
@@ -266,6 +269,7 @@ void readSettingsFromManualInputs() {
       Serial.println(i);
       setManualStyle(i);
       lastButtonPress = millis();
+      resetRequested = true;
       return;
     }
   }
@@ -324,7 +328,7 @@ void setManualStyle(uint style) {
   // TODO: if a button was pressed (even if it was the same style),
   // update the "sync" signal to reset the secondaries.
   
-  // Update the BLE settings to reflect the new manual settings.
+  // Update the local BLE settings to reflect the new manual settings.
   btService.setBrightness(currentServiceStatus.getBrightness());
   btService.setPattern(currentServiceStatus.getPattern());
   btService.setSpeed(currentServiceStatus.getSpeed());

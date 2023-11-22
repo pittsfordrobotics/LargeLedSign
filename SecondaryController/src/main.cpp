@@ -63,7 +63,8 @@ void setup() {
 // Main loop --
 // This metod is called continously.
 void loop()
-{  
+{
+  BLE.poll();
   emitTelemetry();
   //checkForLowPowerState();
 
@@ -189,15 +190,15 @@ void startBLE() {
 
 // Read the BLE settings to see if any have been changed.
 void readBleSettings() {
-  String configString = btService.getSignConfigurationData();
-  Serial.print("Read config data string: ");
-  Serial.println(configString);
-  SignConfigurationData newConfigData(configString);
-  Serial.println("Created config data.");
-  if (newConfigData != currentConfigData) {
-    resetPixelBufferOffsets(newConfigData);
-    currentConfigData = newConfigData;
-  }
+  // String configString = btService.getSignConfigurationData();
+  // Serial.print("Read config data string: ");
+  // Serial.println(configString);
+  // SignConfigurationData newConfigData(configString);
+  // Serial.println("Created config data.");
+  // if (newConfigData != currentConfigData) {
+  //   resetPixelBufferOffsets(newConfigData);
+  //   currentConfigData = newConfigData;
+  // }
 
   newSyncData = btService.getSyncData();
   if (newSyncData > 0 && newSyncData == currentSyncData) {
