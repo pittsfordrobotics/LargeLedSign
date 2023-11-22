@@ -35,6 +35,8 @@ void RainbowStyle::reset()
     shiftColorUsingPattern(Adafruit_NeoPixel::ColorHSV(m_currentHue));
     incrementHue();
   }
+
+  m_nextUpdate = 0;
 }
 
 int RainbowStyle::getIterationDelay() {

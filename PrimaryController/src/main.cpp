@@ -33,8 +33,9 @@ void setup() {
   // todo:
   // Calculate all the digit/column/pixel offsets and write them back to the peripherals.
   consolidateTotalsAndWriteToSecondaries();
-  setManualStyle(0);
   startBLEService();
+  setManualStyle(0);
+  resetRequested = true;
   nextConnectionCheck = millis() + CONNECTION_CHECK_INTERVAL;
 }
 
@@ -114,12 +115,9 @@ void resetSecondaryConnections() {
     }
     allSecondaries.clear();
     populateSecondaries();
-    // Not bothering to recalculate totals at this point...
-    // The assumption is that the connection was interrupted due to signal loss to the client,
-    // not power loss at the client.  The client should still retain all the sign data needed
-    // to properly operate.
-    // If it turns out that client power loss or client reset is an issue, we should recalculate
-    // the totals and republish them to all clients.
+    consolidateTotalsAndWriteToSecondaries();
+    setManualStyle(0);
+    resetRequested = true;
 }
 
 void populateSecondaries() {
@@ -138,7 +136,7 @@ void populateSecondaries() {
     if (secondary->isValidClient()) {
       // Could use 'secondary->getServiceStatus().getSignConfigurationData().getSignType()',
       // but it seems easier to rely on the fact that the local name ends with <position>-<type>.
-      if (includeLogo || secondary->getLocalName().endsWith("-15") > -1) {
+      if (includeLogo || !secondary->getLocalName().endsWith("-15")) {
         allSecondaries.push_back(secondary);
         setStatusDisplay(statusDisplay.encodeDigit(12), statusDisplay.encodeDigit(allSecondaries.size()), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
         secondaryAdded = true;
@@ -332,8 +330,6 @@ void setManualStyle(uint style) {
       currentServiceStatus.setStep(95);
       currentServiceStatus.setStyle(0);
   }
-  // TODO: if a button was pressed (even if it was the same style),
-  // update the "sync" signal to reset the secondaries.
   
   // Update the local BLE settings to reflect the new manual settings.
   btService.setBrightness(currentServiceStatus.getBrightness());

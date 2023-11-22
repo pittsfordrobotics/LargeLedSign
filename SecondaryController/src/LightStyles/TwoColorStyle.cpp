@@ -57,7 +57,7 @@ void TwoColorStyle::reset()
   }
 
   int numBlocks = getNumberOfBlocksForPattern();
-  for (int i = 0; i < numBlocks; i++) {
+  for (int i = 0; i < numBlocks + 1; i++) {
     m_iterationCount++;
     ulong newColor = primaryColor;
     if (mod > 0 && m_iterationCount % mod == 0) {
@@ -71,6 +71,8 @@ void TwoColorStyle::reset()
       shiftColorUsingPattern(newColor);
     }
   }
+  
+  m_nextUpdate = 0;
 }
 
 int TwoColorStyle::getIterationDelay() {
