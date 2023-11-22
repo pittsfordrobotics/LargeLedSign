@@ -13,6 +13,7 @@
 #include <BluetoothCommon.h>
 #include "Bluetooth\SecondaryPeripheral.h"
 #include <SignConfigurationData.h>
+#include <SignOffsetData.h>
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
@@ -53,6 +54,6 @@ void emitTelemetry();
 void indicateBleFailure();
 byte getSignType();
 byte getSignPosition();
-void resetPixelBufferOffsets(SignConfigurationData configData);
+void resetPixelBufferOffsets(SignOffsetData configData);
 
 #endif

@@ -30,7 +30,7 @@ byte currentPattern = DEFAULTPATTERN;
 byte newPattern = DEFAULTPATTERN;
 ulong currentSyncData = 0;
 ulong newSyncData = 0;
-SignConfigurationData currentConfigData;
+SignOffsetData currentOffsetData;
 byte signType;
 byte signPosition;
 
@@ -180,12 +180,13 @@ void startBLE() {
   btService.setStep(DEFAULTSTEP);
   btService.setSyncData(0);
 
-  currentConfigData.setSignType(signType);
-  currentConfigData.setSignOrder(signPosition);
-  currentConfigData.setColumnCount(pixelBuffer.getColumnCount());
-  currentConfigData.setPixelCount(pixelBuffer.getPixelCount());
+  SignConfigurationData configData;
+  configData.setSignType(signType);
+  configData.setSignOrder(signPosition);
+  configData.setColumnCount(pixelBuffer.getColumnCount());
+  configData.setPixelCount(pixelBuffer.getPixelCount());
 
-  btService.setSignConfigurationData(currentConfigData.getConfigurationString());
+  btService.setSignConfigurationData(configData.getConfigurationString());
 }
 
 // Read the BLE settings to see if any have been changed.
@@ -415,23 +416,17 @@ void indicateBleFailure() {
   }
 }
 
-void resetPixelBufferOffsets(SignConfigurationData configData) {
-  if (configData.getDigitsToLeft() >= 0) {
-    pixelBuffer.setDigitsToLeft(configData.getDigitsToLeft());
+void resetPixelBufferOffsets(SignOffsetData offsetData) {
+  if (offsetData.getDigitsToLeft() >= 0) {
+    pixelBuffer.setDigitsToLeft(offsetData.getDigitsToLeft());
   }
-  if (configData.getDigitsToRight() >= 0) {
-    pixelBuffer.setDigitsToRight(configData.getDigitsToRight());
+  if (offsetData.getDigitsToRight() >= 0) {
+    pixelBuffer.setDigitsToRight(offsetData.getDigitsToRight());
   }
-  if (configData.getColumnsToLeft() >= 0) {
-    pixelBuffer.setColsToLeft(configData.getColumnsToLeft());
+  if (offsetData.getColumnsToLeft() >= 0) {
+    pixelBuffer.setColsToLeft(offsetData.getColumnsToLeft());
   }
-  if (configData.getColumnsToRight() >= 0) {
-    pixelBuffer.setColsToRight(configData.getColumnsToRight());
-  }
-  if (configData.getPixelsToLeft() >= 0) {
-    pixelBuffer.setPixelsToLeft(configData.getPixelsToLeft());
-  }
-  if (configData.getPixelsToRight() >= 0) {
-    pixelBuffer.setPixelsToRight(configData.getPixelsToRight());
+  if (offsetData.getColumnsToRight() >= 0) {
+    pixelBuffer.setColsToRight(offsetData.getColumnsToRight());
   }
 }
