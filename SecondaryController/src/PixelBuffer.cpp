@@ -154,8 +154,6 @@ void PixelBuffer::initializeTestMatrix() {
   // Map the pixel indices to rows, columns.
   // ROW 0 is at the TOP of the display.
   // COLUMN 0 is at the LEFT of the display.
-
-  // Establish the 8 rows
   for (int col = 8; col >= 0; col--) {
     std::vector<int>* rowVector = new std::vector<int>();
     for (int row = 0; row < 8; row++) {
@@ -169,9 +167,6 @@ void PixelBuffer::initializeTestMatrix() {
     m_rows.push_back(rowVector);
   }
 
-  // Establish the 8 cols
-  // The pixels count up from the bottom, but we want rows to count up from the top,
-  // so go in reverse order.
   for (int col = 7; col >= 0; col--) {
     std::vector<int>* colVector = new std::vector<int>();
     for (int row = 0; row < 8; row++){
