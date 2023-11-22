@@ -29,7 +29,7 @@ class SecondaryClient {
         void setStyle(byte style);
         void setSpeed(byte speed);
         void setStep(byte step);
-        void setSignConfigurationData(String signConfigurationData);
+        void setSignOffsetData(String offsetData);
         void updateSyncData(ulong syncData);
 
     private:

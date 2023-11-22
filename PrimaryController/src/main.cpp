@@ -190,30 +190,22 @@ void consolidateTotalsAndWriteToSecondaries() {
   }
 
   int numCols = 0;
-  int numPixels = 0;
   for (uint i = 0; i < numDigits; i++) {
     numCols += signConfigurations[i].getColumnCount();
-    numPixels += signConfigurations[i].getPixelCount();
   }
 
   int colsSoFar = 0;
-  int pixelsSoFar = 0;
   for (uint i = 0; i < numDigits; i++) {
     setStatusDisplay(statusDisplay.encodeDigit(12), DISPLAY_DASH, DISPLAY_DASH, statusDisplay.encodeDigit(i+1));
-    SignConfigurationData signConfigData(signConfigurations[i]);
-    signConfigData.setDigitsToLeft(i);
-    signConfigData.setDigitsToRight(numDigits - i - 1);
-    signConfigData.setColumnsToLeft(colsSoFar);
-    signConfigData.setColumnsToRight(numCols - colsSoFar - signConfigData.getColumnCount());
+    SignOffsetData offsetData;
+    offsetData.setDigitsToLeft(i);
+    offsetData.setDigitsToRight(numDigits - i - 1);
+    offsetData.setColumnsToLeft(colsSoFar);
+    offsetData.setColumnsToRight(numCols - colsSoFar - signConfigurations[i].getColumnCount());
     colsSoFar += signConfigurations[i].getColumnCount();
-    signConfigData.setPixelsToLeft(pixelsSoFar);
-    signConfigData.setPixelsToRight(numPixels - pixelsSoFar - signConfigData.getPixelCount());
-    pixelsSoFar += signConfigurations[i].getPixelCount();
     
     // Write the data back to the secondary
-    String configData = String(signConfigData.getConfigurationString());
-    Serial.println(configData);
-    allSecondaries[i]->setSignConfigurationData(configData);
+    allSecondaries[i]->setSignOffsetData(offsetData.getOffsetDataString());
   }
 
   statusDisplay.clear();

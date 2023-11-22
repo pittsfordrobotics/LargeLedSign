@@ -16,12 +16,12 @@ void SecondaryClient::initialize()
         return;
     }
 
-    BLECharacteristic signDataCharacteristic = m_peripheral.characteristic(BTCOMMON_SIGNDATACHARACTERISTIC_UUID);
+    BLECharacteristic signDataCharacteristic = m_peripheral.characteristic(BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID);
 
     if (!signDataCharacteristic)
     {
         Serial.print("Peripheral does not have a characteristic with id '");
-        Serial.print(BTCOMMON_SIGNDATACHARACTERISTIC_UUID);
+        Serial.print(BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID);
         Serial.println("'!");
         disconnect();
         return;
@@ -69,7 +69,7 @@ ServiceStatus SecondaryClient::getServiceStatus() {
     status.setStep(getByteValue(BTCOMMON_STEPCHARACTERISTIC_UUID));
     status.setStyle(getByteValue(BTCOMMON_STYLECHARACTERISTIC_UUID));
     status.setStyleNames(getStringValue(BTCOMMON_STYLENAMESCHARACTERISTIC_UUID));
-    String signConfigData = getStringValue(BTCOMMON_SIGNDATACHARACTERISTIC_UUID);
+    String signConfigData = getStringValue(BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID);
     status.setSignConfigurationData(SignConfigurationData(signConfigData));
 
     return status;
@@ -95,8 +95,8 @@ void SecondaryClient::setStep(byte step) {
     m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
 }
 
-void SecondaryClient::setSignConfigurationData(String signConfigurationData) {
-    m_peripheral.characteristic(BTCOMMON_SIGNDATACHARACTERISTIC_UUID).writeValue(signConfigurationData.c_str());
+void SecondaryClient::setSignOffsetData(String offsetData) {
+    m_peripheral.characteristic(BTCOMMON_OFFSETDATA_CHARACTERISTIC_UUID).writeValue(offsetData.c_str());
 }
 
 void SecondaryClient::updateSyncData(ulong syncData) {

@@ -7,6 +7,8 @@
 #include "CommonPeripheral.h"
 #include "Bluetooth/SecondaryClient.h"
 #include <TM1637Display.h>
+#include <SignConfigurationData.h>
+#include <SignOffsetData.h>
 
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line
