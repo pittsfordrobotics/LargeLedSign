@@ -9,6 +9,7 @@ std::vector<SecondaryClient*> allSecondaries;
 ulong nextConnectionCheck = 0;
 ulong lastButtonPress = 0;
 bool resetRequested = false;
+bool shouldIgnoreLogo = false;
 
 ServiceStatus lastServiceStatus;
 ServiceStatus currentServiceStatus;
@@ -19,6 +20,10 @@ void setup() {
   Serial.println("Starting...");
   
   initializeIO();
+  
+  // If manual button 1 is pressed (ie, LOW), don't look for the logo.
+  shouldIgnoreLogo = digitalRead(manualInputPins[0]) == LOW;
+
   statusDisplay.setBrightness(TM1637_BRIGHTNESS);
   setStatusDisplay(DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH);
   
@@ -123,20 +128,18 @@ void resetSecondaryConnections() {
 void populateSecondaries() {
   byte numberExpected = 2;
 
-  // If manual button 1 is pressed (ie, LOW), don't look for the logo.
-  bool includeLogo = digitalRead(manualInputPins[0]) == HIGH;
-  if (!includeLogo) {
+  if (shouldIgnoreLogo) {
     numberExpected -= 1;
   }
 
   setStatusDisplay(statusDisplay.encodeDigit(12), statusDisplay.encodeDigit(0), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
   while (allSecondaries.size() < numberExpected) {
     bool secondaryAdded = false;
-    SecondaryClient* secondary = scanForSecondary(includeLogo);
+    SecondaryClient* secondary = scanForSecondary();
     if (secondary->isValidClient()) {
       // Could use 'secondary->getServiceStatus().getSignConfigurationData().getSignType()',
       // but it seems easier to rely on the fact that the local name ends with <position>-<type>.
-      if (includeLogo || !secondary->getLocalName().endsWith("-15")) {
+      if (!shouldIgnoreLogo || !secondary->getLocalName().endsWith("-15")) {
         allSecondaries.push_back(secondary);
         setStatusDisplay(statusDisplay.encodeDigit(12), statusDisplay.encodeDigit(allSecondaries.size()), DISPLAY_DASH, statusDisplay.encodeDigit(numberExpected));
         secondaryAdded = true;
@@ -157,7 +160,7 @@ void populateSecondaries() {
   statusDisplay.clear();
 }
 
-SecondaryClient* scanForSecondary(bool includeLogo) {
+SecondaryClient* scanForSecondary() {
   Serial.print("Scanning for peripherals with uuid = ");
   Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
   bool allowDuplicateAdvertisements = true;

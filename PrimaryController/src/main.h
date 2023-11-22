@@ -31,7 +31,7 @@ void startBLEService();
 void readSettingsFromBLE();
 void readSettingsFromManualInputs();
 void setManualStyle(uint style);
-SecondaryClient* scanForSecondary(bool includeLogo);
+SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
 void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4);
 void checkSecondaryConnections();
