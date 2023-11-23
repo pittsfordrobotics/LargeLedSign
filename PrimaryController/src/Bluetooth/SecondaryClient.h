@@ -4,8 +4,8 @@
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include <BluetoothCommon.h>
-#include "StringUtils.h"
-#include "SignStatus.h"
+#include <StringUtils.h>
+#include <SignStatus.h>
 
 class SecondaryClient {
     public:
