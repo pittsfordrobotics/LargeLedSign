@@ -4,13 +4,14 @@
 CommonPeripheral btService;
 TM1637Display statusDisplay(TM1637_CLOCK, TM1637_DIO);
 
-std::vector<int> manualInputPins { MANUAL_INPUT_PINS };
+std::vector<ManualButton*> manualInputButtons;
 std::vector<SecondaryClient*> allSecondaries;
 ulong nextConnectionCheck = 0;
 ulong lastButtonPress = 0;
 bool resetRequested = false;
 bool shouldIgnoreLogo = false;
-
+ulong loopCounter = 0;
+ulong lastTelemetryTimestamp = 0;
 ServiceStatus lastServiceStatus;
 ServiceStatus currentServiceStatus;
 
@@ -22,7 +23,7 @@ void setup() {
   initializeIO();
   
   // If manual button 1 is pressed (ie, LOW), don't look for the logo.
-  shouldIgnoreLogo = digitalRead(manualInputPins[0]) == LOW;
+  shouldIgnoreLogo = digitalRead(manualInputButtons[0]->rawPinStatus()) == LOW;
 
   statusDisplay.setBrightness(TM1637_BRIGHTNESS);
   setStatusDisplay(DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH);
@@ -53,16 +54,10 @@ void loop() {
     statusDisplay.clear();
   }
 
-  if (millis() > nextConnectionCheck) {
-    if (!btService.isConnected()) {
-      // Verify we're still connected to all secondaries.
-      checkSecondaryConnections();
-      nextConnectionCheck = millis() + CONNECTION_CHECK_INTERVAL;
-    }
-  }
-
+  checkSecondaryConnections();
   readSettingsFromBLE();
   // Manual inputs will override BLE settings, so read them last.
+  updateInputButtons();
   readSettingsFromManualInputs();
 
   if (currentServiceStatus != lastServiceStatus || resetRequested) {
@@ -70,12 +65,27 @@ void loop() {
     updateAllSecondaries();
     lastServiceStatus = currentServiceStatus;
   }
+
+  // TEST FOR LONG PRESS
+  for (uint i = 0; i < manualInputButtons.size(); i++) {
+    if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Long) {
+      // ...
+      manualInputButtons[i]->clearPress();
+    }
+  }
 }
 
 void initializeIO() {
   // Initialize the manual IO pins
+  std::vector<int> manualInputPins { MANUAL_INPUT_PINS };
   for (uint i = 0; i < manualInputPins.size(); i++) {
-    pinMode(manualInputPins[i], INPUT_PULLUP);
+    manualInputButtons.push_back(new ManualButton(manualInputPins[i], INPUT_PULLUP));
+  }
+}
+
+void updateInputButtons() {
+  for (uint i = 0; i < manualInputButtons.size(); i++) {
+    manualInputButtons[i]->update();
   }
 }
 
@@ -85,6 +95,10 @@ void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4) {
 }
 
 void checkSecondaryConnections() {
+  if (millis() < nextConnectionCheck || btService.isConnected()) {
+    return;
+  }
+
   setStatusDisplay(DISPLAY_DOT, DISPLAY_EMPTY, DISPLAY_EMPTY, DISPLAY_EMPTY);
   bool atLeastOneDisconnected = false;
   for (uint i = 0; i < allSecondaries.size(); i++) {
@@ -103,6 +117,8 @@ void checkSecondaryConnections() {
   if (atLeastOneDisconnected) {
     resetSecondaryConnections();
   }
+
+  nextConnectionCheck = millis() + CONNECTION_CHECK_INTERVAL;
 }
 
 void resetSecondaryConnections() {
@@ -271,8 +287,12 @@ void readSettingsFromManualInputs() {
   // At this point, we're not doing anything complicated such as
   // looking for button combinations.
   // Just look for the first button that's been pressed.
-  for (uint i = 0; i < manualInputPins.size(); i++) {
-    if (digitalRead(manualInputPins[i]) == LOW) {
+  for (uint i = 0; i < manualInputButtons.size(); i++) {
+    // TODO: use .wasPressed.
+    // Issue: .wasPressed resets the button status, so a long press won't be recognized.
+    // Maybe add a manual .clear method.
+    if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Normal) {
+      manualInputButtons[i]->clearPress();
       Serial.print("Manual style selected: ");
       Serial.println(i);
       setManualStyle(i);
@@ -340,4 +360,32 @@ void setManualStyle(uint style) {
   btService.setSpeed(currentServiceStatus.getSpeed());
   btService.setStep(currentServiceStatus.getStep());
   btService.setStyle(currentServiceStatus.getStyle());
+}
+
+void updateTelemetry()
+{
+  loopCounter++;
+  unsigned long timestamp = millis();
+
+  if (timestamp > lastTelemetryTimestamp + TELEMETRYINTERVAL)
+  {
+    // Calculate loop timing data
+    unsigned long diff = timestamp - lastTelemetryTimestamp;
+    double timePerIteration = (double)diff / loopCounter;
+    Serial.print(loopCounter);
+    Serial.print(" iterations done in ");
+    Serial.print(diff);
+    Serial.print(" msec; avg msec per iteration: ");
+    Serial.println(timePerIteration);
+    lastTelemetryTimestamp = timestamp;
+    loopCounter = 0;
+
+    // Get battery voltage levels for secondaries
+    for (uint i = 0; i < allSecondaries.size(); i++) {
+      Serial.print("Battery voltage for sign ");
+      Serial.print(allSecondaries[i]->getSignOrder());
+      Serial.print(": ");
+      Serial.println(allSecondaries[i]->getBatteryVoltage());
+    }
+  }
 }

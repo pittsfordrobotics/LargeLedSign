@@ -1,20 +1,30 @@
 #include "ManualButton.h"
 
-ManualButton::ManualButton(int pinNumber)
+ManualButton::ManualButton(int pinNumber, PinMode mode)
 {
+    pinMode(pinNumber, mode);
     m_pinNumber = pinNumber;
 }
 
 bool ManualButton::wasPressed()
 {
     bool pressed = m_wasPressed;
-    m_wasPressed = false;
     return pressed;
+}
+
+void ManualButton::clearPress()
+{
+    m_wasPressed = false;
 }
 
 ButtonPressType ManualButton::lastPressType()
 {
     return m_lastPressType;
+}
+
+PinStatus ManualButton::rawPinStatus()
+{
+    return digitalRead(m_pinNumber);
 }
 
 void ManualButton::update()

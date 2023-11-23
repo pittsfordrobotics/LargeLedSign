@@ -42,6 +42,10 @@ void SecondaryClient::initialize()
     m_isValid = true;
 }
 
+float SecondaryClient::getBatteryVoltage() {
+    return getFloatValue(BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID);
+}
+
 bool SecondaryClient::isConnected()
 {
     return m_peripheral.connected();
@@ -128,6 +132,14 @@ byte SecondaryClient::getByteValue(String characteristicUuid) {
     characteristic.read();
     byte value;
     characteristic.readValue(value);
+
+    return value;
+}
+
+float SecondaryClient::getFloatValue(String characteristicUuid) {
+    BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
+    float value;
+    memcpy(&value, (unsigned char*)characteristic.value(), characteristic.valueSize());
 
     return value;
 }

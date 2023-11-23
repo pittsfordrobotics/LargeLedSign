@@ -24,6 +24,7 @@ class SecondaryClient {
         int getSignOrder() { return m_signOrder; }
 
         ServiceStatus getServiceStatus();
+        float getBatteryVoltage();
         void setBrightness(byte brightness);
         void setPattern(byte pattern);
         void setStyle(byte style);
@@ -40,6 +41,7 @@ class SecondaryClient {
         void initialize();
         String getStringValue(String characteristicUuid);
         byte getByteValue(String characteristicUuid);
+        float getFloatValue(String characteristicUuid);
 };
 
 #endif

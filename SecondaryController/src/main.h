@@ -17,13 +17,13 @@
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
-#define VOLTAGEINPUTPIN 17     // The pin # (Digital #) for the analog input to detect battery voltage level.
+#define VOLTAGEINPUTPIN 14     // The pin # (Digital #) for the analog input to detect battery voltage level.
 
 // The order and styletype pinouts need to be updated.
 // Style type isn't yet used.
 // For the selector pins, the most significant bit should be listed first.
-#define ORDER_SELECTOR_PINS  8, 9, 10 // The set of Digital pin #s that tell the controller what position the sign should be in.
-#define STYLE_TYPE_SELECTOR_PINS 4, 5, 6, 7 // The set of Digital pin #s that tell the controller what style (digit # or logo) the sign should is.
+#define ORDER_SELECTOR_PINS  8, 9, 10 // The set of Digital pin #s that tell the controller what position the sign should be in (MSB to LSB).
+#define STYLE_TYPE_SELECTOR_PINS 4, 5, 6, 7 // The set of Digital pin #s that tell the controller what style (digit # or logo) the sign should be (MSB to LSB).
 
 // Initial default values for LED styles
 #define DEFAULTSTYLE 0        // The default style to start with. This is an index into the lightStyles vector.

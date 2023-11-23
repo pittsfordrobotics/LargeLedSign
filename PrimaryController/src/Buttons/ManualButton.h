@@ -9,10 +9,12 @@
 
 class ManualButton {
     public:
-        ManualButton(int pinNumber);
+        ManualButton(int pinNumber, PinMode pinMode);
         void update();
         bool wasPressed();
         ButtonPressType lastPressType();
+        PinStatus rawPinStatus();
+        void clearPress();
     
     private:
         int m_pinNumber{0};

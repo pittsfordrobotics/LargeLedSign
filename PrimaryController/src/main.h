@@ -9,6 +9,8 @@
 #include <TM1637Display.h>
 #include <SignConfigurationData.h>
 #include <SignOffsetData.h>
+#include "Buttons/ManualButton.h"
+#include "Buttons/ButtonPressType.h"
 
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line
@@ -17,7 +19,8 @@
 #define CONNECTION_CHECK_INTERVAL 1500 // Number of milliseconds between checks to see if the secondaries are connected.
 #define MANUAL_INPUT_PINS 15, 9, 14, 10  // Digital pin #s for the manual input buttons.
 
-#define DEBOUNCE_INTERVAL 100 // Interval (msec) to wait before re-reading manual input.
+#define DEBOUNCE_INTERVAL 100  // Interval (msec) to wait before re-reading manual input.
+#define TELEMETRYINTERVAL 2000 // Interval (msec) for updating the telemetry.
 
 // Some shortcut definitions for the status display
 #define DISPLAY_DASH 0b01000000  // Segment G of the 7-segment display.
@@ -30,6 +33,7 @@ void populateSecondaries();
 void startBLEService();
 void readSettingsFromBLE();
 void readSettingsFromManualInputs();
+void updateInputButtons();
 void setManualStyle(uint style);
 SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
@@ -37,3 +41,4 @@ void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4);
 void checkSecondaryConnections();
 void resetSecondaryConnections();
 void updateAllSecondaries();
+void updateTelemetry();
