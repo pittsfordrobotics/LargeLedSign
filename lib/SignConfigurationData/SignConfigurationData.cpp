@@ -11,7 +11,6 @@ SignConfigurationData::SignConfigurationData(String signData) {
     std::vector<String> splitSignData = StringUtils::splitString(signData, ';');
 
     if (splitSignData.size() < 4) {
-        Serial.println("Too little data found for the sign data!");
         return;
     }
 

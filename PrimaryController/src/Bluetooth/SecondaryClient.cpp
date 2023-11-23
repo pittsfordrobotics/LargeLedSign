@@ -138,6 +138,7 @@ byte SecondaryClient::getByteValue(String characteristicUuid) {
 
 float SecondaryClient::getFloatValue(String characteristicUuid) {
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
+    characteristic.read();
     float value;
     memcpy(&value, (unsigned char*)characteristic.value(), characteristic.valueSize());
 

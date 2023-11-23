@@ -23,7 +23,7 @@ void setup() {
   initializeIO();
   
   // If manual button 1 is pressed (ie, LOW), don't look for the logo.
-  shouldIgnoreLogo = digitalRead(manualInputButtons[0]->rawPinStatus()) == LOW;
+  shouldIgnoreLogo = digitalRead(manualInputButtons[0]->rawPinStatus()) == HIGH;
 
   statusDisplay.setBrightness(TM1637_BRIGHTNESS);
   setStatusDisplay(DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH);
@@ -70,9 +70,14 @@ void loop() {
   for (uint i = 0; i < manualInputButtons.size(); i++) {
     if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Long) {
       // ...
+      Serial.print("Manual button ");
+      Serial.print(i);
+      Serial.println(" was long-pressed.");
       manualInputButtons[i]->clearPress();
     }
   }
+
+  updateTelemetry();
 }
 
 void initializeIO() {

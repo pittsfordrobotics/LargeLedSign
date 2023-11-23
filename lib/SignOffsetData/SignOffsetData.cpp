@@ -11,7 +11,6 @@ SignOffsetData::SignOffsetData(String offsetData) {
     std::vector<String> splitOffsetData = StringUtils::splitString(offsetData, ';');
 
     if (splitOffsetData.size() < 4) {
-        Serial.println("Too little data found for the offset data!");
         return;
     }
 

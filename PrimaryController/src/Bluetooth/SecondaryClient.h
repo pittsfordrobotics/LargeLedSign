@@ -17,12 +17,11 @@ class SecondaryClient {
         bool isValidClient() { return m_isValid; }
         String getLocalName();
 
-        // SignOrder is part of ServiceStatus, but it's used when
+        // SignOrder is part of SignStatus, but it's used when
         // initially sorting the clients. Expose it directly here
         // so we don't end up hitting the BT service to get the status
         // every time. It shouldn't ever change, so caching it here is fine.
         int getSignOrder() { return m_signOrder; }
-
         SignStatus getSignStatus();
         float getBatteryVoltage();
         void setBrightness(byte brightness);
