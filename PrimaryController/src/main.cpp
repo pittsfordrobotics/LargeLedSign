@@ -16,14 +16,14 @@ SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
 
 void setup() {
-  delay(500);
   Serial.begin(9600);
+  delay(500);
   Serial.println("Starting...");
   
   initializeIO();
   
   // If manual button 1 is pressed (ie, LOW), don't look for the logo.
-  shouldIgnoreLogo = digitalRead(manualInputButtons[0]->rawPinStatus()) == HIGH;
+  shouldIgnoreLogo = (manualInputButtons[0]->rawPinStatus() == LOW);
 
   statusDisplay.setBrightness(TM1637_BRIGHTNESS);
   setStatusDisplay(DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH, DISPLAY_DASH);
