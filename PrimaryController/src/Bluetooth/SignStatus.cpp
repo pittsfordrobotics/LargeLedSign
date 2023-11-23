@@ -1,18 +1,18 @@
-#include "ServiceStatus.h"
+#include "SignStatus.h"
 
-ServiceStatus::ServiceStatus() {
+SignStatus::SignStatus() {
 }
 
-ServiceStatus::ServiceStatus(const ServiceStatus& other) {
+SignStatus::SignStatus(const SignStatus& other) {
     copy(other);
 }
 
-ServiceStatus& ServiceStatus::operator=(const ServiceStatus& other) {
+SignStatus& SignStatus::operator=(const SignStatus& other) {
     copy(other);
     return *this;
 }
 
-void ServiceStatus::copy(const ServiceStatus& other) {
+void SignStatus::copy(const SignStatus& other) {
     m_brightness = other.m_brightness;
     m_pattern = other.m_pattern;
     m_patternNames = other.m_patternNames;
@@ -22,7 +22,7 @@ void ServiceStatus::copy(const ServiceStatus& other) {
     m_styleNames = other.m_styleNames;
 }
 
-bool ServiceStatus::operator==(const ServiceStatus& other) {
+bool SignStatus::operator==(const SignStatus& other) {
     return (
         m_brightness == other.m_brightness
         && m_pattern == other.m_pattern
@@ -34,7 +34,7 @@ bool ServiceStatus::operator==(const ServiceStatus& other) {
         && m_signConfigData == other.m_signConfigData);
 }
 
-bool ServiceStatus::operator!=(const ServiceStatus& other) {
+bool SignStatus::operator!=(const SignStatus& other) {
     return (
         m_brightness != other.m_brightness
         || m_pattern != other.m_pattern

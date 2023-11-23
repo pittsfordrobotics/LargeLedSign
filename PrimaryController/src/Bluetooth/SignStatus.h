@@ -1,12 +1,12 @@
-#ifndef SERVICESTATUS_H
-#define SERVICESTATUS_H
+#ifndef SIGNSTATUS_H
+#define SIGNSTATUS_H
 
 #include <Arduino.h>
 #include <vector>
 #include "StringUtils.h"
-#include "SignConfigurationData.h"
+#include <SignConfigurationData.h>
 
-class ServiceStatus {
+class SignStatus {
     public:
         String getStyleNames() { return m_styleNames; }
         String getPatternNames() { return m_patternNames; }
@@ -26,14 +26,14 @@ class ServiceStatus {
         void setSpeed(byte speed) { m_speed = speed; }
         void setSignConfigurationData(SignConfigurationData signConfigData) { m_signConfigData = signConfigData; }
 
-        ServiceStatus();
-        ServiceStatus(const ServiceStatus& other);
-        ServiceStatus& operator=(const ServiceStatus& other);
-        bool operator==(const ServiceStatus& other);
-        bool operator!=(const ServiceStatus& other);
+        SignStatus();
+        SignStatus(const SignStatus& other);
+        SignStatus& operator=(const SignStatus& other);
+        bool operator==(const SignStatus& other);
+        bool operator!=(const SignStatus& other);
 
     private:
-        void copy(const ServiceStatus& other);
+        void copy(const SignStatus& other);
 
         String m_styleNames{""};
         String m_patternNames{""};

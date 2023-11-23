@@ -5,7 +5,7 @@
 #include <ArduinoBLE.h>
 #include <BluetoothCommon.h>
 #include "StringUtils.h"
-#include "ServiceStatus.h"
+#include "SignStatus.h"
 
 class SecondaryClient {
     public:
@@ -23,7 +23,7 @@ class SecondaryClient {
         // every time. It shouldn't ever change, so caching it here is fine.
         int getSignOrder() { return m_signOrder; }
 
-        ServiceStatus getServiceStatus();
+        SignStatus getSignStatus();
         float getBatteryVoltage();
         void setBrightness(byte brightness);
         void setPattern(byte pattern);

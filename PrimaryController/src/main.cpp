@@ -12,8 +12,8 @@ bool resetRequested = false;
 bool shouldIgnoreLogo = false;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
-ServiceStatus lastServiceStatus;
-ServiceStatus currentServiceStatus;
+SignStatus lastServiceStatus;
+SignStatus currentServiceStatus;
 
 void setup() {
   delay(500);
@@ -217,7 +217,7 @@ void consolidateTotalsAndWriteToSecondaries() {
   // Stash the sign config data for each secondary so we don't retrieve it every time.
   std::vector<SignConfigurationData> signConfigurations;
   for (uint i = 0; i < numDigits; i++) {
-    ServiceStatus status = allSecondaries[i]->getServiceStatus();
+    SignStatus status = allSecondaries[i]->getSignStatus();
     signConfigurations.push_back(status.getSignConfigurationData());
   }
 
@@ -255,7 +255,7 @@ void startBLEService() {
   setStatusDisplay(DISPLAY_EMPTY, DISPLAY_EMPTY, statusDisplay.encodeDigit(11), statusDisplay.encodeDigit(2));
   Serial.println("Proxying characteristics.");
   
-  ServiceStatus status = allSecondaries.at(0)->getServiceStatus();
+  SignStatus status = allSecondaries.at(0)->getSignStatus();
   btService.setPatternNames(status.getPatternNames());
   btService.setStyleNames(status.getStyleNames());
   btService.setBrightness(status.getBrightness());

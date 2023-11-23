@@ -27,7 +27,7 @@ void SecondaryClient::initialize()
         return;
     }
 
-    ServiceStatus status = getServiceStatus();
+    SignStatus status = getSignStatus();
     SignConfigurationData signConfigData = status.getSignConfigurationData();
     if (signConfigData.getSignOrder() < 0 
         || signConfigData.getSignType() < 0
@@ -64,8 +64,8 @@ String SecondaryClient::getLocalName()
     return m_peripheral.localName();
 }
 
-ServiceStatus SecondaryClient::getServiceStatus() {
-    ServiceStatus status;
+SignStatus SecondaryClient::getSignStatus() {
+    SignStatus status;
     status.setBrightness(getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
     status.setPattern(getByteValue(BTCOMMON_PATTERNCHARACTERISTIC_UUID));
     status.setPatternNames(getStringValue(BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID));

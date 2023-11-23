@@ -1,12 +1,5 @@
 #include "main.h"
 
-// Input pins should be 3 for position, 4 for style (ie, digits 0-9 and logo)
-// Move the numbers to a #define.
-// Should use D4 - D10, but final pinout is still TBD.
-// Alternative: make this a vector instead so the loops can utilize .size().
-// Ex:
-// std::vector<int> orderSelectorPins = { ORDER_SELECTOR_PINS };
-// std::vector<int> signTypeSelectorPins = { SIGN_TYPE_SELECTOR_PINS };
 std::vector<int> orderSelectorPins { ORDER_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
 std::vector<int> typeSelectorPins { STYLE_TYPE_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
 

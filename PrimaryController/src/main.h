@@ -9,6 +9,7 @@
 #include <TM1637Display.h>
 #include <SignConfigurationData.h>
 #include <SignOffsetData.h>
+#include "Bluetooth/SignStatus.h"
 #include "Buttons/ManualButton.h"
 #include "Buttons/ButtonPressType.h"
 
