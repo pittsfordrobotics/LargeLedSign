@@ -6,12 +6,12 @@
 #include "BluetoothCommon.h"
 #include "CommonPeripheral.h"
 #include "Bluetooth/SecondaryClient.h"
-#include <TM1637Display.h>
 #include <SignConfigurationData.h>
 #include <SignOffsetData.h>
 #include <SignStatus.h>
 #include "Buttons/ManualButton.h"
 #include "Buttons/ButtonPressType.h"
+#include "Display/StatusDisplay.h"
 
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line
@@ -37,7 +37,6 @@ void updateInputButtons();
 void setManualStyle(uint style);
 SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
-void setStatusDisplay(byte digit1, byte digit2, byte digit3, byte digit4);
 void checkSecondaryConnections();
 void resetSecondaryConnections();
 void updateAllSecondaries();
