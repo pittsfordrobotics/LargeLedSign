@@ -20,7 +20,6 @@
 #define CONNECTION_CHECK_INTERVAL 1500 // Number of milliseconds between checks to see if the secondaries are connected.
 #define MANUAL_INPUT_PINS 15, 9, 14, 10  // Digital pin #s for the manual input buttons.
 
-#define DEBOUNCE_INTERVAL 100  // Interval (msec) to wait before re-reading manual input.
 #define TELEMETRYINTERVAL 2000 // Interval (msec) for updating the telemetry.
 
 // Some shortcut definitions for the status display

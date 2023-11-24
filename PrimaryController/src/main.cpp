@@ -68,11 +68,14 @@ void loop() {
 
   // TEST FOR LONG PRESS
   for (uint i = 0; i < manualInputButtons.size(); i++) {
-    if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Long) {
-      // ...
+    if (manualInputButtons[i]->wasPressed()) {
       Serial.print("Manual button ");
       Serial.print(i);
-      Serial.println(" was long-pressed.");
+      if (manualInputButtons[i]->lastPressType() == ButtonPressType::Long) {
+        Serial.println(" was long-pressed.");
+      } else {
+        Serial.println(" was double-pressed.");
+      }
       manualInputButtons[i]->clearPress();
     }
   }
@@ -282,11 +285,6 @@ void readSettingsFromBLE() {
 }
 
 void readSettingsFromManualInputs() {
-  if ((lastButtonPress + DEBOUNCE_INTERVAL) > millis()) {
-    // In the de-bounce interval.
-    return;
-  }
-
   // Check the digital inputs to see if we need to change states.
   // A button press is indicated by the input getting pulled low.
   // At this point, we're not doing anything complicated such as

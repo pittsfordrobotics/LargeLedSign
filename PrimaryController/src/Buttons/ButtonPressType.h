@@ -4,7 +4,8 @@
 enum class ButtonPressType {
     None,
     Normal,
-    Long
+    Long,
+    Double
 };
 
 #endif

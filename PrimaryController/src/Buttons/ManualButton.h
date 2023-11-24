@@ -6,6 +6,7 @@
 
 #define MANUALBUTTON_DEBOUNCE_INTERVAL 50
 #define MANUALBUTTON_LONGPRESS 500
+#define DOUBLETAP_INTERVAL 150
 
 class ManualButton {
     public:
@@ -22,7 +23,9 @@ class ManualButton {
         ulong m_lastDownTime{0};
         ulong m_lastUpTime{0};
         ulong m_lastTransitionTime{0};
+        bool m_inDelayInterval{false};
         bool m_wasPressed{false};
+        int m_consecutiveCount{0};
         ButtonPressType m_lastPressType{ButtonPressType::None};
         void setPressType(ulong pressTime);
 };
