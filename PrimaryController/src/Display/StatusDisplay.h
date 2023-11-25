@@ -3,13 +3,14 @@
 
 #include <Arduino.h>
 #include <TM1637Display.h>
+#include <vector>
+#include <queue>
 
 enum class DisplayPriority 
 {
     None = 1,            // No status should be shown.
-    ConnectionIndicator, // Connected to Central.
-    BatteryLevel,        // Display battery levels.
-    Ephimeral,           // Temporary display, clears automatically after a short time.
+    Ephemeral,           // Temporary display, clears automatically after a short time.
+    Sequence,            // Display battery levels.
     AdHoc                // Display status until cleared.
 };
 
@@ -19,7 +20,17 @@ class StatusDisplay {
         StatusDisplay(byte clockPin, byte dioPin, byte brightness);
         ~StatusDisplay();
 
-        void adhocDisplay(String stringToDisplay);
+        // Sets the display to the given string.
+        // The display will stay until another display command overrides it.
+        void setDisplay(String stringToDisplay);
+
+        // Display the given string for the given amount of time.
+        // After this time, the display will be cleared.
+        void displayTemporary(String stringToDisplay, uint durationMsec);
+
+        void displaySequence(std::vector<String> stringsToDisplay, uint durationMsec);
+
+        // Updates the display.
         void update();
         void clear();
 
@@ -29,6 +40,10 @@ class StatusDisplay {
         byte convertCharacter(char c);
 
         byte m_displayBuffer[4];
+        ulong m_nextUpdate{0};
+        uint m_sequenceDuration{0};
+        DisplayPriority m_currentPriority{DisplayPriority::None};
+        std::queue<String> m_displayQueue;
 };
 
 #endif

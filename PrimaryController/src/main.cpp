@@ -25,11 +25,11 @@ void setup() {
   // If manual button 1 is pressed (ie, LOW), don't look for the logo.
   shouldIgnoreLogo = (manualInputButtons[0]->rawPinStatus() == LOW);
 
-  display.adhocDisplay("----");
+  display.setDisplay("----");
   
   if (!BLE.begin()) {
     Serial.println("BLE initialization failed!");
-    display.adhocDisplay("E1");
+    display.setDisplay("E1");
     while(true) {}
   }
   
@@ -43,11 +43,12 @@ void setup() {
 
 void loop() {
   BLE.poll();
+  display.update();
+
   if (btService.isConnected()) {
     // Set the display to "--" to show something connected to us.
-    display.adhocDisplay(" --");
-  } else {
-    display.clear();
+    // Display it as "temporary" since it's a low-priority message.
+    display.displayTemporary(" --", 500);
   }
 
   checkSecondaryConnections();
@@ -69,6 +70,8 @@ void loop() {
       Serial.print(i);
       if (manualInputButtons[i]->lastPressType() == ButtonPressType::Long) {
         Serial.println(" was long-pressed.");
+        std::vector<String> stringsToDisplay { "1=6.7", "2=7.1", "3=6.8", "4=7.0" };
+        display.displaySequence(stringsToDisplay, 1500);
       } else {
         Serial.println(" was double-pressed.");
       }
@@ -98,7 +101,7 @@ void checkSecondaryConnections() {
     return;
   }
 
-  display.adhocDisplay(" .");
+  display.displayTemporary(" .", 200);
   bool atLeastOneDisconnected = false;
   for (uint i = 0; i < allSecondaries.size(); i++) {
     Serial.print("Secondary [");
@@ -111,7 +114,6 @@ void checkSecondaryConnections() {
       atLeastOneDisconnected = true;
     }
   }
-  display.clear();
 
   if (atLeastOneDisconnected) {
     resetSecondaryConnections();
@@ -147,7 +149,7 @@ void populateSecondaries() {
     numberExpected -= 1;
   }
 
-  display.adhocDisplay("C0-" + String(numberExpected));
+  display.setDisplay("C0-" + String(numberExpected));
   while (allSecondaries.size() < numberExpected) {
     bool secondaryAdded = false;
     SecondaryClient* secondary = scanForSecondary();
@@ -156,7 +158,7 @@ void populateSecondaries() {
       // but it seems easier to rely on the fact that the local name ends with <position>-<type>.
       if (!shouldIgnoreLogo || !secondary->getLocalName().endsWith("-15")) {
         allSecondaries.push_back(secondary);
-        display.adhocDisplay("C" + String(allSecondaries.size()) + "-" + String(numberExpected));
+        display.setDisplay("C" + String(allSecondaries.size()) + "-" + String(numberExpected));
         secondaryAdded = true;
       }
     }
@@ -209,7 +211,7 @@ SecondaryClient* scanForSecondary() {
 }
 
 void consolidateTotalsAndWriteToSecondaries() {
-  display.adhocDisplay("C---");
+  display.setDisplay("C---");
   uint numDigits = allSecondaries.size();
 
   // Stash the sign config data for each secondary so we don't retrieve it every time.
@@ -226,7 +228,7 @@ void consolidateTotalsAndWriteToSecondaries() {
 
   int colsSoFar = 0;
   for (uint i = 0; i < numDigits; i++) {
-    display.adhocDisplay("C--" + String(i+1));
+    display.setDisplay("C--" + String(i+1));
     SignOffsetData offsetData;
     offsetData.setDigitsToLeft(i);
     offsetData.setDigitsToRight(numDigits - i - 1);
@@ -242,13 +244,13 @@ void consolidateTotalsAndWriteToSecondaries() {
 }
 
 void startBLEService() {
-  display.adhocDisplay("C  =");
+  display.setDisplay("C  =");
   Serial.println("Setting up Peripheral service using common logic.");
   String localName = "3181 LED Controller Primary";
   btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, localName);
 
   // Set the various characteristics based on what's read from any one of the secondaries.
-  display.adhocDisplay("C ==");
+  display.setDisplay("C ==");
 
   Serial.println("Proxying characteristics.");
   

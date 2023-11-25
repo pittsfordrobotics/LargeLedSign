@@ -16,12 +16,41 @@ StatusDisplay::~StatusDisplay()
 
 void StatusDisplay::update()
 {
-    // TBD
+    if (m_currentPriority == DisplayPriority::None || m_currentPriority == DisplayPriority::AdHoc)
+    {
+        // If None, nothing to do.  If AdHoc, leave it as it is.
+        return;
+    }
+
+    if (millis() > m_nextUpdate)
+    {
+        if (m_currentPriority == DisplayPriority::Ephemeral)
+        {
+            m_display->clear();
+            m_currentPriority = DisplayPriority::None;
+        }
+        else if (m_currentPriority == DisplayPriority::Sequence)
+        {
+            if (!m_displayQueue.empty())
+            {
+                loadStringToBuffer(m_displayQueue.front());
+                m_display->setSegments(m_displayBuffer);
+                m_displayQueue.pop();
+                m_nextUpdate = millis() + m_sequenceDuration;
+            }
+            else
+            {
+                m_display->clear();
+                m_currentPriority = DisplayPriority::None;
+            }
+        }
+    }
 }
 
 void StatusDisplay::clear() 
 {
     m_display->clear();
+    m_currentPriority = DisplayPriority::None;
 }
 
 // String should be 4 chars, plus any dots.
@@ -30,10 +59,59 @@ void StatusDisplay::clear()
 // To display just a dot for a digit, use a space first.
 // Ex: to display "....", the string should be " . . . ."
 // Custom characters: (TBD)
-void StatusDisplay::adhocDisplay(String stringToDisplay)
+void StatusDisplay::setDisplay(String stringToDisplay)
 {
+    // Adhoc is the highest priority, so don't bother checking the current priority.
     loadStringToBuffer(stringToDisplay);
     m_display->setSegments(m_displayBuffer);
+    m_currentPriority = DisplayPriority::AdHoc;
+}
+
+void StatusDisplay::displayTemporary(String stringToDisplay, uint durationMsec)
+{
+    if (m_currentPriority > DisplayPriority::Ephemeral)
+    {
+        return;
+    }
+
+    loadStringToBuffer(stringToDisplay);
+    m_display->setSegments(m_displayBuffer);
+    m_nextUpdate = millis() + durationMsec;
+    m_currentPriority = DisplayPriority::Ephemeral;
+}
+
+void StatusDisplay::displaySequence(std::vector<String> stringsToDisplay, uint durationMsec)
+{
+    if (m_currentPriority > DisplayPriority::Sequence)
+    {
+        return;
+    }
+
+    // Reset any current sequence
+    while (!m_displayQueue.empty())
+    {
+        m_displayQueue.pop();
+    }
+
+    if (stringsToDisplay.size() == 0)
+    {
+        // Nothing to do
+        return;
+    }
+
+    // Load the first string immediately
+    loadStringToBuffer(stringsToDisplay[0]);
+    m_display->setSegments(m_displayBuffer);
+    m_sequenceDuration = durationMsec;
+    m_nextUpdate = millis() + m_sequenceDuration;
+
+    // Load any remaining strings into the queue.
+    for (uint i = 1; i < stringsToDisplay.size(); i++)
+    {
+        m_displayQueue.push(stringsToDisplay[i]);
+    }
+
+    m_currentPriority = DisplayPriority::Sequence;
 }
 
 void StatusDisplay::loadStringToBuffer(String s)
@@ -61,7 +139,7 @@ void StatusDisplay::loadStringToBuffer(String s)
 
         // Peek at the next character to see if it's a dot.
         c = s.charAt(stringPosition);
-        if (c == '.') 
+        if (c == '.')
         {
             // set the dot on the prior digit
             m_displayBuffer[bufferPosition - 1] =  m_displayBuffer[bufferPosition - 1] | Dot;
