@@ -33,8 +33,7 @@ void StatusDisplay::update()
         {
             if (!m_displayQueue.empty())
             {
-                loadStringToBuffer(m_displayQueue.front());
-                m_display->setSegments(m_displayBuffer);
+                displayString(m_displayQueue.front());
                 m_displayQueue.pop();
                 m_nextUpdate = millis() + m_sequenceDuration;
             }
@@ -62,8 +61,7 @@ void StatusDisplay::clear()
 void StatusDisplay::setDisplay(String stringToDisplay)
 {
     // Adhoc is the highest priority, so don't bother checking the current priority.
-    loadStringToBuffer(stringToDisplay);
-    m_display->setSegments(m_displayBuffer);
+    displayString(stringToDisplay);
     m_currentPriority = DisplayPriority::AdHoc;
 }
 
@@ -74,8 +72,7 @@ void StatusDisplay::displayTemporary(String stringToDisplay, uint durationMsec)
         return;
     }
 
-    loadStringToBuffer(stringToDisplay);
-    m_display->setSegments(m_displayBuffer);
+    displayString(stringToDisplay);
     m_nextUpdate = millis() + durationMsec;
     m_currentPriority = DisplayPriority::Ephemeral;
 }
@@ -100,8 +97,7 @@ void StatusDisplay::displaySequence(std::vector<String> stringsToDisplay, uint d
     }
 
     // Load the first string immediately
-    loadStringToBuffer(stringsToDisplay[0]);
-    m_display->setSegments(m_displayBuffer);
+    displayString(stringsToDisplay[0]);
     m_sequenceDuration = durationMsec;
     m_nextUpdate = millis() + m_sequenceDuration;
 
@@ -114,13 +110,9 @@ void StatusDisplay::displaySequence(std::vector<String> stringsToDisplay, uint d
     m_currentPriority = DisplayPriority::Sequence;
 }
 
-void StatusDisplay::loadStringToBuffer(String s)
+void StatusDisplay::displayString(String s)
 {
-    // Reset the byte buffer first
-    for (uint i = 0; i < 4; i++)
-    {
-        m_displayBuffer[i] = 0;
-    }
+    byte buffer[4] {0, 0, 0, 0};
 
     // Convert characters until we run out or hit 4 characters.
     uint stringPosition = 0;
@@ -128,7 +120,7 @@ void StatusDisplay::loadStringToBuffer(String s)
 
     while (stringPosition < s.length() && bufferPosition < 4) {
         char c = s.charAt(stringPosition);
-        m_displayBuffer[bufferPosition] = convertCharacter(c);
+        buffer[bufferPosition] = convertCharacter(c);
         bufferPosition++;
         stringPosition++;
         if (stringPosition >= s.length())
@@ -142,10 +134,12 @@ void StatusDisplay::loadStringToBuffer(String s)
         if (c == '.')
         {
             // set the dot on the prior digit
-            m_displayBuffer[bufferPosition - 1] =  m_displayBuffer[bufferPosition - 1] | Dot;
+            buffer[bufferPosition - 1] =  buffer[bufferPosition - 1] | Dot;
             stringPosition++;
         }
     }
+
+    m_display->setSegments(buffer);
 }
 
 byte StatusDisplay::convertCharacter(char c)

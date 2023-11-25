@@ -36,10 +36,9 @@ class StatusDisplay {
 
     private:
         TM1637Display* m_display;
-        void loadStringToBuffer(String s);
         byte convertCharacter(char c);
+        void displayString(String s);
 
-        byte m_displayBuffer[4];
         ulong m_nextUpdate{0};
         uint m_sequenceDuration{0};
         DisplayPriority m_currentPriority{DisplayPriority::None};
