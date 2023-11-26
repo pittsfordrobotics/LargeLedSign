@@ -52,12 +52,6 @@ void StatusDisplay::clear()
     m_currentPriority = DisplayPriority::None;
 }
 
-// String should be 4 chars, plus any dots.
-// Ex: "A=1.2"
-// The dot will be applied to the prior segment.
-// To display just a dot for a digit, use a space first.
-// Ex: to display "....", the string should be " . . . ."
-// Custom characters: (TBD)
 void StatusDisplay::setDisplay(String stringToDisplay)
 {
     // Adhoc is the highest priority, so don't bother checking the current priority.
