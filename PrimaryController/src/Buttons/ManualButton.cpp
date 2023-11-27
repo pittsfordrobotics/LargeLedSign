@@ -72,8 +72,9 @@ void ManualButton::update()
         }
         else
         {
-            // If we had been pressed but and are in the delay interval,
-            // see if enough time has passed.
+            // If we're inside the delay interval, the next press would be treated
+            // as a double-press.  If we've exited the delay interval, count this
+            // as an actual press and stop waiting.
             if (m_inDelayInterval && (millis() > m_lastUpTime + DOUBLETAP_INTERVAL))
             {
                 m_inDelayInterval = false;
