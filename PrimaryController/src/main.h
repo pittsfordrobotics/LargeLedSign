@@ -22,11 +22,6 @@
 
 #define TELEMETRYINTERVAL 2000 // Interval (msec) for updating the telemetry.
 
-// Some shortcut definitions for the status display
-#define DISPLAY_DASH 0b01000000  // Segment G of the 7-segment display.
-#define DISPLAY_EMPTY 0
-#define DISPLAY_DOT 0b10000000
-
 // Function prototypes
 void initializeIO();
 void populateSecondaries();
