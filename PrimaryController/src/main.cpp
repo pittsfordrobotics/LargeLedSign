@@ -7,7 +7,6 @@ StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 std::vector<ManualButton*> manualInputButtons;
 std::vector<SecondaryClient*> allSecondaries;
 ulong nextConnectionCheck = 0;
-ulong lastButtonPress = 0;
 bool resetRequested = false;
 bool shouldIgnoreLogo = false;
 ulong loopCounter = 0;
@@ -54,8 +53,7 @@ void loop() {
   checkSecondaryConnections();
   readSettingsFromBLE();
   // Manual inputs will override BLE settings, so read them last.
-  updateInputButtons();
-  readSettingsFromManualInputs();
+  processManualInputs();
 
   if (currentServiceStatus != lastServiceStatus || resetRequested) {
     resetRequested = false;
@@ -63,23 +61,42 @@ void loop() {
     lastServiceStatus = currentServiceStatus;
   }
 
-  // TEST FOR LONG PRESS
+  updateTelemetry();
+}
+
+void processManualInputs() {
+  updateInputButtons();
+
+  // Look for any button presses that indicate style changes.
   for (uint i = 0; i < manualInputButtons.size(); i++) {
-    if (manualInputButtons[i]->wasPressed()) {
-      Serial.print("Manual button ");
-      Serial.print(i);
-      if (manualInputButtons[i]->lastPressType() == ButtonPressType::Long) {
-        Serial.println(" was long-pressed.");
-        std::vector<String> stringsToDisplay { "1=6.7", "2=7.1", "3=6.8", "4=7.0" };
-        display.displaySequence(stringsToDisplay, 1500);
-      } else {
-        Serial.println(" was double-pressed.");
-      }
+    // TODO:
+    // Could add "if the button was double-pressed, use style 'i+4'" to get another 4 manual styles.
+    if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Normal) {
       manualInputButtons[i]->clearPress();
+      Serial.print("Manual style selected: ");
+      Serial.println(i);
+      setManualStyle(i);
+      resetRequested = true;
     }
   }
 
-  updateTelemetry();
+  // If button 0 was long-pressed, display battery voltages for the clients.
+  if (manualInputButtons[0]->lastPressType() == ButtonPressType::Long) {
+    manualInputButtons[0]->clearPress();
+    displayBatteryVoltages();
+  }
+}
+
+void displayBatteryVoltages() {
+  std::vector<String> stringsToDisplay;
+  for (uint i = 0; i < allSecondaries.size(); i++) {
+    String voltageString(i+1);
+    voltageString.concat("=");
+    voltageString.concat(String(allSecondaries[i]->getBatteryVoltage(), 2));
+    stringsToDisplay.push_back(voltageString);
+  }
+
+  display.displaySequence(stringsToDisplay, 1500);
 }
 
 void initializeIO() {
@@ -273,28 +290,6 @@ void readSettingsFromBLE() {
   currentServiceStatus.setSpeed(btService.getSpeed());
   currentServiceStatus.setStep(btService.getStep());
   currentServiceStatus.setStyle(btService.getStyle());
-}
-
-void readSettingsFromManualInputs() {
-  // Check the digital inputs to see if we need to change states.
-  // A button press is indicated by the input getting pulled low.
-  // At this point, we're not doing anything complicated such as
-  // looking for button combinations.
-  // Just look for the first button that's been pressed.
-  for (uint i = 0; i < manualInputButtons.size(); i++) {
-    // TODO: use .wasPressed.
-    // Issue: .wasPressed resets the button status, so a long press won't be recognized.
-    // Maybe add a manual .clear method.
-    if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Normal) {
-      manualInputButtons[i]->clearPress();
-      Serial.print("Manual style selected: ");
-      Serial.println(i);
-      setManualStyle(i);
-      lastButtonPress = millis();
-      resetRequested = true;
-      return;
-    }
-  }
 }
 
 void updateAllSecondaries() {
