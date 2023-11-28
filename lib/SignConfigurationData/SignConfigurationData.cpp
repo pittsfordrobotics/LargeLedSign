@@ -1,16 +1,20 @@
 #include "SignConfigurationData.h"
 
-SignConfigurationData::SignConfigurationData() {
+SignConfigurationData::SignConfigurationData()
+{
 }
 
-SignConfigurationData::SignConfigurationData(const SignConfigurationData& other) {
+SignConfigurationData::SignConfigurationData(const SignConfigurationData &other)
+{
     copy(other);
 }
 
-SignConfigurationData::SignConfigurationData(String signData) {
+SignConfigurationData::SignConfigurationData(String signData)
+{
     std::vector<String> splitSignData = StringUtils::splitString(signData, ';');
 
-    if (splitSignData.size() < 4) {
+    if (splitSignData.size() < 4)
+    {
         return;
     }
 
@@ -20,7 +24,8 @@ SignConfigurationData::SignConfigurationData(String signData) {
     m_pixelCount = splitSignData[3].toInt();
 }
 
-String SignConfigurationData::getConfigurationString() {
+String SignConfigurationData::getConfigurationString()
+{
     // type;order;numberOfColumns;numberOfPixels
 
     std::vector<String> strings;
@@ -32,30 +37,28 @@ String SignConfigurationData::getConfigurationString() {
     return StringUtils::joinStrings(strings, ';');
 }
 
-void SignConfigurationData::copy(const SignConfigurationData& other) {
+void SignConfigurationData::copy(const SignConfigurationData &other)
+{
     m_columnCount = other.m_columnCount;
     m_pixelCount = other.m_pixelCount;
     m_signOrder = other.m_signOrder;
     m_signType = other.m_signType;
 }
 
-SignConfigurationData& SignConfigurationData::operator=(const SignConfigurationData& other) {
+SignConfigurationData &SignConfigurationData::operator=(const SignConfigurationData &other)
+{
     copy(other);
     return *this;
 }
 
-bool SignConfigurationData::operator==(const SignConfigurationData& other) {
+bool SignConfigurationData::operator==(const SignConfigurationData &other)
+{
     return (
-        m_columnCount == other.m_columnCount
-        && m_pixelCount == other.m_pixelCount
-        && m_signOrder == other.m_signOrder
-        && m_signType == other.m_signType);
+        m_columnCount == other.m_columnCount && m_pixelCount == other.m_pixelCount && m_signOrder == other.m_signOrder && m_signType == other.m_signType);
 }
 
-bool SignConfigurationData::operator!=(const SignConfigurationData& other) {
+bool SignConfigurationData::operator!=(const SignConfigurationData &other)
+{
     return (
-        m_columnCount != other.m_columnCount
-        || m_pixelCount != other.m_columnCount
-        || m_signOrder != other.m_signOrder
-        || m_signType != other.m_signType);
+        m_columnCount != other.m_columnCount || m_pixelCount != other.m_columnCount || m_signOrder != other.m_signOrder || m_signType != other.m_signType);
 }

@@ -29,20 +29,19 @@ void SecondaryClient::initialize()
 
     SignStatus status = getSignStatus();
     SignConfigurationData signConfigData = status.getSignConfigurationData();
-    if (signConfigData.getSignOrder() < 0 
-        || signConfigData.getSignType() < 0
-        || signConfigData.getColumnCount() < 0 
-        || signConfigData.getPixelCount() < 0) {
-            Serial.println("Sign data is not valid - disconecting.");
-            disconnect();
-            return;
-        }
-    
+    if (signConfigData.getSignOrder() < 0 || signConfigData.getSignType() < 0 || signConfigData.getColumnCount() < 0 || signConfigData.getPixelCount() < 0)
+    {
+        Serial.println("Sign data is not valid - disconecting.");
+        disconnect();
+        return;
+    }
+
     m_signOrder = signConfigData.getSignOrder();
     m_isValid = true;
 }
 
-float SecondaryClient::getBatteryVoltage() {
+float SecondaryClient::getBatteryVoltage()
+{
     return getFloatValue(BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID);
 }
 
@@ -64,7 +63,8 @@ String SecondaryClient::getLocalName()
     return m_peripheral.localName();
 }
 
-SignStatus SecondaryClient::getSignStatus() {
+SignStatus SecondaryClient::getSignStatus()
+{
     SignStatus status;
     status.setBrightness(getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
     status.setPattern(getByteValue(BTCOMMON_PATTERNCHARACTERISTIC_UUID));
@@ -79,35 +79,43 @@ SignStatus SecondaryClient::getSignStatus() {
     return status;
 }
 
-void SecondaryClient::setBrightness(byte brightness) {
+void SecondaryClient::setBrightness(byte brightness)
+{
     m_peripheral.characteristic(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID).writeValue(brightness);
 }
 
-void SecondaryClient::setPattern(byte pattern) {
+void SecondaryClient::setPattern(byte pattern)
+{
     m_peripheral.characteristic(BTCOMMON_PATTERNCHARACTERISTIC_UUID).writeValue(pattern);
 }
 
-void SecondaryClient::setStyle(byte style) {
+void SecondaryClient::setStyle(byte style)
+{
     m_peripheral.characteristic(BTCOMMON_STYLECHARACTERISTIC_UUID).writeValue(style);
 }
 
-void SecondaryClient::setSpeed(byte speed) {
+void SecondaryClient::setSpeed(byte speed)
+{
     m_peripheral.characteristic(BTCOMMON_SPEEDCHARACTERISTIC_UUID).writeValue(speed);
 }
 
-void SecondaryClient::setStep(byte step) {
+void SecondaryClient::setStep(byte step)
+{
     m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
 }
 
-void SecondaryClient::setSignOffsetData(String offsetData) {
+void SecondaryClient::setSignOffsetData(String offsetData)
+{
     m_peripheral.characteristic(BTCOMMON_OFFSETDATA_CHARACTERISTIC_UUID).writeValue(offsetData.c_str());
 }
 
-void SecondaryClient::updateSyncData(ulong syncData) {
+void SecondaryClient::updateSyncData(ulong syncData)
+{
     m_peripheral.characteristic(BTCOMMON_SYNCDATA_CHARACTERISTIC_UUID).writeValue(syncData);
 }
 
-String SecondaryClient::getStringValue(String characteristicUuid) {
+String SecondaryClient::getStringValue(String characteristicUuid)
+{
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
     characteristic.read();
 
@@ -127,7 +135,8 @@ String SecondaryClient::getStringValue(String characteristicUuid) {
     return str;
 }
 
-byte SecondaryClient::getByteValue(String characteristicUuid) {
+byte SecondaryClient::getByteValue(String characteristicUuid)
+{
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
     characteristic.read();
     byte value;
@@ -136,11 +145,12 @@ byte SecondaryClient::getByteValue(String characteristicUuid) {
     return value;
 }
 
-float SecondaryClient::getFloatValue(String characteristicUuid) {
+float SecondaryClient::getFloatValue(String characteristicUuid)
+{
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
     characteristic.read();
     float value;
-    memcpy(&value, (unsigned char*)characteristic.value(), characteristic.valueSize());
+    memcpy(&value, (unsigned char *)characteristic.value(), characteristic.valueSize());
 
     return value;
 }

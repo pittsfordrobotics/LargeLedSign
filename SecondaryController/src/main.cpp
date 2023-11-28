@@ -1,14 +1,14 @@
 #include "main.h"
 
-std::vector<int> orderSelectorPins { ORDER_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
-std::vector<int> typeSelectorPins { STYLE_TYPE_SELECTOR_PINS }; // Tells the controller which digit it's controlling (only the first pin is used so far)
+std::vector<int> orderSelectorPins{ORDER_SELECTOR_PINS};     // Tells the controller which digit it's controlling (only the first pin is used so far)
+std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS}; // Tells the controller which digit it's controlling (only the first pin is used so far)
 
 // Main BLE service wrapper
 SecondaryPeripheral btService;
 
 // Pixel and color data
 PixelBuffer pixelBuffer(DATA_OUT);
-std::vector<LightStyle*> lightStyles;
+std::vector<LightStyle *> lightStyles;
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULTBRIGHTNESS;
@@ -28,13 +28,14 @@ byte signType;
 byte signPosition;
 
 // Other internal state
-int loopCounter = 0;              // Records the number of times the main loop ran since the last timing calculation.
-unsigned long lastTelemetryTimestamp = 0;  // The last time debug information was emitted.
-byte inLowPowerMode = false;      // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
+int loopCounter = 0;                      // Records the number of times the main loop ran since the last timing calculation.
+unsigned long lastTelemetryTimestamp = 0; // The last time debug information was emitted.
+byte inLowPowerMode = false;              // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 // Main entry point for the program --
 // This is run once at startup.
-void setup() {
+void setup()
+{
   // Delay for debugging
   delay(INITIALDELAY);
   Serial.begin(9600);
@@ -59,12 +60,13 @@ void loop()
 {
   BLE.poll();
   emitTelemetry();
-  //checkForLowPowerState();
+  // checkForLowPowerState();
 
-  if (inLowPowerMode) {
+  if (inLowPowerMode)
+  {
     // blink LEDs and exit.
     blinkLowPowerIndicator();
-    return;    
+    return;
   }
 
   // See if any settings have been changed via BLE and apply them if necessary.
@@ -75,13 +77,16 @@ void loop()
 }
 
 // Initialize all input/output pins
-void initializeIO() {
+void initializeIO()
+{
   Serial.println("Initializing I/O pins.");
-  for (uint i = 0; i < orderSelectorPins.size(); i++) {
+  for (uint i = 0; i < orderSelectorPins.size(); i++)
+  {
     pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
   }
 
-  for (uint i = 0; i < typeSelectorPins.size(); i++) {
+  for (uint i = 0; i < typeSelectorPins.size(); i++)
+  {
     pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
   }
 
@@ -91,13 +96,14 @@ void initializeIO() {
 
 // Set up the list of "known" light styles.
 // These are the styles presented in the "Styles" list in the phone app.
-void initializeLightStyles() {
+void initializeLightStyles()
+{
   Serial.println("Initializing light styles");
   lightStyles.push_back(new RainbowStyle("Rainbow", &pixelBuffer));
-  uint32_t pink =  Adafruit_NeoPixel::Color(230, 22, 161);
+  uint32_t pink = Adafruit_NeoPixel::Color(230, 22, 161);
   uint32_t red = Adafruit_NeoPixel::Color(255, 0, 0);
   uint32_t blue = Adafruit_NeoPixel::Color(0, 0, 255);
-  //uint32_t white = Adafruit_NeoPixel::Color(255, 255, 255);
+  // uint32_t white = Adafruit_NeoPixel::Color(255, 255, 255);
   uint32_t orange = Adafruit_NeoPixel::Color(255, 50, 0);
   lightStyles.push_back(new SingleColorStyle("Pink", pink, &pixelBuffer));
   lightStyles.push_back(new TwoColorStyle("Blue-Pink", blue, pink, &pixelBuffer));
@@ -105,15 +111,18 @@ void initializeLightStyles() {
   lightStyles.push_back(new TwoColorStyle("Red-Pink", red, pink, &pixelBuffer));
   lightStyles.push_back(new SingleColorStyle("Red", red, &pixelBuffer));
   lightStyles.push_back(new TwoColorStyle("Orange-Pink", orange, pink, &pixelBuffer));
-  //lightStyles.push_back(new SingleColorStyle("White", white, &pixelBuffer));
+  // lightStyles.push_back(new SingleColorStyle("White", white, &pixelBuffer));
 }
 
-byte getSignType() {
+byte getSignType()
+{
   // Pull the pin low to indicate active.
   byte type = 0;
-  for (uint i = 0; i < typeSelectorPins.size(); i++) {
+  for (uint i = 0; i < typeSelectorPins.size(); i++)
+  {
     type = type << 1;
-    if (digitalRead(typeSelectorPins.at(i)) == HIGH) {
+    if (digitalRead(typeSelectorPins.at(i)) == HIGH)
+    {
       type++;
     }
   }
@@ -121,17 +130,21 @@ byte getSignType() {
   return type;
 }
 
-byte getSignPosition() {
+byte getSignPosition()
+{
   // Pull the pin low to indicate active.
   byte order = 0;
-  for (uint i = 0; i < orderSelectorPins.size(); i++) {
+  for (uint i = 0; i < orderSelectorPins.size(); i++)
+  {
     order = order << 1;
-    if (digitalRead(orderSelectorPins.at(i)) == HIGH) {
+    if (digitalRead(orderSelectorPins.at(i)) == HIGH)
+    {
       order++;
     }
   }
 
-  if (order == 7) {
+  if (order == 7)
+  {
     // The circuit board for the logo doesn't have jumpers and will
     // read as 0b111 (7). It really should be position #2.
     order = 2;
@@ -141,7 +154,8 @@ byte getSignPosition() {
 }
 
 // Set the initial BLE characteristic values and start the BLE service.
-void startBLE() {
+void startBLE()
+{
   Serial.print("Initializing for sign in position ");
   Serial.print(signPosition);
   Serial.print(" and type ");
@@ -151,16 +165,18 @@ void startBLE() {
   localName.concat(signPosition);
   localName.concat("-");
   localName.concat(signType);
-  
+
   // Start the actual BLE engine.
-  if (!BLE.begin()) {
+  if (!BLE.begin())
+  {
     indicateBleFailure();
   }
 
   btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
 
   std::vector<String> styleNames;
-  for (uint i = 0; i < lightStyles.size(); i++) {
+  for (uint i = 0; i < lightStyles.size(); i++)
+  {
     styleNames.push_back(lightStyles[i]->getName());
   }
 
@@ -183,16 +199,19 @@ void startBLE() {
 }
 
 // Read the BLE settings to see if any have been changed.
-void readBleSettings() {
+void readBleSettings()
+{
   String offsetString = btService.getSignOffsetData();
   SignOffsetData newOffsetData(offsetString);
-  if (newOffsetData != currentOffsetData) {
+  if (newOffsetData != currentOffsetData)
+  {
     resetPixelBufferOffsets(newOffsetData);
     currentOffsetData = newOffsetData;
   }
 
   newSyncData = btService.getSyncData();
-  if (newSyncData > 0 && newSyncData == currentSyncData) {
+  if (newSyncData > 0 && newSyncData == currentSyncData)
+  {
     // We're triggering changes based on the sync signal, but it hasn't changed.
     // Do nothing.
     return;
@@ -203,36 +222,42 @@ void readBleSettings() {
   // Check the range on the characteristic values.
   // If out of range, ignore the update and reset the BLE characteristic to the old value.
   newStyle = btService.getStyle();
-  if (!isInRange(newStyle, 0, lightStyles.size()-1)) {
+  if (!isInRange(newStyle, 0, lightStyles.size() - 1))
+  {
     btService.setStyle(currentStyle);
     newStyle = currentStyle;
   }
 
   newSpeed = btService.getSpeed();
-  if (!isInRange(newSpeed, 1, 100)) {
+  if (!isInRange(newSpeed, 1, 100))
+  {
     btService.setSpeed(currentSpeed);
     newSpeed = currentSpeed;
   }
 
   newStep = btService.getStep();
-  if (!isInRange(newStep, 1, 100)) {
+  if (!isInRange(newStep, 1, 100))
+  {
     btService.setStep(currentStep);
     newStep = currentStep;
   }
-  
+
   newPattern = btService.getPattern();
-  if (!isInRange(newPattern, 0, LightStyle::knownPatterns.size()-1)) {
+  if (!isInRange(newPattern, 0, LightStyle::knownPatterns.size() - 1))
+  {
     btService.setPattern(currentPattern);
     newPattern = currentPattern;
   }
 }
 
 // Determine if the give byte value is between (or equal to) the min and max values.
-byte isInRange(byte value, byte minValue, byte maxValue) {
+byte isInRange(byte value, byte minValue, byte maxValue)
+{
   return (value >= minValue && value <= maxValue);
 }
 
-void blinkLowPowerIndicator() {
+void blinkLowPowerIndicator()
+{
   // Turn all LEDs off except for the first one, which will blink red.
   pixelBuffer.clearBuffer();
   pixelBuffer.displayPixels();
@@ -245,9 +270,11 @@ void blinkLowPowerIndicator() {
 
 // Set the style properties (speed, step, pattern, etc) if any have changed,
 // and call the current style class to update the display.
-void updateLEDs() {
+void updateLEDs()
+{
   int shouldResetStyle = false;
-  if (newSyncData > 0 && newSyncData != currentSyncData) {
+  if (newSyncData > 0 && newSyncData != currentSyncData)
+  {
     // Sync data changed -- force a refresh even if nothing else changed.
     Serial.print("New sync data received: ");
     Serial.println(newSyncData);
@@ -255,13 +282,14 @@ void updateLEDs() {
     currentSyncData = newSyncData;
   }
 
-  if (newBrightness != currentBrightness) {
+  if (newBrightness != currentBrightness)
+  {
     pixelBuffer.setBrightness(newBrightness);
     currentBrightness = newBrightness;
   }
 
   LightStyle *style = lightStyles[newStyle];
-  if (currentStyle != newStyle)  
+  if (currentStyle != newStyle)
   {
     Serial.print("Changing style to ");
     Serial.println(newStyle);
@@ -273,23 +301,27 @@ void updateLEDs() {
     currentStyle = newStyle;
   }
 
-  if (currentSpeed != newSpeed) {
+  if (currentSpeed != newSpeed)
+  {
     style->setSpeed(newSpeed);
     currentSpeed = newSpeed;
   }
 
-  if (currentStep != newStep) {
+  if (currentStep != newStep)
+  {
     style->setStep(newStep);
     currentStep = newStep;
   }
 
-  if (currentPattern != newPattern) {
+  if (currentPattern != newPattern)
+  {
     style->setPattern(newPattern);
     shouldResetStyle = true;
     currentPattern = newPattern;
   }
 
-  if (shouldResetStyle) {
+  if (shouldResetStyle)
+  {
     style->reset();
   }
 
@@ -304,10 +336,14 @@ void checkForLowPowerState()
   double currentVoltage = getCalculatedBatteryVoltage();
 
   // Check if the voltage is too low.
-  if (currentVoltage < LOWPOWERTHRESHOLD) {
-    if (inLowPowerMode) {
+  if (currentVoltage < LOWPOWERTHRESHOLD)
+  {
+    if (inLowPowerMode)
+    {
       // Already in low power mode - nothing to do.
-    } else {
+    }
+    else
+    {
       Serial.print("Battery voltage is below threshold. Voltage: ");
       Serial.print(currentVoltage);
       Serial.print(", threshold: ");
@@ -318,23 +354,27 @@ void checkForLowPowerState()
       // (This keeps the pixel buffer intact so we can resume where we left off when power returns.)
       pixelBuffer.setBrightness(0);
       pixelBuffer.displayPixels();
-      //btService.stop();
+      // btService.stop();
       inLowPowerMode = true;
     }
   }
 
   // Check if the voltage is high enough for normal operation.
-  if (currentVoltage > NORMALPOWERTHRESHOLD) {
-    if (!inLowPowerMode) {
+  if (currentVoltage > NORMALPOWERTHRESHOLD)
+  {
+    if (!inLowPowerMode)
+    {
       // Not in low power mode - nothing to do.
-    } else {
+    }
+    else
+    {
       Serial.print("Battery voltage is above normal threshold. Voltage: ");
       Serial.print(currentVoltage);
       Serial.print(", threshold: ");
       Serial.println(NORMALPOWERTHRESHOLD);
       Serial.println("Exiting low power mode.");
       // Exit low power mode.  Re-enable BLE.
-      //btService.resume();
+      // btService.resume();
       pixelBuffer.setBrightness(currentBrightness);
       inLowPowerMode = false;
     }
@@ -375,7 +415,7 @@ void emitTelemetry()
     Serial.println(timePerIteration);
     lastTelemetryTimestamp = timestamp;
     loopCounter = 0;
-    
+
     // Output voltage info periodically
     int rawLevel = getVoltageInputLevel();
     float voltage = getCalculatedBatteryVoltage();
@@ -389,10 +429,12 @@ void emitTelemetry()
   }
 }
 
-void indicateBleFailure() {
-  // Infinite loop here -- we can't continue with the rest of the service, so never return. 
+void indicateBleFailure()
+{
+  // Infinite loop here -- we can't continue with the rest of the service, so never return.
   Serial.println("Could not start BLE service!");
-  while(true) {
+  while (true)
+  {
     // Turn all LEDs off except for the first one, which will blink red/blue.
     pixelBuffer.setBrightness(255);
     pixelBuffer.clearBuffer();
@@ -406,17 +448,22 @@ void indicateBleFailure() {
   }
 }
 
-void resetPixelBufferOffsets(SignOffsetData offsetData) {
-  if (offsetData.getDigitsToLeft() >= 0) {
+void resetPixelBufferOffsets(SignOffsetData offsetData)
+{
+  if (offsetData.getDigitsToLeft() >= 0)
+  {
     pixelBuffer.setDigitsToLeft(offsetData.getDigitsToLeft());
   }
-  if (offsetData.getDigitsToRight() >= 0) {
+  if (offsetData.getDigitsToRight() >= 0)
+  {
     pixelBuffer.setDigitsToRight(offsetData.getDigitsToRight());
   }
-  if (offsetData.getColumnsToLeft() >= 0) {
+  if (offsetData.getColumnsToLeft() >= 0)
+  {
     pixelBuffer.setColsToLeft(offsetData.getColumnsToLeft());
   }
-  if (offsetData.getColumnsToRight() >= 0) {
+  if (offsetData.getColumnsToRight() >= 0)
+  {
     pixelBuffer.setColsToRight(offsetData.getColumnsToRight());
   }
 }

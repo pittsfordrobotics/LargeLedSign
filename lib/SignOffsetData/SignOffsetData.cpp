@@ -1,16 +1,20 @@
 #include "SignOffsetData.h"
 
-SignOffsetData::SignOffsetData() {
+SignOffsetData::SignOffsetData()
+{
 }
 
-SignOffsetData::SignOffsetData(const SignOffsetData& other) {
+SignOffsetData::SignOffsetData(const SignOffsetData &other)
+{
     copy(other);
 }
 
-SignOffsetData::SignOffsetData(String offsetData) {
+SignOffsetData::SignOffsetData(String offsetData)
+{
     std::vector<String> splitOffsetData = StringUtils::splitString(offsetData, ';');
 
-    if (splitOffsetData.size() < 4) {
+    if (splitOffsetData.size() < 4)
+    {
         return;
     }
 
@@ -20,7 +24,8 @@ SignOffsetData::SignOffsetData(String offsetData) {
     m_columnsToRight = splitOffsetData[3].toInt();
 }
 
-String SignOffsetData::getOffsetDataString() {
+String SignOffsetData::getOffsetDataString()
+{
     // digitsL;digitsR;columnsL;columnsR
 
     std::vector<String> strings;
@@ -32,30 +37,28 @@ String SignOffsetData::getOffsetDataString() {
     return StringUtils::joinStrings(strings, ';');
 }
 
-void SignOffsetData::copy(const SignOffsetData& other) {
+void SignOffsetData::copy(const SignOffsetData &other)
+{
     m_digitsToLeft = other.m_digitsToLeft;
     m_digitsToRight = other.m_digitsToRight;
     m_columnsToLeft = other.m_columnsToLeft;
     m_columnsToRight = other.m_columnsToRight;
 }
 
-SignOffsetData& SignOffsetData::operator=(const SignOffsetData& other) {
+SignOffsetData &SignOffsetData::operator=(const SignOffsetData &other)
+{
     copy(other);
     return *this;
 }
 
-bool SignOffsetData::operator==(const SignOffsetData& other) {
+bool SignOffsetData::operator==(const SignOffsetData &other)
+{
     return (
-        m_digitsToLeft == other.m_digitsToLeft
-        && m_digitsToRight == other.m_digitsToRight
-        && m_columnsToLeft == other.m_columnsToLeft
-        && m_columnsToRight == other.m_columnsToRight);
+        m_digitsToLeft == other.m_digitsToLeft && m_digitsToRight == other.m_digitsToRight && m_columnsToLeft == other.m_columnsToLeft && m_columnsToRight == other.m_columnsToRight);
 }
 
-bool SignOffsetData::operator!=(const SignOffsetData& other) {
+bool SignOffsetData::operator!=(const SignOffsetData &other)
+{
     return (
-        m_digitsToLeft != other.m_digitsToLeft
-        || m_digitsToRight != other.m_digitsToRight
-        || m_columnsToLeft != other.m_columnsToLeft
-        || m_columnsToRight != other.m_columnsToRight);
+        m_digitsToLeft != other.m_digitsToLeft || m_digitsToRight != other.m_digitsToRight || m_columnsToLeft != other.m_columnsToLeft || m_columnsToRight != other.m_columnsToRight);
 }
