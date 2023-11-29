@@ -16,7 +16,7 @@ class TwoColorStyle : public LightStyle {
   private:
     int getIterationDelay();
     int getModulus();
-    bool shouldShiftMultiple();
+    bool shouldPatternBeDoubled();
 
     uint32_t m_color1;
     uint32_t m_color2;
