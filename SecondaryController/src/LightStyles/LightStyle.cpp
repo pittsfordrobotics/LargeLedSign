@@ -2,22 +2,12 @@
 #include "LightStyle.h"
 #include "PixelBuffer.h"
 
-std::vector<String> LightStyle::knownPatterns;
+std::vector<String> LightStyle::knownPatterns{ LIGHTPATTERN_NAMES };
 
 LightStyle::LightStyle(String name, PixelBuffer *pixelBuffer)
 {
     m_pixelBuffer = pixelBuffer;
     m_name = name;
-    if (knownPatterns.size() == 0)
-    {
-        // These need to be in the same order as the  enum values in LightPatterns.h
-        knownPatterns.push_back("Solid");
-        knownPatterns.push_back("Right");
-        knownPatterns.push_back("Left");
-        knownPatterns.push_back("Up");
-        knownPatterns.push_back("Down");
-        knownPatterns.push_back("Digit");
-    }
 }
 
 void LightStyle::setSpeed(uint8_t speed)
