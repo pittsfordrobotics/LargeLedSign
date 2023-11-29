@@ -54,11 +54,17 @@ SignOffsetData &SignOffsetData::operator=(const SignOffsetData &other)
 bool SignOffsetData::operator==(const SignOffsetData &other)
 {
     return (
-        m_digitsToLeft == other.m_digitsToLeft && m_digitsToRight == other.m_digitsToRight && m_columnsToLeft == other.m_columnsToLeft && m_columnsToRight == other.m_columnsToRight);
+        m_digitsToLeft == other.m_digitsToLeft 
+        && m_digitsToRight == other.m_digitsToRight 
+        && m_columnsToLeft == other.m_columnsToLeft 
+        && m_columnsToRight == other.m_columnsToRight);
 }
 
 bool SignOffsetData::operator!=(const SignOffsetData &other)
 {
     return (
-        m_digitsToLeft != other.m_digitsToLeft || m_digitsToRight != other.m_digitsToRight || m_columnsToLeft != other.m_columnsToLeft || m_columnsToRight != other.m_columnsToRight);
+        m_digitsToLeft != other.m_digitsToLeft 
+        || m_digitsToRight != other.m_digitsToRight 
+        || m_columnsToLeft != other.m_columnsToLeft 
+        || m_columnsToRight != other.m_columnsToRight);
 }

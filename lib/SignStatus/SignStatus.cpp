@@ -24,16 +24,31 @@ void SignStatus::copy(const SignStatus &other)
     m_step = other.m_step;
     m_style = other.m_style;
     m_styleNames = other.m_styleNames;
+    m_signConfigData = other.m_signConfigData;
 }
 
 bool SignStatus::operator==(const SignStatus &other)
 {
     return (
-        m_brightness == other.m_brightness && m_pattern == other.m_pattern && m_speed == other.m_speed && m_step == other.m_step && m_style == other.m_style && m_styleNames.equals(other.m_styleNames) && m_patternNames.equals(other.m_patternNames) && m_signConfigData == other.m_signConfigData);
+        m_brightness == other.m_brightness 
+        && m_pattern == other.m_pattern 
+        && m_speed == other.m_speed 
+        && m_step == other.m_step 
+        && m_style == other.m_style 
+        && m_styleNames.equals(other.m_styleNames) 
+        && m_patternNames.equals(other.m_patternNames) 
+        && m_signConfigData == other.m_signConfigData);
 }
 
 bool SignStatus::operator!=(const SignStatus &other)
 {
     return (
-        m_brightness != other.m_brightness || m_pattern != other.m_pattern || m_speed != other.m_speed || m_step != other.m_step || m_style != other.m_style || !m_styleNames.equals(other.m_styleNames) || !m_patternNames.equals(other.m_patternNames) || m_signConfigData != other.m_signConfigData);
+        m_brightness != other.m_brightness 
+        || m_pattern != other.m_pattern 
+        || m_speed != other.m_speed 
+        || m_step != other.m_step 
+        || m_style != other.m_style 
+        || !m_styleNames.equals(other.m_styleNames)
+        || !m_patternNames.equals(other.m_patternNames) 
+        || m_signConfigData != other.m_signConfigData);
 }
