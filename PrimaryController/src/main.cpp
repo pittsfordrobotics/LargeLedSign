@@ -78,20 +78,25 @@ void processManualInputs()
     // Look for any button presses that indicate style changes.
     for (uint i = 0; i < manualInputButtons.size(); i++)
     {
-        // TODO:
-        // Could add "if the button was double-pressed, use style 'i+4'" to get another 4 manual styles.
-        if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Normal)
+        if (manualInputButtons[i]->wasPressed() 
+            && (manualInputButtons[i]->lastPressType() == ButtonPressType::Normal || manualInputButtons[i]->lastPressType() == ButtonPressType::Double))
         {
+            int style = i;
+            if (manualInputButtons[i]->lastPressType() == ButtonPressType::Double)
+            {
+                style += 4;
+            }
+
             manualInputButtons[i]->clearPress();
             Serial.print("Manual style selected: ");
-            Serial.println(i);
-            setManualStyle(i);
+            Serial.println(style);
+            setManualStyle(style);
             resetRequested = true;
         }
     }
 
     // If button 0 was long-pressed, display battery voltages for the clients.
-    if (manualInputButtons[0]->lastPressType() == ButtonPressType::Long)
+    if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == ButtonPressType::Long)
     {
         manualInputButtons[0]->clearPress();
         displayBatteryVoltages();
@@ -386,8 +391,24 @@ void setManualStyle(uint style)
         currentServiceStatus.setStep(25);
         currentServiceStatus.setStyle(2);
         break;
-    default:
+    case 3:
         // Rainbow
+        currentServiceStatus.setBrightness(10);
+        currentServiceStatus.setPattern(1);
+        currentServiceStatus.setSpeed(85);
+        currentServiceStatus.setStep(95);
+        currentServiceStatus.setStyle(0);
+        break;
+    case 7:
+        // Rainbow random
+        currentServiceStatus.setBrightness(10);
+        currentServiceStatus.setPattern(6);
+        currentServiceStatus.setSpeed(78);
+        currentServiceStatus.setStep(55);
+        currentServiceStatus.setStyle(0);
+        break;
+    default:
+        // Rainbow - change?
         currentServiceStatus.setBrightness(10);
         currentServiceStatus.setPattern(1);
         currentServiceStatus.setSpeed(85);

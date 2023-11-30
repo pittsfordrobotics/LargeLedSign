@@ -54,39 +54,34 @@ int LightStyle::getNumberOfBlocksToDrain()
         return m_pixelBuffer->getColsToRight();
     case static_cast<int>(LightPatterns::Left):
         return m_pixelBuffer->getColsToLeft();
-    case static_cast<int>(LightPatterns::Up):
-    case static_cast<int>(LightPatterns::Down):
-        return 0;
     case static_cast<int>(LightPatterns::Digit):
         return m_pixelBuffer->getDigitsToRight();
-    default: // Solid or undefined
+    default: // Solid or anything else
         return 0;
     }
 }
 
 void LightStyle::shiftColorUsingPattern(uint32_t newColor)
 {
-    // Stick with integer values here instead of doing a bunch
-    // of "ifs" to compare strings.
     switch (m_pattern)
     {
-    case static_cast<int>(LightPatterns::Right):
-        m_pixelBuffer->shiftColumnsRight(newColor);
-        return;
-    case static_cast<int>(LightPatterns::Left):
-        m_pixelBuffer->shiftColumnsLeft(newColor);
-        return;
-    case static_cast<int>(LightPatterns::Up):
-        m_pixelBuffer->shiftRowsUp(newColor);
-        return;
-    case static_cast<int>(LightPatterns::Down):
-        m_pixelBuffer->shiftRowsDown(newColor);
-        return;
-    default:
-        // Default to Solid (ie, all lights the same color)
-        for (uint i = 0; i < m_pixelBuffer->getPixelCount(); i++)
-        {
-            m_pixelBuffer->setPixel(i, newColor);
-        }
+        case static_cast<int>(LightPatterns::Right):
+            m_pixelBuffer->shiftColumnsRight(newColor);
+            return;
+        case static_cast<int>(LightPatterns::Left):
+            m_pixelBuffer->shiftColumnsLeft(newColor);
+            return;
+        case static_cast<int>(LightPatterns::Up):
+            m_pixelBuffer->shiftRowsUp(newColor);
+            return;
+        case static_cast<int>(LightPatterns::Down):
+            m_pixelBuffer->shiftRowsDown(newColor);
+            return;
+        default:
+            // Default to Solid (ie, all lights the same color)
+            for (uint i = 0; i < m_pixelBuffer->getPixelCount(); i++)
+            {
+                m_pixelBuffer->setPixel(i, newColor);
+            }
     }
 }

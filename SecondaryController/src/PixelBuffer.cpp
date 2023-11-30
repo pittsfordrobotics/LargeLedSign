@@ -14,13 +14,14 @@ PixelBuffer::PixelBuffer(int gpioPin)
 
 void PixelBuffer::initialize(byte signStyle)
 {
+    randomSeed(signStyle * 1000 + millis());
     Serial.print("Initializaing pixel buffer for style ");
     Serial.println(signStyle);
 
     switch (signStyle)
     {
-    default:
-        initializeTestMatrix();
+        default:
+            initializeTestMatrix();
     }
 
     clearBuffer();
@@ -163,6 +164,15 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_
     {
         int pixelIndex = destination->at(i);
         m_pixelColors[pixelIndex] = newColor;
+    }
+}
+
+void PixelBuffer::fillRandomly(ulong newColor, int numberOfPixels)
+{
+    for (int i = 0; i < numberOfPixels; i++)
+    {
+        int pixel = random(0, m_numPixels);
+        m_pixelColors[pixel] = newColor;
     }
 }
 

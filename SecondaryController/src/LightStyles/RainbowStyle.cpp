@@ -17,7 +17,18 @@ void RainbowStyle::update()
     }
 
     uint32_t newColor = Adafruit_NeoPixel::ColorHSV(m_currentHue);
-    shiftColorUsingPattern(newColor);
+    if (m_pattern == static_cast<int>(LightPatterns::Random))
+    {
+        // Make this a const or define
+        double percentToFill = 3 / 100.0;
+        int numPixelsToFill = m_pixelBuffer->getPixelCount() * percentToFill;
+        m_pixelBuffer->fillRandomly(newColor, numPixelsToFill);
+    }
+    else
+    {
+        shiftColorUsingPattern(newColor);
+    }
+
     incrementHue();
     m_nextUpdate = millis() + getIterationDelay();
 }
@@ -25,6 +36,16 @@ void RainbowStyle::update()
 void RainbowStyle::reset()
 {
     m_currentHue = 0;
+    if (m_pattern == static_cast<int>(LightPatterns::Random))
+    {
+        ulong pink = Adafruit_NeoPixel::Color(230, 22, 161);
+        for (int i = 0; i < m_pixelBuffer->getPixelCount(); i++)
+        {
+            m_pixelBuffer->setPixel(i, pink);
+        }
+        return;
+    }
+
     int numBlocks = getNumberOfBlocksForPattern();
     int numBlocksToDrain = getNumberOfBlocksToDrain();
 

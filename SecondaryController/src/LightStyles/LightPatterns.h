@@ -7,10 +7,11 @@ enum class LightPatterns {
     Left = 2,
     Up = 3,
     Down = 4,
-    Digit = 5
+    Digit = 5,
+    Random = 6
 };
 
 // This list of names needs to be kept in sync with the enum values.
-#define LIGHTPATTERN_NAMES "Solid", "Right", "Left", "Up", "Down", "Digit" 
+#define LIGHTPATTERN_NAMES "Solid", "Right", "Left", "Up", "Down", "Digit", "Random"
 
 #endif
