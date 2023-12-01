@@ -17,8 +17,9 @@ void TwoColorStyle::update()
         return;
     }
 
-    uint32_t primaryColor = m_color1;
-    uint32_t secondaryColor = m_color2;
+    ulong primaryColor = m_color1;
+    ulong secondaryColor = m_color2;
+    int mod = getModulus();
 
     if (m_step > 50)
     {
@@ -26,33 +27,52 @@ void TwoColorStyle::update()
         secondaryColor = m_color1;
     }
 
-    uint32_t newColor = primaryColor;
-    int mod = getModulus();
-    int maxModRemainder = 0;
-    if (shouldPatternBeDoubled())
+    if (m_pattern == static_cast<int>(LightPatterns::Random))
     {
-        maxModRemainder = 1;
-        if (mod < 4)
-        {
-            mod = 4;
-        }
+        // Make the percent a const or define
+        double percentToFill = 5 / 100.0;
+        // The ratio of secondary pixels compared to all pixels is 1/mod.
+        double totalNumberToFill = m_pixelBuffer->getPixelCount() * percentToFill;
+        int numberOfSecondaryPixels = totalNumberToFill / mod;
+        int numberOfPrimaryPixels = totalNumberToFill - numberOfSecondaryPixels;
+        m_pixelBuffer->fillRandomly(primaryColor, numberOfPrimaryPixels);
+        m_pixelBuffer->fillRandomly(secondaryColor, numberOfSecondaryPixels);
+    }
+    else
+    {
+        updateSequentialPattern(primaryColor, secondaryColor, 1);
     }
 
-    if (mod > 0 && m_iterationCount % mod <= maxModRemainder)
-    {
-        newColor = secondaryColor;
-    }
-
-    shiftColorUsingPattern(newColor);
-    m_iterationCount++;
     m_nextUpdate = millis() + getIterationDelay();
 }
 
 void TwoColorStyle::reset()
 {
-    m_iterationCount = getNumberOfBlocksToDrain();
+    m_iterationCount = 0;
+    m_nextUpdate = 0;
     uint32_t primaryColor = m_color1;
     uint32_t secondaryColor = m_color2;
+
+    if (m_step > 50)
+    {
+        primaryColor = m_color2;
+        secondaryColor = m_color1;
+    }
+
+    if (m_pattern == static_cast<int>(LightPatterns::Random))
+    {
+        // Fill with the primary color
+        m_pixelBuffer->fill(primaryColor);
+    }
+    else
+    {
+        m_iterationCount = getNumberOfBlocksToDrain();
+        updateSequentialPattern(primaryColor, secondaryColor, getNumberOfBlocksForPattern());
+    }
+}
+
+void TwoColorStyle::updateSequentialPattern(ulong primaryColor, ulong secondaryColor, int numberOfTimesToUpdate)
+{
     int mod = getModulus();
     int maxModRemainder = 0;
 
@@ -65,14 +85,7 @@ void TwoColorStyle::reset()
         }
     }
 
-    if (m_step > 50)
-    {
-        primaryColor = m_color2;
-        secondaryColor = m_color1;
-    }
-
-    int numBlocks = getNumberOfBlocksForPattern();
-    for (int i = 0; i < numBlocks - 1; i++)
+    for (int i = 0; i < numberOfTimesToUpdate - 1; i++)
     {
         ulong newColor = primaryColor;
         if (mod > 0 && m_iterationCount % mod <= maxModRemainder)
@@ -83,8 +96,6 @@ void TwoColorStyle::reset()
         shiftColorUsingPattern(newColor);
         m_iterationCount++;
     }
-
-    m_nextUpdate = 0;
 }
 
 int TwoColorStyle::getIterationDelay()

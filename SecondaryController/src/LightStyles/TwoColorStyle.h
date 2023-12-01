@@ -6,7 +6,8 @@
 #include "PixelBuffer.h"
 #include "LightPatterns.h"
 
-class TwoColorStyle : public LightStyle {
+class TwoColorStyle : public LightStyle 
+{
   public:
     TwoColorStyle(String name, uint32_t color1, uint32_t color2, PixelBuffer* pixelBuffer);
     
@@ -17,6 +18,7 @@ class TwoColorStyle : public LightStyle {
     int getIterationDelay();
     int getModulus();
     bool shouldPatternBeDoubled();
+    void updateSequentialPattern(ulong primaryColor, ulong secondaryColor, int numberOfTimesToUpdate);
 
     uint32_t m_color1;
     uint32_t m_color2;
