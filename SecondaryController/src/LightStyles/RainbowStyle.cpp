@@ -36,6 +36,8 @@ void RainbowStyle::update()
 void RainbowStyle::reset()
 {
     m_currentHue = 0;
+    m_nextUpdate = 0;
+
     if (m_pattern == static_cast<int>(LightPatterns::Random))
     {
         // Reset to a pink background.
@@ -59,8 +61,6 @@ void RainbowStyle::reset()
         shiftColorUsingPattern(Adafruit_NeoPixel::ColorHSV(m_currentHue));
         incrementHue();
     }
-
-    m_nextUpdate = 0;
 }
 
 int RainbowStyle::getIterationDelay()
