@@ -38,11 +38,9 @@ void RainbowStyle::reset()
     m_currentHue = 0;
     if (m_pattern == static_cast<int>(LightPatterns::Random))
     {
+        // Reset to a pink background.
         ulong pink = Adafruit_NeoPixel::Color(230, 22, 161);
-        for (int i = 0; i < m_pixelBuffer->getPixelCount(); i++)
-        {
-            m_pixelBuffer->setPixel(i, pink);
-        }
+        m_pixelBuffer->fill(pink);
         return;
     }
 

@@ -90,6 +90,23 @@ void PixelBuffer::setPixel(unsigned int pixel, ulong color)
     m_pixelColors[pixel] = color;
 }
 
+void PixelBuffer::fill(ulong newColor)
+{
+    for (int i = 0; i < m_numPixels; i++)
+    {
+        m_pixelColors[i] = newColor;
+    }
+}
+
+void PixelBuffer::fillRandomly(ulong newColor, int numberOfPixels)
+{
+    for (int i = 0; i < numberOfPixels; i++)
+    {
+        int pixel = random(0, m_numPixels);
+        m_pixelColors[pixel] = newColor;
+    }
+}
+
 void PixelBuffer::shiftLineRight(ulong newColor)
 {
     for (uint i = m_numPixels - 1; i >= 1; i--)
@@ -164,15 +181,6 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_
     {
         int pixelIndex = destination->at(i);
         m_pixelColors[pixelIndex] = newColor;
-    }
-}
-
-void PixelBuffer::fillRandomly(ulong newColor, int numberOfPixels)
-{
-    for (int i = 0; i < numberOfPixels; i++)
-    {
-        int pixel = random(0, m_numPixels);
-        m_pixelColors[pixel] = newColor;
     }
 }
 

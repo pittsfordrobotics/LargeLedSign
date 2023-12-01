@@ -79,9 +79,6 @@ void LightStyle::shiftColorUsingPattern(uint32_t newColor)
             return;
         default:
             // Default to Solid (ie, all lights the same color)
-            for (uint i = 0; i < m_pixelBuffer->getPixelCount(); i++)
-            {
-                m_pixelBuffer->setPixel(i, newColor);
-            }
+            m_pixelBuffer->fill(newColor);
     }
 }
