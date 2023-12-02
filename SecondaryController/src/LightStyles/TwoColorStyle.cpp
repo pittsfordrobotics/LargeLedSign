@@ -30,7 +30,7 @@ void TwoColorStyle::update()
     if (m_pattern == static_cast<int>(LightPatterns::Random))
     {
         // Make the percent a const or define
-        double percentToFill = 5 / 100.0;
+        double percentToFill = 10 / 100.0;
         // The ratio of secondary pixels compared to all pixels is 1/mod.
         double totalNumberToFill = m_pixelBuffer->getPixelCount() * percentToFill;
         int numberOfSecondaryPixels = totalNumberToFill / mod;
@@ -85,7 +85,7 @@ void TwoColorStyle::updateSequentialPattern(ulong primaryColor, ulong secondaryC
         }
     }
 
-    for (int i = 0; i < numberOfTimesToUpdate - 1; i++)
+    for (int i = 0; i < numberOfTimesToUpdate; i++)
     {
         ulong newColor = primaryColor;
         if (mod > 0 && m_iterationCount % mod <= maxModRemainder)
