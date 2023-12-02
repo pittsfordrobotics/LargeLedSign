@@ -15,11 +15,20 @@ PixelBuffer::PixelBuffer(int gpioPin)
 void PixelBuffer::initialize(byte signStyle)
 {
     randomSeed(signStyle * 1000 + millis());
-    Serial.print("Initializaing pixel buffer for style ");
+    Serial.print("Initializing pixel buffer for style ");
     Serial.println(signStyle);
 
     switch (signStyle)
     {
+        case 1:
+            initializeDigitOne();
+            break;
+        case 3:
+            initializeDigitThree();
+            break;
+        case 8:
+            initializeDigitEight();
+            break;
         default:
             initializeTestMatrix();
     }
