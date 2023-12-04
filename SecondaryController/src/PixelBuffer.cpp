@@ -101,15 +101,15 @@ void PixelBuffer::setPixel(unsigned int pixel, ulong color)
 
 void PixelBuffer::fill(ulong newColor)
 {
-    for (int i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_numPixels; i++)
     {
         m_pixelColors[i] = newColor;
     }
 }
 
-void PixelBuffer::fillRandomly(ulong newColor, int numberOfPixels)
+void PixelBuffer::fillRandomly(ulong newColor, uint numberOfPixels)
 {
-    for (int i = 0; i < numberOfPixels; i++)
+    for (uint i = 0; i < numberOfPixels; i++)
     {
         int pixel = random(0, m_numPixels);
         m_pixelColors[pixel] = newColor;
