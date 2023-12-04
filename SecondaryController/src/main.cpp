@@ -14,14 +14,8 @@ std::vector<LightStyle *> lightStyles; // ****
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULTBRIGHTNESS;
 byte newBrightness = DEFAULTBRIGHTNESS;
-byte currentStyle = -1; // Force the style to "change" on the first iteration.
-byte newStyle = DEFAULTSTYLE; // ****
 byte currentSpeed = DEFAULTSPEED;
 byte newSpeed = DEFAULTSPEED;
-byte currentStep = DEFAULTSTEP; // ****
-byte newStep = DEFAULTSTEP; // ****
-byte currentPattern = DEFAULTPATTERN; // ****
-byte newPattern = DEFAULTPATTERN; // ****
 ulong currentSyncData = 0;
 ulong newSyncData = 0;
 SignOffsetData currentOffsetData;
@@ -195,10 +189,7 @@ void startBLE()
     btService.setStyleNames(styleNames);
     btService.setPatternNames(LightStyle::knownPatterns);
     btService.setBrightness(DEFAULTBRIGHTNESS);
-    btService.setStyle(DEFAULTSTYLE);
     btService.setSpeed(DEFAULTSPEED);
-    btService.setPattern(DEFAULTPATTERN);
-    btService.setStep(DEFAULTSTEP);
     btService.setSyncData(0);
 
     SignConfigurationData configData;
@@ -225,21 +216,6 @@ void readBleSettings()
     newBrightness = btService.getBrightness();
 
     newSyncData = btService.getSyncData();
-    // if (newSyncData > 0 && newSyncData == currentSyncData)
-    // {
-    //     // We're triggering changes based on the sync signal, but it hasn't changed.
-    //     // Do nothing.
-    //     return;
-    // }
-
-    // Check the range on the characteristic values.
-    // If out of range, ignore the update and reset the BLE characteristic to the old value.
-    // newStyle = btService.getStyle();
-    // if (!isInRange(newStyle, 0, lightStyles.size() - 1))
-    // {
-    //     btService.setStyle(currentStyle);
-    //     newStyle = currentStyle;
-    // }
 
     newSpeed = btService.getSpeed();
     if (!isInRange(newSpeed, 1, 100))
@@ -247,20 +223,6 @@ void readBleSettings()
         btService.setSpeed(currentSpeed);
         newSpeed = currentSpeed;
     }
-
-    // newStep = btService.getStep();
-    // if (!isInRange(newStep, 1, 100))
-    // {
-    //     btService.setStep(currentStep);
-    //     newStep = currentStep;
-    // }
-
-    // newPattern = btService.getPattern();
-    // if (!isInRange(newPattern, 0, LightStyle::knownPatterns.size() - 1))
-    // {
-    //     btService.setPattern(currentPattern);
-    //     newPattern = currentPattern;
-    // }
 }
 
 // Determine if the give byte value is between (or equal to) the min and max values.
