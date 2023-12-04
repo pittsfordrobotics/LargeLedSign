@@ -8,24 +8,26 @@ SecondaryPeripheral btService;
 
 // Pixel and color data
 PixelBuffer pixelBuffer(DATA_OUT);
-std::vector<LightStyle *> lightStyles;
+LightStyle* currentLightStyle;
+std::vector<LightStyle *> lightStyles; // ****
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULTBRIGHTNESS;
 byte newBrightness = DEFAULTBRIGHTNESS;
 byte currentStyle = -1; // Force the style to "change" on the first iteration.
-byte newStyle = DEFAULTSTYLE;
+byte newStyle = DEFAULTSTYLE; // ****
 byte currentSpeed = DEFAULTSPEED;
 byte newSpeed = DEFAULTSPEED;
-byte currentStep = DEFAULTSTEP;
-byte newStep = DEFAULTSTEP;
-byte currentPattern = DEFAULTPATTERN;
-byte newPattern = DEFAULTPATTERN;
+byte currentStep = DEFAULTSTEP; // ****
+byte newStep = DEFAULTSTEP; // ****
+byte currentPattern = DEFAULTPATTERN; // ****
+byte newPattern = DEFAULTPATTERN; // ****
 ulong currentSyncData = 0;
 ulong newSyncData = 0;
 SignOffsetData currentOffsetData;
 byte signType;
 byte signPosition;
+PatternData newPatternData; // Is there a need for "new" vs "current"?
 
 // Other internal state
 int loopCounter = 0;                      // Records the number of times the main loop ran since the last timing calculation.
@@ -52,6 +54,16 @@ void setup()
     pixelBuffer.setBrightness(DEFAULTBRIGHTNESS);
 
     startBLE();
+
+    // Setup the default pattern to show prior to any BT connections
+    newPatternData.colorPattern = ColorPattern::SingleColor;
+    newPatternData.displayPattern = DisplayPattern::Solid;
+    // TODO: put the common colors in a helper class.
+    newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
+    // TODO: if we use "current" vs "new", the style creation and reset can be done in the updateLEDs method automatically.
+    currentLightStyle = createLightStyleForNewPatternData();
+    currentLightStyle->reset();
+    btService.setPatternData(newPatternData);
 }
 
 // Main loop --
@@ -209,26 +221,25 @@ void readBleSettings()
         currentOffsetData = newOffsetData;
     }
 
-    PatternData data = btService.getPatternData();
+    newPatternData = btService.getPatternData();
+    newBrightness = btService.getBrightness();
 
     newSyncData = btService.getSyncData();
-    if (newSyncData > 0 && newSyncData == currentSyncData)
-    {
-        // We're triggering changes based on the sync signal, but it hasn't changed.
-        // Do nothing.
-        return;
-    }
-
-    newBrightness = btService.getBrightness();
+    // if (newSyncData > 0 && newSyncData == currentSyncData)
+    // {
+    //     // We're triggering changes based on the sync signal, but it hasn't changed.
+    //     // Do nothing.
+    //     return;
+    // }
 
     // Check the range on the characteristic values.
     // If out of range, ignore the update and reset the BLE characteristic to the old value.
-    newStyle = btService.getStyle();
-    if (!isInRange(newStyle, 0, lightStyles.size() - 1))
-    {
-        btService.setStyle(currentStyle);
-        newStyle = currentStyle;
-    }
+    // newStyle = btService.getStyle();
+    // if (!isInRange(newStyle, 0, lightStyles.size() - 1))
+    // {
+    //     btService.setStyle(currentStyle);
+    //     newStyle = currentStyle;
+    // }
 
     newSpeed = btService.getSpeed();
     if (!isInRange(newSpeed, 1, 100))
@@ -237,19 +248,19 @@ void readBleSettings()
         newSpeed = currentSpeed;
     }
 
-    newStep = btService.getStep();
-    if (!isInRange(newStep, 1, 100))
-    {
-        btService.setStep(currentStep);
-        newStep = currentStep;
-    }
+    // newStep = btService.getStep();
+    // if (!isInRange(newStep, 1, 100))
+    // {
+    //     btService.setStep(currentStep);
+    //     newStep = currentStep;
+    // }
 
-    newPattern = btService.getPattern();
-    if (!isInRange(newPattern, 0, LightStyle::knownPatterns.size() - 1))
-    {
-        btService.setPattern(currentPattern);
-        newPattern = currentPattern;
-    }
+    // newPattern = btService.getPattern();
+    // if (!isInRange(newPattern, 0, LightStyle::knownPatterns.size() - 1))
+    // {
+    //     btService.setPattern(currentPattern);
+    //     newPattern = currentPattern;
+    // }
 }
 
 // Determine if the give byte value is between (or equal to) the min and max values.
@@ -274,6 +285,12 @@ void blinkLowPowerIndicator()
 // and call the current style class to update the display.
 void updateLEDs()
 {
+    if (newBrightness != currentBrightness)
+    {
+        pixelBuffer.setBrightness(newBrightness);
+        currentBrightness = newBrightness;
+    }
+
     int shouldResetStyle = false;
     if (newSyncData > 0 && newSyncData != currentSyncData)
     {
@@ -284,51 +301,52 @@ void updateLEDs()
         currentSyncData = newSyncData;
     }
 
-    if (newBrightness != currentBrightness)
-    {
-        pixelBuffer.setBrightness(newBrightness);
-        currentBrightness = newBrightness;
-    }
-
-    LightStyle *style = lightStyles[newStyle];
-    if (currentStyle != newStyle)
-    {
-        Serial.print("Changing style to ");
-        Serial.println(newStyle);
-        // Changing styles - reset the lights
-        style->setSpeed(currentSpeed);
-        style->setStep(currentStep);
-        style->setPattern(currentPattern);
-        shouldResetStyle = true;
-        currentStyle = newStyle;
-    }
-
-    if (currentSpeed != newSpeed)
-    {
-        style->setSpeed(newSpeed);
-        currentSpeed = newSpeed;
-    }
-
-    if (currentStep != newStep)
-    {
-        style->setStep(newStep);
-        currentStep = newStep;
-    }
-
-    if (currentPattern != newPattern)
-    {
-        style->setPattern(newPattern);
-        shouldResetStyle = true;
-        currentPattern = newPattern;
-    }
-
     if (shouldResetStyle)
     {
-        style->reset();
+        if (currentLightStyle)
+        {
+            delete currentLightStyle;
+        }
+
+        currentLightStyle = createLightStyleForNewPatternData();
+        currentLightStyle->setSpeed(newSpeed);
+        currentLightStyle->reset();
     }
 
-    style->update();
+    // The current style shouldn't ever be null here, but check anyways.
+    if (currentLightStyle)
+    {
+        currentLightStyle->update();
+    }
+
     pixelBuffer.displayPixels();
+}
+
+LightStyle* createLightStyleForNewPatternData()
+{
+    LightStyle* newStyle;
+
+    switch (newPatternData.colorPattern)
+    {
+        case ColorPattern::SingleColor:
+            newStyle = new SingleColorStyle("singlecolor", newPatternData.color1, &pixelBuffer);
+            break;
+        case ColorPattern::TwoColor:
+            newStyle = new TwoColorStyle("twocolor", newPatternData.color1, newPatternData.color2, &pixelBuffer);
+            newStyle->setStep(newPatternData.param1);
+            newStyle->setPattern(static_cast<byte>(newPatternData.displayPattern));
+            break;
+        case ColorPattern::Rainbow:
+            newStyle = new RainbowStyle("rainbow", &pixelBuffer);
+            newStyle->setStep(newPatternData.param1);
+            newStyle->setPattern(static_cast<byte>(newPatternData.displayPattern));
+            break;
+        default:
+            // unknown - use blank for now
+            newStyle = new SingleColorStyle("blank", 0, &pixelBuffer);
+    }
+
+    return newStyle;
 }
 
 // Check if the current battery voltage is too low to run the sign,

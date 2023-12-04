@@ -9,6 +9,10 @@ RainbowStyle::RainbowStyle(String name, PixelBuffer *pixelBuffer) : LightStyle(n
     m_currentHue = 0;
 }
 
+RainbowStyle::~RainbowStyle()
+{
+}
+
 void RainbowStyle::update()
 {
     if (millis() < m_nextUpdate)

@@ -10,6 +10,10 @@ LightStyle::LightStyle(String name, PixelBuffer *pixelBuffer)
     m_name = name;
 }
 
+LightStyle::~LightStyle()
+{
+}
+
 void LightStyle::setSpeed(uint8_t speed)
 {
     m_speed = speed;

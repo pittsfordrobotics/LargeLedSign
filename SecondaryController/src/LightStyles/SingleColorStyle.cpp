@@ -7,6 +7,10 @@ SingleColorStyle::SingleColorStyle(String name, uint32_t color, PixelBuffer *pix
     m_color = color;
 }
 
+SingleColorStyle::~SingleColorStyle()
+{
+}
+
 void SingleColorStyle::update()
 {
     // Single color style does not blink or anything.

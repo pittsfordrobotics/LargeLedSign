@@ -361,9 +361,9 @@ void updateAllSecondaries()
     {
         allSecondaries[i]->setBrightness(currentServiceStatus.getBrightness());
         allSecondaries[i]->setSpeed(currentServiceStatus.getSpeed());
-        allSecondaries[i]->setStep(currentServiceStatus.getStep()); // ****
-        allSecondaries[i]->setStyle(currentServiceStatus.getStyle()); // ****
-        allSecondaries[i]->setPattern(currentServiceStatus.getPattern()); // ****
+        // allSecondaries[i]->setStep(currentServiceStatus.getStep()); // ****
+        // allSecondaries[i]->setStyle(currentServiceStatus.getStyle()); // ****
+        // allSecondaries[i]->setPattern(currentServiceStatus.getPattern()); // ****
         allSecondaries[i]->setPatternData(currentPatternData);
     }
     ulong timestamp = millis();
@@ -382,10 +382,10 @@ void setManualStyle(uint style)
     case 0:
         // Solid Pink
         currentServiceStatus.setBrightness(10);
-        currentServiceStatus.setPattern(0);
+        // currentServiceStatus.setPattern(0);
         currentServiceStatus.setSpeed(1);
-        currentServiceStatus.setStep(1);
-        currentServiceStatus.setStyle(1);
+        // currentServiceStatus.setStep(1);
+        // currentServiceStatus.setStyle(1);
         currentPatternData.colorPattern = ColorPattern::SingleColor;
         currentPatternData.displayPattern = DisplayPattern::Solid;
         currentPatternData.color1 = Pink;
@@ -393,10 +393,10 @@ void setManualStyle(uint style)
     case 1:
         // Red-Pink
         currentServiceStatus.setBrightness(10);
-        currentServiceStatus.setPattern(1);
+        // currentServiceStatus.setPattern(1);
         currentServiceStatus.setSpeed(25);
-        currentServiceStatus.setStep(25);
-        currentServiceStatus.setStyle(4);
+        // currentServiceStatus.setStep(25);
+        // currentServiceStatus.setStyle(4);
         currentPatternData.colorPattern = ColorPattern::TwoColor;
         currentPatternData.displayPattern = DisplayPattern::Right;
         currentPatternData.color1 = Red;
@@ -406,10 +406,10 @@ void setManualStyle(uint style)
     case 2:
         // Blue-Pink
         currentServiceStatus.setBrightness(10);
-        currentServiceStatus.setPattern(1);
+        // currentServiceStatus.setPattern(1);
         currentServiceStatus.setSpeed(25);
-        currentServiceStatus.setStep(25);
-        currentServiceStatus.setStyle(2);
+        // currentServiceStatus.setStep(25);
+        // currentServiceStatus.setStyle(2);
         currentPatternData.colorPattern = ColorPattern::TwoColor;
         currentPatternData.displayPattern = DisplayPattern::Right;
         currentPatternData.color1 = Blue;
@@ -419,10 +419,10 @@ void setManualStyle(uint style)
     case 3:
         // Rainbow
         currentServiceStatus.setBrightness(10);
-        currentServiceStatus.setPattern(1);
+        // currentServiceStatus.setPattern(1);
         currentServiceStatus.setSpeed(85);
-        currentServiceStatus.setStep(95);
-        currentServiceStatus.setStyle(0);
+        // currentServiceStatus.setStep(95);
+        // currentServiceStatus.setStyle(0);
         currentPatternData.colorPattern = ColorPattern::Rainbow;
         currentPatternData.displayPattern = DisplayPattern::Right;
         currentPatternData.param1 = 95;
@@ -430,10 +430,10 @@ void setManualStyle(uint style)
     case 7:
         // Rainbow random
         currentServiceStatus.setBrightness(10);
-        currentServiceStatus.setPattern(6);
+        // currentServiceStatus.setPattern(6);
         currentServiceStatus.setSpeed(78);
-        currentServiceStatus.setStep(55);
-        currentServiceStatus.setStyle(0);
+        // currentServiceStatus.setStep(55);
+        // currentServiceStatus.setStyle(0);
         currentPatternData.colorPattern = ColorPattern::Rainbow;
         currentPatternData.displayPattern = DisplayPattern::Random;
         currentPatternData.param1 = 95;
@@ -441,18 +441,18 @@ void setManualStyle(uint style)
     default:
         // Rainbow - change?
         currentServiceStatus.setBrightness(10);
-        currentServiceStatus.setPattern(1);
+        // currentServiceStatus.setPattern(1);
         currentServiceStatus.setSpeed(85);
-        currentServiceStatus.setStep(95);
-        currentServiceStatus.setStyle(0);
+        // currentServiceStatus.setStep(95);
+        // currentServiceStatus.setStyle(0);
     }
 
     // Update the local BLE settings to reflect the new manual settings.
     btService.setBrightness(currentServiceStatus.getBrightness());
-    btService.setPattern(currentServiceStatus.getPattern());
+    // btService.setPattern(currentServiceStatus.getPattern());
     btService.setSpeed(currentServiceStatus.getSpeed());
-    btService.setStep(currentServiceStatus.getStep());
-    btService.setStyle(currentServiceStatus.getStyle());
+    // btService.setStep(currentServiceStatus.getStep());
+    // btService.setStyle(currentServiceStatus.getStyle());
     btService.setPatternData(currentPatternData);
 }
 

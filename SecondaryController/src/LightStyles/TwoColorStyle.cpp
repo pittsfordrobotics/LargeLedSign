@@ -10,6 +10,10 @@ TwoColorStyle::TwoColorStyle(String name, uint32_t color1, uint32_t color2, Pixe
     m_nextUpdate = 0;
 }
 
+TwoColorStyle::~TwoColorStyle()
+{
+}
+
 void TwoColorStyle::update()
 {
     if (millis() < m_nextUpdate)
