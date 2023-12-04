@@ -7,6 +7,7 @@
 #include <BLETypedCharacteristics.h>
 #include <BluetoothCommon.h>
 #include <StringUtils.h>
+#include <PatternData.h>
 
 class CommonPeripheral {
   public:
@@ -29,6 +30,8 @@ class CommonPeripheral {
     byte getStep();
     void setSpeed(byte speed);
     byte getSpeed();
+    PatternData getPatternData();
+    void setPatternData(PatternData data);
 
     void emitBatteryVoltage(float voltage);
 
@@ -48,12 +51,14 @@ class CommonPeripheral {
     BLEByteCharacteristic m_patternCharacteristic{ BTCOMMON_PATTERNCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
     BLEStringCharacteristic m_patternNamesCharacteristic{ BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
     BLEFloatCharacteristic m_batteryVoltageCharacteristic{ BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID, BLERead | BLENotify };
+    BLECharacteristic m_patternDataCharacteristic{ BTCOMMON_PATTERNDATA_CHARACTERISTIC_UUID, BLERead | BLEWrite, 20 };
 
     byte m_currentBrightness{0};
     byte m_currentStyle{0};
     byte m_currentPattern{0};
     byte m_currentSpeed{0};
     byte m_currentStep{0};
+    PatternData m_currentPatternData;
 };
 
 #endif

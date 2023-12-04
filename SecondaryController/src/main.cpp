@@ -209,6 +209,8 @@ void readBleSettings()
         currentOffsetData = newOffsetData;
     }
 
+    PatternData data = btService.getPatternData();
+
     newSyncData = btService.getSyncData();
     if (newSyncData > 0 && newSyncData == currentSyncData)
     {

@@ -11,8 +11,16 @@ bool resetRequested = false;
 bool shouldIgnoreLogo = false;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
+
+// TODO: Merge the pattern data into the sign status
 SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
+PatternData lastPatternData;
+PatternData currentPatternData;
+
+const ulong Pink = color(230, 22, 161);
+const ulong Red = color(255, 0, 0);
+const ulong Blue = color(0, 0, 255);
 
 void setup()
 {
@@ -61,11 +69,14 @@ void loop()
     // Manual inputs will override BLE settings, so read them last.
     processManualInputs();
 
-    if (currentServiceStatus != lastServiceStatus || resetRequested)
+    if (currentServiceStatus != lastServiceStatus 
+        || currentPatternData != lastPatternData
+        || resetRequested)
     {
         resetRequested = false;
         updateAllSecondaries();
         lastServiceStatus = currentServiceStatus;
+        lastPatternData = currentPatternData;
     }
 
     updateTelemetry();
@@ -350,9 +361,10 @@ void updateAllSecondaries()
     {
         allSecondaries[i]->setBrightness(currentServiceStatus.getBrightness());
         allSecondaries[i]->setSpeed(currentServiceStatus.getSpeed());
-        allSecondaries[i]->setStep(currentServiceStatus.getStep());
-        allSecondaries[i]->setStyle(currentServiceStatus.getStyle());
-        allSecondaries[i]->setPattern(currentServiceStatus.getPattern());
+        allSecondaries[i]->setStep(currentServiceStatus.getStep()); // ****
+        allSecondaries[i]->setStyle(currentServiceStatus.getStyle()); // ****
+        allSecondaries[i]->setPattern(currentServiceStatus.getPattern()); // ****
+        allSecondaries[i]->setPatternData(currentPatternData);
     }
     ulong timestamp = millis();
     for (uint i = 0; i < allSecondaries.size(); i++)
@@ -374,6 +386,9 @@ void setManualStyle(uint style)
         currentServiceStatus.setSpeed(1);
         currentServiceStatus.setStep(1);
         currentServiceStatus.setStyle(1);
+        currentPatternData.colorPattern = ColorPattern::SingleColor;
+        currentPatternData.displayPattern = DisplayPattern::Solid;
+        currentPatternData.color1 = Pink;
         break;
     case 1:
         // Red-Pink
@@ -382,6 +397,11 @@ void setManualStyle(uint style)
         currentServiceStatus.setSpeed(25);
         currentServiceStatus.setStep(25);
         currentServiceStatus.setStyle(4);
+        currentPatternData.colorPattern = ColorPattern::TwoColor;
+        currentPatternData.displayPattern = DisplayPattern::Right;
+        currentPatternData.color1 = Red;
+        currentPatternData.color2 = Pink;
+        currentPatternData.param1 = 25;
         break;
     case 2:
         // Blue-Pink
@@ -390,6 +410,11 @@ void setManualStyle(uint style)
         currentServiceStatus.setSpeed(25);
         currentServiceStatus.setStep(25);
         currentServiceStatus.setStyle(2);
+        currentPatternData.colorPattern = ColorPattern::TwoColor;
+        currentPatternData.displayPattern = DisplayPattern::Right;
+        currentPatternData.color1 = Blue;
+        currentPatternData.color2 = Pink;
+        currentPatternData.param1 = 25;
         break;
     case 3:
         // Rainbow
@@ -398,6 +423,9 @@ void setManualStyle(uint style)
         currentServiceStatus.setSpeed(85);
         currentServiceStatus.setStep(95);
         currentServiceStatus.setStyle(0);
+        currentPatternData.colorPattern = ColorPattern::Rainbow;
+        currentPatternData.displayPattern = DisplayPattern::Right;
+        currentPatternData.param1 = 95;
         break;
     case 7:
         // Rainbow random
@@ -406,6 +434,9 @@ void setManualStyle(uint style)
         currentServiceStatus.setSpeed(78);
         currentServiceStatus.setStep(55);
         currentServiceStatus.setStyle(0);
+        currentPatternData.colorPattern = ColorPattern::Rainbow;
+        currentPatternData.displayPattern = DisplayPattern::Random;
+        currentPatternData.param1 = 95;
         break;
     default:
         // Rainbow - change?
@@ -422,6 +453,7 @@ void setManualStyle(uint style)
     btService.setSpeed(currentServiceStatus.getSpeed());
     btService.setStep(currentServiceStatus.getStep());
     btService.setStyle(currentServiceStatus.getStyle());
+    btService.setPatternData(currentPatternData);
 }
 
 void updateTelemetry()
@@ -451,4 +483,11 @@ void updateTelemetry()
             Serial.println(allSecondaries[i]->getBatteryVoltage());
         }
     }
+}
+
+ulong color(byte red, byte green, byte blue)
+{
+    // Taken from the Adafruit_Neopixel::Color method.
+    // I didn't want to add a dependency on that library for a single method, so copying it here.
+    return ((ulong)red << 16) | ((ulong)green << 8) | blue;
 }

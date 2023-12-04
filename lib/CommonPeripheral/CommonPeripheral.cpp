@@ -17,6 +17,7 @@ void CommonPeripheral::initialize(String uuid, String localName)
     m_ledService->addCharacteristic(m_patternCharacteristic);
     m_ledService->addCharacteristic(m_patternNamesCharacteristic);
     m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
+    m_ledService->addCharacteristic(m_patternDataCharacteristic);
 
     for (uint i = 0; i < m_additionalCharacteristics.size(); i++)
     {
@@ -146,6 +147,32 @@ void CommonPeripheral::setStep(byte step)
 void CommonPeripheral::emitBatteryVoltage(float voltage)
 {
     m_batteryVoltageCharacteristic.writeValue(voltage);
+}
+
+PatternData CommonPeripheral::getPatternData()
+{
+    if (isConnected())
+    {
+        if (m_patternDataCharacteristic.written())
+        {
+            Serial.println("Reading new value for pattern charactersitic.");
+            m_patternDataCharacteristic.readValue(&m_currentPatternData, sizeof(m_currentPatternData));
+            
+            // TEST TEST TEST
+            Serial.print("Color pattern: ");
+            Serial.print(static_cast<byte>(m_currentPatternData.colorPattern));
+            Serial.print("; Color 1:");
+            Serial.println(m_currentPatternData.color1, HEX);
+        }
+    }
+
+    return m_currentPatternData;
+}
+
+void CommonPeripheral::setPatternData(PatternData data)
+{
+    m_currentPatternData = data;
+    m_patternDataCharacteristic.writeValue(&data, sizeof(data));
 }
 
 byte CommonPeripheral::readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name)

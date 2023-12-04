@@ -6,6 +6,7 @@
 #include <BluetoothCommon.h>
 #include <StringUtils.h>
 #include <SignStatus.h>
+#include <PatternData.h>
 
 class SecondaryClient {
     public:
@@ -30,6 +31,7 @@ class SecondaryClient {
         void setSpeed(byte speed);
         void setStep(byte step);
         void setSignOffsetData(String offsetData);
+        void setPatternData(const PatternData& data);
         void updateSyncData(ulong syncData);
 
     private:

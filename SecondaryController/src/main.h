@@ -14,6 +14,7 @@
 #include "Bluetooth\SecondaryPeripheral.h"
 #include <SignConfigurationData.h>
 #include <SignOffsetData.h>
+#include <PatternData.h>
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels

@@ -109,6 +109,15 @@ void SecondaryClient::setSignOffsetData(String offsetData)
     m_peripheral.characteristic(BTCOMMON_OFFSETDATA_CHARACTERISTIC_UUID).writeValue(offsetData.c_str());
 }
 
+void SecondaryClient::setPatternData(const PatternData& data)
+{
+    BLECharacteristic characteristic = m_peripheral.characteristic(BTCOMMON_PATTERNDATA_CHARACTERISTIC_UUID);
+    if (characteristic)
+    {
+        characteristic.writeValue(&data, sizeof(data));
+    }
+}
+
 void SecondaryClient::updateSyncData(ulong syncData)
 {
     m_peripheral.characteristic(BTCOMMON_SYNCDATA_CHARACTERISTIC_UUID).writeValue(syncData);
