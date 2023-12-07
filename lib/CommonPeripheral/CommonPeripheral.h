@@ -31,7 +31,7 @@ class CommonPeripheral {
     void setSpeed(byte speed);
     byte getSpeed();
     PatternData getPatternData();
-    void setPatternData(PatternData data);
+    void setPatternData(const PatternData& data);
 
     void emitBatteryVoltage(float voltage);
 

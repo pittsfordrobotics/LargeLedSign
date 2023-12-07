@@ -1,5 +1,12 @@
 #include "main.h"
 
+// TODO reminders:
+// - Merge new pattern data into sign status (sign status has brightness and speed)
+// - Setup predefined styles here instead of in Secondary
+// - Clean up deprecated secondary characteristics from CommonPeripheral, move to new PrimaryPeripheral.
+// - Have manual buttons detect a sequence of presses (ie, allow user to cylce though a bunch of styles).
+// - (Still TBD) Enable a separate pattern for the logo
+
 // Global variables
 CommonPeripheral btService;
 StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
@@ -15,8 +22,6 @@ ulong lastTelemetryTimestamp = 0;
 // TODO: Merge the pattern data into the sign status
 SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
-PatternData lastPatternData;
-PatternData currentPatternData;
 
 const ulong Pink = color(230, 22, 161);
 const ulong Red = color(255, 0, 0);
@@ -66,18 +71,15 @@ void loop()
     }
 
     checkSecondaryConnections();
-    readSettingsFromBLE();
+    //readSettingsFromBLE();
     // Manual inputs will override BLE settings, so read them last.
     processManualInputs();
 
-    if (currentServiceStatus != lastServiceStatus 
-        || currentPatternData != lastPatternData
-        || resetRequested)
+    if (currentServiceStatus != lastServiceStatus || resetRequested)
     {
         resetRequested = false;
         updateAllSecondaries();
         lastServiceStatus = currentServiceStatus;
-        lastPatternData = currentPatternData;
     }
 
     updateTelemetry();
@@ -350,10 +352,7 @@ void startBLEService()
 void readSettingsFromBLE()
 {
     currentServiceStatus.setBrightness(btService.getBrightness());
-    currentServiceStatus.setPattern(btService.getPattern());
     currentServiceStatus.setSpeed(btService.getSpeed());
-    currentServiceStatus.setStep(btService.getStep());
-    currentServiceStatus.setStyle(btService.getStyle());
 
     // The currentPatternData is what actually detects data changes.
     // Convert old setting characteristics to the PatternData struct.
@@ -363,8 +362,9 @@ void readSettingsFromBLE()
     // Phase 1 for testing: The light styles are defined by the secondaries.
     //    Hard-code the list of styles/patterns and do the conversion here.
     // Phase 2 will be having the Primary establish the list of "Predefined" styles.
+    PatternData patternData;
     DisplayPattern pattern;
-    switch (currentServiceStatus.getPattern())
+    switch (btService.getPattern())
     {
         case 1:
             pattern = DisplayPattern::Right;
@@ -388,51 +388,56 @@ void readSettingsFromBLE()
             pattern = DisplayPattern::Solid;
     }
 
-    switch (currentServiceStatus.getStyle())
+    switch (btService.getStyle())
     {
         case 0:
             // Rainbow
-            currentPatternData.colorPattern = ColorPattern::Rainbow;
-            currentPatternData.displayPattern = pattern;
-            currentPatternData.param1 = currentServiceStatus.getStep();
+            patternData.colorPattern = ColorPattern::Rainbow;
+            patternData.displayPattern = pattern;
+            patternData.param1 = btService.getStep();
             break;
         case 1:
             // Pink
-            currentPatternData.colorPattern = ColorPattern::SingleColor;
-            currentPatternData.color1 = Pink;
+            patternData.colorPattern = ColorPattern::SingleColor;
+            patternData.color1 = Pink;
             break;
         case 2:
             // Blue-Pink
-            currentPatternData.colorPattern = ColorPattern::TwoColor;
-            currentPatternData.color1 = Blue;
-            currentPatternData.color2 = Pink;
-            currentPatternData.param1 = currentServiceStatus.getStep();
+            patternData.colorPattern = ColorPattern::TwoColor;
+            patternData.color1 = Blue;
+            patternData.color2 = Pink;
+            patternData.param1 = btService.getStep();
             break;
         case 3:
             // Blue
-            currentPatternData.colorPattern = ColorPattern::SingleColor;
-            currentPatternData.color1 = Blue;
+            patternData.colorPattern = ColorPattern::SingleColor;
+            patternData.color1 = Blue;
             break;
         case 4:
             // Red-Pink
-            currentPatternData.colorPattern = ColorPattern::TwoColor;
-            currentPatternData.color1 = Red;
-            currentPatternData.color2 = Pink;
-            currentPatternData.param1 = currentServiceStatus.getStep();
+            patternData.colorPattern = ColorPattern::TwoColor;
+            patternData.color1 = Red;
+            patternData.color2 = Pink;
+            patternData.param1 = btService.getStep();
             break;
         case 5:
             // Red
-            currentPatternData.colorPattern = ColorPattern::SingleColor;
-            currentPatternData.color1 = Red;
+            patternData.colorPattern = ColorPattern::SingleColor;
+            patternData.color1 = Red;
             break;
         case 6:
             // Orange-Pink
-            currentPatternData.colorPattern = ColorPattern::TwoColor;
-            currentPatternData.color1 = Orange;
-            currentPatternData.color2 = Pink;
-            currentPatternData.param1 = currentServiceStatus.getStep();
+            patternData.colorPattern = ColorPattern::TwoColor;
+            patternData.color1 = Orange;
+            patternData.color2 = Pink;
+            patternData.param1 = btService.getStep();
             break;
+        default:
+            // Unknown
+            patternData.colorPattern = ColorPattern::Blank;
     }
+
+    currentServiceStatus.setPatternData(patternData);
 }
 
 void updateAllSecondaries()
@@ -441,7 +446,7 @@ void updateAllSecondaries()
     {
         allSecondaries[i]->setBrightness(currentServiceStatus.getBrightness());
         allSecondaries[i]->setSpeed(currentServiceStatus.getSpeed());
-        allSecondaries[i]->setPatternData(currentPatternData);
+        allSecondaries[i]->setPatternData(currentServiceStatus.getPatternData());
     }
     ulong timestamp = millis();
     for (uint i = 0; i < allSecondaries.size(); i++)
@@ -452,94 +457,98 @@ void updateAllSecondaries()
 
 void setManualStyle(uint style)
 {
+    PatternData pattern;
+
     switch (style)
     {
         case 0:
             // Solid Pink
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(1);
-            currentPatternData.colorPattern = ColorPattern::SingleColor;
-            currentPatternData.displayPattern = DisplayPattern::Solid;
-            currentPatternData.color1 = Pink;
+            pattern.colorPattern = ColorPattern::SingleColor;
+            pattern.displayPattern = DisplayPattern::Solid;
+            pattern.color1 = Pink;
             // old
-            currentServiceStatus.setPattern(0);
-            currentServiceStatus.setStep(1);
-            currentServiceStatus.setStyle(1);
+            // currentServiceStatus.setPattern(0);
+            // currentServiceStatus.setStep(1);
+            // currentServiceStatus.setStyle(1);
             break;
         case 1:
             // Red-Pink
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(25);
-            currentPatternData.colorPattern = ColorPattern::TwoColor;
-            currentPatternData.displayPattern = DisplayPattern::Right;
-            currentPatternData.color1 = Red;
-            currentPatternData.color2 = Pink;
-            currentPatternData.param1 = 25;
+            pattern.colorPattern = ColorPattern::TwoColor;
+            pattern.displayPattern = DisplayPattern::Right;
+            pattern.color1 = Red;
+            pattern.color2 = Pink;
+            pattern.param1 = 25;
             // old
-            currentServiceStatus.setPattern(1);
-            currentServiceStatus.setStep(25);
-            currentServiceStatus.setStyle(4);
+            // currentServiceStatus.setPattern(1);
+            // currentServiceStatus.setStep(25);
+            // currentServiceStatus.setStyle(4);
             break;
         case 2:
             // Blue-Pink
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(25);
-            currentPatternData.colorPattern = ColorPattern::TwoColor;
-            currentPatternData.displayPattern = DisplayPattern::Right;
-            currentPatternData.color1 = Blue;
-            currentPatternData.color2 = Pink;
-            currentPatternData.param1 = 25;
+            pattern.colorPattern = ColorPattern::TwoColor;
+            pattern.displayPattern = DisplayPattern::Right;
+            pattern.color1 = Blue;
+            pattern.color2 = Pink;
+            pattern.param1 = 25;
             // old
-            currentServiceStatus.setPattern(1);
-            currentServiceStatus.setStep(25);
-            currentServiceStatus.setStyle(2);
+            // currentServiceStatus.setPattern(1);
+            // currentServiceStatus.setStep(25);
+            // currentServiceStatus.setStyle(2);
             break;
         case 3:
             // Rainbow
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(85);
-            currentPatternData.colorPattern = ColorPattern::Rainbow;
-            currentPatternData.displayPattern = DisplayPattern::Right;
-            currentPatternData.param1 = 95;
+            pattern.colorPattern = ColorPattern::Rainbow;
+            pattern.displayPattern = DisplayPattern::Right;
+            pattern.param1 = 95;
             // old
-            currentServiceStatus.setPattern(1);
-            currentServiceStatus.setStep(95);
-            currentServiceStatus.setStyle(0);
+            // currentServiceStatus.setPattern(1);
+            // currentServiceStatus.setStep(95);
+            // currentServiceStatus.setStyle(0);
             break;
         case 7:
             // Rainbow random
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(78);
-            currentPatternData.colorPattern = ColorPattern::Rainbow;
-            currentPatternData.displayPattern = DisplayPattern::Random;
-            currentPatternData.param1 = 95;
+            pattern.colorPattern = ColorPattern::Rainbow;
+            pattern.displayPattern = DisplayPattern::Random;
+            pattern.param1 = 95;
             // old
-            currentServiceStatus.setPattern(6);
-            currentServiceStatus.setStep(55);
-            currentServiceStatus.setStyle(0);
+            // currentServiceStatus.setPattern(6);
+            // currentServiceStatus.setStep(55);
+            // currentServiceStatus.setStyle(0);
             break;
         default:
             // Rainbow - change?
             currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(85);
-            currentPatternData.colorPattern = ColorPattern::Rainbow;
-            currentPatternData.displayPattern = DisplayPattern::Random;
-            currentPatternData.param1 = 95;
+            currentServiceStatus.setSpeed(1);
+            pattern.colorPattern = ColorPattern::SingleColor;
+            pattern.displayPattern = DisplayPattern::Solid;
+            pattern.color1 = Pink;
             // old
-            currentServiceStatus.setPattern(1);
-            currentServiceStatus.setStep(95);
-            currentServiceStatus.setStyle(0);
+            // currentServiceStatus.setPattern(1);
+            // currentServiceStatus.setStep(95);
+            // currentServiceStatus.setStyle(0);
     }
+
+    currentServiceStatus.setPatternData(pattern);
 
     // Update the local BLE settings to reflect the new manual settings.
     btService.setBrightness(currentServiceStatus.getBrightness());
     btService.setSpeed(currentServiceStatus.getSpeed());
-    btService.setPatternData(currentPatternData);
+    btService.setPatternData(pattern);
 
     // Set back the old characteristics so the next read won't think something changed.
-    btService.setPattern(currentServiceStatus.getPattern());
-    btService.setStyle(currentServiceStatus.getStyle());
-    btService.setStep(currentServiceStatus.getStep());
+    // btService.setPattern(currentServiceStatus.getPattern());
+    // btService.setStyle(currentServiceStatus.getStyle());
+    // btService.setStep(currentServiceStatus.getStep());
 }
 
 void updateTelemetry()

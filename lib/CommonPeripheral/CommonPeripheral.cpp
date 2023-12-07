@@ -169,7 +169,7 @@ PatternData CommonPeripheral::getPatternData()
     return m_currentPatternData;
 }
 
-void CommonPeripheral::setPatternData(PatternData data)
+void CommonPeripheral::setPatternData(const PatternData& data)
 {
     m_currentPatternData = data;
     m_patternDataCharacteristic.writeValue(&data, sizeof(data));

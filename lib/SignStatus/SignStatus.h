@@ -3,8 +3,9 @@
 
 #include <Arduino.h>
 #include <vector>
-#include "StringUtils.h"
+#include <StringUtils.h>
 #include <SignConfigurationData.h>
+#include <PatternData.h>
 
 class SignStatus {
     public:
@@ -16,6 +17,7 @@ class SignStatus {
         byte getStep() { return m_step; }
         byte getSpeed() { return m_speed; }
         SignConfigurationData getSignConfigurationData() { return m_signConfigData; }
+        PatternData getPatternData() { return m_patternData; }
 
         void setStyleNames(String styleNames) { m_styleNames = styleNames; }
         void setPatternNames(String patternNames) { m_patternNames = patternNames; }
@@ -25,6 +27,7 @@ class SignStatus {
         void setStep(byte step) { m_step = step; }
         void setSpeed(byte speed) { m_speed = speed; }
         void setSignConfigurationData(SignConfigurationData signConfigData) { m_signConfigData = signConfigData; }
+        void setPatternData(PatternData patternData) { m_patternData = patternData; }
 
         SignStatus();
         SignStatus(const SignStatus& other);
@@ -43,6 +46,7 @@ class SignStatus {
         byte m_step{0};
         byte m_speed{0};
         SignConfigurationData m_signConfigData;
+        PatternData m_patternData;
 };
 
 #endif

@@ -25,6 +25,7 @@ void SignStatus::copy(const SignStatus &other)
     m_style = other.m_style;
     m_styleNames = other.m_styleNames;
     m_signConfigData = other.m_signConfigData;
+    m_patternData = other.m_patternData;
 }
 
 bool SignStatus::operator==(const SignStatus &other)
@@ -37,7 +38,8 @@ bool SignStatus::operator==(const SignStatus &other)
         && m_style == other.m_style 
         && m_styleNames.equals(other.m_styleNames) 
         && m_patternNames.equals(other.m_patternNames) 
-        && m_signConfigData == other.m_signConfigData);
+        && m_signConfigData == other.m_signConfigData
+        && m_patternData == other.m_patternData);
 }
 
 bool SignStatus::operator!=(const SignStatus &other)
@@ -49,6 +51,7 @@ bool SignStatus::operator!=(const SignStatus &other)
         || m_step != other.m_step 
         || m_style != other.m_style 
         || !m_styleNames.equals(other.m_styleNames)
-        || !m_patternNames.equals(other.m_patternNames) 
-        || m_signConfigData != other.m_signConfigData);
+        || !m_patternNames.equals(other.m_patternNames)
+        || m_signConfigData != other.m_signConfigData
+        || m_patternData != other.m_patternData);
 }
