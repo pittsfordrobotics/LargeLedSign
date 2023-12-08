@@ -26,10 +26,7 @@ class SecondaryClient {
         SignStatus getSignStatus();
         float getBatteryVoltage();
         void setBrightness(byte brightness);
-        void setPattern(byte pattern);
-        void setStyle(byte style);
         void setSpeed(byte speed);
-        void setStep(byte step);
         void setSignOffsetData(String offsetData);
         void setPatternData(const PatternData& data);
         void updateSyncData(ulong syncData);

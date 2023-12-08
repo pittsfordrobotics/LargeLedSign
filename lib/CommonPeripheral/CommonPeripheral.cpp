@@ -10,11 +10,8 @@ void CommonPeripheral::initialize(String uuid, String localName)
     BLE.setLocalName(localName.c_str());
     BLE.setAdvertisedService(*m_ledService);
     m_ledService->addCharacteristic(m_brightnessCharacteristic);
-    m_ledService->addCharacteristic(m_styleCharacteristic);
     m_ledService->addCharacteristic(m_styleNamesCharacteristic);
     m_ledService->addCharacteristic(m_speedCharacteristic);
-    m_ledService->addCharacteristic(m_stepCharacteristic);
-    m_ledService->addCharacteristic(m_patternCharacteristic);
     m_ledService->addCharacteristic(m_patternNamesCharacteristic);
     m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
     m_ledService->addCharacteristic(m_patternDataCharacteristic);
@@ -96,18 +93,6 @@ void CommonPeripheral::setBrightness(byte brightness)
     m_brightnessCharacteristic.writeValue(brightness);
 }
 
-byte CommonPeripheral::getStyle()
-{
-    m_currentStyle = readByteFromCharacteristic(m_styleCharacteristic, m_currentStyle, "style");
-    return m_currentStyle;
-}
-
-void CommonPeripheral::setStyle(byte style)
-{
-    m_currentStyle = style;
-    m_styleCharacteristic.writeValue(style);
-}
-
 byte CommonPeripheral::getSpeed()
 {
     m_currentSpeed = readByteFromCharacteristic(m_speedCharacteristic, m_currentSpeed, "speed");
@@ -118,30 +103,6 @@ void CommonPeripheral::setSpeed(byte speed)
 {
     m_currentSpeed = speed;
     m_speedCharacteristic.writeValue(speed);
-}
-
-byte CommonPeripheral::getPattern()
-{
-    m_currentPattern = readByteFromCharacteristic(m_patternCharacteristic, m_currentPattern, "pattern");
-    return m_currentPattern;
-}
-
-void CommonPeripheral::setPattern(byte pattern)
-{
-    m_currentPattern = pattern;
-    m_patternCharacteristic.writeValue(pattern);
-}
-
-byte CommonPeripheral::getStep()
-{
-    m_currentStep = readByteFromCharacteristic(m_stepCharacteristic, m_currentStep, "step");
-    return m_currentStep;
-}
-
-void CommonPeripheral::setStep(byte step)
-{
-    m_currentStep = step;
-    m_stepCharacteristic.writeValue(step);
 }
 
 void CommonPeripheral::emitBatteryVoltage(float voltage)

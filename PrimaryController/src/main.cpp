@@ -340,10 +340,8 @@ void startBLEService()
     btService.setPatternNames(status.getPatternNames());
     btService.setStyleNames(status.getStyleNames());
     btService.setBrightness(status.getBrightness());
-    btService.setPattern(status.getPattern());
     btService.setSpeed(status.getSpeed());
-    btService.setStep(status.getStep());
-    btService.setStyle(status.getStyle());
+    btService.setPatternData(status.getPatternData());
 
     Serial.println("Peripheral service started.");
     display.clear();
@@ -353,91 +351,7 @@ void readSettingsFromBLE()
 {
     currentServiceStatus.setBrightness(btService.getBrightness());
     currentServiceStatus.setSpeed(btService.getSpeed());
-
-    // The currentPatternData is what actually detects data changes.
-    // Convert old setting characteristics to the PatternData struct.
-    // (Need to update the Android app for a new interface.)
-    // This will need cleaning up!
-
-    // Phase 1 for testing: The light styles are defined by the secondaries.
-    //    Hard-code the list of styles/patterns and do the conversion here.
-    // Phase 2 will be having the Primary establish the list of "Predefined" styles.
-    PatternData patternData;
-    DisplayPattern pattern;
-    switch (btService.getPattern())
-    {
-        case 1:
-            pattern = DisplayPattern::Right;
-            break;
-        case 2:
-            pattern = DisplayPattern::Left;
-            break;
-        case 3:
-            pattern = DisplayPattern::Up;
-            break;
-        case 4:
-            pattern = DisplayPattern::Down;
-            break;
-        case 5:
-            pattern = DisplayPattern::Digit;
-            break;
-        case 6:
-            pattern = DisplayPattern::Random;
-            break;
-        default:
-            pattern = DisplayPattern::Solid;
-    }
-
-    switch (btService.getStyle())
-    {
-        case 0:
-            // Rainbow
-            patternData.colorPattern = ColorPattern::Rainbow;
-            patternData.displayPattern = pattern;
-            patternData.param1 = btService.getStep();
-            break;
-        case 1:
-            // Pink
-            patternData.colorPattern = ColorPattern::SingleColor;
-            patternData.color1 = Pink;
-            break;
-        case 2:
-            // Blue-Pink
-            patternData.colorPattern = ColorPattern::TwoColor;
-            patternData.color1 = Blue;
-            patternData.color2 = Pink;
-            patternData.param1 = btService.getStep();
-            break;
-        case 3:
-            // Blue
-            patternData.colorPattern = ColorPattern::SingleColor;
-            patternData.color1 = Blue;
-            break;
-        case 4:
-            // Red-Pink
-            patternData.colorPattern = ColorPattern::TwoColor;
-            patternData.color1 = Red;
-            patternData.color2 = Pink;
-            patternData.param1 = btService.getStep();
-            break;
-        case 5:
-            // Red
-            patternData.colorPattern = ColorPattern::SingleColor;
-            patternData.color1 = Red;
-            break;
-        case 6:
-            // Orange-Pink
-            patternData.colorPattern = ColorPattern::TwoColor;
-            patternData.color1 = Orange;
-            patternData.color2 = Pink;
-            patternData.param1 = btService.getStep();
-            break;
-        default:
-            // Unknown
-            patternData.colorPattern = ColorPattern::Blank;
-    }
-
-    currentServiceStatus.setPatternData(patternData);
+    currentServiceStatus.setPatternData(btService.getPatternData());
 }
 
 void updateAllSecondaries()

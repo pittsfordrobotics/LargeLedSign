@@ -55,10 +55,10 @@ struct PatternData {
 	union {
 		ulong color4{0};
 		struct {
-			byte exParam1;
-			byte exParam2;
-			byte exParam3;
-			byte exParam4;
+			byte param3;
+			byte param4;
+			byte param5;
+			byte param6;
 		};
 	};
 
