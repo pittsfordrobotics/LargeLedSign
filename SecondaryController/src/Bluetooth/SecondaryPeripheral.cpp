@@ -5,6 +5,8 @@ SecondaryPeripheral::SecondaryPeripheral()
     m_additionalCharacteristics.push_back(m_signConfigurationCharacteristic);
     m_additionalCharacteristics.push_back(m_signOffsetDataCharacteristic);
     m_additionalCharacteristics.push_back(m_syncDataCharacteristic);
+
+    m_syncDataCharacteristic.writeValue(0);
 }
 
 void SecondaryPeripheral::setSignConfigurationData(String signData)
@@ -22,10 +24,4 @@ ulong SecondaryPeripheral::getSyncData()
 {
     m_currentSyncData = readULongFromCharacteristic(m_syncDataCharacteristic, m_currentSyncData, "SyncData");
     return m_currentSyncData;
-}
-
-void SecondaryPeripheral::setSyncData(ulong syncData)
-{
-    m_currentSyncData = syncData;
-    m_syncDataCharacteristic.writeValue(syncData);
 }

@@ -56,6 +56,6 @@ void indicateBleFailure();
 byte getSignType();
 byte getSignPosition();
 void resetPixelBufferOffsets(SignOffsetData configData);
-LightStyle* createLightStyleForNewPatternData();
+LightStyle* createLightStyleForPatternData(PatternData patternData);
 
 #endif

@@ -21,7 +21,8 @@ ulong newSyncData = 0;
 SignOffsetData currentOffsetData;
 byte signType;
 byte signPosition;
-PatternData newPatternData; // Is there a need for "new" vs "current"?
+PatternData currentPatternData;
+PatternData newPatternData;
 
 // Other internal state
 int loopCounter = 0;                      // Records the number of times the main loop ran since the last timing calculation.
@@ -54,9 +55,7 @@ void setup()
     newPatternData.displayPattern = DisplayPattern::Solid;
     // TODO: put the common colors in a helper class.
     newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
-    // TODO: if we use "current" vs "new", the style creation and reset can be done in the updateLEDs method automatically.
-    currentLightStyle = createLightStyleForNewPatternData();
-    currentLightStyle->reset();
+    currentLightStyle = createLightStyleForPatternData(newPatternData);
     btService.setPatternData(newPatternData);
 }
 
@@ -188,7 +187,6 @@ void startBLE()
 
     btService.setBrightness(DEFAULTBRIGHTNESS);
     btService.setSpeed(DEFAULTSPEED);
-    btService.setSyncData(0);
 
     SignConfigurationData configData;
     configData.setSignType(signType);
@@ -212,9 +210,7 @@ void readBleSettings()
 
     newPatternData = btService.getPatternData();
     newBrightness = btService.getBrightness();
-
     newSyncData = btService.getSyncData();
-
     newSpeed = btService.getSpeed();
     if (!isInRange(newSpeed, 1, 100))
     {
@@ -261,6 +257,16 @@ void updateLEDs()
         currentSyncData = newSyncData;
     }
 
+    if (currentSyncData == 0 && newSyncData == 0)
+    {
+        // We're not triggering on sync data, so just check if the pattern data changed.
+        if (currentPatternData != newPatternData)
+        {
+            Serial.println("Detected a change in pattern data (no sync).");
+            shouldResetStyle = true;
+        }
+    }
+
     if (shouldResetStyle)
     {
         if (currentLightStyle)
@@ -268,9 +274,11 @@ void updateLEDs()
             delete currentLightStyle;
         }
 
-        currentLightStyle = createLightStyleForNewPatternData();
+        currentLightStyle = createLightStyleForPatternData(newPatternData);
         currentLightStyle->setSpeed(newSpeed);
         currentLightStyle->reset();
+
+        currentPatternData = newPatternData;
     }
 
     // The current style shouldn't ever be null here, but check anyways.
@@ -282,24 +290,24 @@ void updateLEDs()
     pixelBuffer.displayPixels();
 }
 
-LightStyle* createLightStyleForNewPatternData()
+LightStyle* createLightStyleForPatternData(PatternData patternData)
 {
     LightStyle* newStyle;
 
-    switch (newPatternData.colorPattern)
+    switch (patternData.colorPattern)
     {
         case ColorPattern::SingleColor:
-            newStyle = new SingleColorStyle("singlecolor", newPatternData.color1, &pixelBuffer);
+            newStyle = new SingleColorStyle("singlecolor", patternData.color1, &pixelBuffer);
             break;
         case ColorPattern::TwoColor:
-            newStyle = new TwoColorStyle("twocolor", newPatternData.color1, newPatternData.color2, &pixelBuffer);
-            newStyle->setStep(newPatternData.param1);
-            newStyle->setPattern(static_cast<byte>(newPatternData.displayPattern));
+            newStyle = new TwoColorStyle("twocolor", patternData.color1, patternData.color2, &pixelBuffer);
+            newStyle->setStep(patternData.param1);
+            newStyle->setPattern(static_cast<byte>(patternData.displayPattern));
             break;
         case ColorPattern::Rainbow:
             newStyle = new RainbowStyle("rainbow", &pixelBuffer);
-            newStyle->setStep(newPatternData.param1);
-            newStyle->setPattern(static_cast<byte>(newPatternData.displayPattern));
+            newStyle->setStep(patternData.param1);
+            newStyle->setPattern(static_cast<byte>(patternData.displayPattern));
             break;
         default:
             // unknown - use blank for now

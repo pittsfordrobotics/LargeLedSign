@@ -12,7 +12,6 @@ class SecondaryPeripheral : public CommonPeripheral {
     void setSignConfigurationData(String signData);
     String getSignOffsetData();
     ulong getSyncData();
-    void setSyncData(ulong syncData);
 
   private:
     String m_currentOffsetData;
