@@ -8,6 +8,7 @@
 class LightStyle {
   public:
     LightStyle(String name, PixelBuffer* pixelBuffer);
+    virtual ~LightStyle();
 
     // Gets the name of the style.
     String getName();

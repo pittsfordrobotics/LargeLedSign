@@ -9,7 +9,8 @@
 class RainbowStyle : public LightStyle {
   public:
     RainbowStyle(String name, PixelBuffer* pixelBuffer);
-    
+    ~RainbowStyle();
+
     void reset();
     void update();
 

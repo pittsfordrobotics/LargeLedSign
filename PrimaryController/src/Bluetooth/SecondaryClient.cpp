@@ -67,12 +67,7 @@ SignStatus SecondaryClient::getSignStatus()
 {
     SignStatus status;
     status.setBrightness(getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
-    status.setPattern(getByteValue(BTCOMMON_PATTERNCHARACTERISTIC_UUID));
-    status.setPatternNames(getStringValue(BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID));
     status.setSpeed(getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID));
-    status.setStep(getByteValue(BTCOMMON_STEPCHARACTERISTIC_UUID));
-    status.setStyle(getByteValue(BTCOMMON_STYLECHARACTERISTIC_UUID));
-    status.setStyleNames(getStringValue(BTCOMMON_STYLENAMESCHARACTERISTIC_UUID));
     String signConfigData = getStringValue(BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID);
     status.setSignConfigurationData(SignConfigurationData(signConfigData));
 
@@ -84,29 +79,23 @@ void SecondaryClient::setBrightness(byte brightness)
     m_peripheral.characteristic(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID).writeValue(brightness);
 }
 
-void SecondaryClient::setPattern(byte pattern)
-{
-    m_peripheral.characteristic(BTCOMMON_PATTERNCHARACTERISTIC_UUID).writeValue(pattern);
-}
-
-void SecondaryClient::setStyle(byte style)
-{
-    m_peripheral.characteristic(BTCOMMON_STYLECHARACTERISTIC_UUID).writeValue(style);
-}
-
 void SecondaryClient::setSpeed(byte speed)
 {
     m_peripheral.characteristic(BTCOMMON_SPEEDCHARACTERISTIC_UUID).writeValue(speed);
 }
 
-void SecondaryClient::setStep(byte step)
-{
-    m_peripheral.characteristic(BTCOMMON_STEPCHARACTERISTIC_UUID).writeValue(step);
-}
-
 void SecondaryClient::setSignOffsetData(String offsetData)
 {
     m_peripheral.characteristic(BTCOMMON_OFFSETDATA_CHARACTERISTIC_UUID).writeValue(offsetData.c_str());
+}
+
+void SecondaryClient::setPatternData(const PatternData& data)
+{
+    BLECharacteristic characteristic = m_peripheral.characteristic(BTCOMMON_PATTERNDATA_CHARACTERISTIC_UUID);
+    if (characteristic)
+    {
+        characteristic.writeValue(&data, sizeof(data));
+    }
 }
 
 void SecondaryClient::updateSyncData(ulong syncData)

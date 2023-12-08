@@ -37,3 +37,4 @@ void resetSecondaryConnections();
 void updateAllSecondaries();
 void updateTelemetry();
 void displayBatteryVoltages();
+ulong color(byte red, byte green, byte blue);

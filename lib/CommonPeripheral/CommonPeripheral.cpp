@@ -10,13 +10,11 @@ void CommonPeripheral::initialize(String uuid, String localName)
     BLE.setLocalName(localName.c_str());
     BLE.setAdvertisedService(*m_ledService);
     m_ledService->addCharacteristic(m_brightnessCharacteristic);
-    m_ledService->addCharacteristic(m_styleCharacteristic);
-    m_ledService->addCharacteristic(m_styleNamesCharacteristic);
     m_ledService->addCharacteristic(m_speedCharacteristic);
-    m_ledService->addCharacteristic(m_stepCharacteristic);
-    m_ledService->addCharacteristic(m_patternCharacteristic);
-    m_ledService->addCharacteristic(m_patternNamesCharacteristic);
     m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
+    m_ledService->addCharacteristic(m_patternDataCharacteristic);
+    m_ledService->addCharacteristic(m_colorPatternListCharacteristic);
+    m_ledService->addCharacteristic(m_displayPatternListCharacteristic);
 
     for (uint i = 0; i < m_additionalCharacteristics.size(); i++)
     {
@@ -51,37 +49,21 @@ bool CommonPeripheral::isConnected()
     return false;
 }
 
-void CommonPeripheral::setStyleNames(std::vector<String> styleNames)
-{
-    String allStyles = StringUtils::joinStrings(styleNames, ';');
-    setStyleNames(allStyles);
-}
+// void CommonPeripheral::setStyleNames(std::vector<String> styleNames)
+// {
+//     String allStyles = StringUtils::joinStrings(styleNames, ';');
+//     setStyleNames(allStyles);
+// }
 
-void CommonPeripheral::setStyleNames(String styleNames)
-{
-    Serial.print("All style names: ");
-    Serial.println(styleNames);
-    Serial.print("Style name string length: ");
-    Serial.println(styleNames.length());
+// void CommonPeripheral::setStyleNames(String styleNames)
+// {
+//     Serial.print("All style names: ");
+//     Serial.println(styleNames);
+//     Serial.print("Style name string length: ");
+//     Serial.println(styleNames.length());
 
-    m_styleNamesCharacteristic.writeValue(styleNames);
-}
-
-void CommonPeripheral::setPatternNames(std::vector<String> patternNames)
-{
-    String allPatterns = StringUtils::joinStrings(patternNames, ';');
-    setPatternNames(allPatterns);
-}
-
-void CommonPeripheral::setPatternNames(String patternNames)
-{
-    Serial.print("All pattern names: ");
-    Serial.println(patternNames);
-    Serial.print("Pattern name string length: ");
-    Serial.println(patternNames.length());
-
-    m_patternNamesCharacteristic.writeValue(patternNames);
-}
+//     m_styleNamesCharacteristic.writeValue(styleNames);
+// }
 
 byte CommonPeripheral::getBrightness()
 {
@@ -93,18 +75,6 @@ void CommonPeripheral::setBrightness(byte brightness)
 {
     m_currentBrightness = brightness;
     m_brightnessCharacteristic.writeValue(brightness);
-}
-
-byte CommonPeripheral::getStyle()
-{
-    m_currentStyle = readByteFromCharacteristic(m_styleCharacteristic, m_currentStyle, "style");
-    return m_currentStyle;
-}
-
-void CommonPeripheral::setStyle(byte style)
-{
-    m_currentStyle = style;
-    m_styleCharacteristic.writeValue(style);
 }
 
 byte CommonPeripheral::getSpeed()
@@ -119,33 +89,35 @@ void CommonPeripheral::setSpeed(byte speed)
     m_speedCharacteristic.writeValue(speed);
 }
 
-byte CommonPeripheral::getPattern()
-{
-    m_currentPattern = readByteFromCharacteristic(m_patternCharacteristic, m_currentPattern, "pattern");
-    return m_currentPattern;
-}
-
-void CommonPeripheral::setPattern(byte pattern)
-{
-    m_currentPattern = pattern;
-    m_patternCharacteristic.writeValue(pattern);
-}
-
-byte CommonPeripheral::getStep()
-{
-    m_currentStep = readByteFromCharacteristic(m_stepCharacteristic, m_currentStep, "step");
-    return m_currentStep;
-}
-
-void CommonPeripheral::setStep(byte step)
-{
-    m_currentStep = step;
-    m_stepCharacteristic.writeValue(step);
-}
-
 void CommonPeripheral::emitBatteryVoltage(float voltage)
 {
     m_batteryVoltageCharacteristic.writeValue(voltage);
+}
+
+PatternData CommonPeripheral::getPatternData()
+{
+    if (isConnected())
+    {
+        if (m_patternDataCharacteristic.written())
+        {
+            Serial.println("Reading new value for pattern charactersitic.");
+            m_patternDataCharacteristic.readValue(&m_currentPatternData, sizeof(m_currentPatternData));
+            
+            // TEST TEST TEST
+            Serial.print("Color pattern: ");
+            Serial.print(static_cast<byte>(m_currentPatternData.colorPattern));
+            Serial.print("; Color 1:");
+            Serial.println(m_currentPatternData.color1, HEX);
+        }
+    }
+
+    return m_currentPatternData;
+}
+
+void CommonPeripheral::setPatternData(const PatternData& data)
+{
+    m_currentPatternData = data;
+    m_patternDataCharacteristic.writeValue(&data, sizeof(data));
 }
 
 byte CommonPeripheral::readByteFromCharacteristic(BLEByteCharacteristic characteristic, byte defaultValue, String name)

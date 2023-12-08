@@ -49,7 +49,7 @@ class PixelBuffer {
     void shiftRowsDown(ulong newColor);
 
     // Sets a random assortment of pixels in the buffer to the given color.
-    void fillRandomly(ulong newColor, int numberOfPixels);
+    void fillRandomly(ulong newColor, uint numberOfPixels);
 
     // Sets the color of all pixels in the buffer to the given color.
     void fill(ulong newColor);
