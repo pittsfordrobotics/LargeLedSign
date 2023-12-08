@@ -207,7 +207,7 @@ void resetSecondaryConnections()
 
 void populateSecondaries()
 {
-    byte numberExpected = 2;
+    byte numberExpected = NUMBER_OF_SECONDARIES;
 
     if (shouldIgnoreLogo)
     {
