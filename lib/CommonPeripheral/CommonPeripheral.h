@@ -16,10 +16,6 @@ class CommonPeripheral {
     void resume();
     bool isConnected();
 
-    void setStyleNames(std::vector<String> styleNames);
-    void setStyleNames(String styleNames);
-    void setPatternNames(std::vector<String> patternNames);
-    void setPatternNames(String patternNames);
     void setBrightness(byte brightness);
     byte getBrightness();
     void setSpeed(byte speed);
@@ -38,11 +34,12 @@ class CommonPeripheral {
   private:
     BLEService* m_ledService;
     BLEByteCharacteristic m_brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
-    BLEStringCharacteristic m_styleNamesCharacteristic{ BTCOMMON_STYLENAMESCHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
     BLEByteCharacteristic m_speedCharacteristic{BTCOMMON_SPEEDCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
-    BLEStringCharacteristic m_patternNamesCharacteristic{ BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
     BLEFloatCharacteristic m_batteryVoltageCharacteristic{ BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID, BLERead | BLENotify };
     BLECharacteristic m_patternDataCharacteristic{ BTCOMMON_PATTERNDATA_CHARACTERISTIC_UUID, BLERead | BLEWrite, sizeof(PatternData) };
+    BLEStringCharacteristic m_colorPatternListCharacteristic{ BTCOMMON_COLORPATTERNLIST_CHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
+    BLEStringCharacteristic m_displayPatternListCharacteristic{ BTCOMMON_DISPLAYPATTERNLIST_CHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
+    
 
     byte m_currentBrightness{0};
     byte m_currentSpeed{0};

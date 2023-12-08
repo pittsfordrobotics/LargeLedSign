@@ -186,8 +186,6 @@ void startBLE()
         styleNames.push_back(lightStyles[i]->getName());
     }
 
-    btService.setStyleNames(styleNames);
-    btService.setPatternNames(LightStyle::knownPatterns);
     btService.setBrightness(DEFAULTBRIGHTNESS);
     btService.setSpeed(DEFAULTSPEED);
     btService.setSyncData(0);

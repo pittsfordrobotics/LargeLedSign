@@ -67,9 +67,7 @@ SignStatus SecondaryClient::getSignStatus()
 {
     SignStatus status;
     status.setBrightness(getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
-    status.setPatternNames(getStringValue(BTCOMMON_PATTERNNAMESCHARACTERISTIC_UUID));
     status.setSpeed(getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID));
-    status.setStyleNames(getStringValue(BTCOMMON_STYLENAMESCHARACTERISTIC_UUID));
     String signConfigData = getStringValue(BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID);
     status.setSignConfigurationData(SignConfigurationData(signConfigData));
 

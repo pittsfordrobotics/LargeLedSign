@@ -337,8 +337,6 @@ void startBLEService()
     Serial.println("Proxying characteristics.");
 
     SignStatus status = allSecondaries.at(0)->getSignStatus();
-    btService.setPatternNames(status.getPatternNames());
-    btService.setStyleNames(status.getStyleNames());
     btService.setBrightness(status.getBrightness());
     btService.setSpeed(status.getSpeed());
     btService.setPatternData(status.getPatternData());

@@ -10,11 +10,11 @@ void CommonPeripheral::initialize(String uuid, String localName)
     BLE.setLocalName(localName.c_str());
     BLE.setAdvertisedService(*m_ledService);
     m_ledService->addCharacteristic(m_brightnessCharacteristic);
-    m_ledService->addCharacteristic(m_styleNamesCharacteristic);
     m_ledService->addCharacteristic(m_speedCharacteristic);
-    m_ledService->addCharacteristic(m_patternNamesCharacteristic);
     m_ledService->addCharacteristic(m_batteryVoltageCharacteristic);
     m_ledService->addCharacteristic(m_patternDataCharacteristic);
+    m_ledService->addCharacteristic(m_colorPatternListCharacteristic);
+    m_ledService->addCharacteristic(m_displayPatternListCharacteristic);
 
     for (uint i = 0; i < m_additionalCharacteristics.size(); i++)
     {
@@ -49,37 +49,21 @@ bool CommonPeripheral::isConnected()
     return false;
 }
 
-void CommonPeripheral::setStyleNames(std::vector<String> styleNames)
-{
-    String allStyles = StringUtils::joinStrings(styleNames, ';');
-    setStyleNames(allStyles);
-}
+// void CommonPeripheral::setStyleNames(std::vector<String> styleNames)
+// {
+//     String allStyles = StringUtils::joinStrings(styleNames, ';');
+//     setStyleNames(allStyles);
+// }
 
-void CommonPeripheral::setStyleNames(String styleNames)
-{
-    Serial.print("All style names: ");
-    Serial.println(styleNames);
-    Serial.print("Style name string length: ");
-    Serial.println(styleNames.length());
+// void CommonPeripheral::setStyleNames(String styleNames)
+// {
+//     Serial.print("All style names: ");
+//     Serial.println(styleNames);
+//     Serial.print("Style name string length: ");
+//     Serial.println(styleNames.length());
 
-    m_styleNamesCharacteristic.writeValue(styleNames);
-}
-
-void CommonPeripheral::setPatternNames(std::vector<String> patternNames)
-{
-    String allPatterns = StringUtils::joinStrings(patternNames, ';');
-    setPatternNames(allPatterns);
-}
-
-void CommonPeripheral::setPatternNames(String patternNames)
-{
-    Serial.print("All pattern names: ");
-    Serial.println(patternNames);
-    Serial.print("Pattern name string length: ");
-    Serial.println(patternNames.length());
-
-    m_patternNamesCharacteristic.writeValue(patternNames);
-}
+//     m_styleNamesCharacteristic.writeValue(styleNames);
+// }
 
 byte CommonPeripheral::getBrightness()
 {
