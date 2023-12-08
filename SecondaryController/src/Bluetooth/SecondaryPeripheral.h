@@ -12,6 +12,7 @@ class SecondaryPeripheral : public CommonPeripheral {
     void setSignConfigurationData(String signData);
     String getSignOffsetData();
     ulong getSyncData();
+    void emitTimestamp(ulong timestamp);
 
   private:
     String m_currentOffsetData;
@@ -19,6 +20,7 @@ class SecondaryPeripheral : public CommonPeripheral {
     BLEStringCharacteristic m_signConfigurationCharacteristic{ BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
     BLEStringCharacteristic m_signOffsetDataCharacteristic{ BTCOMMON_OFFSETDATA_CHARACTERISTIC_UUID, BLERead | BLEWrite, BTCOMMON_MAXSTRINGLENGTH };
     BLEUnsignedLongCharacteristic m_syncDataCharacteristic{ BTCOMMON_SYNCDATA_CHARACTERISTIC_UUID, BLERead | BLEWrite };
+    BLEUnsignedLongCharacteristic m_timestampCharacteristic{ BTCOMMON_TIMESTAMP_CHARACTERISTIC_UUID, BLERead };
 };
 
 #endif

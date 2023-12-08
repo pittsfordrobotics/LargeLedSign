@@ -26,7 +26,8 @@ PatternData newPatternData;
 
 // Other internal state
 int loopCounter = 0;                      // Records the number of times the main loop ran since the last timing calculation.
-unsigned long lastTelemetryTimestamp = 0; // The last time debug information was emitted.
+ulong lastTelemetryTimestamp = 0;         // The last time debug information was emitted.
+ulong lastBtTimestampUpdate = 0;          // The last time the 'timestamp' BT characteristic was updated.
 byte inLowPowerMode = false;              // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 // Main entry point for the program --
@@ -389,12 +390,18 @@ int getVoltageInputLevel()
 void emitTelemetry()
 {
     loopCounter++;
-    unsigned long timestamp = millis();
+    ulong timestamp = millis();
+
+    if (timestamp > lastBtTimestampUpdate + TIMESTAMPUPDATEINTERVAL)
+    {
+        btService.emitTimestamp(timestamp);
+        lastBtTimestampUpdate = timestamp;    
+    }
 
     if (timestamp > lastTelemetryTimestamp + TELEMETRYINTERVAL)
     {
         // Calculate loop timing data
-        unsigned long diff = timestamp - lastTelemetryTimestamp;
+        ulong diff = timestamp - lastTelemetryTimestamp;
         double timePerIteration = (double)diff / loopCounter;
         Serial.print(loopCounter);
         Serial.print(" iterations (msec): ");
