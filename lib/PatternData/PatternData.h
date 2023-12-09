@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-enum class ColorPattern : byte
+enum class ColorPatternType : byte
 {
 	Blank = 0,
 	SingleColor = 1,
@@ -11,7 +11,7 @@ enum class ColorPattern : byte
 	Rainbow = 3
 };
 
-enum class DisplayPattern : byte
+enum class DisplayPatternType : byte
 {
     Solid = 0,
     Right = 1,
@@ -27,11 +27,11 @@ enum class DisplayPattern : byte
 struct PatternData {
 	// Indicates the color pattern.
 	// Ex: Single color, 2-color, rainbow, etc.
-	ColorPattern colorPattern{ColorPattern::Blank};
+	ColorPatternType colorPattern{ColorPatternType::Blank};
 
 	// Indicates the pattern to use to display the selected color(s).
 	// Ex: Shift by columns right/left, Shift by rows up/down, fill randomly, etc.
-	DisplayPattern displayPattern{DisplayPattern::Solid};
+	DisplayPatternType displayPattern{DisplayPatternType::Solid};
 
 	// Optional parameter for the pattern.
 	// Ex: The color increment for the rainbow pattern.

@@ -52,8 +52,8 @@ void setup()
     startBLE();
 
     // Setup the default pattern to show prior to any BT connections
-    newPatternData.colorPattern = ColorPattern::SingleColor;
-    newPatternData.displayPattern = DisplayPattern::Solid;
+    newPatternData.colorPattern = ColorPatternType::SingleColor;
+    newPatternData.displayPattern = DisplayPatternType::Solid;
     // TODO: put the common colors in a helper class.
     newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
     currentLightStyle = createLightStyleForPatternData(newPatternData);
@@ -297,15 +297,15 @@ LightStyle* createLightStyleForPatternData(PatternData patternData)
 
     switch (patternData.colorPattern)
     {
-        case ColorPattern::SingleColor:
+        case ColorPatternType::SingleColor:
             newStyle = new SingleColorStyle("singlecolor", patternData.color1, &pixelBuffer);
             break;
-        case ColorPattern::TwoColor:
+        case ColorPatternType::TwoColor:
             newStyle = new TwoColorStyle("twocolor", patternData.color1, patternData.color2, &pixelBuffer);
             newStyle->setStep(patternData.param1);
             newStyle->setPattern(static_cast<byte>(patternData.displayPattern));
             break;
-        case ColorPattern::Rainbow:
+        case ColorPatternType::Rainbow:
             newStyle = new RainbowStyle("rainbow", &pixelBuffer);
             newStyle->setStep(patternData.param1);
             newStyle->setPattern(static_cast<byte>(patternData.displayPattern));

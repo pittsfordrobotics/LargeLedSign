@@ -1,12 +1,9 @@
 #include "TwoColorPattern.h"
 
-TwoColorPattern::TwoColorPattern(ulong color1, ulong color2, byte minimumDuration)
+TwoColorPattern::TwoColorPattern(ulong color1, ulong color2)
 {
     m_color1 = color1;
     m_color2 = color2;
-    m_minimumDuration = minimumDuration;
-    m_color1Duration = minimumDuration;
-    m_color2 = minimumDuration;
 }
 
 void TwoColorPattern::reset()
@@ -43,9 +40,9 @@ byte TwoColorPattern::convertDuration(byte duration)
 {
     // convert the 0-255 duration value to something more reasonable like 1-50
     int convertedDuration = MathUtils::rescaleInput(1, 50, duration);
-    if (convertedDuration < m_minimumDuration)
+    if (convertedDuration < 1)
     {
-        convertedDuration = m_minimumDuration;
+        convertedDuration = 1;
     }
 
     return convertedDuration;

@@ -8,7 +8,7 @@
 class TwoColorPattern : public ColorPattern
 {
     public:
-        TwoColorPattern(ulong color1, ulong color2, byte minimumDuration);
+        TwoColorPattern(ulong color1, ulong color2);
 
         virtual void reset();
         virtual ulong getNextColor();
@@ -20,9 +20,8 @@ class TwoColorPattern : public ColorPattern
     private:
         ulong m_color1{0};
         ulong m_color2{0};
-        byte m_minimumDuration{1};
-        byte m_color1Duration{0};
-        byte m_color2Duration{0};
+        byte m_color1Duration{1};
+        byte m_color2Duration{1};
         ulong m_iterationCount{0};
 
         byte convertDuration(byte duration);
