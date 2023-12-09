@@ -1,5 +1,10 @@
 #include "RainbowColorPattern.h"
 
+RainbowColorPattern::RainbowColorPattern()
+{
+    m_parameterList.push_back("Hue increment");
+}
+
 void RainbowColorPattern::reset()
 {
     m_currentHue = 0;

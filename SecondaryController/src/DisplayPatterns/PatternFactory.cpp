@@ -2,8 +2,18 @@
 
 DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternData, PixelBuffer* pixelBuffer)
 {
+    std::vector<byte> params;
+    params.push_back(patternData.param1);
+    params.push_back(patternData.param2);
+    params.push_back(patternData.param3);
+    params.push_back(patternData.param4);
+    params.push_back(patternData.param5);
+    params.push_back(patternData.param6);
+
     ColorPattern* colorPattern = createColorPatternForPatternData(patternData);
     DisplayPattern* displayPattern;
+
+    uint startOfDisplayParameters = colorPattern->getParameterList().size();
 
     switch (patternData.displayPattern)
     {
@@ -46,7 +56,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         {
             RandomDisplayPattern* pattern = new RandomDisplayPattern(pixelBuffer);
             pattern->setColorPattern(colorPattern);
-            pattern->setUpdateAmount(patternData.param2);
+            pattern->setUpdateAmount(params[startOfDisplayParameters]);
             displayPattern = pattern;
             break;
         }

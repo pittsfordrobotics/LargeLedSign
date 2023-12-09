@@ -13,6 +13,11 @@ DisplayPattern::~DisplayPattern()
     }
 }
 
+std::vector<String> DisplayPattern::getParameterList()
+{
+    return m_emptyParameters;
+}
+
 void DisplayPattern::setColorPattern(ColorPattern* colorPattern)
 {
     m_colorPattern = colorPattern;

@@ -410,6 +410,30 @@ void setManualStyle(uint style)
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
             break;
+        case 5:
+            // Blue-Pink random
+            currentServiceStatus.setBrightness(10);
+            currentServiceStatus.setSpeed(200);
+            pattern.colorPattern = ColorPatternType::TwoColor;
+            pattern.color1 = Blue;
+            pattern.color2 = Pink;
+            pattern.displayPattern = DisplayPatternType::Random;
+            pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
+            pattern.param3 = 15;
+            break;
+        case 6:
+            // Red-Pink random
+            currentServiceStatus.setBrightness(10);
+            currentServiceStatus.setSpeed(200);
+            pattern.colorPattern = ColorPatternType::TwoColor;
+            pattern.color1 = Red;
+            pattern.color2 = Pink;
+            pattern.displayPattern = DisplayPatternType::Random;
+            pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
+            pattern.param3 = 15;
+            break;
         case 7:
             // Rainbow random
             currentServiceStatus.setBrightness(10);

@@ -4,6 +4,10 @@ TwoColorPattern::TwoColorPattern(ulong color1, ulong color2)
 {
     m_color1 = color1;
     m_color2 = color2;
+
+    m_colorCount = 2;
+    m_parameterList.push_back("Color1 duration");
+    m_parameterList.push_back("Color2 duration");
 }
 
 void TwoColorPattern::reset()

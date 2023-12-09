@@ -12,6 +12,7 @@
 #include "ColorPatterns/RainbowColorPattern.h"
 #include "PixelBuffer.h"
 #include <PatternData.h>
+#include <vector>
 
 class PatternFactory
 {

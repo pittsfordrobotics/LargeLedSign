@@ -9,6 +9,7 @@
 class RainbowColorPattern : public ColorPattern
 {
     public:
+        RainbowColorPattern();
         virtual void reset();
         virtual ulong getNextColor();
         virtual void incrementOnly(uint incrementAmount);
