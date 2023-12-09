@@ -15,6 +15,8 @@
 #include <SignConfigurationData.h>
 #include <SignOffsetData.h>
 #include <PatternData.h>
+#include "DisplayPatterns/DisplayPattern.h"
+#include "DisplayPatterns/PatternFactory.h"
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
@@ -44,12 +46,10 @@
 
 // Function prototypes
 void initializeIO();
-void initializeLightStyles();
 void startBLE();
 void blinkLowPowerIndicator();
 void readBleSettings();
 void updateLEDs();
-byte isInRange(byte value, byte minValue, byte maxValue);
 float getCalculatedBatteryVoltage();
 int getVoltageInputLevel();
 void emitTelemetry();
@@ -57,6 +57,5 @@ void indicateBleFailure();
 byte getSignType();
 byte getSignPosition();
 void resetPixelBufferOffsets(SignOffsetData configData);
-LightStyle* createLightStyleForPatternData(PatternData patternData);
 
 #endif

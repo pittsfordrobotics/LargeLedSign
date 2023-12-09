@@ -16,10 +16,10 @@
 class PatternFactory
 {
     public:
-        static DisplayPattern* CreateForPatternData(const PatternData& patternData, PixelBuffer* pixelBuffer);
+        static DisplayPattern* createForPatternData(const PatternData& patternData, PixelBuffer* pixelBuffer);
 
     private:
-        static ColorPattern* CreateColorPatternForPatternData(const PatternData& patternData);
+        static ColorPattern* createColorPatternForPatternData(const PatternData& patternData);
 };
 
 #endif

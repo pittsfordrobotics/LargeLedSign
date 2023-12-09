@@ -377,8 +377,8 @@ void setManualStyle(uint style)
             // Solid Pink
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(1);
-            pattern.colorPattern = ColorPattern::SingleColor;
-            pattern.displayPattern = DisplayPattern::Solid;
+            pattern.colorPattern = ColorPatternType::SingleColor;
+            pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = Pink;
             // old
             // currentServiceStatus.setPattern(0);
@@ -389,8 +389,8 @@ void setManualStyle(uint style)
             // Red-Pink
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(25);
-            pattern.colorPattern = ColorPattern::TwoColor;
-            pattern.displayPattern = DisplayPattern::Right;
+            pattern.colorPattern = ColorPatternType::TwoColor;
+            pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Red;
             pattern.color2 = Pink;
             pattern.param1 = 25;
@@ -403,8 +403,8 @@ void setManualStyle(uint style)
             // Blue-Pink
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(25);
-            pattern.colorPattern = ColorPattern::TwoColor;
-            pattern.displayPattern = DisplayPattern::Right;
+            pattern.colorPattern = ColorPatternType::TwoColor;
+            pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Blue;
             pattern.color2 = Pink;
             pattern.param1 = 25;
@@ -417,8 +417,8 @@ void setManualStyle(uint style)
             // Rainbow
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(85);
-            pattern.colorPattern = ColorPattern::Rainbow;
-            pattern.displayPattern = DisplayPattern::Right;
+            pattern.colorPattern = ColorPatternType::Rainbow;
+            pattern.displayPattern = DisplayPatternType::Right;
             pattern.param1 = 95;
             // old
             // currentServiceStatus.setPattern(1);
@@ -429,8 +429,8 @@ void setManualStyle(uint style)
             // Rainbow random
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(78);
-            pattern.colorPattern = ColorPattern::Rainbow;
-            pattern.displayPattern = DisplayPattern::Random;
+            pattern.colorPattern = ColorPatternType::Rainbow;
+            pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 95;
             // old
             // currentServiceStatus.setPattern(6);
@@ -441,8 +441,8 @@ void setManualStyle(uint style)
             // Rainbow - change?
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(1);
-            pattern.colorPattern = ColorPattern::SingleColor;
-            pattern.displayPattern = DisplayPattern::Solid;
+            pattern.colorPattern = ColorPatternType::SingleColor;
+            pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = Pink;
             // old
             // currentServiceStatus.setPattern(1);

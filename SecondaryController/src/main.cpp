@@ -8,8 +8,7 @@ SecondaryPeripheral btService;
 
 // Pixel and color data
 PixelBuffer pixelBuffer(DATA_OUT);
-LightStyle* currentLightStyle;
-std::vector<LightStyle *> lightStyles; // ****
+DisplayPattern* currentLightStyle;
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULTBRIGHTNESS;
@@ -44,7 +43,6 @@ void setup()
     initializeIO();
     signType = getSignType();
     signPosition = getSignPosition();
-    initializeLightStyles();
 
     pixelBuffer.initialize(signType);
     pixelBuffer.setBrightness(DEFAULTBRIGHTNESS);
@@ -56,7 +54,7 @@ void setup()
     newPatternData.displayPattern = DisplayPatternType::Solid;
     // TODO: put the common colors in a helper class.
     newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
-    currentLightStyle = createLightStyleForPatternData(newPatternData);
+    currentLightStyle = PatternFactory::createForPatternData(newPatternData, &pixelBuffer);
     btService.setPatternData(newPatternData);
 }
 
@@ -102,23 +100,23 @@ void initializeIO()
 
 // Set up the list of "known" light styles.
 // These are the styles presented in the "Styles" list in the phone app.
-void initializeLightStyles()
-{
-    Serial.println("Initializing light styles");
-    lightStyles.push_back(new RainbowStyle("Rainbow", &pixelBuffer));
-    uint32_t pink = Adafruit_NeoPixel::Color(230, 22, 161);
-    uint32_t red = Adafruit_NeoPixel::Color(255, 0, 0);
-    uint32_t blue = Adafruit_NeoPixel::Color(0, 0, 255);
-    // uint32_t white = Adafruit_NeoPixel::Color(255, 255, 255);
-    uint32_t orange = Adafruit_NeoPixel::Color(255, 50, 0);
-    lightStyles.push_back(new SingleColorStyle("Pink", pink, &pixelBuffer));
-    lightStyles.push_back(new TwoColorStyle("Blue-Pink", blue, pink, &pixelBuffer));
-    lightStyles.push_back(new SingleColorStyle("Blue", blue, &pixelBuffer));
-    lightStyles.push_back(new TwoColorStyle("Red-Pink", red, pink, &pixelBuffer));
-    lightStyles.push_back(new SingleColorStyle("Red", red, &pixelBuffer));
-    lightStyles.push_back(new TwoColorStyle("Orange-Pink", orange, pink, &pixelBuffer));
-    // lightStyles.push_back(new SingleColorStyle("White", white, &pixelBuffer));
-}
+// void initializeLightStyles()
+// {
+//     Serial.println("Initializing light styles");
+//     lightStyles.push_back(new RainbowStyle("Rainbow", &pixelBuffer));
+//     uint32_t pink = Adafruit_NeoPixel::Color(230, 22, 161);
+//     uint32_t red = Adafruit_NeoPixel::Color(255, 0, 0);
+//     uint32_t blue = Adafruit_NeoPixel::Color(0, 0, 255);
+//     // uint32_t white = Adafruit_NeoPixel::Color(255, 255, 255);
+//     uint32_t orange = Adafruit_NeoPixel::Color(255, 50, 0);
+//     lightStyles.push_back(new SingleColorStyle("Pink", pink, &pixelBuffer));
+//     lightStyles.push_back(new TwoColorStyle("Blue-Pink", blue, pink, &pixelBuffer));
+//     lightStyles.push_back(new SingleColorStyle("Blue", blue, &pixelBuffer));
+//     lightStyles.push_back(new TwoColorStyle("Red-Pink", red, pink, &pixelBuffer));
+//     lightStyles.push_back(new SingleColorStyle("Red", red, &pixelBuffer));
+//     lightStyles.push_back(new TwoColorStyle("Orange-Pink", orange, pink, &pixelBuffer));
+//     // lightStyles.push_back(new SingleColorStyle("White", white, &pixelBuffer));
+// }
 
 byte getSignType()
 {
@@ -178,23 +176,15 @@ void startBLE()
         indicateBleFailure();
     }
 
-    btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
-
-    std::vector<String> styleNames;
-    for (uint i = 0; i < lightStyles.size(); i++)
-    {
-        styleNames.push_back(lightStyles[i]->getName());
-    }
-
-    btService.setBrightness(DEFAULTBRIGHTNESS);
-    btService.setSpeed(DEFAULTSPEED);
-
     SignConfigurationData configData;
     configData.setSignType(signType);
     configData.setSignOrder(signPosition);
     configData.setColumnCount(pixelBuffer.getColumnCount());
     configData.setPixelCount(pixelBuffer.getPixelCount());
 
+    btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
+    btService.setBrightness(DEFAULTBRIGHTNESS);
+    btService.setSpeed(DEFAULTSPEED);
     btService.setSignConfigurationData(configData.getConfigurationString());
 }
 
@@ -213,17 +203,6 @@ void readBleSettings()
     newBrightness = btService.getBrightness();
     newSyncData = btService.getSyncData();
     newSpeed = btService.getSpeed();
-    if (!isInRange(newSpeed, 1, 100))
-    {
-        btService.setSpeed(currentSpeed);
-        newSpeed = currentSpeed;
-    }
-}
-
-// Determine if the give byte value is between (or equal to) the min and max values.
-byte isInRange(byte value, byte minValue, byte maxValue)
-{
-    return (value >= minValue && value <= maxValue);
 }
 
 void blinkLowPowerIndicator()
@@ -275,7 +254,7 @@ void updateLEDs()
             delete currentLightStyle;
         }
 
-        currentLightStyle = createLightStyleForPatternData(newPatternData);
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData, &pixelBuffer);
         currentLightStyle->setSpeed(newSpeed);
         currentLightStyle->reset();
 
@@ -289,33 +268,6 @@ void updateLEDs()
     }
 
     pixelBuffer.displayPixels();
-}
-
-LightStyle* createLightStyleForPatternData(PatternData patternData)
-{
-    LightStyle* newStyle;
-
-    switch (patternData.colorPattern)
-    {
-        case ColorPatternType::SingleColor:
-            newStyle = new SingleColorStyle("singlecolor", patternData.color1, &pixelBuffer);
-            break;
-        case ColorPatternType::TwoColor:
-            newStyle = new TwoColorStyle("twocolor", patternData.color1, patternData.color2, &pixelBuffer);
-            newStyle->setStep(patternData.param1);
-            newStyle->setPattern(static_cast<byte>(patternData.displayPattern));
-            break;
-        case ColorPatternType::Rainbow:
-            newStyle = new RainbowStyle("rainbow", &pixelBuffer);
-            newStyle->setStep(patternData.param1);
-            newStyle->setPattern(static_cast<byte>(patternData.displayPattern));
-            break;
-        default:
-            // unknown - use blank for now
-            newStyle = new SingleColorStyle("blank", 0, &pixelBuffer);
-    }
-
-    return newStyle;
 }
 
 // Check if the current battery voltage is too low to run the sign,

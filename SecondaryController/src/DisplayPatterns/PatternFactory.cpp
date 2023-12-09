@@ -1,8 +1,8 @@
 #include "PatternFactory.h"
 
-DisplayPattern* PatternFactory::CreateForPatternData(const PatternData& patternData, PixelBuffer* pixelBuffer)
+DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternData, PixelBuffer* pixelBuffer)
 {
-    ColorPattern* colorPattern = CreateColorPatternForPatternData(patternData);
+    ColorPattern* colorPattern = createColorPatternForPatternData(patternData);
     DisplayPattern* displayPattern;
 
     switch (patternData.displayPattern)
@@ -63,7 +63,7 @@ DisplayPattern* PatternFactory::CreateForPatternData(const PatternData& patternD
     return displayPattern;
 }
 
-ColorPattern* PatternFactory::CreateColorPatternForPatternData(const PatternData& patternData)
+ColorPattern* PatternFactory::createColorPatternForPatternData(const PatternData& patternData)
 {
     switch (patternData.colorPattern)
     {

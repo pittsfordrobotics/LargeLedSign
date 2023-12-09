@@ -6,7 +6,10 @@
 class ColorPattern
 {
     public:
-        virtual ~ColorPattern() = 0;
+        virtual ~ColorPattern() 
+        {
+            // ColorPattern base class doesn't have any explicit destructor logic, so just in-line the method here.
+        };
 
         // Resets the color pattern to its initial state.
         virtual void reset() = 0;

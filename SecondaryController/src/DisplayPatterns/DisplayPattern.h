@@ -11,7 +11,7 @@ class DisplayPattern {
         // Instantiates a new DisplayPattern.
         // The PixelBuffer will survive destruction of the class,
         DisplayPattern(PixelBuffer* pixelBuffer);
-        ~DisplayPattern();
+        virtual ~DisplayPattern();
 
         // The ColorPattern passed in here will be "owned" by the DisplayPattern
         // When the DisplayPattern is deleted, the ColorPattern will be deleted as well.
