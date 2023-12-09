@@ -8,14 +8,24 @@
 #include <SignStatus.h>
 #include <PatternData.h>
 
+/******************************
+ * Provides communication functionality to the secondary sign controllers.
+*/
 class SecondaryClient {
     public:
         SecondaryClient(BLEDevice peripheral);
         ~SecondaryClient();
 
+        // Indicates whether the client is still connected to the remote controller.
         bool isConnected();
+
+        // Disconnects the client session.
         void disconnect();
+
+        // Indicates whether the detected client is valid.
         bool isValidClient() { return m_isValid; }
+
+        // Gets the remote client's name.
         String getLocalName();
 
         // SignOrder is part of SignStatus, but it's used when

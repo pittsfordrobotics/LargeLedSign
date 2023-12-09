@@ -2,11 +2,17 @@
 #define MANUALBUTTON_H
 
 #include <Arduino.h>
-#include "ButtonPressType.h"
 
 #define MANUALBUTTON_DEBOUNCE_INTERVAL 50
 #define MANUALBUTTON_LONGPRESS 500
 #define DOUBLETAP_INTERVAL 150
+
+enum class ButtonPressType {
+    None,
+    Normal,
+    Long,
+    Double
+};
 
 class ManualButton {
     public:

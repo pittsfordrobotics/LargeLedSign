@@ -46,7 +46,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         {
             RandomDisplayPattern* pattern = new RandomDisplayPattern(pixelBuffer);
             pattern->setColorPattern(colorPattern);
-            pattern->setUpdateAmount(patternData.param1);
+            pattern->setUpdateAmount(patternData.param2);
             displayPattern = pattern;
             break;
         }

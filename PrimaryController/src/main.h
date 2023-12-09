@@ -10,7 +10,6 @@
 #include <SignOffsetData.h>
 #include <SignStatus.h>
 #include "Buttons/ManualButton.h"
-#include "Buttons/ButtonPressType.h"
 #include "Display/StatusDisplay.h"
 
 #define NUMBER_OF_SECONDARIES 3

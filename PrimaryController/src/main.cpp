@@ -19,7 +19,6 @@ bool shouldIgnoreLogo = false;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 
-// TODO: Merge the pattern data into the sign status
 SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
 
@@ -380,74 +379,52 @@ void setManualStyle(uint style)
             pattern.colorPattern = ColorPatternType::SingleColor;
             pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = Pink;
-            // old
-            // currentServiceStatus.setPattern(0);
-            // currentServiceStatus.setStep(1);
-            // currentServiceStatus.setStyle(1);
             break;
         case 1:
             // Red-Pink
             currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(25);
+            currentServiceStatus.setSpeed(65);
             pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Red;
             pattern.color2 = Pink;
-            pattern.param1 = 25;
-            // old
-            // currentServiceStatus.setPattern(1);
-            // currentServiceStatus.setStep(25);
-            // currentServiceStatus.setStyle(4);
+            pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
             break;
         case 2:
             // Blue-Pink
             currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(25);
+            currentServiceStatus.setSpeed(65);
             pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Blue;
             pattern.color2 = Pink;
-            pattern.param1 = 25;
-            // old
-            // currentServiceStatus.setPattern(1);
-            // currentServiceStatus.setStep(25);
-            // currentServiceStatus.setStyle(2);
+            pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
             break;
         case 3:
             // Rainbow
             currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(85);
+            currentServiceStatus.setSpeed(215);
             pattern.colorPattern = ColorPatternType::Rainbow;
             pattern.displayPattern = DisplayPatternType::Right;
-            pattern.param1 = 95;
-            // old
-            // currentServiceStatus.setPattern(1);
-            // currentServiceStatus.setStep(95);
-            // currentServiceStatus.setStyle(0);
+            pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
             break;
         case 7:
             // Rainbow random
             currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(78);
+            currentServiceStatus.setSpeed(200);
             pattern.colorPattern = ColorPatternType::Rainbow;
             pattern.displayPattern = DisplayPatternType::Random;
-            pattern.param1 = 95;
-            // old
-            // currentServiceStatus.setPattern(6);
-            // currentServiceStatus.setStep(55);
-            // currentServiceStatus.setStyle(0);
+            pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
+            pattern.param2 = 15;  // Percent to fill, 0-255, scaled to 1-50
             break;
         default:
-            // Rainbow - change?
             currentServiceStatus.setBrightness(10);
             currentServiceStatus.setSpeed(1);
             pattern.colorPattern = ColorPatternType::SingleColor;
             pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = Pink;
-            // old
-            // currentServiceStatus.setPattern(1);
-            // currentServiceStatus.setStep(95);
-            // currentServiceStatus.setStyle(0);
     }
 
     currentServiceStatus.setPatternData(pattern);
@@ -456,11 +433,6 @@ void setManualStyle(uint style)
     btService.setBrightness(currentServiceStatus.getBrightness());
     btService.setSpeed(currentServiceStatus.getSpeed());
     btService.setPatternData(pattern);
-
-    // Set back the old characteristics so the next read won't think something changed.
-    // btService.setPattern(currentServiceStatus.getPattern());
-    // btService.setStyle(currentServiceStatus.getStyle());
-    // btService.setStep(currentServiceStatus.getStep());
 }
 
 void updateTelemetry()

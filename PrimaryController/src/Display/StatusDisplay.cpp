@@ -106,7 +106,7 @@ void StatusDisplay::displaySequence(std::vector<String> stringsToDisplay, uint d
 
 void StatusDisplay::displayString(String s)
 {
-    byte buffer[4]{0, 0, 0, 0};
+    byte tempBuffer[4]{0, 0, 0, 0};
 
     // Convert characters until we run out or hit 4 characters.
     uint stringPosition = 0;
@@ -115,7 +115,7 @@ void StatusDisplay::displayString(String s)
     while (stringPosition < s.length() && bufferPosition < 4)
     {
         char c = s.charAt(stringPosition);
-        buffer[bufferPosition] = convertCharacter(c);
+        tempBuffer[bufferPosition] = convertCharacter(c);
         bufferPosition++;
         stringPosition++;
         if (stringPosition >= s.length())
@@ -129,12 +129,12 @@ void StatusDisplay::displayString(String s)
         if (c == '.')
         {
             // set the dot on the prior digit
-            buffer[bufferPosition - 1] = buffer[bufferPosition - 1] | Dot;
+            tempBuffer[bufferPosition - 1] = tempBuffer[bufferPosition - 1] | Dot;
             stringPosition++;
         }
     }
 
-    m_display->setSegments(buffer);
+    m_display->setSegments(tempBuffer);
 }
 
 byte StatusDisplay::convertCharacter(char c)
