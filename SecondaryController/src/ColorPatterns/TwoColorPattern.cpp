@@ -50,3 +50,8 @@ byte TwoColorPattern::convertDuration(byte duration)
 
     return convertedDuration;
 }
+
+void TwoColorPattern::incrementOnly(uint incrementAmount)
+{
+    m_iterationCount = incrementAmount;
+}

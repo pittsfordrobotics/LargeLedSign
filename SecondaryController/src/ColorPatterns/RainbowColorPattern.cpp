@@ -16,3 +16,8 @@ void RainbowColorPattern::setHueIncrement(byte hueIncrement)
 {
     m_hueIncrement = MathUtils::rescaleInput(5, 1000, hueIncrement);
 }
+
+void RainbowColorPattern::incrementOnly(uint incrementAmount)
+{
+    m_currentHue += incrementAmount * m_hueIncrement;
+}

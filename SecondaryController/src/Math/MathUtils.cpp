@@ -1,6 +1,6 @@
 #include "MathUtils.h"
 
-int MathUtils::rescaleInput(int outputMin, int outputMax, int inputValue)
+int MathUtils::rescaleInput(int outputMin, int outputMax, byte inputValue)
 {
     // inputValue is a byte, so inputMin = 0; inputMax = 255
     // m = (outputMax - outputMin) / (inputMax - inputMin)

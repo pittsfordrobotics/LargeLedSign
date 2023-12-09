@@ -13,3 +13,7 @@ ulong SingleColorPattern::getNextColor()
 {
     return m_color;
 }
+
+void SingleColorPattern::incrementOnly(uint incrementAmount)
+{
+}

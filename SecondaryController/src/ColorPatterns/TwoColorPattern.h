@@ -9,8 +9,11 @@ class TwoColorPattern : public ColorPattern
 {
     public:
         TwoColorPattern(ulong color1, ulong color2, byte minimumDuration);
+
         virtual void reset();
         virtual ulong getNextColor();
+        virtual void incrementOnly(uint incrementAmount);
+
         void setColor1Duration(byte duration);
         void setColor2Duration(byte duration);
 

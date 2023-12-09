@@ -11,6 +11,7 @@ class SingleColorPattern : public ColorPattern
 
         virtual void reset();
         virtual ulong getNextColor();
+        virtual void incrementOnly(uint incrementAmount);
 
     private:
         ulong m_color{0};

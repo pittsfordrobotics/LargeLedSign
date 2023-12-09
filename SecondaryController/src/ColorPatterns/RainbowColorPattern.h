@@ -11,6 +11,8 @@ class RainbowColorPattern : public ColorPattern
     public:
         virtual void reset();
         virtual ulong getNextColor();
+        virtual void incrementOnly(uint incrementAmount);
+
         void setHueIncrement(byte increment);
 
     private:
