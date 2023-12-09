@@ -6,10 +6,6 @@
 #include <ArduinoBLE.h>
 #include <vector>
 #include "PixelBuffer.h"
-#include "LightStyles/LightStyle.h"
-#include "LightStyles/SingleColorStyle.h"
-#include "LightStyles/TwoColorStyle.h"
-#include "LightStyles/RainbowStyle.h"
 #include <BluetoothCommon.h>
 #include "Bluetooth\SecondaryPeripheral.h"
 #include <SignConfigurationData.h>
