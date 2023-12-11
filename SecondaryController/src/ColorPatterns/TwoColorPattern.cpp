@@ -6,8 +6,6 @@ TwoColorPattern::TwoColorPattern(ulong color1, ulong color2)
     m_color2 = color2;
 
     m_colorCount = 2;
-    m_parameterList.push_back("Color1 duration");
-    m_parameterList.push_back("Color2 duration");
 }
 
 void TwoColorPattern::reset()
@@ -28,6 +26,11 @@ ulong TwoColorPattern::getNextColor()
     m_iterationCount++;
 
     return color;
+}
+
+uint TwoColorPattern::getNumberOfParameters()
+{
+    return getParameterNames().size();
 }
 
 void TwoColorPattern::setColor1Duration(byte duration)
@@ -55,4 +58,13 @@ byte TwoColorPattern::convertDuration(byte duration)
 void TwoColorPattern::incrementOnly(uint incrementAmount)
 {
     m_iterationCount = incrementAmount;
+}
+
+std::vector<String> TwoColorPattern::getParameterNames()
+{
+    std::vector<String> parameterNames;
+    parameterNames.push_back("Color 1 duration");
+    parameterNames.push_back("Color 2 duration");
+
+    return parameterNames;
 }

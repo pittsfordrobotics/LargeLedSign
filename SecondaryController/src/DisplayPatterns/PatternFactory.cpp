@@ -13,7 +13,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
     ColorPattern* colorPattern = createColorPatternForPatternData(patternData);
     DisplayPattern* displayPattern;
 
-    uint startOfDisplayParameters = colorPattern->getParameterList().size();
+    uint startOfDisplayParameters = colorPattern->getNumberOfParameters();
 
     switch (patternData.displayPattern)
     {

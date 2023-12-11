@@ -13,9 +13,12 @@ class TwoColorPattern : public ColorPattern
         virtual void reset();
         virtual ulong getNextColor();
         virtual void incrementOnly(uint incrementAmount);
+        virtual uint getNumberOfParameters();
 
         void setColor1Duration(byte duration);
         void setColor2Duration(byte duration);
+
+        static std::vector<String> getParameterNames();
 
     private:
         ulong m_color1{0};

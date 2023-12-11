@@ -24,11 +24,10 @@ class ColorPattern
         // Gets the number of colors expected by this color pattern.
         uint getNumberOfColors() { return m_colorCount; }
 
-        // Gets the list of parameters associated with the color pattern.
-        std::vector<String> getParameterList() { return m_parameterList; }
+        // Gets the number of parameters required by the color pattern.
+        virtual uint getNumberOfParameters() = 0;
 
     protected:
-        std::vector<String> m_parameterList;
         uint m_colorCount{0};
 };
 

@@ -15,6 +15,16 @@ ulong SingleColorPattern::getNextColor()
     return m_color;
 }
 
+uint SingleColorPattern::getNumberOfParameters()
+{
+    return getParameterNames().size();
+}
+
 void SingleColorPattern::incrementOnly(uint incrementAmount)
 {
+}
+
+std::vector<String> SingleColorPattern::getParameterNames()
+{
+    return std::vector<String>();
 }

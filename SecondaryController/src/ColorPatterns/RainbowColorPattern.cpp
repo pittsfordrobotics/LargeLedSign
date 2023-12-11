@@ -2,7 +2,6 @@
 
 RainbowColorPattern::RainbowColorPattern()
 {
-    m_parameterList.push_back("Hue increment");
 }
 
 void RainbowColorPattern::reset()
@@ -17,6 +16,11 @@ ulong RainbowColorPattern::getNextColor()
     return color;
 }
 
+uint RainbowColorPattern::getNumberOfParameters()
+{
+    return getParameterNames().size();
+}
+
 void RainbowColorPattern::setHueIncrement(byte hueIncrement)
 {
     m_hueIncrement = MathUtils::rescaleInput(5, 1000, hueIncrement);
@@ -25,4 +29,12 @@ void RainbowColorPattern::setHueIncrement(byte hueIncrement)
 void RainbowColorPattern::incrementOnly(uint incrementAmount)
 {
     m_currentHue += incrementAmount * m_hueIncrement;
+}
+
+std::vector<String> RainbowColorPattern::getParameterNames()
+{
+    std::vector<String> parameterNames;
+    parameterNames.push_back("Hue increment");
+
+    return parameterNames;
 }
