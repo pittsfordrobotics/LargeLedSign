@@ -26,3 +26,11 @@ void RandomDisplayPattern::updateInternal()
     int numPixelsToFill = m_pixelBuffer->getPixelCount() * m_percentToFill;
     m_pixelBuffer->fillRandomly(newColor, numPixelsToFill);
 }
+
+std::vector<String> RandomDisplayPattern::getParameterNames()
+{
+    std::vector<String> parameterNames;
+    parameterNames.push_back("Update amount");
+
+    return parameterNames;
+}

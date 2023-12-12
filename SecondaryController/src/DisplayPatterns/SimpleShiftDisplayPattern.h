@@ -17,6 +17,8 @@ class SimpleShiftDisplayPattern : public DisplayPattern{
     public:
         SimpleShiftDisplayPattern(ShiftType shiftType, PixelBuffer* pixelBuffer);
 
+        static std::vector<String> getParameterNames();
+
     protected:
         virtual void updateInternal();
         virtual void resetInternal();

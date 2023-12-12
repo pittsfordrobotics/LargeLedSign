@@ -14,3 +14,8 @@ void SolidDisplayPattern::updateInternal()
 {
     // Nothing to do.
 }
+
+std::vector<String> SolidDisplayPattern::getParameterNames()
+{
+    return std::vector<String>();
+}

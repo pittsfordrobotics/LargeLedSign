@@ -71,3 +71,8 @@ int SimpleShiftDisplayPattern::getNumberOfBlocksForPattern()
             return 1;
     }
 }
+
+std::vector<String> SimpleShiftDisplayPattern::getParameterNames()
+{
+    return std::vector<String>();
+}

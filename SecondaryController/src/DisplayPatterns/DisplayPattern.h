@@ -14,9 +14,6 @@ class DisplayPattern {
         DisplayPattern(PixelBuffer* pixelBuffer);
         virtual ~DisplayPattern();
 
-        // Gets the list of parameters associated with the display pattern.
-        virtual std::vector<String> getParameterList();
-
         // The ColorPattern passed in here will be "owned" by the DisplayPattern
         // When the DisplayPattern is deleted, the ColorPattern will be deleted as well.
         void setColorPattern(ColorPattern* colorPattern);
@@ -38,7 +35,6 @@ class DisplayPattern {
     private:
         ulong m_nextUpdate{0};
         uint m_iterationDelay{0};
-        std::vector<String> m_emptyParameters;
 };
 
 #endif

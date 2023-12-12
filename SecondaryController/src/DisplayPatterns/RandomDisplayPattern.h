@@ -11,6 +11,8 @@ class RandomDisplayPattern : public DisplayPattern
     public:
         RandomDisplayPattern(PixelBuffer* pixelBuffer);
         void setUpdateAmount(byte updateAmount);
+
+        static std::vector<String> getParameterNames();
     
     protected:
         virtual void updateInternal();
