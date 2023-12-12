@@ -103,6 +103,16 @@ void SecondaryClient::updateSyncData(ulong syncData)
     m_peripheral.characteristic(BTCOMMON_SYNCDATA_CHARACTERISTIC_UUID).writeValue(syncData);
 }
 
+String SecondaryClient::getColorPatternList()
+{
+    return getStringValue(BTCOMMON_COLORPATTERNLIST_CHARACTERISTIC_UUID);
+}
+
+String SecondaryClient::getDisplayPatternList()
+{
+    return getStringValue(BTCOMMON_DISPLAYPATTERNLIST_CHARACTERISTIC_UUID);
+}
+
 String SecondaryClient::getStringValue(String characteristicUuid)
 {
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());

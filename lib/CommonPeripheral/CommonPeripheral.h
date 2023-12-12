@@ -22,8 +22,10 @@ class CommonPeripheral {
     byte getSpeed();
     PatternData getPatternData();
     void setPatternData(const PatternData& data);
-
+    
     void emitBatteryVoltage(float voltage);
+    void setColorPatternList(String patternList);
+    void setDisplayPatternList(String patternList);
 
   protected:
     std::vector<BLECharacteristic> m_additionalCharacteristics;

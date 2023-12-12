@@ -97,3 +97,58 @@ ColorPattern* PatternFactory::createColorPatternForPatternData(const PatternData
             return new SingleColorPattern(0);
     }
 }
+
+String PatternFactory::getKnownColorPatterns()
+{
+    String knownPatterns;
+    knownPatterns += getColorPatternString("Single Color", ColorPatternType::SingleColor, 1, SingleColorPattern::getParameterNames());
+    knownPatterns += ";" + getColorPatternString("Two Color", ColorPatternType::TwoColor, 2, TwoColorPattern::getParameterNames());
+    knownPatterns += ";" + getColorPatternString("Rainbow", ColorPatternType::Rainbow, 0, RainbowColorPattern::getParameterNames());
+
+    return knownPatterns;
+}
+
+String PatternFactory::getKnownDisplayPatterns()
+{
+    String knownPatterns;
+    knownPatterns += getDisplayPatternString("Solid", DisplayPatternType::Solid, SolidDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Right", DisplayPatternType::Right, SimpleShiftDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Left", DisplayPatternType::Left, SimpleShiftDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Up", DisplayPatternType::Up, SimpleShiftDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Down", DisplayPatternType::Down, SimpleShiftDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Digit", DisplayPatternType::Digit, SimpleShiftDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Random", DisplayPatternType::Random, RandomDisplayPattern::getParameterNames());
+
+    return knownPatterns;
+}
+
+String PatternFactory::getColorPatternString(String patternName, ColorPatternType patternType, uint numberOfColors, std::vector<String> parameterNames)
+{
+    // Format:
+    // <name>,<number>,<#colors>,<param1>,...
+    String patternString = patternName;
+    patternString += "," + String(static_cast<byte>(patternType));
+    patternString += "," + String(numberOfColors);
+    
+    for (uint i = 0; i < parameterNames.size(); i++)
+    {
+        patternString += "," + parameterNames[i];
+    }
+
+    return patternString;
+}
+
+String PatternFactory::getDisplayPatternString(String patternName, DisplayPatternType patternType, std::vector<String> parameterNames)
+{
+    // Format:
+    // <name>,<number>,<#colors>,<param1>,...
+    String patternString = patternName;
+    patternString += "," + String(static_cast<byte>(patternType));
+    
+    for (uint i = 0; i < parameterNames.size(); i++)
+    {
+        patternString += "," + parameterNames[i];
+    }
+
+    return patternString;
+}

@@ -335,10 +335,12 @@ void startBLEService()
 
     Serial.println("Proxying characteristics.");
 
-    SignStatus status = allSecondaries.at(0)->getSignStatus();
+    SignStatus status = allSecondaries[0]->getSignStatus();
     btService.setBrightness(status.getBrightness());
     btService.setSpeed(status.getSpeed());
     btService.setPatternData(status.getPatternData());
+    btService.setColorPatternList(allSecondaries[0]->getColorPatternList());
+    btService.setDisplayPatternList(allSecondaries[0]->getDisplayPatternList());
 
     Serial.println("Peripheral service started.");
     display.clear();

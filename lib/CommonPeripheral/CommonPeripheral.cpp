@@ -49,21 +49,15 @@ bool CommonPeripheral::isConnected()
     return false;
 }
 
-// void CommonPeripheral::setStyleNames(std::vector<String> styleNames)
-// {
-//     String allStyles = StringUtils::joinStrings(styleNames, ';');
-//     setStyleNames(allStyles);
-// }
+void CommonPeripheral::setColorPatternList(String patternList)
+{
+    m_colorPatternListCharacteristic.writeValue(patternList);
+}
 
-// void CommonPeripheral::setStyleNames(String styleNames)
-// {
-//     Serial.print("All style names: ");
-//     Serial.println(styleNames);
-//     Serial.print("Style name string length: ");
-//     Serial.println(styleNames.length());
-
-//     m_styleNamesCharacteristic.writeValue(styleNames);
-// }
+void CommonPeripheral::setDisplayPatternList(String patternList)
+{
+    m_displayPatternListCharacteristic.writeValue(patternList);
+}
 
 byte CommonPeripheral::getBrightness()
 {

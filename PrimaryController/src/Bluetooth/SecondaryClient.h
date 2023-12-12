@@ -40,6 +40,8 @@ class SecondaryClient {
         void setSignOffsetData(String offsetData);
         void setPatternData(const PatternData& data);
         void updateSyncData(ulong syncData);
+        String getColorPatternList();
+        String getDisplayPatternList();
 
     private:
         BLEDevice m_peripheral;

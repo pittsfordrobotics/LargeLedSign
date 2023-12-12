@@ -186,6 +186,8 @@ void startBLE()
     btService.setBrightness(DEFAULTBRIGHTNESS);
     btService.setSpeed(DEFAULTSPEED);
     btService.setSignConfigurationData(configData.getConfigurationString());
+    btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
+    btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
 }
 
 // Read the BLE settings to see if any have been changed.
