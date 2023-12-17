@@ -177,15 +177,15 @@ void startBLE()
     }
 
     SignConfigurationData configData;
-    configData.setSignType(signType);
-    configData.setSignOrder(signPosition);
-    configData.setColumnCount(pixelBuffer.getColumnCount());
-    configData.setPixelCount(pixelBuffer.getPixelCount());
+    configData.signType = signType;
+    configData.signOrder = signPosition;
+    configData.columnCount = pixelBuffer.getColumnCount();
+    configData.pixelCount = pixelBuffer.getPixelCount();
 
     btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
     btService.setBrightness(DEFAULTBRIGHTNESS);
     btService.setSpeed(DEFAULTSPEED);
-    btService.setSignConfigurationData(configData.getConfigurationString());
+    btService.setSignConfigurationData(configData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
 }

@@ -10,9 +10,9 @@ SecondaryPeripheral::SecondaryPeripheral()
     m_syncDataCharacteristic.writeValue(0);
 }
 
-void SecondaryPeripheral::setSignConfigurationData(String signData)
+void SecondaryPeripheral::setSignConfigurationData(const SignConfigurationData& data)
 {
-    m_signConfigurationCharacteristic.writeValue(signData);
+    m_signConfigurationCharacteristic.writeValue(&data, sizeof(data));
 }
 
 String SecondaryPeripheral::getSignOffsetData()

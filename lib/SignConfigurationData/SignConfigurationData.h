@@ -2,36 +2,31 @@
 #define SIGNCONFIGURATIONDATA_H
 
 #include <Arduino.h>
-#include <vector>
-#include <StringUtils.h>
 
-class SignConfigurationData {
+struct SignConfigurationData {
     public:
+        byte signType{0};
+        byte signOrder{0};
+        byte digitCount{0};
+        byte columnCount{0};
+        ushort pixelCount{0};
+
+        // Creates a new SignConfigurationData struct with default values.
         SignConfigurationData();
-        SignConfigurationData(String signData);
+
+        // Creates a new SignConfigurationData struct with values copied from the provided SignConfigurationData.
         SignConfigurationData(const SignConfigurationData& other);
+
+        // Sets the values of the current SignConfigurationData to be the same as the provided SignConfigurationData.
         SignConfigurationData& operator=(const SignConfigurationData& other);
+
+        // Returns true if this SignConfigurationData is the same as the provided SignConfigurationData.
         bool operator==(const SignConfigurationData& other);
+
+        // Returns true if this SignConfigurationData is different than the provided SignConfigurationData.
         bool operator!=(const SignConfigurationData& other);
 
-        int getSignType() { return m_signType; }
-        int getSignOrder() { return m_signOrder; }
-        int getColumnCount() { return m_columnCount; }
-        int getPixelCount() { return m_pixelCount; }
-
-        void setSignType(int signType) { m_signType = signType; }
-        void setSignOrder(int signOrder) { m_signOrder = signOrder; }
-        void setColumnCount(int columnCount) { m_columnCount = columnCount; }
-        void setPixelCount(int pixelCount) { m_pixelCount = pixelCount; }
-
-        String getConfigurationString();
-
     private:
-        int m_signType{-1};
-        int m_signOrder{-1};
-        int m_columnCount{-1};
-        int m_pixelCount{-1};
-
         void copy(const SignConfigurationData& other);
 };
 

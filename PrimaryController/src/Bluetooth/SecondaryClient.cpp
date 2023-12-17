@@ -29,14 +29,16 @@ void SecondaryClient::initialize()
 
     SignStatus status = getSignStatus();
     SignConfigurationData signConfigData = status.getSignConfigurationData();
-    if (signConfigData.getSignOrder() < 0 || signConfigData.getSignType() < 0 || signConfigData.getColumnCount() < 0 || signConfigData.getPixelCount() < 0)
+    
+    // If all sign config values are 0, there's something strange going on.
+    if (signConfigData.signOrder == 0 || signConfigData.signType == 0 || signConfigData.columnCount == 0 || signConfigData.pixelCount == 0)
     {
         Serial.println("Sign data is not valid - disconecting.");
         disconnect();
         return;
     }
 
-    m_signOrder = signConfigData.getSignOrder();
+    m_signOrder = signConfigData.signOrder;
     m_isValid = true;
 }
 
@@ -68,8 +70,9 @@ SignStatus SecondaryClient::getSignStatus()
     SignStatus status;
     status.setBrightness(getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
     status.setSpeed(getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID));
-    String signConfigData = getStringValue(BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID);
-    status.setSignConfigurationData(SignConfigurationData(signConfigData));
+    SignConfigurationData signConfigData;
+    m_peripheral.characteristic(BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID).readValue(&signConfigData, sizeof(signConfigData));
+    status.setSignConfigurationData(signConfigData);
 
     return status;
 }

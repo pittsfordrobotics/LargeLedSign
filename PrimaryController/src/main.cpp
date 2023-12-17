@@ -302,7 +302,7 @@ void consolidateTotalsAndWriteToSecondaries()
     int numCols = 0;
     for (uint i = 0; i < numDigits; i++)
     {
-        numCols += signConfigurations[i].getColumnCount();
+        numCols += signConfigurations[i].columnCount;
     }
 
     int colsSoFar = 0;
@@ -313,8 +313,8 @@ void consolidateTotalsAndWriteToSecondaries()
         offsetData.setDigitsToLeft(i);
         offsetData.setDigitsToRight(numDigits - i - 1);
         offsetData.setColumnsToLeft(colsSoFar);
-        offsetData.setColumnsToRight(numCols - colsSoFar - signConfigurations[i].getColumnCount());
-        colsSoFar += signConfigurations[i].getColumnCount();
+        offsetData.setColumnsToRight(numCols - colsSoFar - signConfigurations[i].columnCount);
+        colsSoFar += signConfigurations[i].columnCount;
 
         // Write the data back to the secondary
         allSecondaries[i]->setSignOffsetData(offsetData.getOffsetDataString());
@@ -390,8 +390,8 @@ void setManualStyle(uint style)
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Red;
             pattern.color2 = Pink;
-            pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
+            pattern.param1 = 40; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 15; // Duration, 0-255, scaled to 1-50
             break;
         case 2:
             // Blue-Pink
