@@ -206,32 +206,29 @@ void resetSecondaryConnections()
 
 void populateSecondaries()
 {
-    byte numberExpected = NUMBER_OF_SECONDARIES;
+    ulong scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
 
-    if (shouldIgnoreLogo)
+    display.setDisplay("C-0");
+    while (millis() < scanTimeout)
     {
-        numberExpected -= 1;
-    }
-
-    display.setDisplay("C0-" + String(numberExpected));
-    while (allSecondaries.size() < numberExpected)
-    {
-        bool secondaryAdded = false;
         SecondaryClient *secondary = scanForSecondary();
         if (secondary->isValidClient())
         {
-            // Could use 'secondary->getServiceStatus().getSignConfigurationData().getSignType()',
+            // If the 'shouldIgnoreLogo' flag is set, don't add the logo as a secondary even if it was discovered.
+            // We could use 'secondary->getServiceStatus().getSignConfigurationData().signType',
             // but it seems easier to rely on the fact that the local name ends with <position>-<type>.
             if (!shouldIgnoreLogo || !secondary->getLocalName().endsWith("-15"))
             {
                 allSecondaries.push_back(secondary);
-                display.setDisplay("C" + String(allSecondaries.size()) + "-" + String(numberExpected));
-                secondaryAdded = true;
+                display.setDisplay("C-" + String(allSecondaries.size()));
+
+                // Reset timeout and continue looking for secondaries.
+                scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
             }
         }
-        if (!secondaryAdded)
+        else
         {
-            // Clean up the memory from the invalid peripheral
+            // Clean up the memory from the invalid peripheral.
             delete secondary;
         }
     }
@@ -248,6 +245,8 @@ void populateSecondaries()
 
 SecondaryClient *scanForSecondary()
 {
+    ulong scanTimeout = millis() + MAX_SCAN_TIME;
+
     Serial.print("Scanning for peripherals with uuid = ");
     Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
     bool allowDuplicateAdvertisements = true;
@@ -257,6 +256,13 @@ SecondaryClient *scanForSecondary()
     while (!peripheral)
     {
         peripheral = BLE.available();
+
+        if (millis() > scanTimeout)
+        {
+            Serial.println("Scan timed out.");
+            // Return a dummy client - it'll be ignored and cleaned up.
+            return new SecondaryClient(peripheral);
+        }
     }
 
     String localName = "unknown";

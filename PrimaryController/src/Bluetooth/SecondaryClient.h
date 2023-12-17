@@ -46,8 +46,8 @@ class SecondaryClient {
 
     private:
         BLEDevice m_peripheral;
-        bool m_isValid;
-        int m_signOrder;
+        bool m_isValid{false};
+        int m_signOrder{0};
 
         void initialize();
         String getStringValue(String characteristicUuid);

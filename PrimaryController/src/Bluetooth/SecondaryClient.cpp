@@ -9,6 +9,7 @@ SecondaryClient::SecondaryClient(BLEDevice peripheral)
 void SecondaryClient::initialize()
 {
     m_isValid = false;
+
     if (!m_peripheral.discoverAttributes())
     {
         Serial.println("Attribute discovery failed!");
