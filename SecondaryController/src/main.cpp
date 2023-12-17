@@ -193,8 +193,7 @@ void startBLE()
 // Read the BLE settings to see if any have been changed.
 void readBleSettings()
 {
-    String offsetString = btService.getSignOffsetData();
-    SignOffsetData newOffsetData(offsetString);
+    SignOffsetData newOffsetData = btService.getSignOffsetData();
     if (newOffsetData != currentOffsetData)
     {
         resetPixelBufferOffsets(newOffsetData);
@@ -399,20 +398,8 @@ void indicateBleFailure()
 
 void resetPixelBufferOffsets(SignOffsetData offsetData)
 {
-    if (offsetData.getDigitsToLeft() >= 0)
-    {
-        pixelBuffer.setDigitsToLeft(offsetData.getDigitsToLeft());
-    }
-    if (offsetData.getDigitsToRight() >= 0)
-    {
-        pixelBuffer.setDigitsToRight(offsetData.getDigitsToRight());
-    }
-    if (offsetData.getColumnsToLeft() >= 0)
-    {
-        pixelBuffer.setColsToLeft(offsetData.getColumnsToLeft());
-    }
-    if (offsetData.getColumnsToRight() >= 0)
-    {
-        pixelBuffer.setColsToRight(offsetData.getColumnsToRight());
-    }
+    pixelBuffer.setDigitsToLeft(offsetData.digitsToLeft);
+    pixelBuffer.setDigitsToRight(offsetData.digitsToRight);
+    pixelBuffer.setColsToLeft(offsetData.columnsToLeft);
+    pixelBuffer.setColsToRight(offsetData.columnsToRight);
 }

@@ -87,9 +87,9 @@ void SecondaryClient::setSpeed(byte speed)
     m_peripheral.characteristic(BTCOMMON_SPEEDCHARACTERISTIC_UUID).writeValue(speed);
 }
 
-void SecondaryClient::setSignOffsetData(String offsetData)
+void SecondaryClient::setSignOffsetData(const SignOffsetData& data)
 {
-    m_peripheral.characteristic(BTCOMMON_OFFSETDATA_CHARACTERISTIC_UUID).writeValue(offsetData.c_str());
+    m_peripheral.characteristic(BTCOMMON_OFFSETDATA_CHARACTERISTIC_UUID).writeValue(&data, sizeof(data));
 }
 
 void SecondaryClient::setPatternData(const PatternData& data)

@@ -15,9 +15,9 @@ void SecondaryPeripheral::setSignConfigurationData(const SignConfigurationData& 
     m_signConfigurationCharacteristic.writeValue(&data, sizeof(data));
 }
 
-String SecondaryPeripheral::getSignOffsetData()
+SignOffsetData SecondaryPeripheral::getSignOffsetData()
 {
-    m_currentOffsetData = readStringFromCharacteristic(m_signOffsetDataCharacteristic, m_currentOffsetData, "OffsetData");
+    m_signOffsetDataCharacteristic.readValue(&m_currentOffsetData, sizeof(m_currentOffsetData));
     return m_currentOffsetData;
 }
 

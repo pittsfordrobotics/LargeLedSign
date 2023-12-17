@@ -2,36 +2,30 @@
 #define SIGNOFFSETDATA_H
 
 #include <Arduino.h>
-#include <vector>
-#include <StringUtils.h>
 
-class SignOffsetData {
+struct SignOffsetData {
     public:
+        byte digitsToRight{0};
+        byte digitsToLeft{0};
+        ushort columnsToLeft{0};
+        ushort columnsToRight{0};
+
+        // Creates a new SignOffsetData struct with default values.
         SignOffsetData();
-        SignOffsetData(String offsetData);
+
+        // Creates a new SignOffsetData struct with values copied from the provided SignOffsetData.
         SignOffsetData(const SignOffsetData& other);
+
+        // Sets the values of the current SignOffsetData to be the same as the provided SignOffsetData.
         SignOffsetData& operator=(const SignOffsetData& other);
+
+        // Returns true if this SignOffsetData is the same as the provided SignOffsetData.
         bool operator==(const SignOffsetData& other);
+
+        // Returns true if this SignOffsetData is different than the provided SignOffsetData.
         bool operator!=(const SignOffsetData& other);
 
-        int getDigitsToRight() { return m_digitsToRight; }
-        int getDigitsToLeft() { return m_digitsToLeft; }
-        int getColumnsToRight() { return m_columnsToRight; }
-        int getColumnsToLeft() { return m_columnsToLeft; }
-
-        void setDigitsToLeft(int digitsToLeft) { m_digitsToLeft = digitsToLeft; }
-        void setDigitsToRight(int digitsToRight) { m_digitsToRight = digitsToRight; }
-        void setColumnsToLeft(int columnsToLeft) { m_columnsToLeft = columnsToLeft; }
-        void setColumnsToRight(int columnsToRight) { m_columnsToRight = columnsToRight; }
-
-        String getOffsetDataString();
-
     private:
-        int m_digitsToRight{-1};
-        int m_digitsToLeft{-1};
-        int m_columnsToRight{-1};
-        int m_columnsToLeft{-1};
-
         void copy(const SignOffsetData& other);
 };
 

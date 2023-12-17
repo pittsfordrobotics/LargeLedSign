@@ -7,6 +7,7 @@
 #include <StringUtils.h>
 #include <SignStatus.h>
 #include <PatternData.h>
+#include <SignOffsetData.h>
 
 /******************************
  * Provides communication functionality to the secondary sign controllers.
@@ -37,7 +38,7 @@ class SecondaryClient {
         float getBatteryVoltage();
         void setBrightness(byte brightness);
         void setSpeed(byte speed);
-        void setSignOffsetData(String offsetData);
+        void setSignOffsetData(const SignOffsetData& data);
         void setPatternData(const PatternData& data);
         void updateSyncData(ulong syncData);
         String getColorPatternList();

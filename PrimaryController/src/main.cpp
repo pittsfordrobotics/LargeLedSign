@@ -310,14 +310,14 @@ void consolidateTotalsAndWriteToSecondaries()
     {
         display.setDisplay("C--" + String(i + 1));
         SignOffsetData offsetData;
-        offsetData.setDigitsToLeft(i);
-        offsetData.setDigitsToRight(numDigits - i - 1);
-        offsetData.setColumnsToLeft(colsSoFar);
-        offsetData.setColumnsToRight(numCols - colsSoFar - signConfigurations[i].columnCount);
+        offsetData.digitsToLeft = i;
+        offsetData.digitsToRight = numDigits - i - 1;
+        offsetData.columnsToLeft = colsSoFar;
+        offsetData.columnsToRight = numCols - colsSoFar - signConfigurations[i].columnCount;
         colsSoFar += signConfigurations[i].columnCount;
 
         // Write the data back to the secondary
-        allSecondaries[i]->setSignOffsetData(offsetData.getOffsetDataString());
+        allSecondaries[i]->setSignOffsetData(offsetData);
     }
 
     display.clear();

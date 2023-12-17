@@ -9,40 +9,12 @@ SignOffsetData::SignOffsetData(const SignOffsetData &other)
     copy(other);
 }
 
-SignOffsetData::SignOffsetData(String offsetData)
-{
-    std::vector<String> splitOffsetData = StringUtils::splitString(offsetData, ';');
-
-    if (splitOffsetData.size() < 4)
-    {
-        return;
-    }
-
-    m_digitsToLeft = splitOffsetData[0].toInt();
-    m_digitsToRight = splitOffsetData[1].toInt();
-    m_columnsToLeft = splitOffsetData[2].toInt();
-    m_columnsToRight = splitOffsetData[3].toInt();
-}
-
-String SignOffsetData::getOffsetDataString()
-{
-    // digitsL;digitsR;columnsL;columnsR
-
-    std::vector<String> strings;
-    strings.push_back(String(m_digitsToLeft));
-    strings.push_back(String(m_digitsToRight));
-    strings.push_back(String(m_columnsToLeft));
-    strings.push_back(String(m_columnsToRight));
-
-    return StringUtils::joinStrings(strings, ';');
-}
-
 void SignOffsetData::copy(const SignOffsetData &other)
 {
-    m_digitsToLeft = other.m_digitsToLeft;
-    m_digitsToRight = other.m_digitsToRight;
-    m_columnsToLeft = other.m_columnsToLeft;
-    m_columnsToRight = other.m_columnsToRight;
+    this->digitsToLeft = other.digitsToLeft;
+    this->digitsToRight = other.digitsToRight;
+    this->columnsToLeft = other.columnsToLeft;
+    this->columnsToRight = other.columnsToRight;
 }
 
 SignOffsetData &SignOffsetData::operator=(const SignOffsetData &other)
@@ -54,17 +26,17 @@ SignOffsetData &SignOffsetData::operator=(const SignOffsetData &other)
 bool SignOffsetData::operator==(const SignOffsetData &other)
 {
     return (
-        m_digitsToLeft == other.m_digitsToLeft 
-        && m_digitsToRight == other.m_digitsToRight 
-        && m_columnsToLeft == other.m_columnsToLeft 
-        && m_columnsToRight == other.m_columnsToRight);
+        this->digitsToLeft == other.digitsToLeft 
+        && this->digitsToRight == other.digitsToRight 
+        && this->columnsToLeft == other.columnsToLeft 
+        && this->columnsToRight == other.columnsToRight);
 }
 
 bool SignOffsetData::operator!=(const SignOffsetData &other)
 {
     return (
-        m_digitsToLeft != other.m_digitsToLeft 
-        || m_digitsToRight != other.m_digitsToRight 
-        || m_columnsToLeft != other.m_columnsToLeft 
-        || m_columnsToRight != other.m_columnsToRight);
+        this->digitsToLeft != other.digitsToLeft 
+        || this->digitsToRight != other.digitsToRight 
+        || this->columnsToLeft != other.columnsToLeft 
+        || this->columnsToRight != other.columnsToRight);
 }
