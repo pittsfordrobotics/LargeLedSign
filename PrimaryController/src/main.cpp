@@ -422,7 +422,7 @@ void setManualStyle(uint style)
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 15;
+            pattern.param3 = 15; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             break;
         case 6:
             // Blue-Pink random
@@ -434,7 +434,7 @@ void setManualStyle(uint style)
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 15;
+            pattern.param3 = 15; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             break;
         case 7:
             // Rainbow random
@@ -443,7 +443,7 @@ void setManualStyle(uint style)
             pattern.colorPattern = ColorPatternType::Rainbow;
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
-            pattern.param2 = 15;  // Percent to fill, 0-255, scaled to 1-50
+            pattern.param2 = 15;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             break;
         default:
             currentServiceStatus.brightness = 10;
