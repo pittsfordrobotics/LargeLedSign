@@ -40,24 +40,49 @@ struct PatternData {
 	// Optional parameter for the pattern.
 	byte param2{0};
 
+	// Since we're using RGB LEDs with no White value, utilize the empty
+	// White value in each of the colors bedlow for another parameter.
+
 	// The first color in the color pattern, if needed for the pattern.
-	ulong color1{0};
+	union {
+		ulong color1{0};
+		struct {
+			byte blue1;
+			byte green1;
+			byte red1;
+			byte param3;
+		};
+	};
 
 	// The second color in the color pattern, if needed for the pattern.
-	ulong color2{0};
+	union {
+		ulong color2{0};
+		struct {
+			byte blue2;
+			byte green2;
+			byte red2;
+			byte param4;
+		};
+	};
 
 	// The third color in the color pattern, if needed for the pattern.
-	ulong color3{0};
+	union {
+		ulong color3{0};
+		struct {
+			byte blue3;
+			byte green3;
+			byte red3;
+			byte param5;
+		};
+	};
 
 	// The fourth color in the color pattern, if needed for the pattern.
-	// --OR --
-	// Four additional optional parameters used to control the pattern.
 	union {
 		ulong color4{0};
 		struct {
-			byte param3;
-			byte param4;
-			byte param5;
+			byte blue4;
+			byte green4;
+			byte red4;
 			byte param6;
 		};
 	};
