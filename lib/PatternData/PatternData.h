@@ -41,7 +41,7 @@ struct PatternData {
 	byte param2{0};
 
 	// Since we're using RGB LEDs with no White value, utilize the empty
-	// White value in each of the colors bedlow for another parameter.
+	// White value in each of the colors below for more parameters.
 
 	// The first color in the color pattern, if needed for the pattern.
 	union {
