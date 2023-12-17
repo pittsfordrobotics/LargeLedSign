@@ -17,32 +17,32 @@ SignStatus &SignStatus::operator=(const SignStatus &other)
 
 void SignStatus::copy(const SignStatus &other)
 {
-    m_brightness = other.m_brightness;
-    m_patternNames = other.m_patternNames;
-    m_speed = other.m_speed;
-    m_styleNames = other.m_styleNames;
-    m_signConfigData = other.m_signConfigData;
-    m_patternData = other.m_patternData;
+    this->brightness = other.brightness;
+    this->patternNames = other.patternNames;
+    this->speed = other.speed;
+    this->styleNames = other.styleNames;
+    this->signConfigurationData = other.signConfigurationData;
+    this->patternData = other.patternData;
 }
 
 bool SignStatus::operator==(const SignStatus &other)
 {
     return (
-        m_brightness == other.m_brightness 
-        && m_speed == other.m_speed 
-        && m_styleNames.equals(other.m_styleNames) 
-        && m_patternNames.equals(other.m_patternNames) 
-        && m_signConfigData == other.m_signConfigData
-        && m_patternData == other.m_patternData);
+        this->brightness == other.brightness 
+        && this->speed == other.speed 
+        && this->styleNames.equals(other.styleNames) 
+        && this->patternNames.equals(other.patternNames) 
+        && this->signConfigurationData == other.signConfigurationData
+        && this->patternData == other.patternData);
 }
 
 bool SignStatus::operator!=(const SignStatus &other)
 {
     return (
-        m_brightness != other.m_brightness 
-        || m_speed != other.m_speed 
-        || !m_styleNames.equals(other.m_styleNames)
-        || !m_patternNames.equals(other.m_patternNames)
-        || m_signConfigData != other.m_signConfigData
-        || m_patternData != other.m_patternData);
+        this->brightness != other.brightness 
+        || this->speed != other.speed 
+        || !this->styleNames.equals(other.styleNames)
+        || !this->patternNames.equals(other.patternNames)
+        || this->signConfigurationData != other.signConfigurationData
+        || this->patternData != other.patternData);
 }

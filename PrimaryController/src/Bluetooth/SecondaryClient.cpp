@@ -28,7 +28,7 @@ void SecondaryClient::initialize()
     }
 
     SignStatus status = getSignStatus();
-    SignConfigurationData signConfigData = status.getSignConfigurationData();
+    SignConfigurationData signConfigData = status.signConfigurationData;
     
     // If all sign config values are 0, there's something strange going on.
     if (signConfigData.signOrder == 0 || signConfigData.signType == 0 || signConfigData.columnCount == 0 || signConfigData.pixelCount == 0)
@@ -68,11 +68,11 @@ String SecondaryClient::getLocalName()
 SignStatus SecondaryClient::getSignStatus()
 {
     SignStatus status;
-    status.setBrightness(getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID));
-    status.setSpeed(getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID));
+    status.brightness = getByteValue(BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID);
+    status.speed = getByteValue(BTCOMMON_SPEEDCHARACTERISTIC_UUID);
     SignConfigurationData signConfigData;
     m_peripheral.characteristic(BTCOMMON_SIGNCONFIGURATION_CHARACTERISTIC_UUID).readValue(&signConfigData, sizeof(signConfigData));
-    status.setSignConfigurationData(signConfigData);
+    status.signConfigurationData = signConfigData;
 
     return status;
 }

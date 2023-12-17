@@ -296,7 +296,7 @@ void consolidateTotalsAndWriteToSecondaries()
     for (uint i = 0; i < numDigits; i++)
     {
         SignStatus status = allSecondaries[i]->getSignStatus();
-        signConfigurations.push_back(status.getSignConfigurationData());
+        signConfigurations.push_back(status.signConfigurationData);
     }
 
     int numCols = 0;
@@ -336,9 +336,9 @@ void startBLEService()
     Serial.println("Proxying characteristics.");
 
     SignStatus status = allSecondaries[0]->getSignStatus();
-    btService.setBrightness(status.getBrightness());
-    btService.setSpeed(status.getSpeed());
-    btService.setPatternData(status.getPatternData());
+    btService.setBrightness(status.brightness);
+    btService.setSpeed(status.speed);
+    btService.setPatternData(status.patternData);
     btService.setColorPatternList(allSecondaries[0]->getColorPatternList());
     btService.setDisplayPatternList(allSecondaries[0]->getDisplayPatternList());
 
@@ -348,18 +348,18 @@ void startBLEService()
 
 void readSettingsFromBLE()
 {
-    currentServiceStatus.setBrightness(btService.getBrightness());
-    currentServiceStatus.setSpeed(btService.getSpeed());
-    currentServiceStatus.setPatternData(btService.getPatternData());
+    currentServiceStatus.brightness = btService.getBrightness();
+    currentServiceStatus.speed = btService.getSpeed();
+    currentServiceStatus.patternData = btService.getPatternData();
 }
 
 void updateAllSecondaries()
 {
     for (uint i = 0; i < allSecondaries.size(); i++)
     {
-        allSecondaries[i]->setBrightness(currentServiceStatus.getBrightness());
-        allSecondaries[i]->setSpeed(currentServiceStatus.getSpeed());
-        allSecondaries[i]->setPatternData(currentServiceStatus.getPatternData());
+        allSecondaries[i]->setBrightness(currentServiceStatus.brightness);
+        allSecondaries[i]->setSpeed(currentServiceStatus.speed);
+        allSecondaries[i]->setPatternData(currentServiceStatus.patternData);
     }
     ulong timestamp = millis();
     for (uint i = 0; i < allSecondaries.size(); i++)
@@ -376,16 +376,16 @@ void setManualStyle(uint style)
     {
         case 0:
             // Solid Pink
-            currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(1);
+            currentServiceStatus.brightness = 10;
+            currentServiceStatus.speed = 1;
             pattern.colorPattern = ColorPatternType::SingleColor;
             pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = Pink;
             break;
         case 1:
             // Red-Pink
-            currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(65);
+            currentServiceStatus.brightness = 10;
+            currentServiceStatus.speed = 65;
             pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Red;
@@ -395,8 +395,8 @@ void setManualStyle(uint style)
             break;
         case 2:
             // Blue-Pink
-            currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(65);
+            currentServiceStatus.brightness = 10;
+            currentServiceStatus.speed = 65;
             pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Blue;
@@ -406,16 +406,16 @@ void setManualStyle(uint style)
             break;
         case 3:
             // Rainbow
-            currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(215);
+            currentServiceStatus.brightness = 10;
+            currentServiceStatus.speed = 215;
             pattern.colorPattern = ColorPatternType::Rainbow;
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
             break;
         case 5:
             // Red-Pink random
-            currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(200);
+            currentServiceStatus.brightness = 10;
+            currentServiceStatus.speed = 200;
             pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.color1 = Red;
             pattern.color2 = Pink;
@@ -426,8 +426,8 @@ void setManualStyle(uint style)
             break;
         case 6:
             // Blue-Pink random
-            currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(200);
+            currentServiceStatus.brightness = 10;
+            currentServiceStatus.speed = 200;
             pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.color1 = Blue;
             pattern.color2 = Pink;
@@ -438,26 +438,26 @@ void setManualStyle(uint style)
             break;
         case 7:
             // Rainbow random
-            currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(200);
+            currentServiceStatus.brightness = 10;
+            currentServiceStatus.speed = 200;
             pattern.colorPattern = ColorPatternType::Rainbow;
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
             pattern.param2 = 15;  // Percent to fill, 0-255, scaled to 1-50
             break;
         default:
-            currentServiceStatus.setBrightness(10);
-            currentServiceStatus.setSpeed(1);
+            currentServiceStatus.brightness = 10;
+            currentServiceStatus.speed = 1;
             pattern.colorPattern = ColorPatternType::SingleColor;
             pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = Pink;
     }
 
-    currentServiceStatus.setPatternData(pattern);
+    currentServiceStatus.patternData = pattern;
 
     // Update the local BLE settings to reflect the new manual settings.
-    btService.setBrightness(currentServiceStatus.getBrightness());
-    btService.setSpeed(currentServiceStatus.getSpeed());
+    btService.setBrightness(currentServiceStatus.brightness);
+    btService.setSpeed(currentServiceStatus.speed);
     btService.setPatternData(pattern);
 }
 

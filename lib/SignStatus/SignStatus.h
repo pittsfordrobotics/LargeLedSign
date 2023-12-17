@@ -7,21 +7,14 @@
 #include <SignConfigurationData.h>
 #include <PatternData.h>
 
-class SignStatus {
+struct SignStatus {
     public:
-        String getStyleNames() { return m_styleNames; }
-        String getPatternNames() { return m_patternNames; }
-        byte getBrightness() { return m_brightness; }
-        byte getSpeed() { return m_speed; }
-        SignConfigurationData getSignConfigurationData() { return m_signConfigData; }
-        PatternData getPatternData() { return m_patternData; }
-
-        void setStyleNames(String styleNames) { m_styleNames = styleNames; }
-        void setPatternNames(String patternNames) { m_patternNames = patternNames; }
-        void setBrightness(byte brightness) { m_brightness = brightness; }
-        void setSpeed(byte speed) { m_speed = speed; }
-        void setSignConfigurationData(SignConfigurationData signConfigData) { m_signConfigData = signConfigData; }
-        void setPatternData(PatternData patternData) { m_patternData = patternData; }
+        String styleNames;
+        String patternNames;
+        byte brightness{0};
+        byte speed{0};
+        SignConfigurationData signConfigurationData;
+        PatternData patternData;
 
         SignStatus();
         SignStatus(const SignStatus& other);
@@ -31,13 +24,6 @@ class SignStatus {
 
     private:
         void copy(const SignStatus& other);
-
-        String m_styleNames{""};
-        String m_patternNames{""};
-        byte m_brightness{0};
-        byte m_speed{0};
-        SignConfigurationData m_signConfigData;
-        PatternData m_patternData;
 };
 
 #endif
