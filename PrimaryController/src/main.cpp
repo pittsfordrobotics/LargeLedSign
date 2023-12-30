@@ -235,6 +235,11 @@ void populateSecondaries()
                 // Reset timeout and continue looking for secondaries.
                 scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
             }
+            else
+            {
+                // Clean up the memory from the unused logo secondary.
+                delete secondary;
+            }
         }
         else
         {
