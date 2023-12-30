@@ -22,7 +22,7 @@ ulong lastTelemetryTimestamp = 0;
 SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
 
-const ulong Pink = color(230, 22, 161);
+const ulong Pink = color(230, 22, 161); // E6 16 A1
 const ulong Red = color(255, 0, 0);
 const ulong Blue = color(0, 0, 255);
 const ulong Orange = color(255, 50, 0);
@@ -64,15 +64,17 @@ void loop()
 
     if (btService.isConnected())
     {
+        // Something is connected via BT.
         // Set the display to "--" to show something connected to us.
         // Display it as "temporary" since it's a low-priority message.
         display.displayTemporary(" --", 500);
+        readSettingsFromBLE();
     }
-
-    checkSecondaryConnections();
-    //readSettingsFromBLE();
-    // Manual inputs will override BLE settings, so read them last.
-    processManualInputs();
+    else
+    {
+        checkSecondaryConnections();
+        processManualInputs();
+    }
 
     if (currentServiceStatus != lastServiceStatus || resetRequested)
     {
