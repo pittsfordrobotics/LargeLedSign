@@ -68,13 +68,14 @@ void loop()
         // Set the display to "--" to show something connected to us.
         // Display it as "temporary" since it's a low-priority message.
         display.displayTemporary(" --", 500);
-        readSettingsFromBLE();
     }
     else
     {
         checkSecondaryConnections();
-        processManualInputs();
     }
+
+    readSettingsFromBLE();
+    processManualInputs();
 
     if (currentServiceStatus != lastServiceStatus || resetRequested)
     {
@@ -115,6 +116,13 @@ void processManualInputs()
     {
         manualInputButtons[0]->clearPress();
         displayBatteryVoltages();
+    }
+
+    // If button 3 was long-pressed, force-disconnect any BT clients.
+    if (manualInputButtons[3]->wasPressed() && manualInputButtons[3]->lastPressType() == ButtonPressType::Long)
+    {
+        manualInputButtons[3]->clearPress();
+        btService.disconnect();
     }
 }
 

@@ -15,6 +15,7 @@ class CommonPeripheral {
     void stop();
     void resume();
     bool isConnected();
+    void disconnect();
 
     void setBrightness(byte brightness);
     byte getBrightness();

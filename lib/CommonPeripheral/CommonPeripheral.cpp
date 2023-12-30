@@ -49,6 +49,14 @@ bool CommonPeripheral::isConnected()
     return false;
 }
 
+void CommonPeripheral::disconnect() {
+    BLEDevice central = BLE.central();
+    if (central)
+    {
+        central.disconnect();
+    }
+}
+
 void CommonPeripheral::setColorPatternList(String patternList)
 {
     m_colorPatternListCharacteristic.writeValue(patternList);
