@@ -12,7 +12,7 @@ void SolidDisplayPattern::resetInternal()
 
 void SolidDisplayPattern::updateInternal()
 {
-    // Nothing to do.
+    m_pixelBuffer->fill(m_colorPattern->getNextColor());
 }
 
 std::vector<String> SolidDisplayPattern::getParameterNames()
