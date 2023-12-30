@@ -60,6 +60,20 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
+        case DisplayPatternType::CenterOutVertical:
+        {
+            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Vertical, pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            displayPattern = pattern;
+            break;
+        }
+        case DisplayPatternType::CenterOutHorizontal:
+        {
+            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Horizontal, pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            displayPattern = pattern;
+            break;
+        }
         default:
         {
             SolidDisplayPattern* pattern = new SolidDisplayPattern(pixelBuffer);
@@ -118,6 +132,8 @@ String PatternFactory::getKnownDisplayPatterns()
     knownPatterns += ";" + getDisplayPatternString("Down", DisplayPatternType::Down, SimpleShiftDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("Digit", DisplayPatternType::Digit, SimpleShiftDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("Random", DisplayPatternType::Random, RandomDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("CenterOut-V", DisplayPatternType::CenterOutVertical, CenterOutDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("CenterOut-H", DisplayPatternType::CenterOutHorizontal, CenterOutDisplayPattern::getParameterNames());
 
     return knownPatterns;
 }

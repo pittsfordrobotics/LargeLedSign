@@ -26,27 +26,43 @@ class PixelBuffer {
 
     // Sets the first pixel in the buffer to the new color,
     // shifting all the pixels in the buffer to the right by one.
-    void shiftLineRight(ulong newColor);
+    void shiftPixelsRight(ulong newColor);
 
     // Sets the last pixel in the buffer to the new color,
     // shifting all the pixels in the buffer to the left by one.
-    void shiftLineLeft(ulong newColor);
+    void shiftPixelsLeft(ulong newColor);
 
     // Sets the pixels in the first column to the new color,
     // shifting all the columns to the right by one.
     void shiftColumnsRight(ulong newColor);
 
+    // Sets the pixels in the starting column to the new color,
+    // shifting the columns to the right by one.
+    void shiftColumnsRight(ulong newColor, uint startingColumn);
+
     // Sets the pixels in the last column to the new color,
     // shifting all the columns to the left by one.
     void shiftColumnsLeft(ulong newColor);
+
+    // Sets the pixels in the starting column to the new color,
+    // shifting the columns to the left by one.
+    void shiftColumnsLeft(ulong newColor, uint startingColumn);
 
     // Sets the pixels in the bottom row to the new color,
     // shifting all the rows up by one.
     void shiftRowsUp(ulong newColor);
 
+    // Sets the pixels in the starting row to the new color,
+    // shifting subsequent the rows up by one.
+    void shiftRowsUp(ulong newColor, uint startingRow);
+
     // Sets the pixels in the top row to the new color,
     // shifting all the rows down by one.
     void shiftRowsDown(ulong newColor);
+
+    // Sets the pixels in the starting row to the new color,
+    // shifting prior rows down by one.
+    void shiftRowsDown(ulong newColor, uint startingRow);
 
     // Sets a random assortment of pixels in the buffer to the given color.
     void fillRandomly(ulong newColor, uint numberOfPixels);
@@ -87,8 +103,8 @@ class PixelBuffer {
     std::vector<std::vector<int>*> m_rows;
     
     void setColorForMappedPixels(std::vector<int>* destination, ulong newColor);
-    void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor);
-    void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor);
+    void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
+    void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
     void initializeTestMatrix();
     void initializeDigitOne();
     void initializeDigitThree();

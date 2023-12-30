@@ -6,6 +6,7 @@
 #include "SolidDisplayPattern.h"
 #include "SimpleShiftDisplayPattern.h"
 #include "RandomDisplayPattern.h"
+#include "CenterOutDisplayPattern.h"
 #include "ColorPatterns/ColorPattern.h"
 #include "ColorPatterns/SingleColorPattern.h"
 #include "ColorPatterns/TwoColorPattern.h"

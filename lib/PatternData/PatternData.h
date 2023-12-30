@@ -19,7 +19,9 @@ enum class DisplayPatternType : byte
     Up = 3,
     Down = 4,
     Digit = 5,
-    Random = 6
+    Random = 6,
+	CenterOutVertical = 7,
+	CenterOutHorizontal = 8
 };
 
 // The max data packet we can send from the primary controller to the
