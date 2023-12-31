@@ -91,6 +91,29 @@ void processManualInputs()
 {
     updateInputButtons();
 
+    // If button 0 was long-pressed, display battery voltages for the clients.
+    if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == ButtonPressType::Long)
+    {
+        manualInputButtons[0]->clearPress();
+        displayBatteryVoltages();
+    }
+
+    // If button 3 was long-pressed, force-disconnect any BT clients.
+    // If both buttons 2 and 3 were long-pressed, reconnect the clients.
+    if (manualInputButtons[3]->wasPressed() && manualInputButtons[3]->lastPressType() == ButtonPressType::Long)
+    {
+        manualInputButtons[3]->clearPress();
+        if (manualInputButtons[2]->wasPressed() && manualInputButtons[2]->lastPressType() == ButtonPressType::Long)
+        {
+            manualInputButtons[2]->clearPress();
+            resetSecondaryConnections();
+        }
+        else
+        {
+            btService.disconnect();
+        }
+    }
+
     // Look for any button presses that indicate style changes.
     for (uint i = 0; i < manualInputButtons.size(); i++)
     {
@@ -109,20 +132,6 @@ void processManualInputs()
             setManualStyle(style);
             resetRequested = true;
         }
-    }
-
-    // If button 0 was long-pressed, display battery voltages for the clients.
-    if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == ButtonPressType::Long)
-    {
-        manualInputButtons[0]->clearPress();
-        displayBatteryVoltages();
-    }
-
-    // If button 3 was long-pressed, force-disconnect any BT clients.
-    if (manualInputButtons[3]->wasPressed() && manualInputButtons[3]->lastPressType() == ButtonPressType::Long)
-    {
-        manualInputButtons[3]->clearPress();
-        btService.disconnect();
     }
 }
 
@@ -219,7 +228,8 @@ void populateSecondaries()
     ulong scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
 
     display.setDisplay("C-0");
-    while (millis() < scanTimeout)
+    // Continue to look for secondaries until we pass the timeout after finding at least one.
+    while (millis() < scanTimeout || allSecondaries.size() == 0)
     {
         SecondaryClient *secondary = scanForSecondary();
         if (secondary->isValidClient())

@@ -94,7 +94,11 @@ void ManualButton::setPressType(ulong pressTime)
     }
     else
     {
-        if (m_consecutiveCount > 1)
+        if (m_consecutiveCount > 2)
+        {
+            m_lastPressType = ButtonPressType::Triple;
+        }
+        else if (m_consecutiveCount > 1)
         {
             m_lastPressType = ButtonPressType::Double;
         }

@@ -90,7 +90,9 @@ void CenterOutDisplayPattern::updateInternal()
         {
             uint localCenter = m_centerLine - m_pixelBuffer->getColsToLeft();
             m_pixelBuffer->shiftColumnsLeft(newColor, localCenter);
-            m_pixelBuffer->shiftColumnsRight(newColor, localCenter + 1);
+            if (localCenter < m_pixelBuffer->getColumnCount() - 1) {
+                m_pixelBuffer->shiftColumnsRight(newColor, localCenter + 1);
+            }
         }
     }
 }
