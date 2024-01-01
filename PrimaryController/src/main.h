@@ -11,6 +11,7 @@
 #include <SignStatus.h>
 #include "Buttons/ManualButton.h"
 #include "Display/StatusDisplay.h"
+#include "PredefinedStyle.h"
 
 #define NUMBER_OF_SECONDARIES 3
 
@@ -40,4 +41,3 @@ void resetSecondaryConnections();
 void updateAllSecondaries();
 void updateTelemetry();
 void displayBatteryVoltages();
-ulong color(byte red, byte green, byte blue);

@@ -22,11 +22,6 @@ ulong lastTelemetryTimestamp = 0;
 SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
 
-const ulong Pink = color(230, 22, 161); // E6 16 A1
-const ulong Red = color(255, 0, 0);
-const ulong Blue = color(0, 0, 255);
-const ulong Orange = color(255, 50, 0);
-
 void setup()
 {
     Serial.begin(9600);
@@ -402,94 +397,43 @@ void updateAllSecondaries()
 void setManualStyle(uint style)
 {
     PatternData pattern;
+    PredefinedStyle styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
 
     switch (style)
     {
         case 0:
-            // Solid Pink
-            currentServiceStatus.brightness = 10;
-            currentServiceStatus.speed = 1;
-            pattern.colorPattern = ColorPatternType::SingleColor;
-            pattern.displayPattern = DisplayPatternType::Solid;
-            pattern.color1 = Pink;
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
             break;
         case 1:
-            // Red-Pink
-            currentServiceStatus.brightness = 10;
-            currentServiceStatus.speed = 65;
-            pattern.colorPattern = ColorPatternType::TwoColor;
-            pattern.displayPattern = DisplayPatternType::Right;
-            pattern.color1 = Red;
-            pattern.color2 = Pink;
-            pattern.param1 = 40; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 15; // Duration, 0-255, scaled to 1-50
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::RedPink_Right);
             break;
         case 2:
-            // Blue-Pink
-            currentServiceStatus.brightness = 10;
-            currentServiceStatus.speed = 65;
-            pattern.colorPattern = ColorPatternType::TwoColor;
-            pattern.displayPattern = DisplayPatternType::Right;
-            pattern.color1 = Blue;
-            pattern.color2 = Pink;
-            pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::BluePink_Right);
             break;
         case 3:
-            // Rainbow
-            currentServiceStatus.brightness = 10;
-            currentServiceStatus.speed = 215;
-            pattern.colorPattern = ColorPatternType::Rainbow;
-            pattern.displayPattern = DisplayPatternType::Right;
-            pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Rainbow_Right);
             break;
         case 5:
-            // Red-Pink random
-            currentServiceStatus.brightness = 10;
-            currentServiceStatus.speed = 200;
-            pattern.colorPattern = ColorPatternType::TwoColor;
-            pattern.color1 = Red;
-            pattern.color2 = Pink;
-            pattern.displayPattern = DisplayPatternType::Random;
-            pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 15; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::RedPink_Random);
             break;
         case 6:
-            // Blue-Pink random
-            currentServiceStatus.brightness = 10;
-            currentServiceStatus.speed = 200;
-            pattern.colorPattern = ColorPatternType::TwoColor;
-            pattern.color1 = Blue;
-            pattern.color2 = Pink;
-            pattern.displayPattern = DisplayPatternType::Random;
-            pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 15; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::BluePink_Random);
             break;
         case 7:
-            // Rainbow random
-            currentServiceStatus.brightness = 10;
-            currentServiceStatus.speed = 200;
-            pattern.colorPattern = ColorPatternType::Rainbow;
-            pattern.displayPattern = DisplayPatternType::Random;
-            pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
-            pattern.param2 = 15;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Rainbow_Random);
             break;
         default:
-            currentServiceStatus.brightness = 10;
-            currentServiceStatus.speed = 1;
-            pattern.colorPattern = ColorPatternType::SingleColor;
-            pattern.displayPattern = DisplayPatternType::Solid;
-            pattern.color1 = Pink;
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
     }
 
-    currentServiceStatus.patternData = pattern;
+    currentServiceStatus.brightness = styleDefinition.getBrightness();
+    currentServiceStatus.speed = styleDefinition.getSpeed();
+    currentServiceStatus.patternData = styleDefinition.getPatternData();
 
     // Update the local BLE settings to reflect the new manual settings.
     btService.setBrightness(currentServiceStatus.brightness);
     btService.setSpeed(currentServiceStatus.speed);
-    btService.setPatternData(pattern);
+    btService.setPatternData(currentServiceStatus.patternData);
 }
 
 void updateTelemetry()
@@ -519,11 +463,4 @@ void updateTelemetry()
             Serial.println(allSecondaries[i]->getBatteryVoltage());
         }
     }
-}
-
-ulong color(byte red, byte green, byte blue)
-{
-    // Taken from the Adafruit_Neopixel::Color method.
-    // I didn't want to add a dependency on that library for a single method, so copying it here.
-    return ((ulong)red << 16) | ((ulong)green << 8) | blue;
 }
