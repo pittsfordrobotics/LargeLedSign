@@ -84,7 +84,7 @@ class PixelBuffer {
     // Set an individual pixel in the buffer to a color.
     void setPixel(uint pixel, ulong color);
 
-    // Output the interal pixel buffer to the NeoPixel LEDs.
+    // Output the internal pixel buffer to the NeoPixel LEDs.
     void displayPixels();
 
     // Clears the internal pixel buffer, but does not reset the NeoPixel LEDs.

@@ -1,6 +1,8 @@
 #ifndef PREDEFINEDSTYLE_H
 #define PREDEFINEDSTYLE_H
 
+#define DEFAULT_BRIGHTNESS 10
+
 #include <Arduino.h>
 #include <PatternData.h>
 #include <vector>

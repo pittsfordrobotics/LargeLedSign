@@ -13,8 +13,6 @@
 #include "Display/StatusDisplay.h"
 #include "PredefinedStyle.h"
 
-#define NUMBER_OF_SECONDARIES 3
-
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line
 #define TM1637_BRIGHTNESS 5  // Brightness of the TM1637, between 0 and 7

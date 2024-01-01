@@ -17,6 +17,10 @@
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
 #define VOLTAGEINPUTPIN 14     // The pin # (Digital #) for the analog input to detect battery voltage level.
+// The Digital pin # that tells us to monitor the battery voltage.
+// When this pin is pulled low, the battery voltage will not be monitored.
+// This pin is not connected on the actual signs, so should remain high (active).
+#define BATTERY_MONITOR_ACTIVE_PIN  12  
 
 // The order and styletype pinouts need to be updated.
 // Style type isn't yet used.
@@ -25,11 +29,8 @@
 #define STYLE_TYPE_SELECTOR_PINS 4, 5, 6, 7 // The set of Digital pin #s that tell the controller what style (digit # or logo) the sign should be (MSB to LSB).
 
 // Initial default values for LED styles
-#define DEFAULTSTYLE 0        // The default style to start with. This is an index into the lightStyles vector.
-#define DEFAULTBRIGHTNESS 20  // Brightness should be between 0 and 255.
-#define DEFAULTSPEED 90       // Speed should be between 1 and 100.
-#define DEFAULTSTEP  70       // Step should be between 1 and 100.
-#define DEFAULTPATTERN 1      // Default pattern (ie, Row/Column/Digit/etc). This is an index into the LightStyle::knownPatterns vector.
+#define DEFAULT_BRIGHTNESS 20  // Brightness should be between 0 and 255.
+#define DEFAULT_SPEED 90       // Speed should be between 1 and 100.
 
 // Batter power monitoring
 #define LOWPOWERTHRESHOLD 5.9     // The voltage below which the system will go into "low power" mode.
@@ -49,6 +50,7 @@ void updateLEDs();
 float getCalculatedBatteryVoltage();
 int getVoltageInputLevel();
 void emitTelemetry();
+void checkForLowPowerState();
 void indicateBleFailure();
 byte getSignType();
 byte getSignPosition();

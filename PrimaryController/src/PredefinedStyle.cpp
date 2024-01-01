@@ -52,8 +52,6 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
     const ulong Red = color(255, 0, 0);
     const ulong Blue = color(0, 0, 255);
 
-    const byte defaultBrightness = 10;
-
     switch (styleName)
     {
         case PredefinedStyles::Pink_Solid:
@@ -62,7 +60,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.colorPattern = ColorPatternType::SingleColor;
             pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = Pink;
-            return PredefinedStyle{"Solid Pink", defaultBrightness, 1, pattern};
+            return PredefinedStyle{"Solid Pink", DEFAULT_BRIGHTNESS, 1, pattern};
         }
         case PredefinedStyles::RedPink_Right:
         {
@@ -73,7 +71,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.color2 = Pink;
             pattern.param1 = 40; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 15; // Duration, 0-255, scaled to 1-50
-            return PredefinedStyle{"Red-Pink", defaultBrightness, 65, pattern};
+            return PredefinedStyle{"Red-Pink", DEFAULT_BRIGHTNESS, 65, pattern};
         }
         case PredefinedStyles::BluePink_Right:
         {
@@ -84,7 +82,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.color2 = Pink;
             pattern.param1 = 40; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 15; // Duration, 0-255, scaled to 1-50
-            return PredefinedStyle{"Blue-Pink", defaultBrightness, 65, pattern};
+            return PredefinedStyle{"Blue-Pink", DEFAULT_BRIGHTNESS, 65, pattern};
         }
         case PredefinedStyles::Rainbow_Right:
         {
@@ -92,7 +90,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.colorPattern = ColorPatternType::Rainbow;
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
-            return PredefinedStyle{"Rainbow", defaultBrightness, 215, pattern};
+            return PredefinedStyle{"Rainbow", DEFAULT_BRIGHTNESS, 215, pattern};
         }
         case PredefinedStyles::RedPink_Random:
         {
@@ -104,7 +102,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
             pattern.param3 = 15; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
-            return PredefinedStyle{"Red-Pink Random", defaultBrightness, 200, pattern};
+            return PredefinedStyle{"Red-Pink Random", DEFAULT_BRIGHTNESS, 200, pattern};
         }
         case PredefinedStyles::BluePink_Random:
         {
@@ -116,7 +114,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param1 = 30; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 10; // Duration, 0-255, scaled to 1-50
             pattern.param3 = 15; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
-            return PredefinedStyle{"Blue-Pink Random", defaultBrightness, 200, pattern};
+            return PredefinedStyle{"Blue-Pink Random", DEFAULT_BRIGHTNESS, 200, pattern};
         }
         case PredefinedStyles::Rainbow_Random:
         {
@@ -125,7 +123,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
             pattern.param2 = 15;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
-            return PredefinedStyle{"Rainbow Random", defaultBrightness, 200, pattern};
+            return PredefinedStyle{"Rainbow Random", DEFAULT_BRIGHTNESS, 200, pattern};
         }
         default:
         {
@@ -133,7 +131,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.colorPattern = ColorPatternType::SingleColor;
             pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = Pink;
-            return PredefinedStyle{"Solid Pink", defaultBrightness, 1, pattern};
+            return PredefinedStyle{"Solid Pink", DEFAULT_BRIGHTNESS, 1, pattern};
         }
     }
 }

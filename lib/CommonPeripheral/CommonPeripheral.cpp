@@ -102,14 +102,7 @@ PatternData CommonPeripheral::getPatternData()
     {
         if (m_patternDataCharacteristic.written())
         {
-            Serial.println("Reading new value for pattern charactersitic.");
             m_patternDataCharacteristic.readValue(&m_currentPatternData, sizeof(m_currentPatternData));
-            
-            // TEST TEST TEST
-            Serial.print("Color pattern: ");
-            Serial.print(static_cast<byte>(m_currentPatternData.colorPattern));
-            Serial.print("; Color 1:");
-            Serial.println(m_currentPatternData.color1, HEX);
         }
     }
 
@@ -128,11 +121,7 @@ byte CommonPeripheral::readByteFromCharacteristic(BLEByteCharacteristic characte
     {
         if (characteristic.written())
         {
-            Serial.print("Reading new value for ");
-            Serial.print(name);
             byte valByte = characteristic.value();
-            Serial.print(". Byte received: ");
-            Serial.println(valByte, HEX);
             return valByte;
         }
     }
@@ -146,11 +135,7 @@ String CommonPeripheral::readStringFromCharacteristic(BLEStringCharacteristic ch
     {
         if (characteristic.written())
         {
-            Serial.print("Reading new value for ");
-            Serial.print(name);
             String value = characteristic.value();
-            Serial.print(". Value received: ");
-            Serial.println(value);
             return value;
         }
     }
@@ -164,11 +149,7 @@ ulong CommonPeripheral::readULongFromCharacteristic(BLEUnsignedLongCharacteristi
     {
         if (characteristic.written())
         {
-            Serial.print("Reading new value for ");
-            Serial.print(name);
             ulong value = characteristic.value();
-            Serial.print(". Value received: ");
-            Serial.println(value);
             return value;
         }
     }
