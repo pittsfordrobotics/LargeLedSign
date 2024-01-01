@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "ColorPattern.h"
 #include "../Math/MathUtils.h"
+#include <vector>
 
 class TwoColorPattern : public ColorPattern
 {
@@ -27,6 +28,7 @@ class TwoColorPattern : public ColorPattern
         byte m_color2Duration{1};
         ulong m_iterationCount{0};
 
+        std::vector<ulong> m_colorSequence;
         byte convertDuration(byte duration);
 };
 

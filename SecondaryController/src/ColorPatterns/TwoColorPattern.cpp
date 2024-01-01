@@ -11,20 +11,28 @@ TwoColorPattern::TwoColorPattern(ulong color1, ulong color2)
 void TwoColorPattern::reset()
 {
     m_iterationCount = 0;
+    
+    for (int i = 0; i < m_color1Duration; i++)
+    {
+        m_colorSequence.push_back(m_color1);
+    }
+    for (int i = 0; i < m_color2Duration; i++)
+    {
+        m_colorSequence.push_back(m_color2);
+    }
 }
 
 ulong TwoColorPattern::getNextColor()
 {
-    int modulus = m_color1Duration + m_color2Duration;
-    int remainder = m_iterationCount % modulus;
-    ulong color = m_color2;
-    if (remainder < m_color1Duration)
+    // Check the size of the sequence list just in case.
+    if (m_colorSequence.size() == 0)
     {
-        color = m_color1;
+        return 0;
     }
 
+    m_iterationCount = m_iterationCount % m_colorSequence.size();
+    ulong color = m_colorSequence[m_iterationCount];
     m_iterationCount++;
-
     return color;
 }
 
