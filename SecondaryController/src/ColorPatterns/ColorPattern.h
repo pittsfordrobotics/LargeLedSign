@@ -29,6 +29,14 @@ class ColorPattern
 
     protected:
         uint m_colorCount{0};
+
+        // Just in-line the 'color' method here.
+        ulong color(byte red, byte green, byte blue)
+        {
+            // Taken from the Adafruit_Neopixel::Color method.
+            // I didn't want to add a dependency on that library for a single method, so copying it here.
+            return ((ulong)red << 16) | ((ulong)green << 8) | blue;
+        }
 };
 
 #endif

@@ -100,6 +100,15 @@ ColorPattern* PatternFactory::createColorPatternForPatternData(const PatternData
                 twoColorPattern->setColor2Duration(patternData.param2);
                 return twoColorPattern;
             }
+        case ColorPatternType::TwoColorFade:
+            {
+                TwoColorFadePattern* twoColorFadePattern = new TwoColorFadePattern(patternData.color1, patternData.color2);
+                twoColorFadePattern->setColorDuration(patternData.param1);
+                twoColorFadePattern->setFadeInDuration(patternData.param2);
+                twoColorFadePattern->setFadeOutDuration(patternData.param3);
+                twoColorFadePattern->setFadedDuration(patternData.param4);
+                return twoColorFadePattern;
+            }
         case ColorPatternType::Rainbow:
             {
                 RainbowColorPattern* rainbowPattern = new RainbowColorPattern();
@@ -117,6 +126,7 @@ String PatternFactory::getKnownColorPatterns()
     String knownPatterns;
     knownPatterns += getColorPatternString("Single Color", ColorPatternType::SingleColor, 1, SingleColorPattern::getParameterNames());
     knownPatterns += ";" + getColorPatternString("Two Color", ColorPatternType::TwoColor, 2, TwoColorPattern::getParameterNames());
+    knownPatterns += ";" + getColorPatternString("Two Color Fade", ColorPatternType::TwoColorFade, 2, TwoColorFadePattern::getParameterNames());
     knownPatterns += ";" + getColorPatternString("Rainbow", ColorPatternType::Rainbow, 0, RainbowColorPattern::getParameterNames());
 
     return knownPatterns;

@@ -8,7 +8,8 @@ enum class ColorPatternType : byte
 	Blank = 0,
 	SingleColor = 1,
 	TwoColor = 2,
-	Rainbow = 3
+	Rainbow = 3,
+	TwoColorFade = 4
 };
 
 enum class DisplayPatternType : byte
