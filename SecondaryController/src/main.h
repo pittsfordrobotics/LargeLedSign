@@ -17,10 +17,6 @@
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
 #define VOLTAGEINPUTPIN 14     // The pin # (Digital #) for the analog input to detect battery voltage level.
-// The Digital pin # that tells us to monitor the battery voltage.
-// When this pin is pulled low, the battery voltage will not be monitored.
-// This pin is not connected on the actual signs, so should remain high (active).
-#define BATTERY_MONITOR_ACTIVE_PIN  12  
 
 // The order and styletype pinouts need to be updated.
 // Style type isn't yet used.
@@ -29,8 +25,10 @@
 #define STYLE_TYPE_SELECTOR_PINS 4, 5, 6, 7 // The set of Digital pin #s that tell the controller what style (digit # or logo) the sign should be (MSB to LSB).
 
 // Initial default values for LED styles
-#define DEFAULT_BRIGHTNESS 20  // Brightness should be between 0 and 255.
-#define DEFAULT_SPEED 90       // Speed should be between 1 and 100.
+#define DEFAULT_BRIGHTNESS 255  // Brightness should be between 0 and 255.
+#define DEFAULT_SPEED 90        // Speed should be between 1 and 100.
+#define LOW_BRIGHTNESS_PIN  12  // When this Digital pin # is pulled low, the default brightness will be much lower than normal.
+#define DEFAULT_BRIGHTNESS_LOW 20 // The default brightness to use when the "Low Brightness" pin has been pulled low.
 
 // Batter power monitoring
 #define LOWPOWERTHRESHOLD 5.9     // The voltage below which the system will go into "low power" mode.

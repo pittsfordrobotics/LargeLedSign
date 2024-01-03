@@ -45,7 +45,16 @@ void setup()
     signPosition = getSignPosition();
 
     pixelBuffer.initialize(signType);
-    pixelBuffer.setBrightness(DEFAULT_BRIGHTNESS);
+
+    byte defaultBrightness = DEFAULT_BRIGHTNESS;
+    if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
+    {
+        defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
+    }
+
+    pixelBuffer.setBrightness(defaultBrightness);
+    currentBrightness = defaultBrightness;
+    newBrightness = defaultBrightness;
 
     startBLE();
 
@@ -95,7 +104,7 @@ void initializeIO()
 
     Serial.println("Initializing the analog input to monitor battery voltage.");
     pinMode(VOLTAGEINPUTPIN, INPUT);
-    pinMode(BATTERY_MONITOR_ACTIVE_PIN, INPUT_PULLUP);
+    pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
 }
 
 byte getSignType()
@@ -163,8 +172,8 @@ void startBLE()
     configData.pixelCount = pixelBuffer.getPixelCount();
 
     btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
-    btService.setBrightness(DEFAULT_BRIGHTNESS);
-    btService.setSpeed(DEFAULT_SPEED);
+    btService.setBrightness(currentBrightness);
+    btService.setSpeed(currentSpeed);
     btService.setSignConfigurationData(configData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
@@ -256,14 +265,6 @@ void updateLEDs()
 // or if the battery has been charged enough to restart operation.
 void checkForLowPowerState()
 {
-    if (digitalRead(BATTERY_MONITOR_ACTIVE_PIN) == LOW)
-    {
-        // When the pin is pulled low, don't monitor the battery voltage.
-        inLowPowerMode = false;
-        pixelBuffer.setBrightness(currentBrightness);
-        return;
-    }
-
     double currentVoltage = getCalculatedBatteryVoltage();
 
     // Check if the voltage is too low.

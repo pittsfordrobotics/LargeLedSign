@@ -1,8 +1,6 @@
 #ifndef PREDEFINEDSTYLE_H
 #define PREDEFINEDSTYLE_H
 
-#define DEFAULT_BRIGHTNESS 10
-
 #include <Arduino.h>
 #include <PatternData.h>
 #include <vector>
@@ -22,17 +20,15 @@ enum class PredefinedStyles {
 class PredefinedStyle {
     public:
         static PredefinedStyle getPredefinedStyle(PredefinedStyles styleName);
-        PredefinedStyle(String name, byte brightness, byte speed, PatternData patternData);
+        PredefinedStyle(String name, byte speed, PatternData patternData);
         PredefinedStyle(const PredefinedStyle& other);
         PredefinedStyle& operator=(const PredefinedStyle& other);
         String getName();
         PatternData getPatternData();
-        byte getBrightness();
         byte getSpeed();
 
     private:
         String m_name;
-        byte m_brightness{0};
         byte m_speed{0};
         PatternData m_patternData;
         

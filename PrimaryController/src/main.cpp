@@ -426,12 +426,10 @@ void setManualStyle(uint style)
             styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
     }
 
-    currentServiceStatus.brightness = styleDefinition.getBrightness();
     currentServiceStatus.speed = styleDefinition.getSpeed();
     currentServiceStatus.patternData = styleDefinition.getPatternData();
 
     // Update the local BLE settings to reflect the new manual settings.
-    btService.setBrightness(currentServiceStatus.brightness);
     btService.setSpeed(currentServiceStatus.speed);
     btService.setPatternData(currentServiceStatus.patternData);
 }
