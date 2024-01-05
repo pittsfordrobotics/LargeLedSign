@@ -413,11 +413,14 @@ void setManualStyle(uint style)
         case 3:
             styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Rainbow_Right);
             break;
+        case 4:
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
+            break;
         case 5:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::RedPink_Random);
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::RedPink_CenterOut);
             break;
         case 6:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::BluePink_Random);
+            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::BluePink_CenterOut);
             break;
         case 7:
             styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Rainbow_Random);

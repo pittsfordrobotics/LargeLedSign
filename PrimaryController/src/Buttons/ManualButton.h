@@ -11,8 +11,7 @@ enum class ButtonPressType {
     None,
     Normal,
     Long,
-    Double,
-    Triple
+    Double
 };
 
 class ManualButton {
