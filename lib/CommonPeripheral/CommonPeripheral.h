@@ -6,7 +6,6 @@
 #include <ArduinoBLE.h>
 #include <BLETypedCharacteristics.h>
 #include <BluetoothCommon.h>
-#include <StringUtils.h>
 #include <PatternData.h>
 
 class CommonPeripheral {
@@ -39,11 +38,10 @@ class CommonPeripheral {
     BLEByteCharacteristic m_brightnessCharacteristic{ BTCOMMON_BRIGHTNESSCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
     BLEByteCharacteristic m_speedCharacteristic{BTCOMMON_SPEEDCHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite };
     BLEFloatCharacteristic m_batteryVoltageCharacteristic{ BTCOMMON_BATTERYVOLTAGECHARACTERISTIC_UUID, BLERead | BLENotify };
-    BLECharacteristic m_patternDataCharacteristic{ BTCOMMON_PATTERNDATA_CHARACTERISTIC_UUID, BLERead | BLEWrite, sizeof(PatternData) };
+    BLECharacteristic m_patternDataCharacteristic{ BTCOMMON_PATTERNDATA_CHARACTERISTIC_UUID, BLERead | BLENotify | BLEWrite, sizeof(PatternData) };
     BLEStringCharacteristic m_colorPatternListCharacteristic{ BTCOMMON_COLORPATTERNLIST_CHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
     BLEStringCharacteristic m_displayPatternListCharacteristic{ BTCOMMON_DISPLAYPATTERNLIST_CHARACTERISTIC_UUID, BLERead, BTCOMMON_MAXSTRINGLENGTH };
     
-
     byte m_currentBrightness{0};
     byte m_currentSpeed{0};
     PatternData m_currentPatternData;
