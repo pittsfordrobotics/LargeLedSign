@@ -102,12 +102,30 @@ ColorPattern* PatternFactory::createColorPatternForPatternData(const PatternData
             }
         case ColorPatternType::TwoColorFade:
             {
-                TwoColorFadePattern* twoColorFadePattern = new TwoColorFadePattern(patternData.color1, patternData.color2);
+                ColorFadePattern* twoColorFadePattern = new ColorFadePattern(patternData.color1, patternData.color2);
                 twoColorFadePattern->setColorDuration(patternData.param1);
                 twoColorFadePattern->setFadeInDuration(patternData.param2);
                 twoColorFadePattern->setFadeOutDuration(patternData.param3);
                 twoColorFadePattern->setFadedDuration(patternData.param4);
                 return twoColorFadePattern;
+            }
+        case ColorPatternType::ThreeColorFade:
+            {
+                ColorFadePattern* threeColorFadePattern = new ColorFadePattern(patternData.color1, patternData.color2, patternData.color3);
+                threeColorFadePattern->setColorDuration(patternData.param1);
+                threeColorFadePattern->setFadeInDuration(patternData.param2);
+                threeColorFadePattern->setFadeOutDuration(patternData.param3);
+                threeColorFadePattern->setFadedDuration(patternData.param4);
+                return threeColorFadePattern;
+            }
+        case ColorPatternType::FourColorFade:
+            {
+                ColorFadePattern* fourColorFadePattern = new ColorFadePattern(patternData.color1, patternData.color2, patternData.color3, patternData.color4);
+                fourColorFadePattern->setColorDuration(patternData.param1);
+                fourColorFadePattern->setFadeInDuration(patternData.param2);
+                fourColorFadePattern->setFadeOutDuration(patternData.param3);
+                fourColorFadePattern->setFadedDuration(patternData.param4);
+                return fourColorFadePattern;
             }
         case ColorPatternType::Rainbow:
             {
@@ -126,7 +144,9 @@ String PatternFactory::getKnownColorPatterns()
     String knownPatterns;
     knownPatterns += getColorPatternString("Single Color", ColorPatternType::SingleColor, 1, SingleColorPattern::getParameterNames());
     knownPatterns += ";" + getColorPatternString("Two Color", ColorPatternType::TwoColor, 2, TwoColorPattern::getParameterNames());
-    knownPatterns += ";" + getColorPatternString("Two Color Fade", ColorPatternType::TwoColorFade, 2, TwoColorFadePattern::getParameterNames());
+    knownPatterns += ";" + getColorPatternString("Two Color Fade", ColorPatternType::TwoColorFade, 2, ColorFadePattern::getParameterNames());
+    knownPatterns += ";" + getColorPatternString("Three Color Fade", ColorPatternType::ThreeColorFade, 3, ColorFadePattern::getParameterNames());
+    knownPatterns += ";" + getColorPatternString("Four Color Fade", ColorPatternType::FourColorFade, 4, ColorFadePattern::getParameterNames());
     knownPatterns += ";" + getColorPatternString("Rainbow", ColorPatternType::Rainbow, 0, RainbowColorPattern::getParameterNames());
 
     return knownPatterns;

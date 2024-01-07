@@ -10,7 +10,7 @@
 #include "ColorPatterns/ColorPattern.h"
 #include "ColorPatterns/SingleColorPattern.h"
 #include "ColorPatterns/TwoColorPattern.h"
-#include "ColorPatterns/TwoColorFadePattern.h"
+#include "ColorPatterns/ColorFadePattern.h"
 #include "ColorPatterns/RainbowColorPattern.h"
 #include "PixelBuffer.h"
 #include <PatternData.h>
