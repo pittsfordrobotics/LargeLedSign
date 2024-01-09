@@ -5,6 +5,7 @@
 #include <BluetoothCommon.h>
 #include "Bluetooth/SecondaryClient.h"
 #include <SignDataLib.h>
+#include <DisplayPatternLib.h>
 #include "Buttons/ManualButton.h"
 #include "Display/StatusDisplay.h"
 #include "PredefinedStyle.h"

@@ -365,8 +365,8 @@ void startBLEService()
     btService.setBrightness(status.brightness);
     btService.setSpeed(status.speed);
     btService.setPatternData(status.patternData);
-    btService.setColorPatternList(allSecondaries[0]->getColorPatternList());
-    btService.setDisplayPatternList(allSecondaries[0]->getDisplayPatternList());
+    btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
+    btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
 
     Serial.println("Peripheral service started.");
     display.clear();
