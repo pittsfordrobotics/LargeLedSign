@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include "ColorPattern.h"
-#include "..\Math\MathUtils.h"
+#include <MathUtils.h>
 
 class RainbowColorPattern : public ColorPattern
 {

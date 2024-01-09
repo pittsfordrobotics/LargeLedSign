@@ -7,11 +7,7 @@
 #include "SimpleShiftDisplayPattern.h"
 #include "RandomDisplayPattern.h"
 #include "CenterOutDisplayPattern.h"
-#include "ColorPatterns/ColorPattern.h"
-#include "ColorPatterns/SingleColorPattern.h"
-#include "ColorPatterns/TwoColorPattern.h"
-#include "ColorPatterns/ColorFadePattern.h"
-#include "ColorPatterns/RainbowColorPattern.h"
+#include <ColorPatternLib.h>
 #include "PixelBuffer.h"
 #include <PatternData.h>
 #include <vector>
