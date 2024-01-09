@@ -4,9 +4,8 @@
 #include <Arduino.h>
 #include <vector>
 #include <ArduinoBLE.h>
-#include <BLETypedCharacteristics.h>
-#include <BluetoothCommon.h>
 #include <PatternData.h>
+#include "BluetoothCommon.h"
 
 class CommonPeripheral {
   public:

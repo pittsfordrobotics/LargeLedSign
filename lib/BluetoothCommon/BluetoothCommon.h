@@ -17,4 +17,6 @@
 
 #define BTCOMMON_MAXSTRINGLENGTH 510
 
+#include "CommonPeripheral.h"
+
 #endif
