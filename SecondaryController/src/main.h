@@ -8,8 +8,7 @@
 #include <PixelBuffer.h>
 #include <BluetoothCommon.h>
 #include "Bluetooth\SecondaryPeripheral.h"
-#include <SignConfigurationData.h>
-#include <SignOffsetData.h>
+#include <SignDataLib.h>
 #include <PatternData.h>
 #include <DisplayPatternLib.h>
 
