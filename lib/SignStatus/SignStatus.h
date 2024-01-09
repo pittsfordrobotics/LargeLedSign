@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <vector>
-#include <StringUtils.h>
 #include <SignConfigurationData.h>
 #include <PatternData.h>
 
