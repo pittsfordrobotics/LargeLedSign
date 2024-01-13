@@ -13,6 +13,7 @@ StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 
 std::vector<ManualButton *> manualInputButtons;
 std::vector<SecondaryClient *> allSecondaries;
+std::vector<std::vector<PredefinedStyles>> manualStyles;
 ulong nextConnectionCheck = 0;
 bool resetRequested = false;
 bool shouldIgnoreLogo = false;
@@ -21,6 +22,8 @@ ulong lastTelemetryTimestamp = 0;
 
 SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
+int lastManualButtonPressed = -1;
+int manualButtonSequenceNumber = 0;
 
 void setup()
 {
@@ -28,6 +31,7 @@ void setup()
     delay(500);
     Serial.println("Starting...");
 
+    setupManualStyleLists();
     initializeIO();
 
     // If manual button 1 is pressed (ie, LOW), don't look for the logo.
@@ -47,7 +51,7 @@ void setup()
     populateSecondaries();
     consolidateTotalsAndWriteToSecondaries();
     startBLEService();
-    setManualStyle(0);
+    setManualStyle(PredefinedStyles::Pink_Solid);
     resetRequested = true;
     nextConnectionCheck = millis() + CONNECTION_CHECK_INTERVAL;
 }
@@ -86,15 +90,16 @@ void processManualInputs()
 {
     updateInputButtons();
 
-    // If button 0 was long-pressed, display battery voltages for the clients.
+    // First look for any long-presses that happened.
+    // If button 1 (id 0) was long-pressed, display battery voltages for the clients.
     if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == ButtonPressType::Long)
     {
         manualInputButtons[0]->clearPress();
         displayBatteryVoltages();
     }
 
-    // If button 3 was long-pressed, force-disconnect any BT clients.
-    // If both buttons 2 and 3 were long-pressed, reconnect the clients.
+    // If button 4 (id 3) was long-pressed, force-disconnect any BT clients.
+    // If both buttons 3 and 4 (ids 2 and 3) were long-pressed, reconnect the clients.
     if (manualInputButtons[3]->wasPressed() && manualInputButtons[3]->lastPressType() == ButtonPressType::Long)
     {
         manualInputButtons[3]->clearPress();
@@ -109,25 +114,43 @@ void processManualInputs()
         }
     }
 
-    // Look for any button presses that indicate style changes.
+    // Next look for any button presses that indicate style changes.
+    // If the same button was pressed previously, cycle through the styles.
     for (uint i = 0; i < manualInputButtons.size(); i++)
     {
-        if (manualInputButtons[i]->wasPressed() 
-            && (manualInputButtons[i]->lastPressType() == ButtonPressType::Normal || manualInputButtons[i]->lastPressType() == ButtonPressType::Double))
+        if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Normal)
         {
-            int style = i;
-            if (manualInputButtons[i]->lastPressType() == ButtonPressType::Double)
+            if ((int)i == lastManualButtonPressed)
             {
-                style += 4;
+                // This button was pressed last time -- cycle through the sequence.
+                manualButtonSequenceNumber++;
+            }
+            else
+            {
+                manualButtonSequenceNumber = 0;
             }
 
+            // Get the vector corresponding to the button number (4 vectors; 1 per button),
+            // then get the style by indexing into the vector.
+            int sequenceIndex = manualButtonSequenceNumber % manualStyles[i].size();
+            PredefinedStyles selectedStyle = manualStyles[i][sequenceIndex];
+            setManualStyle(selectedStyle);
             manualInputButtons[i]->clearPress();
-            Serial.print("Manual style selected: ");
-            Serial.println(style);
-            setManualStyle(style);
-            resetRequested = true;
+            lastManualButtonPressed = i;
         }
     }
+}
+
+void setManualStyle(PredefinedStyles style)
+{
+    PredefinedStyle styleDefinition = PredefinedStyle::getPredefinedStyle(style);
+    currentServiceStatus.speed = styleDefinition.getSpeed();
+    currentServiceStatus.patternData = styleDefinition.getPatternData();
+
+    // Update the local BLE settings to reflect the new manual settings.
+    btService.setSpeed(currentServiceStatus.speed);
+    btService.setPatternData(currentServiceStatus.patternData);
+    resetRequested = true;
 }
 
 void displayBatteryVoltages()
@@ -214,7 +237,7 @@ void resetSecondaryConnections()
     allSecondaries.clear();
     populateSecondaries();
     consolidateTotalsAndWriteToSecondaries();
-    setManualStyle(0);
+    setManualStyle(PredefinedStyles::Pink_Solid);
     resetRequested = true;
 }
 
@@ -394,47 +417,30 @@ void updateAllSecondaries()
     }
 }
 
-void setManualStyle(uint style)
+void setupManualStyleLists()
 {
-    PatternData pattern;
-    PredefinedStyle styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
+    // Styles for button 1 (id 0)
+    std::vector<PredefinedStyles> button1Styles;
+    button1Styles.push_back(PredefinedStyles::Pink_Solid);
+    manualStyles.push_back(button1Styles);
 
-    switch (style)
-    {
-        case 0:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
-            break;
-        case 1:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::RedPink_Right);
-            break;
-        case 2:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::BluePink_Right);
-            break;
-        case 3:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Rainbow_Right);
-            break;
-        case 4:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
-            break;
-        case 5:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::RedPink_CenterOut);
-            break;
-        case 6:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::BluePink_CenterOut);
-            break;
-        case 7:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Rainbow_Random);
-            break;
-        default:
-            styleDefinition = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
-    }
+    // Styles for button 2 (id 1)
+    std::vector<PredefinedStyles> button2Styles;
+    button2Styles.push_back(PredefinedStyles::RedPink_Right);
+    button2Styles.push_back(PredefinedStyles::RedPink_CenterOut);
+    manualStyles.push_back(button2Styles);
 
-    currentServiceStatus.speed = styleDefinition.getSpeed();
-    currentServiceStatus.patternData = styleDefinition.getPatternData();
+    // Styles for button 3 (id 2)
+    std::vector<PredefinedStyles> button3Styles;
+    button3Styles.push_back(PredefinedStyles::BluePink_Right);
+    button3Styles.push_back(PredefinedStyles::BluePink_CenterOut);
+    manualStyles.push_back(button3Styles);
 
-    // Update the local BLE settings to reflect the new manual settings.
-    btService.setSpeed(currentServiceStatus.speed);
-    btService.setPatternData(currentServiceStatus.patternData);
+    // Styles for button 4 (id 3)
+    std::vector<PredefinedStyles> button4Styles;
+    button4Styles.push_back(PredefinedStyles::Rainbow_Right);
+    button4Styles.push_back(PredefinedStyles::Rainbow_Random);
+    manualStyles.push_back(button4Styles);
 }
 
 void updateTelemetry()
