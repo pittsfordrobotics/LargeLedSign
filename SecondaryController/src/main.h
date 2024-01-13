@@ -5,14 +5,12 @@
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoBLE.h>
 #include <vector>
-#include "PixelBuffer.h"
+#include <PixelBuffer.h>
 #include <BluetoothCommon.h>
 #include "Bluetooth\SecondaryPeripheral.h"
-#include <SignConfigurationData.h>
-#include <SignOffsetData.h>
+#include <SignDataLib.h>
 #include <PatternData.h>
-#include "DisplayPatterns/DisplayPattern.h"
-#include "DisplayPatterns/PatternFactory.h"
+#include <DisplayPatternLib.h>
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels

@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "DisplayPattern.h"
 #include "PixelBuffer.h"
-#include "Math/MathUtils.h"
+#include <MathUtils.h>
 
 class RandomDisplayPattern : public DisplayPattern
 {

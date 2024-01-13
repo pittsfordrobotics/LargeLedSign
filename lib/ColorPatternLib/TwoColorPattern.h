@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "ColorPattern.h"
-#include "../Math/MathUtils.h"
+#include <MathUtils.h>
 #include <vector>
 
 class TwoColorPattern : public ColorPattern

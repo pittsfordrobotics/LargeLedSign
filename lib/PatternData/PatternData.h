@@ -9,7 +9,9 @@ enum class ColorPatternType : byte
 	SingleColor = 1,
 	TwoColor = 2,
 	Rainbow = 3,
-	TwoColorFade = 4
+	TwoColorFade = 4,
+	ThreeColorFade = 5,
+	FourColorFade = 6,
 };
 
 enum class DisplayPatternType : byte

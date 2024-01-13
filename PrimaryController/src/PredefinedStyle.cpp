@@ -113,8 +113,8 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             PatternData pattern;
             pattern.colorPattern = ColorPatternType::Rainbow;
             pattern.displayPattern = DisplayPatternType::Random;
-            pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
-            pattern.param2 = 15;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            pattern.param1 = 160; // Hue increment, 0-255, scaled to 5-1000
+            pattern.param2 = 40;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Rainbow Random", 200, pattern};
         }
         case PredefinedStyles::RedPink_CenterOut:
