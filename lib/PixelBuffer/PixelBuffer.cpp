@@ -40,7 +40,7 @@ void PixelBuffer::initialize(byte signStyle)
 
 void PixelBuffer::clearBuffer()
 {
-    for (uint i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_pixelBufferSize; i++)
     {
         m_pixelColors[i] = 0;
     }
@@ -48,7 +48,7 @@ void PixelBuffer::clearBuffer()
 
 void PixelBuffer::displayPixels()
 {
-    for (uint i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_pixelBufferSize; i++)
     {
         m_neoPixels->setPixelColor(i, m_pixelColors[i]);
     }
@@ -91,7 +91,7 @@ void PixelBuffer::setBrightness(byte brightness)
 
 void PixelBuffer::setPixel(unsigned int pixel, ulong color)
 {
-    if (pixel >= m_numPixels)
+    if (pixel >= m_pixelBufferSize)
     {
         return;
     }
@@ -101,7 +101,7 @@ void PixelBuffer::setPixel(unsigned int pixel, ulong color)
 
 void PixelBuffer::fill(ulong newColor)
 {
-    for (uint i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_pixelBufferSize; i++)
     {
         m_pixelColors[i] = newColor;
     }
@@ -118,7 +118,7 @@ void PixelBuffer::fillRandomly(ulong newColor, uint numberOfPixels)
 
 void PixelBuffer::shiftPixelsRight(ulong newColor)
 {
-    for (uint i = m_numPixels - 1; i >= 1; i--)
+    for (uint i = m_pixelBufferSize - 1; i >= 1; i--)
     {
         m_pixelColors[i] = m_pixelColors[i - 1];
     }
@@ -128,7 +128,7 @@ void PixelBuffer::shiftPixelsRight(ulong newColor)
 
 void PixelBuffer::shiftPixelsLeft(ulong newColor)
 {
-    for (uint i = 0; i < m_numPixels - 1; i++)
+    for (uint i = 0; i < m_pixelBufferSize - 1; i++)
     {
         m_pixelColors[i] = m_pixelColors[i + 1];
     }
@@ -215,9 +215,10 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_
 
 void PixelBuffer::initializeTestMatrix()
 {
-    m_numPixels = std::max(minimumPixelsInBuffer, (uint)64);
-    m_pixelColors = new uint32_t[m_numPixels];
-    m_neoPixels = new Adafruit_NeoPixel(m_numPixels, m_gpioPin, NEO_GRB + NEO_KHZ800);
+    m_numPixels = 64;
+    m_pixelBufferSize = std::max(minimumPixelsInBuffer, m_numPixels);
+    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
 
     // Map the pixel indices to rows, columns.
     // ROW 0 is at the TOP of the display.
@@ -254,9 +255,10 @@ void PixelBuffer::initializeDigitOne()
 {
     // 216 actual pixels
     // 18 columns, 40 rows
-    m_numPixels = std::max(minimumPixelsInBuffer, (uint)216);
-    m_pixelColors = new uint32_t[m_numPixels];
-    m_neoPixels = new Adafruit_NeoPixel(m_numPixels, m_gpioPin, NEO_GRB + NEO_KHZ800);
+    m_numPixels = 216;
+    m_pixelBufferSize = std::max(minimumPixelsInBuffer, m_numPixels);
+    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
 
     m_columns.push_back(new std::vector<int>{ 180, 189, 198 });
     m_columns.push_back(new std::vector<int>{ 185, 194, 203 });
@@ -323,9 +325,10 @@ void PixelBuffer::initializeDigitThree()
 {
     // 313 actual pixels
     // 23 columns, 39 rows
-    m_numPixels = std::max(minimumPixelsInBuffer, (uint)216);
-    m_pixelColors = new uint32_t[m_numPixels];
-    m_neoPixels = new Adafruit_NeoPixel(m_numPixels, m_gpioPin, NEO_GRB + NEO_KHZ800);
+    m_numPixels = 216;
+    m_pixelBufferSize = std::max(minimumPixelsInBuffer, m_numPixels);
+    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
 
     m_columns.push_back(new std::vector<int>{ 0, 9, 18, 27, 36, 253, 262, 271, 280, 289});
     m_columns.push_back(new std::vector<int>{ 5, 14, 23, 32, 42, 258, 267, 276, 285, 295});
@@ -396,9 +399,10 @@ void PixelBuffer::initializeDigitEight()
 {
     // 356 actual pixels
     // 23 columns, 39 rows
-    m_numPixels = std::max(minimumPixelsInBuffer, (uint)216);
-    m_pixelColors = new uint32_t[m_numPixels];
-    m_neoPixels = new Adafruit_NeoPixel(m_numPixels, m_gpioPin, NEO_GRB + NEO_KHZ800);
+    m_numPixels = 216;
+    m_pixelBufferSize = std::max(minimumPixelsInBuffer, m_numPixels);
+    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
 
     m_columns.push_back(new std::vector<int>{ 0, 9, 18, 27, 36, 240, 249, 258, 267, 276, 308, 351});
     m_columns.push_back(new std::vector<int>{ 5, 14, 23, 32, 42, 245, 254, 263, 272, 282, 303, 313, 346, 355});
@@ -469,10 +473,10 @@ void PixelBuffer::initializeLogo()
 {
     // 140 actual pixels
     // 23 columns, 24 rows
-
-    m_numPixels = std::max(minimumPixelsInBuffer, (uint)140);
-    m_pixelColors = new uint32_t[m_numPixels];
-    m_neoPixels = new Adafruit_NeoPixel(m_numPixels, m_gpioPin, NEO_GRB + NEO_KHZ800);
+    m_numPixels = 140;
+    m_pixelBufferSize = std::max(minimumPixelsInBuffer, m_numPixels);
+    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
 
     m_columns.push_back(new std::vector<int>{ 99, 100});
     m_columns.push_back(new std::vector<int>{ 98, 102});

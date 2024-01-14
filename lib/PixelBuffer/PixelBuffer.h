@@ -94,6 +94,7 @@ class PixelBuffer {
     int m_gpioPin;
     Adafruit_NeoPixel* m_neoPixels;
     uint m_numPixels{0};
+    uint m_pixelBufferSize{0};
     ulong* m_pixelColors;
     uint m_digitsToLeft{0};
     uint m_digitsToRight{0};
