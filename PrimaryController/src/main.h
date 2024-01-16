@@ -9,6 +9,7 @@
 #include "Buttons/ManualButton.h"
 #include "Display/StatusDisplay.h"
 #include "PredefinedStyle.h"
+#include "Buttons/ButtonConfiguration.h"
 
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line
@@ -28,8 +29,7 @@ void startBLEService();
 void readSettingsFromBLE();
 void processManualInputs();
 void updateInputButtons();
-void setManualStyle(PredefinedStyles style);
-void setupManualStyleLists();
+void setManualStyle(PredefinedStyle style);
 SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
 void checkSecondaryConnections();

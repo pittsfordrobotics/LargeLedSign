@@ -176,6 +176,11 @@ void PixelBuffer::shiftRowsDown(ulong newColor, uint startingRow)
     shiftPixelBlocksRight(m_rows, newColor, startingRow);
 }
 
+void PixelBuffer::shiftDigitsRight(ulong newColor)
+{
+    shiftPixelBlocksRight(m_digits, newColor, 0);
+}
+
 void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, ulong newColor, uint startingBlock)
 {
     for (uint i = pixelBlocks.size() - 1; i > startingBlock; i--)
@@ -249,6 +254,13 @@ void PixelBuffer::initializeTestMatrix()
         }
         m_columns.push_back(colVector);
     }
+
+    m_digits.push_back(new std::vector<int>());
+    
+    for (int i = 0; i < m_numPixels; i++)
+    {
+        m_digits[0]->push_back(i);
+    }
 }
 
 void PixelBuffer::initializeDigitOne()
@@ -319,6 +331,13 @@ void PixelBuffer::initializeDigitOne()
     m_rows.push_back(new std::vector<int>{ 9, 10, 11, 12, 13 });
     m_rows.push_back(new std::vector<int>{ 5, 6, 7, 8 });
     m_rows.push_back(new std::vector<int>{ 0, 1, 2, 3, 4 });
+
+    m_digits.push_back(new std::vector<int>());
+    
+    for (int i = 0; i < m_numPixels; i++)
+    {
+        m_digits[0]->push_back(i);
+    }
 }
 
 void PixelBuffer::initializeDigitThree()
@@ -393,6 +412,13 @@ void PixelBuffer::initializeDigitThree()
     m_rows.push_back(new std::vector<int>{ 47, 48, 49, 50, 51, 109, 110, 111, 112, 113});
     m_rows.push_back(new std::vector<int>{ 52, 53, 54, 55, 60, 114, 115, 116, 117});
     m_rows.push_back(new std::vector<int>{ 56, 57, 58, 59, 118, 119, 120, 121});
+
+    m_digits.push_back(new std::vector<int>());
+    
+    for (int i = 0; i < m_numPixels; i++)
+    {
+        m_digits[0]->push_back(i);
+    }
 }
 
 void PixelBuffer::initializeDigitEight()
@@ -467,6 +493,13 @@ void PixelBuffer::initializeDigitEight()
     m_rows.push_back(new std::vector<int>{ 47, 48, 49, 50, 51, 109, 110, 111, 112, 113});
     m_rows.push_back(new std::vector<int>{ 52, 53, 54, 55, 60, 114, 115, 116, 117});
     m_rows.push_back(new std::vector<int>{ 56, 57, 58, 59, 118, 119, 120, 121});
+
+    m_digits.push_back(new std::vector<int>());
+    
+    for (int i = 0; i < m_numPixels; i++)
+    {
+        m_digits[0]->push_back(i);
+    }
 }
 
 void PixelBuffer::initializeLogo()
@@ -526,4 +559,11 @@ void PixelBuffer::initializeLogo()
     m_rows.push_back(new std::vector<int>{ 76, 77, 81, 83, 84, 85, 89});
     m_rows.push_back(new std::vector<int>{ 78, 82});
     m_rows.push_back(new std::vector<int>{ 79, 80});
+
+    m_digits.push_back(new std::vector<int>());
+    
+    for (int i = 0; i < m_numPixels; i++)
+    {
+        m_digits[0]->push_back(i);
+    }
 }

@@ -64,6 +64,10 @@ class PixelBuffer {
     // shifting prior rows down by one.
     void shiftRowsDown(ulong newColor, uint startingRow);
 
+    // Sets the pixels in the leftmost digit to the new color,
+    // shifting all the digit colors one place to the right.
+    void shiftDigitsRight(ulong newColor);
+
     // Sets a random assortment of pixels in the buffer to the given color.
     void fillRandomly(ulong newColor, uint numberOfPixels);
 
@@ -102,6 +106,7 @@ class PixelBuffer {
     uint m_colsToRight{0};
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
+    std::vector<std::vector<int>*> m_digits;
     
     void setColorForMappedPixels(std::vector<int>* destination, ulong newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);

@@ -13,7 +13,7 @@ StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 
 std::vector<ManualButton *> manualInputButtons;
 std::vector<SecondaryClient *> allSecondaries;
-std::vector<std::vector<PredefinedStyles>> manualStyles;
+ButtonConfiguration buttonConfig;
 ulong nextConnectionCheck = 0;
 bool resetRequested = false;
 bool shouldIgnoreLogo = false;
@@ -25,13 +25,14 @@ SignStatus currentServiceStatus;
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
 
+PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
+
 void setup()
 {
     Serial.begin(9600);
     delay(500);
     Serial.println("Starting...");
 
-    setupManualStyleLists();
     initializeIO();
 
     // If manual button 1 is pressed (ie, LOW), don't look for the logo.
@@ -51,7 +52,7 @@ void setup()
     populateSecondaries();
     consolidateTotalsAndWriteToSecondaries();
     startBLEService();
-    setManualStyle(PredefinedStyles::Pink_Solid);
+    setManualStyle(defaultStyle);
     resetRequested = true;
     nextConnectionCheck = millis() + CONNECTION_CHECK_INTERVAL;
 }
@@ -73,6 +74,7 @@ void loop()
         checkSecondaryConnections();
     }
 
+    updateInputButtons();
     readSettingsFromBLE();
     processManualInputs();
 
@@ -132,8 +134,7 @@ void processManualInputs()
 
             // Get the vector corresponding to the button number (4 vectors; 1 per button),
             // then get the style by indexing into the vector.
-            int sequenceIndex = manualButtonSequenceNumber % manualStyles[i].size();
-            PredefinedStyles selectedStyle = manualStyles[i][sequenceIndex];
+            PredefinedStyle selectedStyle = buttonConfig.getStyleForButton(i, manualButtonSequenceNumber);
             setManualStyle(selectedStyle);
             manualInputButtons[i]->clearPress();
             lastManualButtonPressed = i;
@@ -141,11 +142,10 @@ void processManualInputs()
     }
 }
 
-void setManualStyle(PredefinedStyles style)
+void setManualStyle(PredefinedStyle style)
 {
-    PredefinedStyle styleDefinition = PredefinedStyle::getPredefinedStyle(style);
-    currentServiceStatus.speed = styleDefinition.getSpeed();
-    currentServiceStatus.patternData = styleDefinition.getPatternData();
+    currentServiceStatus.speed = style.getSpeed();
+    currentServiceStatus.patternData = style.getPatternData();
 
     // Update the local BLE settings to reflect the new manual settings.
     btService.setSpeed(currentServiceStatus.speed);
@@ -237,7 +237,7 @@ void resetSecondaryConnections()
     allSecondaries.clear();
     populateSecondaries();
     consolidateTotalsAndWriteToSecondaries();
-    setManualStyle(PredefinedStyles::Pink_Solid);
+    setManualStyle(defaultStyle);
     resetRequested = true;
 }
 
@@ -415,32 +415,6 @@ void updateAllSecondaries()
     {
         allSecondaries[i]->updateSyncData(timestamp);
     }
-}
-
-void setupManualStyleLists()
-{
-    // Styles for button 1 (id 0)
-    std::vector<PredefinedStyles> button1Styles;
-    button1Styles.push_back(PredefinedStyles::Pink_Solid);
-    manualStyles.push_back(button1Styles);
-
-    // Styles for button 2 (id 1)
-    std::vector<PredefinedStyles> button2Styles;
-    button2Styles.push_back(PredefinedStyles::RedPink_Right);
-    button2Styles.push_back(PredefinedStyles::RedPink_CenterOut);
-    manualStyles.push_back(button2Styles);
-
-    // Styles for button 3 (id 2)
-    std::vector<PredefinedStyles> button3Styles;
-    button3Styles.push_back(PredefinedStyles::BluePink_Right);
-    button3Styles.push_back(PredefinedStyles::BluePink_CenterOut);
-    manualStyles.push_back(button3Styles);
-
-    // Styles for button 4 (id 3)
-    std::vector<PredefinedStyles> button4Styles;
-    button4Styles.push_back(PredefinedStyles::Rainbow_Right);
-    button4Styles.push_back(PredefinedStyles::Rainbow_Random);
-    manualStyles.push_back(button4Styles);
 }
 
 void updateTelemetry()
