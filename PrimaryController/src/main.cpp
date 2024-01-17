@@ -90,8 +90,6 @@ void loop()
 
 void processManualInputs()
 {
-    updateInputButtons();
-
     // First look for any long-presses that happened.
     // If button 1 (id 0) was long-pressed, display battery voltages for the clients.
     if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == ButtonPressType::Long)

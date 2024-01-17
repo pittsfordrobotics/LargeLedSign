@@ -116,6 +116,7 @@ class PixelBuffer {
     void initializeDigitThree();
     void initializeDigitEight();
     void initializeLogo();
+    void initializeOldSign();
 };
 
 #endif

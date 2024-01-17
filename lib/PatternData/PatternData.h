@@ -12,6 +12,7 @@ enum class ColorPatternType : byte
 	TwoColorFade = 4,
 	ThreeColorFade = 5,
 	FourColorFade = 6,
+	BackgroundPlusThree = 7
 };
 
 enum class DisplayPatternType : byte

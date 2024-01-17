@@ -127,6 +127,15 @@ ColorPattern* PatternFactory::createColorPatternForPatternData(const PatternData
                 fourColorFadePattern->setFadedDuration(patternData.param4);
                 return fourColorFadePattern;
             }
+        case ColorPatternType:: BackgroundPlusThree:
+            {
+                BackgroundPlusThree* bgPlusThreePattern = new BackgroundPlusThree(patternData.color1, patternData.color2, patternData.color3, patternData.color4);
+                bgPlusThreePattern->setBackgroundDuration(patternData.param1);
+                bgPlusThreePattern->setColor1Duration(patternData.param2);
+                bgPlusThreePattern->setColor2Duration(patternData.param3);
+                bgPlusThreePattern->setColor3Duration(patternData.param4);
+                return bgPlusThreePattern;
+            }
         case ColorPatternType::Rainbow:
             {
                 RainbowColorPattern* rainbowPattern = new RainbowColorPattern();
@@ -145,8 +154,9 @@ String PatternFactory::getKnownColorPatterns()
     knownPatterns += getColorPatternString("Single Color", ColorPatternType::SingleColor, 1, SingleColorPattern::getParameterNames());
     knownPatterns += ";" + getColorPatternString("Two Color", ColorPatternType::TwoColor, 2, TwoColorPattern::getParameterNames());
     knownPatterns += ";" + getColorPatternString("Two Color Fade", ColorPatternType::TwoColorFade, 2, ColorFadePattern::getParameterNames());
-    knownPatterns += ";" + getColorPatternString("Three Color Fade", ColorPatternType::ThreeColorFade, 3, ColorFadePattern::getParameterNames());
-    knownPatterns += ";" + getColorPatternString("Four Color Fade", ColorPatternType::FourColorFade, 4, ColorFadePattern::getParameterNames());
+    //knownPatterns += ";" + getColorPatternString("Three Color Fade", ColorPatternType::ThreeColorFade, 3, ColorFadePattern::getParameterNames());
+    //knownPatterns += ";" + getColorPatternString("Four Color Fade", ColorPatternType::FourColorFade, 4, ColorFadePattern::getParameterNames());
+    knownPatterns += ";" + getColorPatternString("Background+3", ColorPatternType::BackgroundPlusThree, 4, BackgroundPlusThree::getParameterNames());
     knownPatterns += ";" + getColorPatternString("Rainbow", ColorPatternType::Rainbow, 0, RainbowColorPattern::getParameterNames());
 
     return knownPatterns;

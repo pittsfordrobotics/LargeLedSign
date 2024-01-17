@@ -9,5 +9,6 @@
 #include "SingleColorPattern.h"
 #include "TwoColorFadePattern.h"
 #include "TwoColorPattern.h"
+#include "BackgroundPlusThree.h"
 
 #endif
