@@ -23,7 +23,7 @@
 #define MAX_TOTAL_SCAN_TIME 10000  // The total time (msec) to spend looking for secondary peripherals.
 
 // Function prototypes
-void initializeIO();
+void setupStyleLists();
 void populateSecondaries();
 void startBLEService();
 void readSettingsFromBLE();
