@@ -7,7 +7,7 @@
 #include <SignDataLib.h>
 #include <DisplayPatternLib.h>
 #include <PushButton.h>
-#include "Display/StatusDisplay.h"
+#include <StatusDisplay.h>
 #include "PredefinedStyle.h"
 #include "Buttons/ButtonConfiguration.h"
 
