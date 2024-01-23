@@ -11,9 +11,9 @@
 CommonPeripheral btService;
 StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 
-std::vector<ManualButton *> manualInputButtons;
+std::vector<PushButton *> manualInputButtons;
 std::vector<SecondaryClient *> allSecondaries;
-ButtonConfiguration buttonConfig;
+PredefinedStyleList* predefinedStyleList;
 ulong nextConnectionCheck = 0;
 bool resetRequested = false;
 bool shouldIgnoreLogo = false;
@@ -33,7 +33,14 @@ void setup()
     delay(500);
     Serial.println("Starting...");
 
-    initializeIO();
+    std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
+    for (uint i = 0; i < manualInputPins.size(); i++)
+    {
+        manualInputButtons.push_back(new PushButton(manualInputPins[i], INPUT_PULLUP));
+    }
+
+    predefinedStyleList = new PredefinedStyleList(manualInputButtons.size());
+    setupStyleLists();
 
     // If manual button 1 is pressed (ie, LOW), don't look for the logo.
     shouldIgnoreLogo = (manualInputButtons[0]->rawPinStatus() == LOW);
@@ -132,7 +139,7 @@ void processManualInputs()
 
             // Get the vector corresponding to the button number (4 vectors; 1 per button),
             // then get the style by indexing into the vector.
-            PredefinedStyle selectedStyle = buttonConfig.getStyleForButton(i, manualButtonSequenceNumber);
+            PredefinedStyle selectedStyle = predefinedStyleList->getStyle(i, manualButtonSequenceNumber);
             setManualStyle(selectedStyle);
             manualInputButtons[i]->clearPress();
             lastManualButtonPressed = i;
@@ -163,16 +170,6 @@ void displayBatteryVoltages()
     }
 
     display.displaySequence(stringsToDisplay, 1500);
-}
-
-void initializeIO()
-{
-    // Initialize the manual IO pins
-    std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
-    for (uint i = 0; i < manualInputPins.size(); i++)
-    {
-        manualInputButtons.push_back(new ManualButton(manualInputPins[i], INPUT_PULLUP));
-    }
 }
 
 void updateInputButtons()
@@ -413,6 +410,24 @@ void updateAllSecondaries()
     {
         allSecondaries[i]->updateSyncData(timestamp);
     }
+}
+
+void setupStyleLists()
+{
+    // Styles for button 1 (id 0)
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
+
+    // Styles for button 2 (id 1)
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
+
+    // Styles for button 3 (id 2)
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_CenterOut);
+
+    // Styles for button 4 (id 3)
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::Rainbow_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::Rainbow_Random);
 }
 
 void updateTelemetry()

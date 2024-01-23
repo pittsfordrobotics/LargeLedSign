@@ -6,10 +6,9 @@
 #include "Bluetooth/SecondaryClient.h"
 #include <SignDataLib.h>
 #include <DisplayPatternLib.h>
-#include "Buttons/ManualButton.h"
-#include "Display/StatusDisplay.h"
-#include "PredefinedStyle.h"
-#include "Buttons/ButtonConfiguration.h"
+#include <PushButton.h>
+#include <StatusDisplay.h>
+#include <PredefinedStyleLib.h>
 
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line
@@ -23,7 +22,7 @@
 #define MAX_TOTAL_SCAN_TIME 10000  // The total time (msec) to spend looking for secondary peripherals.
 
 // Function prototypes
-void initializeIO();
+void setupStyleLists();
 void populateSecondaries();
 void startBLEService();
 void readSettingsFromBLE();
