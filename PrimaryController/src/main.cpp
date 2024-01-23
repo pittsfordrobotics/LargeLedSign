@@ -139,7 +139,7 @@ void processManualInputs()
 
             // Get the vector corresponding to the button number (4 vectors; 1 per button),
             // then get the style by indexing into the vector.
-            PredefinedStyle selectedStyle = predefinedStyleList->getStyleForButton(i, manualButtonSequenceNumber);
+            PredefinedStyle selectedStyle = predefinedStyleList->getStyle(i, manualButtonSequenceNumber);
             setManualStyle(selectedStyle);
             manualInputButtons[i]->clearPress();
             lastManualButtonPressed = i;

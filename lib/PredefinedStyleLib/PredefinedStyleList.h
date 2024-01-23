@@ -13,14 +13,14 @@ class PredefinedStyleList {
 
         void addStyleToList(uint listNumber, PredefinedStyles style);
 
-        // Gets the style associated with the given button number and sequence number.
+        // Gets the style associated with the given list and sequence number.
         // The sequence number will "wrap around" if needed.
-        // If there are no styles associated with the button number, the default style will be returned.
-        PredefinedStyle getStyleForButton(uint buttonNumber, uint sequenceNumber);
+        // If there are no styles associated with the list, the default style will be returned.
+        PredefinedStyle getStyle(uint listNumber, uint sequenceNumber);
 
     private:
         PredefinedStyles m_defaultStyle{ PredefinedStyles::Pink_Solid };
-        std::vector<std::vector<PredefinedStyles>> m_buttonStyles;
+        std::vector<std::vector<PredefinedStyles>> m_styleLists;
 };
 
 #endif
