@@ -8,8 +8,7 @@
 #include <DisplayPatternLib.h>
 #include <PushButton.h>
 #include <StatusDisplay.h>
-#include "PredefinedStyle.h"
-#include "Buttons/ButtonConfiguration.h"
+#include <PredefinedStyleLib.h>
 
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
 #define TM1637_DIO 7      // Digital pin # for the TM1637 data line

@@ -13,7 +13,7 @@ StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 
 std::vector<PushButton *> manualInputButtons;
 std::vector<SecondaryClient *> allSecondaries;
-ButtonConfiguration* buttonConfig;
+PredefinedStyleList* predefinedStyleList;
 ulong nextConnectionCheck = 0;
 bool resetRequested = false;
 bool shouldIgnoreLogo = false;
@@ -39,7 +39,7 @@ void setup()
         manualInputButtons.push_back(new PushButton(manualInputPins[i], INPUT_PULLUP));
     }
 
-    buttonConfig = new ButtonConfiguration(manualInputButtons.size());
+    predefinedStyleList = new PredefinedStyleList(manualInputButtons.size());
     setupStyleLists();
 
     // If manual button 1 is pressed (ie, LOW), don't look for the logo.
@@ -139,7 +139,7 @@ void processManualInputs()
 
             // Get the vector corresponding to the button number (4 vectors; 1 per button),
             // then get the style by indexing into the vector.
-            PredefinedStyle selectedStyle = buttonConfig->getStyleForButton(i, manualButtonSequenceNumber);
+            PredefinedStyle selectedStyle = predefinedStyleList->getStyleForButton(i, manualButtonSequenceNumber);
             setManualStyle(selectedStyle);
             manualInputButtons[i]->clearPress();
             lastManualButtonPressed = i;
@@ -415,19 +415,19 @@ void updateAllSecondaries()
 void setupStyleLists()
 {
     // Styles for button 1 (id 0)
-    buttonConfig->addStyleToList(0, PredefinedStyles::Pink_Solid);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
 
     // Styles for button 2 (id 1)
-    buttonConfig->addStyleToList(1, PredefinedStyles::RedPink_Right);
-    buttonConfig->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
 
     // Styles for button 3 (id 2)
-    buttonConfig->addStyleToList(1, PredefinedStyles::BluePink_Right);
-    buttonConfig->addStyleToList(1, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_CenterOut);
 
     // Styles for button 4 (id 3)
-    buttonConfig->addStyleToList(1, PredefinedStyles::Rainbow_Right);
-    buttonConfig->addStyleToList(1, PredefinedStyles::Rainbow_Random);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::Rainbow_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::Rainbow_Random);
 }
 
 void updateTelemetry()

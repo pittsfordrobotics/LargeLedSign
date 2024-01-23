@@ -4,18 +4,7 @@
 #include <Arduino.h>
 #include <PatternData.h>
 #include <vector>
-
-enum class PredefinedStyles {
-    Pink_Solid,
-    RedPink_Right,
-    BluePink_Right,
-    Rainbow_Right,
-    RedPink_Random,
-    BluePink_Random,
-    Rainbow_Random,
-    RedPink_CenterOut,
-    BluePink_CenterOut
-};
+#include "PredefinedStyles.h"
 
 class PredefinedStyle {
     public:

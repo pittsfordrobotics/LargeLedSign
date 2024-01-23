@@ -1,14 +1,15 @@
-#ifndef BUTTONCONFIGURATION_H
-#define BUTTONCONFIGURATION_H
+#ifndef PREDEFINEDSTYLELIST_H
+#define PREDEFINEDSTYLELIST_H
 
 #include <Arduino.h>
 #include <vector>
 #include "PredefinedStyle.h"
+#include "PredefinedStyleLib.h"
 
-class ButtonConfiguration {
+class PredefinedStyleList {
     public:
         // The default constructor.
-        ButtonConfiguration(uint numberOfLists);
+        PredefinedStyleList(uint numberOfLists);
 
         void addStyleToList(uint listNumber, PredefinedStyles style);
 
