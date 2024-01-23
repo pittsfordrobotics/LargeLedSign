@@ -11,7 +11,7 @@
 CommonPeripheral btService;
 StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 
-std::vector<ManualButton *> manualInputButtons;
+std::vector<PushButton *> manualInputButtons;
 std::vector<SecondaryClient *> allSecondaries;
 ButtonConfiguration buttonConfig;
 ulong nextConnectionCheck = 0;
@@ -171,7 +171,7 @@ void initializeIO()
     std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
     for (uint i = 0; i < manualInputPins.size(); i++)
     {
-        manualInputButtons.push_back(new ManualButton(manualInputPins[i], INPUT_PULLUP));
+        manualInputButtons.push_back(new PushButton(manualInputPins[i], INPUT_PULLUP));
     }
 }
 

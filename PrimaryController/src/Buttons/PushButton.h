@@ -1,10 +1,10 @@
-#ifndef MANUALBUTTON_H
-#define MANUALBUTTON_H
+#ifndef PUSHBUTTON_H
+#define PUSHBUTTON_H
 
 #include <Arduino.h>
 
-#define MANUALBUTTON_DEBOUNCE_INTERVAL 50
-#define MANUALBUTTON_LONGPRESS 500
+#define PUSHBUTTON_DEBOUNCE_INTERVAL 50
+#define PUSHBUTTON_LONGPRESS 500
 #define DOUBLETAP_INTERVAL 150
 
 enum class ButtonPressType {
@@ -14,9 +14,9 @@ enum class ButtonPressType {
     Double
 };
 
-class ManualButton {
+class PushButton {
     public:
-        ManualButton(int pinNumber, PinMode pinMode);
+        PushButton(int pinNumber, PinMode pinMode);
         void update();
         bool wasPressed();
         ButtonPressType lastPressType();

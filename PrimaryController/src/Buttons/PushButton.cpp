@@ -1,34 +1,34 @@
-#include "ManualButton.h"
+#include "PushButton.h"
 
-ManualButton::ManualButton(int pinNumber, PinMode mode)
+PushButton::PushButton(int pinNumber, PinMode mode)
 {
     pinMode(pinNumber, mode);
     m_pinNumber = pinNumber;
 }
 
-bool ManualButton::wasPressed()
+bool PushButton::wasPressed()
 {
     bool pressed = m_wasPressed;
     return pressed;
 }
 
-void ManualButton::clearPress()
+void PushButton::clearPress()
 {
     m_wasPressed = false;
     m_lastPressType = ButtonPressType::None;
 }
 
-ButtonPressType ManualButton::lastPressType()
+ButtonPressType PushButton::lastPressType()
 {
     return m_lastPressType;
 }
 
-PinStatus ManualButton::rawPinStatus()
+PinStatus PushButton::rawPinStatus()
 {
     return digitalRead(m_pinNumber);
 }
 
-void ManualButton::update()
+void PushButton::update()
 {
     if (digitalRead(m_pinNumber) == LOW)
     {
@@ -37,7 +37,7 @@ void ManualButton::update()
         {
             // Button was up, but is down now.
             // Check to see if we're outside the debounce window
-            if (millis() > m_lastTransitionTime + MANUALBUTTON_DEBOUNCE_INTERVAL)
+            if (millis() > m_lastTransitionTime + PUSHBUTTON_DEBOUNCE_INTERVAL)
             {
                 m_lastDownTime = millis();
                 m_lastTransitionTime = m_lastDownTime;
@@ -62,7 +62,7 @@ void ManualButton::update()
         {
             // Button was down, but is up now.
             // check to see if we're outside the debounce window
-            if (millis() > m_lastTransitionTime + MANUALBUTTON_DEBOUNCE_INTERVAL)
+            if (millis() > m_lastTransitionTime + PUSHBUTTON_DEBOUNCE_INTERVAL)
             {
                 m_lastUpTime = millis();
                 m_lastTransitionTime = m_lastUpTime;
@@ -86,9 +86,9 @@ void ManualButton::update()
     }
 }
 
-void ManualButton::setPressType(ulong pressTime)
+void PushButton::setPressType(ulong pressTime)
 {
-    if (pressTime > MANUALBUTTON_LONGPRESS)
+    if (pressTime > PUSHBUTTON_LONGPRESS)
     {
         m_lastPressType = ButtonPressType::Long;
     }
