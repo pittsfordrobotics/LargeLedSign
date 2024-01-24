@@ -29,6 +29,9 @@ void PixelBuffer::initialize(byte signStyle)
         case 8:
             initializeDigitEight();
             break;
+        case 16:
+            initializeOldSign();
+            break;
         default:
             initializeTestMatrix();
     }
