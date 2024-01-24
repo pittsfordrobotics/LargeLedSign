@@ -55,6 +55,7 @@ void setup()
     display.setDisplay("----");
     setupStyleLists();
     pixelBuffer.initialize(LEGACY_SIGN_TYPE);
+    pixelBuffer.setBrightness(currentBrightness);
 
     if (!BLE.begin())
     {
@@ -167,7 +168,7 @@ void startBLEService()
     // Set the various characteristics based on the defaults
     display.setDisplay("C ==");
 
-    btService.setBrightness(newBrightness);
+    btService.setBrightness(currentBrightness);
     btService.setSpeed(defaultStyle.getSpeed());
     btService.setPatternData(defaultStyle.getPatternData());
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
@@ -197,8 +198,8 @@ void setupStyleLists()
     predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
 
     // Styles for button 3 (id 2)
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_CenterOut);
 }
 
 void initializeIO()
