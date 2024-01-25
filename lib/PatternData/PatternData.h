@@ -2,31 +2,8 @@
 #define PATTERNDATA_H
 
 #include <Arduino.h>
-
-enum class ColorPatternType : byte
-{
-	Blank = 0,
-	SingleColor = 1,
-	TwoColor = 2,
-	Rainbow = 3,
-	TwoColorFade = 4,
-	ThreeColorFade = 5,
-	FourColorFade = 6,
-	BackgroundPlusThree = 7
-};
-
-enum class DisplayPatternType : byte
-{
-    Solid = 0,
-    Right = 1,
-    Left = 2,
-    Up = 3,
-    Down = 4,
-    Digit = 5,
-    Random = 6,
-	CenterOutVertical = 7,
-	CenterOutHorizontal = 8
-};
+#include "ColorPatternType.h"
+#include "DisplayPatternType.h"
 
 // The max data packet we can send from the primary controller to the
 // secondary controller is 20 bytes, so make sure we're under that limit.
