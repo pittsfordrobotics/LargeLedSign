@@ -29,8 +29,9 @@
 #define DEFAULT_BRIGHTNESS_LOW 20 // The default brightness to use when the "Low Brightness" pin has been pulled low.
 
 // Batter power monitoring
-#define LOWPOWERTHRESHOLD 5.9     // The voltage below which the system will go into "low power" mode.
-#define NORMALPOWERTHRESHOLD 6.9  // The voltage above which the system will recover from "low power" mode.
+#define LOWPOWERTHRESHOLD 7.0     // The voltage below which the system will go into "low power" mode.
+#define NORMALPOWERTHRESHOLD 7.4  // The voltage above which the system will recover from "low power" mode.
+#define VOLTAGEMULTIPLIER 4.83    // The value to multiply the analog reading by to get the actual voltage.
 
 // Debugging info
 #define INITIALDELAY 500        // Startup delay (in msec) for debugging.

@@ -309,10 +309,10 @@ void checkForLowPowerState()
 float getCalculatedBatteryVoltage()
 {
     // The analog input ranges from 0 (0V) to 1024 (3.3V), resulting in 0.00322 Volts per "tick".
-    // The battery voltage passes through a voltage divider such that the voltage at the input
-    // is 1/3 of the actual battery voltage.
+    // The battery voltage passes through a voltage divider so we have to multiply the input by
+    // a scale factor to get the actual voltage.
     float rawLevel = getVoltageInputLevel();
-    return rawLevel * 3 * 3.3 / 1024;
+    return rawLevel * VOLTAGEMULTIPLIER * 3.3 / 1024;
 }
 
 // Read the raw value from the "voltage input" pin.
