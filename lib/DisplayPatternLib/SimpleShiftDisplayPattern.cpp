@@ -38,6 +38,9 @@ void SimpleShiftDisplayPattern::updateInternal()
         case ShiftType::Digit:
             m_pixelBuffer->shiftDigitsRight(newColor);
             return;
+        case ShiftType::Line:
+            m_pixelBuffer->shiftLine(newColor);
+            return;
         default:
             // Default to Solid (ie, all lights the same color)
             m_pixelBuffer->fill(newColor);

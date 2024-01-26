@@ -184,6 +184,16 @@ void PixelBuffer::shiftDigitsRight(ulong newColor)
     shiftPixelBlocksRight(m_digits, newColor, 0);
 }
 
+void PixelBuffer::shiftLine(ulong newColor)
+{
+    for (uint i = m_pixelBufferSize - 1; i > 0; i--)
+    {
+        m_pixelColors[i] = m_pixelColors[i - 1];
+    }
+
+    m_pixelColors[0] = newColor;
+}
+
 void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, ulong newColor, uint startingBlock)
 {
     for (uint i = pixelBlocks.size() - 1; i > startingBlock; i--)
@@ -260,7 +270,7 @@ void PixelBuffer::initializeTestMatrix()
 
     m_digits.push_back(new std::vector<int>());
     
-    for (int i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_numPixels; i++)
     {
         m_digits[0]->push_back(i);
     }
@@ -337,7 +347,7 @@ void PixelBuffer::initializeDigitOne()
 
     m_digits.push_back(new std::vector<int>());
     
-    for (int i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_numPixels; i++)
     {
         m_digits[0]->push_back(i);
     }
@@ -418,7 +428,7 @@ void PixelBuffer::initializeDigitThree()
 
     m_digits.push_back(new std::vector<int>());
     
-    for (int i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_numPixels; i++)
     {
         m_digits[0]->push_back(i);
     }
@@ -499,7 +509,7 @@ void PixelBuffer::initializeDigitEight()
 
     m_digits.push_back(new std::vector<int>());
     
-    for (int i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_numPixels; i++)
     {
         m_digits[0]->push_back(i);
     }
@@ -565,7 +575,7 @@ void PixelBuffer::initializeLogo()
 
     m_digits.push_back(new std::vector<int>());
     
-    for (int i = 0; i < m_numPixels; i++)
+    for (uint i = 0; i < m_numPixels; i++)
     {
         m_digits[0]->push_back(i);
     }

@@ -28,6 +28,7 @@
 #define DEFAULT_BRIGHTNESS_LOW 20 // The default brightness to use when the "Low Brightness" pin has been pulled low.
 
 #define LEGACY_SIGN_TYPE 16     // The "sign type" corresponding to the Legacy sign, used to initialize the pixel buffer.
+#define BTCHECKINTERVAL = 500   // The amount of time, in msec, between checks to see if we need to set the display to indicate a BT connection.
 
 // Function prototypes
 void initializeIO();

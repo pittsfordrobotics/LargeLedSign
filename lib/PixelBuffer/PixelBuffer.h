@@ -68,6 +68,10 @@ class PixelBuffer {
     // shifting all the digit colors one place to the right.
     void shiftDigitsRight(ulong newColor);
 
+    // Sets the first pixel in the line to the new color,
+    // shifting all other pixel colors one place further down the line.
+    void shiftLine(ulong newColor);
+
     // Sets a random assortment of pixels in the buffer to the given color.
     void fillRandomly(ulong newColor, uint numberOfPixels);
 

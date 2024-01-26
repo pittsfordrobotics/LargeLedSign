@@ -52,6 +52,13 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
+        case DisplayPatternType::Line:
+        {
+            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Line, pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            displayPattern = pattern;
+            break;
+        }
         case DisplayPatternType::Random:
         {
             RandomDisplayPattern* pattern = new RandomDisplayPattern(pixelBuffer);
@@ -174,6 +181,7 @@ String PatternFactory::getKnownDisplayPatterns()
     knownPatterns += ";" + getDisplayPatternString("Random", DisplayPatternType::Random, RandomDisplayPattern::getParameterNames());
     //knownPatterns += ";" + getDisplayPatternString("CenterOut-V", DisplayPatternType::CenterOutVertical, CenterOutDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("CenterOut", DisplayPatternType::CenterOutHorizontal, CenterOutDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Line", DisplayPatternType::Line, SimpleShiftDisplayPattern::getParameterNames());
 
     return knownPatterns;
 }

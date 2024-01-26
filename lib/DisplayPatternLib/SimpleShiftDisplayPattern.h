@@ -10,7 +10,8 @@ enum class ShiftType {
     Left,
     Up,
     Down,
-    Digit
+    Digit,
+    Line
 };
 
 class SimpleShiftDisplayPattern : public DisplayPattern{
