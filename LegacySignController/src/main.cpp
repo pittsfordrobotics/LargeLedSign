@@ -17,6 +17,7 @@ std::vector<PushButton *> manualInputButtons;
 PredefinedStyleList* predefinedStyleList;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
+ulong lastConnectionCheck = 0;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
@@ -83,12 +84,16 @@ void loop()
         return;
     }
 
-    if (btService.isConnected())
+    if (btService.isConnected() && millis() > lastConnectionCheck + BTCHECKINTERVAL)
     {
         // Something is connected via BT.
         // Set the display to "--" to show something connected to us.
         // Display it as "temporary" since it's a low-priority message.
-        //display.displayTemporary(" --", 500);
+        // Updating the display takes about 30 msec.  Doing it on every iteration
+        // will have a very noticable effect on the LED updates, so only
+        // re-update the display every half second or so.
+        display.displayTemporary(" --", BTCHECKINTERVAL + 50);
+        lastConnectionCheck = millis();
     }
 
     readSettingsFromBLE();
