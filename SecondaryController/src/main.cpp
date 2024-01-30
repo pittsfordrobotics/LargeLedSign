@@ -114,7 +114,7 @@ byte getSignType()
     for (uint i = 0; i < typeSelectorPins.size(); i++)
     {
         type = type << 1;
-        if (digitalRead(typeSelectorPins.at(i)) == HIGH)
+        if (digitalRead(typeSelectorPins.at(i)) == LOW)
         {
             type++;
         }
@@ -130,17 +130,10 @@ byte getSignPosition()
     for (uint i = 0; i < orderSelectorPins.size(); i++)
     {
         order = order << 1;
-        if (digitalRead(orderSelectorPins.at(i)) == HIGH)
+        if (digitalRead(orderSelectorPins.at(i)) == LOW)
         {
             order++;
         }
-    }
-
-    if (order == 7)
-    {
-        // The circuit board for the logo doesn't have jumpers and will
-        // read as 0b111 (7). It really should be position #2.
-        order = 2;
     }
 
     return order;
@@ -356,6 +349,9 @@ void emitTelemetry()
         Serial.print(rawLevel);
         Serial.print("; calculated voltage: ");
         Serial.println(voltage);
+
+        Serial.print("Bluetooth connected: ");
+        Serial.println(btService.isConnected());
     }
 }
 
