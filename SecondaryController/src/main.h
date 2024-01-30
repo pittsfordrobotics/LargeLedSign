@@ -35,7 +35,7 @@
 
 // Debugging info
 #define INITIALDELAY 500        // Startup delay (in msec) for debugging.
-#define TELEMETRYINTERVAL 5000  // The amount of time (in msec) between timing calculations.
+#define TELEMETRYINTERVAL 2000  // The amount of time (in msec) between timing calculations.
 #define TIMESTAMPUPDATEINTERVAL 500 // The amount of time (in msec) between updates to the 'timestamp' BT characteristic
 
 // Function prototypes
