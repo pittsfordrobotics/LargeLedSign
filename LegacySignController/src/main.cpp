@@ -23,6 +23,7 @@ int manualButtonSequenceNumber = 0;
 byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
+PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULT_BRIGHTNESS;
@@ -76,13 +77,6 @@ void loop()
     updateTelemetry();
     checkForLowPowerState();
 
-    if (inLowPowerMode)
-    {
-        // blink LEDs and exit.
-        blinkLowPowerIndicator();
-        return;
-    }
-
     if (btService.isConnected())
     {
         // Something is connected via BT.
@@ -91,9 +85,14 @@ void loop()
         display.displayTemporary(" --", 500);
     }
 
-    readSettingsFromBLE();
-    updateInputButtons();
-    processManualInputs();
+    if (!inLowPowerMode)
+    {
+        // Only process inputs if we're not in low power mode.
+        readSettingsFromBLE();
+        updateInputButtons();
+        processManualInputs();
+    }
+
     updateLEDs();
 }
 
@@ -251,6 +250,12 @@ void checkForLowPowerState()
             Serial.println(LOWPOWERTHRESHOLD);
             Serial.println("Entering low power mode.");
             inLowPowerMode = true;
+
+            // Set up the "low power" display pattern.
+            // The next call to updateLEDs will set this pattern for us.
+            newBrightness = 255;
+            newPatternData = lowPowerStyle.getPatternData();
+            newSpeed = lowPowerStyle.getSpeed();
         }
     }
 
