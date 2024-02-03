@@ -7,6 +7,7 @@
 #include "SimpleShiftDisplayPattern.h"
 #include "RandomDisplayPattern.h"
 #include "CenterOutDisplayPattern.h"
+#include "LowPowerDisplayPattern.h"
 #include <ColorPatternLib.h>
 #include "PixelBuffer.h"
 #include <PatternData.h>
