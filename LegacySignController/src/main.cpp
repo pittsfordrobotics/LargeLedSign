@@ -82,7 +82,7 @@ void loop()
         // Something is connected via BT.
         // Set the display to "--" to show something connected to us.
         // Display it as "temporary" since it's a low-priority message.
-        display.displayTemporary(" --", 500);
+        display.displayTemporary(" --", 200);
     }
 
     if (!inLowPowerMode)

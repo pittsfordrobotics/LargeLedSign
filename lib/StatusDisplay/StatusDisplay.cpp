@@ -26,8 +26,7 @@ void StatusDisplay::update()
     {
         if (m_currentPriority == DisplayPriority::Ephemeral)
         {
-            m_display->clear();
-            m_currentPriority = DisplayPriority::None;
+            clear();
         }
         else if (m_currentPriority == DisplayPriority::Sequence)
         {
@@ -39,8 +38,7 @@ void StatusDisplay::update()
             }
             else
             {
-                m_display->clear();
-                m_currentPriority = DisplayPriority::None;
+                clear();
             }
         }
     }
@@ -49,6 +47,7 @@ void StatusDisplay::update()
 void StatusDisplay::clear()
 {
     m_display->clear();
+    m_lastDisplayString = "";
     m_currentPriority = DisplayPriority::None;
 }
 
