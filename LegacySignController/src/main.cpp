@@ -318,6 +318,16 @@ void updateLEDs()
         currentBrightness = newBrightness;
     }
 
+    if (newSpeed != currentSpeed)
+    {
+        if (currentLightStyle)
+        {
+            currentLightStyle->setSpeed(newSpeed);
+        }
+        
+        currentSpeed = newSpeed;
+    }
+
     if (currentPatternData != newPatternData)
     {
         if (currentLightStyle)
