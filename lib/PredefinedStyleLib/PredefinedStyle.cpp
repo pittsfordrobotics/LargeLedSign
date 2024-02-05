@@ -46,6 +46,14 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
 
     switch (styleName)
     {
+        case PredefinedStyles::LowPower:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::SingleColor;
+            pattern.displayPattern = DisplayPatternType::LowPower;
+            pattern.color1 = Red;
+            return PredefinedStyle{"Low Power", 1, pattern};
+        }
         case PredefinedStyles::Pink_Solid:
         {
             PatternData pattern;

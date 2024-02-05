@@ -14,7 +14,8 @@ enum class DisplayPatternType : byte
     Random = 6,
 	CenterOutVertical = 7,
 	CenterOutHorizontal = 8,
-	Line = 9
+	Line = 9,
+    LowPower = 10
 };
 
 #endif

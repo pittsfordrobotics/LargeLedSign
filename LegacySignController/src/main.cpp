@@ -17,13 +17,13 @@ std::vector<PushButton *> manualInputButtons;
 PredefinedStyleList* predefinedStyleList;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
-ulong lastConnectionCheck = 0;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
-byte inLowPowerMode = false;              // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
+byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
+PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULT_BRIGHTNESS;
@@ -77,28 +77,22 @@ void loop()
     updateTelemetry();
     checkForLowPowerState();
 
-    if (inLowPowerMode)
-    {
-        // blink LEDs and exit.
-        blinkLowPowerIndicator();
-        return;
-    }
-
-    if (btService.isConnected() && millis() > lastConnectionCheck + BTCHECKINTERVAL)
+    if (btService.isConnected())
     {
         // Something is connected via BT.
         // Set the display to "--" to show something connected to us.
         // Display it as "temporary" since it's a low-priority message.
-        // Updating the display takes about 30 msec.  Doing it on every iteration
-        // will have a very noticable effect on the LED updates, so only
-        // re-update the display every half second or so.
-        display.displayTemporary(" --", BTCHECKINTERVAL + 50);
-        lastConnectionCheck = millis();
+        display.displayTemporary(" --", 200);
     }
 
-    readSettingsFromBLE();
-    updateInputButtons();
-    processManualInputs();
+    if (!inLowPowerMode)
+    {
+        // Only process inputs if we're not in low power mode.
+        readSettingsFromBLE();
+        updateInputButtons();
+        processManualInputs();
+    }
+
     updateLEDs();
 }
 
@@ -256,6 +250,12 @@ void checkForLowPowerState()
             Serial.println(LOWPOWERTHRESHOLD);
             Serial.println("Entering low power mode.");
             inLowPowerMode = true;
+
+            // Set up the "low power" display pattern.
+            // The next call to updateLEDs will set this pattern for us.
+            newBrightness = 255;
+            newPatternData = lowPowerStyle.getPatternData();
+            newSpeed = lowPowerStyle.getSpeed();
         }
     }
 
@@ -316,6 +316,16 @@ void updateLEDs()
     {
         pixelBuffer.setBrightness(newBrightness);
         currentBrightness = newBrightness;
+    }
+
+    if (newSpeed != currentSpeed)
+    {
+        if (currentLightStyle)
+        {
+            currentLightStyle->setSpeed(newSpeed);
+        }
+        
+        currentSpeed = newSpeed;
     }
 
     if (currentPatternData != newPatternData)

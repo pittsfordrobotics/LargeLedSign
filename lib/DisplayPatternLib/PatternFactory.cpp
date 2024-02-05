@@ -17,6 +17,13 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
 
     switch (patternData.displayPattern)
     {
+        case DisplayPatternType::LowPower:
+        {
+            LowPowerDisplayPattern* pattern = new LowPowerDisplayPattern(pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            displayPattern = pattern;
+            break;
+        }
         case DisplayPatternType::Up:
         {
             SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Up, pixelBuffer);

@@ -26,8 +26,7 @@ void StatusDisplay::update()
     {
         if (m_currentPriority == DisplayPriority::Ephemeral)
         {
-            m_display->clear();
-            m_currentPriority = DisplayPriority::None;
+            clear();
         }
         else if (m_currentPriority == DisplayPriority::Sequence)
         {
@@ -39,8 +38,7 @@ void StatusDisplay::update()
             }
             else
             {
-                m_display->clear();
-                m_currentPriority = DisplayPriority::None;
+                clear();
             }
         }
     }
@@ -49,6 +47,7 @@ void StatusDisplay::update()
 void StatusDisplay::clear()
 {
     m_display->clear();
+    m_lastDisplayString = "";
     m_currentPriority = DisplayPriority::None;
 }
 
@@ -106,6 +105,12 @@ void StatusDisplay::displaySequence(std::vector<String> stringsToDisplay, uint d
 
 void StatusDisplay::displayString(String s)
 {
+    if (m_lastDisplayString.equals(s))
+    {
+        // Already displaying this string.
+        return;
+    }
+
     byte tempBuffer[4]{0, 0, 0, 0};
 
     // Convert characters until we run out or hit 4 characters.
@@ -135,6 +140,7 @@ void StatusDisplay::displayString(String s)
     }
 
     m_display->setSegments(tempBuffer);
+    m_lastDisplayString = s;
 }
 
 byte StatusDisplay::convertCharacter(char c)

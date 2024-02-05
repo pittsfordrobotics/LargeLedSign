@@ -11,6 +11,7 @@
 #include <SignDataLib.h>
 #include <PatternData.h>
 #include <DisplayPatternLib.h>
+#include <PredefinedStyleLib.h>
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels

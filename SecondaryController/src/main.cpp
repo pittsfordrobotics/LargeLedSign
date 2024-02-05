@@ -22,6 +22,7 @@ byte signType;
 byte signPosition;
 PatternData currentPatternData;
 PatternData newPatternData;
+PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
 
 // Other internal state
 int loopCounter = 0;                      // Records the number of times the main loop ran since the last timing calculation.
@@ -74,15 +75,11 @@ void loop()
     emitTelemetry();
     checkForLowPowerState();
 
-    if (inLowPowerMode)
+    if (!inLowPowerMode)
     {
-        // blink LEDs and exit.
-        blinkLowPowerIndicator();
-        return;
+        // See if any settings have been changed via BLE and apply them if necessary.
+        readBleSettings();
     }
-
-    // See if any settings have been changed via BLE and apply them if necessary.
-    readBleSettings();
 
     // Apply any updates that were received via BLE or manually
     updateLEDs();
@@ -212,7 +209,7 @@ void updateLEDs()
     }
 
     int shouldResetStyle = false;
-    if (newSyncData > 0 && newSyncData != currentSyncData)
+    if (newSyncData != currentSyncData)
     {
         // Sync data changed -- force a refresh even if nothing else changed.
         Serial.print("New sync data received: ");
@@ -275,6 +272,13 @@ void checkForLowPowerState()
             Serial.println(LOWPOWERTHRESHOLD);
             Serial.println("Entering low power mode.");
             inLowPowerMode = true;
+
+            // Set up the "low power" display pattern.
+            // The next call to updateLEDs will set this pattern for us.
+            newBrightness = 255;
+            newPatternData = lowPowerStyle.getPatternData();
+            newSpeed = lowPowerStyle.getSpeed();
+            newSyncData++;
         }
     }
 
@@ -294,6 +298,10 @@ void checkForLowPowerState()
             Serial.println("Exiting low power mode.");
             pixelBuffer.setBrightness(currentBrightness);
             inLowPowerMode = false;
+
+            // Update the sync data to tell the system to update the pattern
+            // back to the original one before we went into low power mode.
+            newSyncData++;
         }
     }
 }

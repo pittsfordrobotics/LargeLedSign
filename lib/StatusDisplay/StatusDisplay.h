@@ -52,6 +52,7 @@ class StatusDisplay {
         byte convertCharacter(char c);
         void displayString(String s);
 
+        String m_lastDisplayString;
         ulong m_nextUpdate{0};
         uint m_sequenceDuration{0};
         DisplayPriority m_currentPriority{DisplayPriority::None};
