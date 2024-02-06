@@ -161,7 +161,7 @@ void startBLEService()
 {
     display.setDisplay("C  =");
     Serial.println("Setting up Peripheral service using common logic.");
-    String localName = "3181 LED Legacy Controller";
+    String localName = "Small 3181 Sign";
     btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, localName);
 
     // Set the various characteristics based on the defaults
@@ -189,16 +189,16 @@ void setupStyleLists()
     predefinedStyleList = new PredefinedStyleList(manualInputButtons.size());
 
     // Styles for button 1 (id 0)
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random);
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Right);
 
     // Styles for button 2 (id 1)
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_Right);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Digit);
 
     // Styles for button 3 (id 2)
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_Right);
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Digit);
 }
 
 void initializeIO()

@@ -11,7 +11,9 @@ enum class PredefinedStyles {
     BluePink_Random,
     Rainbow_Random,
     RedPink_CenterOut,
-    BluePink_CenterOut
+    BluePink_CenterOut,
+    RedPink_Digit,
+    BluePink_Digit
 };
 
 #endif
