@@ -7,7 +7,7 @@ std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS}; // Tells the contro
 SecondaryPeripheral btService;
 
 // Pixel and color data
-PixelBuffer pixelBuffer(DATA_OUT);
+PixelBuffer* pixelBuffer;
 DisplayPattern* currentLightStyle;
 
 // Settings that are updated via bluetooth
@@ -45,7 +45,8 @@ void setup()
     signType = getSignType();
     signPosition = getSignPosition();
 
-    pixelBuffer.initialize(signType);
+    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
+    pixelBuffer->initialize();
 
     byte defaultBrightness = DEFAULT_BRIGHTNESS;
     if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
@@ -53,7 +54,7 @@ void setup()
         defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
     }
 
-    pixelBuffer.setBrightness(defaultBrightness);
+    pixelBuffer->setBrightness(defaultBrightness);
     currentBrightness = defaultBrightness;
     newBrightness = defaultBrightness;
 
@@ -63,7 +64,7 @@ void setup()
     newPatternData.colorPattern = ColorPatternType::SingleColor;
     newPatternData.displayPattern = DisplayPatternType::Solid;
     newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
-    currentLightStyle = PatternFactory::createForPatternData(newPatternData, &pixelBuffer);
+    currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
     btService.setPatternData(newPatternData);
 }
 
@@ -158,8 +159,8 @@ void startBLE()
     SignConfigurationData configData;
     configData.signType = signType;
     configData.signOrder = signPosition;
-    configData.columnCount = pixelBuffer.getColumnCount();
-    configData.pixelCount = pixelBuffer.getPixelCount();
+    configData.columnCount = pixelBuffer->getColumnCount();
+    configData.pixelCount = pixelBuffer->getPixelCount();
 
     btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
     btService.setBrightness(currentBrightness);
@@ -188,13 +189,13 @@ void readBleSettings()
 void blinkLowPowerIndicator()
 {
     // Turn all LEDs off except for the first one, which will blink red.
-    pixelBuffer.setBrightness(255);
-    pixelBuffer.clearBuffer();
-    pixelBuffer.displayPixels();
+    pixelBuffer->setBrightness(255);
+    pixelBuffer->clearBuffer();
+    pixelBuffer->displayPixels();
     delay(500);
 
-    pixelBuffer.setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
-    pixelBuffer.displayPixels();
+    pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
+    pixelBuffer->displayPixels();
     delay(500);
 }
 
@@ -204,7 +205,7 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        pixelBuffer.setBrightness(newBrightness);
+        pixelBuffer->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
 
@@ -235,7 +236,7 @@ void updateLEDs()
             delete currentLightStyle;
         }
 
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, &pixelBuffer);
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
         currentLightStyle->setSpeed(newSpeed);
         currentLightStyle->reset();
 
@@ -248,7 +249,7 @@ void updateLEDs()
         currentLightStyle->update();
     }
 
-    pixelBuffer.displayPixels();
+    pixelBuffer->displayPixels();
 }
 
 // Check if the current battery voltage is too low to run the sign,
@@ -296,7 +297,7 @@ void checkForLowPowerState()
             Serial.print(", threshold: ");
             Serial.println(NORMALPOWERTHRESHOLD);
             Serial.println("Exiting low power mode.");
-            pixelBuffer.setBrightness(currentBrightness);
+            pixelBuffer->setBrightness(currentBrightness);
             inLowPowerMode = false;
 
             // Update the sync data to tell the system to update the pattern
@@ -370,22 +371,22 @@ void indicateBleFailure()
     while (true)
     {
         // Turn all LEDs off except for the first one, which will blink red/blue.
-        pixelBuffer.setBrightness(255);
-        pixelBuffer.clearBuffer();
-        pixelBuffer.setPixel(0, Adafruit_NeoPixel::Color(0, 0, 255));
-        pixelBuffer.displayPixels();
+        pixelBuffer->setBrightness(255);
+        pixelBuffer->clearBuffer();
+        pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(0, 0, 255));
+        pixelBuffer->displayPixels();
         delay(500);
 
-        pixelBuffer.setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
-        pixelBuffer.displayPixels();
+        pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
+        pixelBuffer->displayPixels();
         delay(500);
     }
 }
 
 void resetPixelBufferOffsets(SignOffsetData offsetData)
 {
-    pixelBuffer.setDigitsToLeft(offsetData.digitsToLeft);
-    pixelBuffer.setDigitsToRight(offsetData.digitsToRight);
-    pixelBuffer.setColsToLeft(offsetData.columnsToLeft);
-    pixelBuffer.setColsToRight(offsetData.columnsToRight);
+    pixelBuffer->setDigitsToLeft(offsetData.digitsToLeft);
+    pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
+    pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
+    pixelBuffer->setColsToRight(offsetData.columnsToRight);
 }
