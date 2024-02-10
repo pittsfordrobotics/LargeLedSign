@@ -7,6 +7,7 @@
 #include <PushButton.h>
 #include <StatusDisplay.h>
 #include <PredefinedStyleLib.h>
+#include <PixelBufferLib.h>
 
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
 #define VOLTAGEINPUTPIN 17     // The pin # (Digital #) for the analog input to detect battery voltage level.
@@ -42,5 +43,4 @@ float getCalculatedBatteryVoltage();
 int getVoltageInputLevel();
 void displayBatteryVoltage();
 void checkForLowPowerState();
-void blinkLowPowerIndicator();
 void updateLEDs();

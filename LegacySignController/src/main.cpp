@@ -1,16 +1,9 @@
 #include "main.h"
 
-// TODO reminders:
-// - Merge new pattern data into sign status (sign status has brightness and speed)
-// - Setup predefined styles here instead of in Secondary
-// - Clean up deprecated secondary characteristics from CommonPeripheral, move to new PrimaryPeripheral.
-// - Have manual buttons detect a sequence of presses (ie, allow user to cylce though a bunch of styles).
-// - (Still TBD) Enable a separate pattern for the logo
-
 // Global variables
 CommonPeripheral btService;
 StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
-PixelBuffer pixelBuffer(DATA_OUT);
+PixelBuffer* pixelBuffer;
 DisplayPattern* currentLightStyle;
 
 std::vector<PushButton *> manualInputButtons;
@@ -55,8 +48,9 @@ void setup()
 
     display.setDisplay("----");
     setupStyleLists();
-    pixelBuffer.initialize(LEGACY_SIGN_TYPE);
-    pixelBuffer.setBrightness(currentBrightness);
+    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(LEGACY_SIGN_TYPE, DATA_OUT);
+    pixelBuffer->initialize();
+    pixelBuffer->setBrightness(currentBrightness);
 
     if (!BLE.begin())
     {
@@ -273,7 +267,7 @@ void checkForLowPowerState()
             Serial.print(", threshold: ");
             Serial.println(NORMALPOWERTHRESHOLD);
             Serial.println("Exiting low power mode.");
-            pixelBuffer.setBrightness(currentBrightness);
+            pixelBuffer->setBrightness(currentBrightness);
             inLowPowerMode = false;
         }
     }
@@ -314,7 +308,7 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        pixelBuffer.setBrightness(newBrightness);
+        pixelBuffer->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
 
@@ -335,7 +329,7 @@ void updateLEDs()
             delete currentLightStyle;
         }
 
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, &pixelBuffer);
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
         currentLightStyle->setSpeed(newSpeed);
         currentLightStyle->reset();
 
@@ -348,18 +342,5 @@ void updateLEDs()
         currentLightStyle->update();
     }
 
-    pixelBuffer.displayPixels();    
-}
-
-void blinkLowPowerIndicator()
-{
-    // Turn all LEDs off except for the first one, which will blink red.
-    pixelBuffer.setBrightness(255);
-    pixelBuffer.clearBuffer();
-    pixelBuffer.displayPixels();
-    delay(500);
-
-    pixelBuffer.setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
-    pixelBuffer.displayPixels();
-    delay(500);
+    pixelBuffer->displayPixels();    
 }
