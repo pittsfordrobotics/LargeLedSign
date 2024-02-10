@@ -5,6 +5,9 @@
 #include "Digit1PixelBuffer.h"
 #include "Digit3PixelBuffer.h"
 #include "Digit8PixelBuffer.h"
+#include "LogoPixelBuffer.h"
+#include "TestMatrixPixelBuffer.h"
+#include "LegacySignPixelBuffer.h"
 
 class PixelBufferFactory
 {
