@@ -12,7 +12,6 @@ class PixelBuffer {
   public:
     PixelBuffer(int gpioPin);
 
-    void initialize(byte signStyle);
     void initialize();
 
     void setDigitsToLeft(uint digitsToLeft) { m_digitsToLeft = digitsToLeft; }
@@ -119,12 +118,6 @@ class PixelBuffer {
     void setColorForMappedPixels(std::vector<int>* destination, ulong newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
-    void initializeTestMatrix();
-    void initializeDigitOne();
-    void initializeDigitThree();
-    void initializeDigitEight();
-    void initializeLogo();
-    void initializeOldSign();
 };
 
 #endif
