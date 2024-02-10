@@ -8,6 +8,6 @@ class TestMatrixPixelBuffer : public PixelBuffer
 {
     public:
         TestMatrixPixelBuffer(int gpioPin);
-}
+};
 
 #endif
