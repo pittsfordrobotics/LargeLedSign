@@ -41,6 +41,14 @@ void PixelBuffer::initialize(byte signStyle)
     m_neoPixels->clear();
 }
 
+void PixelBuffer::initialize()
+{
+    m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
+    clearBuffer();
+    m_neoPixels->begin();
+    m_neoPixels->clear();
+}
+
 void PixelBuffer::clearBuffer()
 {
     for (uint i = 0; i < m_pixelBufferSize; i++)
