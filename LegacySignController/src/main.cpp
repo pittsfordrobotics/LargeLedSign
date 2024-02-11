@@ -49,7 +49,6 @@ void setup()
     display.setDisplay("----");
     setupStyleLists();
     pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(LEGACY_SIGN_TYPE, DATA_OUT);
-    pixelBuffer->initialize();
     pixelBuffer->setBrightness(currentBrightness);
 
     if (!BLE.begin())

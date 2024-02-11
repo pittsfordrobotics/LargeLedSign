@@ -2,20 +2,30 @@
 
 PixelBuffer* PixelBufferFactory::CreatePixelBufferForSignType(byte signType, int gpioPin)
 {
+    PixelBuffer* pixelBuffer;
+
     switch (signType)
     {
         case 1:
-            return new Digit1PixelBuffer(gpioPin);
+            pixelBuffer = new Digit1PixelBuffer(gpioPin);
+            break;
         case 3:
-            return new Digit3PixelBuffer(gpioPin);
+            pixelBuffer = new Digit3PixelBuffer(gpioPin);
+            break;
         case 8:
-            return new Digit8PixelBuffer(gpioPin);
+            pixelBuffer = new Digit8PixelBuffer(gpioPin);
+            break;
         case 15:
-            return new LogoPixelBuffer(gpioPin);
+            pixelBuffer = new LogoPixelBuffer(gpioPin);
+            break;
         case 16:
-            return new LegacySignPixelBuffer(gpioPin);
+            pixelBuffer = new LegacySignPixelBuffer(gpioPin);
+            break;
         default:
-            return new TestMatrixPixelBuffer(gpioPin);
+            pixelBuffer = new TestMatrixPixelBuffer(gpioPin);
+            break;
     }
+
+    pixelBuffer->initialize();
 }
 

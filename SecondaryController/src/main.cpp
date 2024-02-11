@@ -46,7 +46,6 @@ void setup()
     signPosition = getSignPosition();
 
     pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
-    pixelBuffer->initialize();
 
     byte defaultBrightness = DEFAULT_BRIGHTNESS;
     if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
