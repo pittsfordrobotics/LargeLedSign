@@ -27,5 +27,7 @@ PixelBuffer* PixelBufferFactory::CreatePixelBufferForSignType(byte signType, int
     }
 
     pixelBuffer->initialize();
+
+    return pixelBuffer;
 }
 

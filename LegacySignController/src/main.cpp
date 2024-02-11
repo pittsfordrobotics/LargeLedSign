@@ -46,15 +46,17 @@ void setup()
         newBrightness = DEFAULT_BRIGHTNESS_LOW;
     }
 
-    display.setDisplay("----");
+    display.setDisplay("---1");
     setupStyleLists();
+    display.setDisplay("---2");
     pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(LEGACY_SIGN_TYPE, DATA_OUT);
     pixelBuffer->setBrightness(currentBrightness);
+    display.setDisplay("---3");
 
     if (!BLE.begin())
     {
         Serial.println("BLE initialization failed!");
-        display.setDisplay("E1");
+        display.setDisplay("E-1");
         while (true)
         {
         }
