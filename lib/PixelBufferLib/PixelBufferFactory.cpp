@@ -17,6 +17,7 @@ PixelBuffer* PixelBufferFactory::CreatePixelBufferForSignType(byte signType, int
             break;
         case 10:
             pixelBuffer = new PitSignPixelBuffer(gpioPin);
+            break;
         case 15:
             pixelBuffer = new LogoPixelBuffer(gpioPin);
             break;
