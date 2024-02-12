@@ -8,6 +8,7 @@
 #include "LogoPixelBuffer.h"
 #include "TestMatrixPixelBuffer.h"
 #include "LegacySignPixelBuffer.h"
+#include "PitSignPixelBuffer.h"
 
 class PixelBufferFactory
 {
