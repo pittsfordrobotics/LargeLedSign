@@ -1,16 +1,18 @@
+#ifndef PIXEL_BUFFER_H
+#define PIXEL_BUFFER_H
+
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <vector>
 #include <algorithm>
 
-#ifndef PIXEL_BUFFER_H
-#define PIXEL_BUFFER_H
+#define PB_MINIMUM_PIXELS 360
 
 class PixelBuffer {
   public:
     PixelBuffer(int gpioPin);
 
-    void initialize(byte signStyle);
+    void initialize();
 
     void setDigitsToLeft(uint digitsToLeft) { m_digitsToLeft = digitsToLeft; }
     void setDigitsToRight(uint digitsToRight) { m_digitsToRight = digitsToRight; }
@@ -98,9 +100,7 @@ class PixelBuffer {
     // Clears the internal pixel buffer, but does not reset the NeoPixel LEDs.
     void clearBuffer();
 
-  private:
-    int m_gpioPin;
-    Adafruit_NeoPixel* m_neoPixels;
+  protected:
     uint m_numPixels{0};
     uint m_pixelBufferSize{0};
     ulong* m_pixelColors;
@@ -112,15 +112,12 @@ class PixelBuffer {
     std::vector<std::vector<int>*> m_rows;
     std::vector<std::vector<int>*> m_digits;
     
+  private:
+    int m_gpioPin;
+    Adafruit_NeoPixel* m_neoPixels;
     void setColorForMappedPixels(std::vector<int>* destination, ulong newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
-    void initializeTestMatrix();
-    void initializeDigitOne();
-    void initializeDigitThree();
-    void initializeDigitEight();
-    void initializeLogo();
-    void initializeOldSign();
 };
 
 #endif
