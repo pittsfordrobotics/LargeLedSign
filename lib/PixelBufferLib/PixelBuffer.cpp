@@ -28,8 +28,23 @@ void PixelBuffer::clearBuffer()
     }
 }
 
+void PixelBuffer::stop()
+{
+    m_isStopped = true;
+}
+
+void PixelBuffer::resume()
+{
+    m_isStopped = false;
+}
+
 void PixelBuffer::displayPixels()
 {
+    if (m_isStopped)
+    {
+        return;
+    }
+
     for (uint i = 0; i < m_pixelBufferSize; i++)
     {
         m_neoPixels->setPixelColor(i, m_pixelColors[i]);

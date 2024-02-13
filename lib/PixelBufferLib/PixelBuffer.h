@@ -100,6 +100,12 @@ class PixelBuffer {
     // Clears the internal pixel buffer, but does not reset the NeoPixel LEDs.
     void clearBuffer();
 
+    // Stop processing any LED output updates.
+    void stop();
+
+    // Resume processing LED output updates.
+    void resume();
+
   protected:
     uint m_numPixels{0};
     uint m_pixelBufferSize{0};
@@ -113,6 +119,7 @@ class PixelBuffer {
     std::vector<std::vector<int>*> m_digits;
     
   private:
+    bool m_isStopped{false};
     int m_gpioPin;
     Adafruit_NeoPixel* m_neoPixels;
     void setColorForMappedPixels(std::vector<int>* destination, ulong newColor);
