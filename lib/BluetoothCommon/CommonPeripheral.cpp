@@ -30,7 +30,7 @@ void CommonPeripheral::initialize(String uuid, String localName)
 void CommonPeripheral::stop()
 {
     // Disconnect any clients and stop advertising.
-    BLE.disconnect();
+    disconnect();
     BLE.stopAdvertise();
 }
 

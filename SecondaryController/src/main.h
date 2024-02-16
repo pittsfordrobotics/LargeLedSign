@@ -35,7 +35,7 @@
 #define LOWPOWERTHRESHOLD 7.0     // The voltage below which the system will go into "low power" mode.
 #define NORMALPOWERTHRESHOLD 7.4  // The voltage above which the system will recover from "low power" mode.
 #define VOLTAGEMULTIPLIER 4.83    // The value to multiply the analog reading by to get the actual voltage.
-#define LOW_POWER_INDICATOR_PIN 19 // The digital output pin that has the LED to indicate "low power" mode.
+#define POWER_INDICATOR_PIN 19    // The digital output pin that has the LED to indicate the power status.
 
 // Debugging info
 #define INITIALDELAY 500        // Startup delay (in msec) for debugging.
@@ -59,5 +59,8 @@ byte getSignPosition();
 void resetPixelBufferOffsets(SignOffsetData configData);
 void enterLowPowerMode();
 void exitLowPowerMode();
+void updateSoftPowerState();
+void turnOnPowerLed();
+void turnOffPowerLed();
 
 #endif
