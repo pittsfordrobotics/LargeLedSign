@@ -7,8 +7,8 @@ std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS}; // Tells the contro
 SecondaryPeripheral btService;
 
 // Pixel and color data
-PixelBuffer* pixelBuffer;
-DisplayPattern* currentLightStyle;
+PixelBuffer *pixelBuffer;
+DisplayPattern *currentLightStyle;
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULT_BRIGHTNESS;
@@ -23,12 +23,15 @@ byte signPosition;
 PatternData currentPatternData;
 PatternData newPatternData;
 PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
+PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
 
 // Other internal state
-int loopCounter = 0;                      // Records the number of times the main loop ran since the last timing calculation.
-ulong lastTelemetryTimestamp = 0;         // The last time debug information was emitted.
-ulong lastBtTimestampUpdate = 0;          // The last time the 'timestamp' BT characteristic was updated.
-byte inLowPowerMode = false;              // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
+int loopCounter = 0;              // Records the number of times the main loop ran since the last timing calculation.
+ulong lastTelemetryTimestamp = 0; // The last time debug information was emitted.
+ulong lastBtTimestampUpdate = 0;  // The last time the 'timestamp' BT characteristic was updated.
+byte inLowPowerMode = false;      // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
+
+bool isOff = false;
 
 // Main entry point for the program --
 // This is run once at startup.
@@ -42,6 +45,7 @@ void setup()
 
     // Initialize components
     initializeIO();
+    turnOnPowerLed();
     signType = getSignType();
     signPosition = getSignPosition();
 
@@ -71,9 +75,28 @@ void setup()
 // This method is called continously.
 void loop()
 {
+    updateSoftPowerState();
+
+    if (isOff)
+    {
+        // If we're supposed to be off, do nothing.
+        delay(100);
+        return;
+    }
+
     BLE.poll();
     emitTelemetry();
     checkForLowPowerState();
+
+    if (signType == PITSIGN_TYPE_ID && inLowPowerMode)
+    {
+        // The "pit" sign blinks a dedicated LED and doesn't use the main sign pixels.
+        turnOffPowerLed();
+        delay(500);
+        turnOnPowerLed();
+        delay(500);
+        return;
+    }
 
     if (!inLowPowerMode)
     {
@@ -99,9 +122,9 @@ void initializeIO()
         pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
     }
 
-    Serial.println("Initializing the analog input to monitor battery voltage.");
     pinMode(VOLTAGEINPUTPIN, INPUT);
     pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
+    pinMode(POWER_INDICATOR_PIN, OUTPUT);
 }
 
 byte getSignType()
@@ -161,7 +184,12 @@ void startBLE()
     configData.columnCount = pixelBuffer->getColumnCount();
     configData.pixelCount = pixelBuffer->getPixelCount();
 
-    btService.initialize(BTCOMMON_SECONDARYCONTROLLER_UUID, localName);
+    // If the sign "position" is 0, then we'll assume we're standalone.
+    String uuid = signPosition == 0
+                      ? BTCOMMON_PRIMARYCONTROLLER_UUID
+                      : BTCOMMON_SECONDARYCONTROLLER_UUID;
+
+    btService.initialize(uuid, localName);
     btService.setBrightness(currentBrightness);
     btService.setSpeed(currentSpeed);
     btService.setSignConfigurationData(configData);
@@ -183,19 +211,6 @@ void readBleSettings()
     newBrightness = btService.getBrightness();
     newSyncData = btService.getSyncData();
     newSpeed = btService.getSpeed();
-}
-
-void blinkLowPowerIndicator()
-{
-    // Turn all LEDs off except for the first one, which will blink red.
-    pixelBuffer->setBrightness(255);
-    pixelBuffer->clearBuffer();
-    pixelBuffer->displayPixels();
-    delay(500);
-
-    pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
-    pixelBuffer->displayPixels();
-    delay(500);
 }
 
 // Set the style properties (speed, step, pattern, etc) if any have changed,
@@ -271,14 +286,7 @@ void checkForLowPowerState()
             Serial.print(", threshold: ");
             Serial.println(LOWPOWERTHRESHOLD);
             Serial.println("Entering low power mode.");
-            inLowPowerMode = true;
-
-            // Set up the "low power" display pattern.
-            // The next call to updateLEDs will set this pattern for us.
-            newBrightness = 255;
-            newPatternData = lowPowerStyle.getPatternData();
-            newSpeed = lowPowerStyle.getSpeed();
-            newSyncData++;
+            enterLowPowerMode();
         }
     }
 
@@ -296,14 +304,41 @@ void checkForLowPowerState()
             Serial.print(", threshold: ");
             Serial.println(NORMALPOWERTHRESHOLD);
             Serial.println("Exiting low power mode.");
-            pixelBuffer->setBrightness(currentBrightness);
-            inLowPowerMode = false;
-
-            // Update the sync data to tell the system to update the pattern
-            // back to the original one before we went into low power mode.
-            newSyncData++;
+            exitLowPowerMode();
         }
     }
+}
+
+void enterLowPowerMode()
+{
+    inLowPowerMode = true;
+
+    // The pit sign has an explicit "low power" LED that we can use
+    // instead of blinking the display pixels.
+    if (signType == PITSIGN_TYPE_ID)
+    {
+        pixelBuffer->setBrightness(0);
+        pixelBuffer->displayPixels();
+        pixelBuffer->stop();
+    }
+    else
+    {
+        // Set up the "low power" display pattern.
+        // The next call to updateLEDs will set this pattern for us.
+        newBrightness = 255;
+        newPatternData = lowPowerStyle.getPatternData();
+        newSpeed = lowPowerStyle.getSpeed();
+        newSyncData++;
+    }
+}
+
+void exitLowPowerMode()
+{
+    inLowPowerMode = false;
+
+    pixelBuffer->resume();
+    pixelBuffer->setBrightness(currentBrightness);
+    newSyncData++;
 }
 
 // Read the analog input from the "voltage input" pin and calculate the batter voltage.
@@ -331,7 +366,7 @@ void emitTelemetry()
     if (timestamp > lastBtTimestampUpdate + TIMESTAMPUPDATEINTERVAL)
     {
         btService.emitTimestamp(timestamp);
-        lastBtTimestampUpdate = timestamp;    
+        lastBtTimestampUpdate = timestamp;
     }
 
     if (timestamp > lastTelemetryTimestamp + TELEMETRYINTERVAL)
@@ -388,4 +423,46 @@ void resetPixelBufferOffsets(SignOffsetData offsetData)
     pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
     pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
     pixelBuffer->setColsToRight(offsetData.columnsToRight);
+}
+
+void turnOnPowerLed()
+{
+    digitalWrite(POWER_INDICATOR_PIN, HIGH);
+}
+
+void turnOffPowerLed()
+{
+    digitalWrite(POWER_INDICATOR_PIN, LOW);
+}
+
+void updateSoftPowerState()
+{
+    powerButton.update();
+
+    if (powerButton.wasPressed())
+    {
+        powerButton.clearPress();
+        if (isOff)
+        {
+            // We're currently "off", so turn "on".
+            // Attempting to restart the BT service by restarting advertising
+            // nulls out the device's advertised name for some reason, even if
+            // we set it explicitly before restarting advertising.
+            // To get around this, just restart the entire system.
+            NVIC_SystemReset();
+        }
+        else
+        {
+            // We're currently "on", so turn "off".
+            isOff = true;
+            turnOffPowerLed();
+
+            btService.disconnect();
+            btService.stop();
+
+            pixelBuffer->setBrightness(0);
+            pixelBuffer->displayPixels();
+            pixelBuffer->stop();
+       }
+    }
 }
