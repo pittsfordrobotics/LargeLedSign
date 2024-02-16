@@ -4,6 +4,8 @@ void CommonPeripheral::initialize(String uuid, String localName)
 {
     Serial.print("Initializing BLE peripheral service for UUID ");
     Serial.print(uuid);
+    Serial.print(" and name ");
+    Serial.print(localName);
     Serial.println(".");
 
     m_ledService = new BLEService(uuid.c_str());
