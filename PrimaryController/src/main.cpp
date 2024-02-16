@@ -422,12 +422,12 @@ void setupStyleLists()
     predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
 
     // Styles for button 3 (id 2)
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_CenterOut);
 
     // Styles for button 4 (id 3)
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::Rainbow_Right);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::Rainbow_Random);
+    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Right);
+    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random);
 }
 
 void updateTelemetry()
