@@ -421,29 +421,15 @@ void setupStyleLists()
 
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
 
-    // speed 220
-    // duration 70
     predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
-
-    // speed 220
-    // duration 70
     predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_CenterOut);
-
-    // third button press
-    // blue-pink random
-    // speed 220
-    // duration 100
-    // update amt 200
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random_v2);
 
     predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Right);
     predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_CenterOut);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random_v2);
 
-    // speed 240
-    // hue 255
-    // amt 50
-    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random_v1);
-    // speed 255
-    // hue 120
+    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random_v2);
     predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Right);
 }
 
