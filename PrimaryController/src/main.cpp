@@ -24,6 +24,7 @@ SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
+std::vector<long> secondaryTimestamps;
 
 PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
 
@@ -230,6 +231,7 @@ void resetSecondaryConnections()
         delete allSecondaries.at(i);
     }
     allSecondaries.clear();
+    secondaryTimestamps.clear();
     populateSecondaries();
     consolidateTotalsAndWriteToSecondaries();
     setManualStyle(defaultStyle);
@@ -341,6 +343,7 @@ void consolidateTotalsAndWriteToSecondaries()
     {
         SignStatus status = allSecondaries[i]->getSignStatus();
         signConfigurations.push_back(status.signConfigurationData);
+        secondaryTimestamps.push_back(allSecondaries[i]->getTimestamp());
     }
 
     int numCols = 0;
@@ -448,13 +451,19 @@ void updateTelemetry()
         lastTelemetryTimestamp = timestamp;
         loopCounter = 0;
 
-        // Get battery voltage levels for secondaries
+        // Get battery voltage levels for secondaries and the elapsed timestamps
         for (uint i = 0; i < allSecondaries.size(); i++)
         {
-            Serial.print("Battery voltage for sign ");
+            long secondaryTimestamp = allSecondaries[i]->getTimestamp();
+            long timestampDiff = secondaryTimestamp - secondaryTimestamps[i];
+            secondaryTimestamps[i] = secondaryTimestamp;
+
+            Serial.print("Sign ");
             Serial.print(allSecondaries[i]->getSignOrder());
-            Serial.print(": ");
-            Serial.println(allSecondaries[i]->getBatteryVoltage());
+            Serial.print(": battery voltage = ");
+            Serial.print(allSecondaries[i]->getBatteryVoltage());
+            Serial.print(", timestamp delta = ");
+            Serial.println(timestampDiff);
         }
     }
 }
