@@ -184,15 +184,15 @@ void setupStyleLists()
     predefinedStyleList = new PredefinedStyleList(manualInputButtons.size());
 
     // Styles for button 1 (id 0)
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random_v1);
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
 
     // Styles for button 2 (id 1)
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random_v1);
     predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Digit);
 
     // Styles for button 3 (id 2)
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random_v1);
     predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Digit);
 }
 

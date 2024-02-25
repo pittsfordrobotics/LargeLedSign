@@ -419,7 +419,6 @@ void setupStyleLists()
     // combine center 2 columns in the #8 sign
     // Check sign drift
 
-    // brightness = 150
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
 
     // speed 220
@@ -442,7 +441,7 @@ void setupStyleLists()
     // speed 240
     // hue 255
     // amt 50
-    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random);
+    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random_v1);
     // speed 255
     // hue 120
     predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Right);

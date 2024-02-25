@@ -92,7 +92,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
             return PredefinedStyle{"Rainbow", 215, pattern};
         }
-        case PredefinedStyles::RedPink_Random:
+        case PredefinedStyles::RedPink_Random_v1:
         {
             PatternData pattern;
             pattern.colorPattern = ColorPatternType::TwoColor;
@@ -104,7 +104,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param3 = 50; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Red-Pink Random", 255, pattern};
         }
-        case PredefinedStyles::BluePink_Random:
+        case PredefinedStyles::BluePink_Random_v1:
         {
             PatternData pattern;
             pattern.colorPattern = ColorPatternType::TwoColor;
@@ -116,7 +116,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param3 = 50; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Blue-Pink Random", 255, pattern};
         }
-        case PredefinedStyles::Rainbow_Random:
+        case PredefinedStyles::Rainbow_Random_v1:
         {
             PatternData pattern;
             pattern.colorPattern = ColorPatternType::Rainbow;
