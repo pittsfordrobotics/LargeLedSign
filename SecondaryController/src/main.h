@@ -9,7 +9,6 @@
 #include <BluetoothCommon.h>
 #include "Bluetooth\SecondaryPeripheral.h"
 #include <SignDataLib.h>
-#include <PatternData.h>
 #include <DisplayPatternLib.h>
 #include <PredefinedStyleLib.h>
 #include <PushButton.h>
