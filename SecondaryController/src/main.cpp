@@ -441,28 +441,38 @@ void updateSoftPowerState()
 
     if (powerButton.wasPressed())
     {
-        powerButton.clearPress();
-        if (isOff)
+        if (powerButton.lastPressType() == ButtonPressType::Long)
         {
-            // We're currently "off", so turn "on".
-            // Attempting to restart the BT service by restarting advertising
-            // nulls out the device's advertised name for some reason, even if
-            // we set it explicitly before restarting advertising.
-            // To get around this, just restart the entire system.
-            NVIC_SystemReset();
+            // Long-press: Update our power state.
+            if (isOff)
+            {
+                // We're currently "off", so turn "on".
+                // Attempting to restart the BT service by restarting advertising
+                // nulls out the device's advertised name for some reason, even if
+                // we set it explicitly before restarting advertising.
+                // To get around this, just restart the entire system.
+                NVIC_SystemReset();
+            }
+            else
+            {
+                // We're currently "on", so turn "off".
+                isOff = true;
+                turnOffPowerLed();
+
+                btService.disconnect();
+                btService.stop();
+
+                pixelBuffer->setBrightness(0);
+                pixelBuffer->displayPixels();
+                pixelBuffer->stop();
+            }
         }
         else
         {
-            // We're currently "on", so turn "off".
-            isOff = true;
-            turnOffPowerLed();
+            // Normal press.  Cycle through sign styles.
+            
+        }
 
-            btService.disconnect();
-            btService.stop();
-
-            pixelBuffer->setBrightness(0);
-            pixelBuffer->displayPixels();
-            pixelBuffer->stop();
-       }
+        powerButton.clearPress();
     }
 }
