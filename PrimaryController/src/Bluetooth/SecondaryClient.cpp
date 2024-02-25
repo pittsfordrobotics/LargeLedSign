@@ -117,6 +117,11 @@ String SecondaryClient::getDisplayPatternList()
     return getStringValue(BTCOMMON_DISPLAYPATTERNLIST_CHARACTERISTIC_UUID);
 }
 
+long SecondaryClient::getTimestamp()
+{
+    return getLongValue(BTCOMMON_TIMESTAMP_CHARACTERISTIC_UUID);
+}
+
 String SecondaryClient::getStringValue(String characteristicUuid)
 {
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
@@ -154,6 +159,16 @@ float SecondaryClient::getFloatValue(String characteristicUuid)
     characteristic.read();
     float value;
     memcpy(&value, (unsigned char *)characteristic.value(), characteristic.valueSize());
+
+    return value;
+}
+
+long SecondaryClient::getLongValue(String characteristicUuid)
+{
+    BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());
+    characteristic.read();
+    long value;
+    characteristic.readValue(value);
 
     return value;
 }
