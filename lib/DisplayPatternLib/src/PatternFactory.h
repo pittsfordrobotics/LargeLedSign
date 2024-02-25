@@ -3,14 +3,20 @@
 
 #include <Arduino.h>
 #include "DisplayPattern.h"
-#include "SolidDisplayPattern.h"
-#include "SimpleShiftDisplayPattern.h"
-#include "RandomDisplayPattern.h"
-#include "CenterOutDisplayPattern.h"
-#include "LowPowerDisplayPattern.h"
-#include <ColorPatternLib.h>
-#include "PixelBuffer.h"
-#include <PatternData.h>
+#include "DisplayPatterns\SolidDisplayPattern.h"
+#include "DisplayPatterns\SimpleShiftDisplayPattern.h"
+#include "DisplayPatterns\RandomDisplayPattern.h"
+#include "DisplayPatterns\CenterOutDisplayPattern.h"
+#include "DisplayPatterns\LowPowerDisplayPattern.h"
+#include "ColorPatterns\ColorPattern.h"
+#include "ColorPatterns\ColorFadePattern.h"
+#include "ColorPatterns\RainbowColorPattern.h"
+#include "ColorPatterns\SingleColorPattern.h"
+#include "ColorPatterns\TwoColorFadePattern.h"
+#include "ColorPatterns\TwoColorPattern.h"
+#include "ColorPatterns\BackgroundPlusThree.h"
+#include <PixelBuffer.h>
+#include "PatternData.h"
 #include <vector>
 
 class PatternFactory

@@ -2,8 +2,8 @@
 #define PATTERNDATA_H
 
 #include <Arduino.h>
-#include "ColorPatternType.h"
-#include "DisplayPatternType.h"
+#include "enums\ColorPatternType.h"
+#include "enums\DisplayPatternType.h"
 
 // The max data packet we can send from the primary controller to the
 // secondary controller is 20 bytes, so make sure we're under that limit.
