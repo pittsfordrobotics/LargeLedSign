@@ -480,7 +480,6 @@ void readInputButton()
             // Update the local BLE settings to reflect the new manual settings.
             btService.setSpeed(newSpeed);
             btService.setPatternData(newPatternData);
-
             buttonPressCount++;
         }
 
@@ -491,10 +490,10 @@ void readInputButton()
 void setupStyleList()
 {
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_Right);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_Right);
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_CenterOut);
-    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Right);
-    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_Right);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_CenterOut);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Right);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random);
 }
