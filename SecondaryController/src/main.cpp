@@ -24,6 +24,8 @@ PatternData currentPatternData;
 PatternData newPatternData;
 PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
 PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
+PredefinedStyleList* predefinedStyleList = new PredefinedStyleList(1);
+int buttonPressCount = 0;
 
 // Other internal state
 int loopCounter = 0;              // Records the number of times the main loop ran since the last timing calculation.
@@ -44,6 +46,7 @@ void setup()
     lastTelemetryTimestamp = millis();
 
     // Initialize components
+    setupStyleList();
     initializeIO();
     turnOnPowerLed();
     signType = getSignType();
@@ -75,7 +78,7 @@ void setup()
 // This method is called continously.
 void loop()
 {
-    updateSoftPowerState();
+    readInputButton();
 
     if (isOff)
     {
@@ -435,7 +438,7 @@ void turnOffPowerLed()
     digitalWrite(POWER_INDICATOR_PIN, LOW);
 }
 
-void updateSoftPowerState()
+void readInputButton()
 {
     powerButton.update();
 
@@ -470,9 +473,28 @@ void updateSoftPowerState()
         else
         {
             // Normal press.  Cycle through sign styles.
-            
+            PredefinedStyle selectedStyle = predefinedStyleList->getStyle(0, buttonPressCount);
+            newSpeed = selectedStyle.getSpeed();
+            newPatternData = selectedStyle.getPatternData();
+
+            // Update the local BLE settings to reflect the new manual settings.
+            btService.setSpeed(newSpeed);
+            btService.setPatternData(newPatternData);
+
+            buttonPressCount++;
         }
 
         powerButton.clearPress();
     }
+}
+
+void setupStyleList()
+{
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Right);
+    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random);
 }

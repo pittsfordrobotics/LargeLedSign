@@ -58,8 +58,9 @@ byte getSignPosition();
 void resetPixelBufferOffsets(SignOffsetData configData);
 void enterLowPowerMode();
 void exitLowPowerMode();
-void updateSoftPowerState();
+void readInputButton();
 void turnOnPowerLed();
 void turnOffPowerLed();
+void setupStyleList();
 
 #endif
