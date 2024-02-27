@@ -24,6 +24,8 @@ PatternData currentPatternData;
 PatternData newPatternData;
 PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
 PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
+PredefinedStyleList* predefinedStyleList = new PredefinedStyleList(1);
+int buttonPressCount = 0;
 
 // Other internal state
 int loopCounter = 0;              // Records the number of times the main loop ran since the last timing calculation.
@@ -44,6 +46,7 @@ void setup()
     lastTelemetryTimestamp = millis();
 
     // Initialize components
+    setupStyleList();
     initializeIO();
     turnOnPowerLed();
     signType = getSignType();
@@ -75,7 +78,7 @@ void setup()
 // This method is called continously.
 void loop()
 {
-    updateSoftPowerState();
+    readInputButton();
 
     if (isOff)
     {
@@ -435,34 +438,62 @@ void turnOffPowerLed()
     digitalWrite(POWER_INDICATOR_PIN, LOW);
 }
 
-void updateSoftPowerState()
+void readInputButton()
 {
     powerButton.update();
 
     if (powerButton.wasPressed())
     {
-        powerButton.clearPress();
-        if (isOff)
+        if (powerButton.lastPressType() == ButtonPressType::Long)
         {
-            // We're currently "off", so turn "on".
-            // Attempting to restart the BT service by restarting advertising
-            // nulls out the device's advertised name for some reason, even if
-            // we set it explicitly before restarting advertising.
-            // To get around this, just restart the entire system.
-            NVIC_SystemReset();
+            // Long-press: Update our power state.
+            if (isOff)
+            {
+                // We're currently "off", so turn "on".
+                // Attempting to restart the BT service by restarting advertising
+                // nulls out the device's advertised name for some reason, even if
+                // we set it explicitly before restarting advertising.
+                // To get around this, just restart the entire system.
+                NVIC_SystemReset();
+            }
+            else
+            {
+                // We're currently "on", so turn "off".
+                isOff = true;
+                turnOffPowerLed();
+
+                btService.disconnect();
+                btService.stop();
+
+                pixelBuffer->setBrightness(0);
+                pixelBuffer->displayPixels();
+                pixelBuffer->stop();
+            }
         }
         else
         {
-            // We're currently "on", so turn "off".
-            isOff = true;
-            turnOffPowerLed();
+            // Normal press.  Cycle through sign styles.
+            PredefinedStyle selectedStyle = predefinedStyleList->getStyle(0, buttonPressCount);
+            newSpeed = selectedStyle.getSpeed();
+            newPatternData = selectedStyle.getPatternData();
 
-            btService.disconnect();
-            btService.stop();
+            // Update the local BLE settings to reflect the new manual settings.
+            btService.setSpeed(newSpeed);
+            btService.setPatternData(newPatternData);
+            buttonPressCount++;
+        }
 
-            pixelBuffer->setBrightness(0);
-            pixelBuffer->displayPixels();
-            pixelBuffer->stop();
-       }
+        powerButton.clearPress();
     }
+}
+
+void setupStyleList()
+{
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_Right);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_CenterOut);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Right);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random);
 }
