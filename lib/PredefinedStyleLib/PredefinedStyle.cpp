@@ -69,9 +69,9 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Red;
             pattern.color2 = Pink;
-            pattern.param1 = 40; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 15; // Duration, 0-255, scaled to 1-50
-            return PredefinedStyle{"Red-Pink", 65, pattern};
+            pattern.param1 = 70; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 75; // Duration, 0-255, scaled to 1-50
+            return PredefinedStyle{"Red-Pink", 220, pattern};
         }
         case PredefinedStyles::BluePink_Right:
         {
@@ -80,9 +80,9 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.color1 = Blue;
             pattern.color2 = Pink;
-            pattern.param1 = 40; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 15; // Duration, 0-255, scaled to 1-50
-            return PredefinedStyle{"Blue-Pink", 65, pattern};
+            pattern.param1 = 70; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 70; // Duration, 0-255, scaled to 1-50
+            return PredefinedStyle{"Blue-Pink", 220, pattern};
         }
         case PredefinedStyles::Rainbow_Right:
         {
@@ -90,9 +90,9 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.colorPattern = ColorPatternType::Rainbow;
             pattern.displayPattern = DisplayPatternType::Right;
             pattern.param1 = 120; // Hue increment, 0-255, scaled to 5-1000
-            return PredefinedStyle{"Rainbow", 215, pattern};
+            return PredefinedStyle{"Rainbow", 255, pattern};
         }
-        case PredefinedStyles::RedPink_Random:
+        case PredefinedStyles::RedPink_Random_v1:
         {
             PatternData pattern;
             pattern.colorPattern = ColorPatternType::TwoColor;
@@ -104,7 +104,19 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param3 = 50; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Red-Pink Random", 255, pattern};
         }
-        case PredefinedStyles::BluePink_Random:
+        case PredefinedStyles::RedPink_Random_v2:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::TwoColor;
+            pattern.color1 = Red;
+            pattern.color2 = Pink;
+            pattern.displayPattern = DisplayPatternType::Random;
+            pattern.param1 = 100; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 100; // Duration, 0-255, scaled to 1-50
+            pattern.param3 = 200; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            return PredefinedStyle{"Red-Pink Random v2", 220, pattern};
+        }
+        case PredefinedStyles::BluePink_Random_v1:
         {
             PatternData pattern;
             pattern.colorPattern = ColorPatternType::TwoColor;
@@ -116,7 +128,19 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param3 = 50; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Blue-Pink Random", 255, pattern};
         }
-        case PredefinedStyles::Rainbow_Random:
+        case PredefinedStyles::BluePink_Random_v2:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::TwoColor;
+            pattern.color1 = Blue;
+            pattern.color2 = Pink;
+            pattern.displayPattern = DisplayPatternType::Random;
+            pattern.param1 = 100; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 100; // Duration, 0-255, scaled to 1-50
+            pattern.param3 = 200; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            return PredefinedStyle{"Blue-Pink Random v2", 220, pattern};
+        }
+        case PredefinedStyles::Rainbow_Random_v1:
         {
             PatternData pattern;
             pattern.colorPattern = ColorPatternType::Rainbow;
@@ -125,30 +149,35 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param2 = 30;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Rainbow Random", 245, pattern};
         }
+        case PredefinedStyles::Rainbow_Random_v2:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::Rainbow;
+            pattern.displayPattern = DisplayPatternType::Random;
+            pattern.param1 = 255; // Hue increment, 0-255, scaled to 5-1000
+            pattern.param2 = 50;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            return PredefinedStyle{"Rainbow Random v2", 240, pattern};
+        }
         case PredefinedStyles::RedPink_CenterOut:
         {
             PatternData pattern;
-            pattern.colorPattern = ColorPatternType::TwoColorFade;
+            pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.displayPattern = DisplayPatternType::CenterOutHorizontal;
             pattern.color1 = Red;
             pattern.color2 = Pink;
-            pattern.param1 = 19; // color duration
-            pattern.param2 = 0;  // fade-in duration
-            pattern.param3 = 65; // fade-out duration
-            pattern.param4 = 22; // faded duration
-            return PredefinedStyle{"Blue-Pink Center-Out", 196, pattern};
+            pattern.param1 = 70; // color1 duration
+            pattern.param2 = 70; // color2 duration
+            return PredefinedStyle{"Blue-Pink Center-Out", 220, pattern};
         }
         case PredefinedStyles::BluePink_CenterOut:
         {
             PatternData pattern;
-            pattern.colorPattern = ColorPatternType::TwoColorFade;
+            pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.displayPattern = DisplayPatternType::CenterOutHorizontal;
             pattern.color1 = Blue;
             pattern.color2 = Pink;
-            pattern.param1 = 19; // color duration
-            pattern.param2 = 0;  // fade-in duration
-            pattern.param3 = 65; // fade-out duration
-            pattern.param4 = 22; // faded duration
+            pattern.param1 = 70; // color1 duration
+            pattern.param2 = 70; // color2 duration
             return PredefinedStyle{"Blue-Pink Center-Out", 196, pattern};
         }
         case PredefinedStyles::RedPink_Digit:

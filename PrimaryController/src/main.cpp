@@ -383,7 +383,9 @@ void startBLEService()
     Serial.println("Proxying characteristics.");
 
     SignStatus status = allSecondaries[0]->getSignStatus();
-    btService.setBrightness(status.brightness);
+    // Override brightness to be 150 for now
+    // btService.setBrightness(status.brightness);
+    btService.setBrightness(150);
     btService.setSpeed(status.speed);
     btService.setPatternData(status.patternData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
@@ -417,20 +419,21 @@ void updateAllSecondaries()
 
 void setupStyleLists()
 {
-    // Styles for button 1 (id 0)
+    // combine center 2 columns in the #8 sign
+    // Check sign drift
+
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
 
-    // Styles for button 2 (id 1)
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_Right);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::RedPink_CenterOut);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random_v2);
 
-    // Styles for button 3 (id 2)
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_Right);
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::BluePink_CenterOut);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Right);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_CenterOut);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random_v2);
 
-    // Styles for button 4 (id 3)
+    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random_v2);
     predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Right);
-    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random);
 }
 
 void updateTelemetry()
