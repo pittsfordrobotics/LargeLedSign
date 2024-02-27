@@ -41,6 +41,7 @@ class SecondaryClient {
         void updateSyncData(ulong syncData);
         String getColorPatternList();
         String getDisplayPatternList();
+        long getTimestamp();
 
     private:
         BLEDevice m_peripheral;
@@ -51,6 +52,7 @@ class SecondaryClient {
         String getStringValue(String characteristicUuid);
         byte getByteValue(String characteristicUuid);
         float getFloatValue(String characteristicUuid);
+        long getLongValue(String characeristicUuid);
 };
 
 #endif
