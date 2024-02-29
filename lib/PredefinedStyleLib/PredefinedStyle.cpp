@@ -7,7 +7,7 @@ PredefinedStyle::PredefinedStyle(String name, byte speed, PatternData patternDat
     m_patternData = patternData;
 }
 
-PredefinedStyle::PredefinedStyle(const PredefinedStyle& other)
+PredefinedStyle::PredefinedStyle(const PredefinedStyle &other)
 {
     m_name = other.m_name;
     m_speed = other.m_speed;
@@ -29,12 +29,12 @@ PatternData PredefinedStyle::getPatternData()
     return m_patternData;
 }
 
-PredefinedStyle& PredefinedStyle::operator=(const PredefinedStyle& other)
+PredefinedStyle &PredefinedStyle::operator=(const PredefinedStyle &other)
 {
     this->m_name = other.m_name;
     this->m_speed = other.m_speed;
     this->m_patternData = other.m_patternData;
-    
+
     return *this;
 }
 
@@ -44,6 +44,10 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
     const ulong Red = color(255, 0, 0);
     const ulong Blue = color(0, 0, 255);
 
+    // Constructing predefined styles this way seemed like a good idea
+    // at the time, but this is getting quite unwieldy.  There needs to
+    // be a better way of handling this.
+    // (It's a shame c++ doesn't can't use reflection.)
     switch (styleName)
     {
         case PredefinedStyles::LowPower:
@@ -101,7 +105,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 255; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 255; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 50; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            pattern.param3 = 50;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Red-Pink Random", 255, pattern};
         }
         case PredefinedStyles::RedPink_Random_v2:
@@ -125,7 +129,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 255; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 255; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 50; // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            pattern.param3 = 50;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Blue-Pink Random", 255, pattern};
         }
         case PredefinedStyles::BluePink_Random_v2:
@@ -201,6 +205,62 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param1 = 20; // color1 duration
             pattern.param2 = 20; // color2 duration
             return PredefinedStyle{"Blue-Pink Digit", 150, pattern};
+        }
+        case PredefinedStyles::Rainbow_Lava_6inch:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::Rainbow;
+            pattern.displayPattern = DisplayPatternType::Line;
+            pattern.param1 = 255; // Hue increment, 0-255, scaled to 5-1000
+            return PredefinedStyle{"Rainbow Lava 6inch", 255, pattern};
+        }
+        case PredefinedStyles::BluePink_6inch:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::TwoColor;
+            pattern.color1 = Blue;
+            pattern.color2 = Pink;
+            pattern.displayPattern = DisplayPatternType::Random;
+            pattern.param1 = 150; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 150; // Duration, 0-255, scaled to 1-50
+            pattern.param3 = 75;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            return PredefinedStyle{"Blue-Pink 6inch", 230, pattern};
+        }
+        case PredefinedStyles::RedPink_6inch:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::TwoColor;
+            pattern.color1 = Red;
+            pattern.color2 = Pink;
+            pattern.displayPattern = DisplayPatternType::Random;
+            pattern.param1 = 150; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 150; // Duration, 0-255, scaled to 1-50
+            pattern.param3 = 75;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            return PredefinedStyle{"Blue-Pink 6inch", 230, pattern};
+        }
+        case PredefinedStyles::Red_Solid:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::SingleColor;
+            pattern.displayPattern = DisplayPatternType::Solid;
+            pattern.color1 = Red;
+            return PredefinedStyle{"Solid Red", 1, pattern};
+        }
+        case PredefinedStyles::Yellow_Solid:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::SingleColor;
+            pattern.displayPattern = DisplayPatternType::Solid;
+            pattern.color1 = color(255, 180, 0);
+            return PredefinedStyle{"Solid Yellow", 1, pattern};
+        }
+        case PredefinedStyles::Green_Solid:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::SingleColor;
+            pattern.displayPattern = DisplayPatternType::Solid;
+            pattern.color1 = color(0, 255, 0);
+            return PredefinedStyle{"Solid Green", 1, pattern};
         }
         default:
         {

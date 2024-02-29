@@ -16,7 +16,13 @@ enum class PredefinedStyles {
     RedPink_CenterOut,
     BluePink_CenterOut,
     RedPink_Digit,
-    BluePink_Digit
+    BluePink_Digit,
+    Rainbow_Lava_6inch,
+    RedPink_6inch,
+    BluePink_6inch,
+    Red_Solid,
+    Yellow_Solid,
+    Green_Solid
 };
 
 #endif
