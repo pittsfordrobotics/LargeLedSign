@@ -495,5 +495,5 @@ void setupStyleList()
     predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_Right);
     predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_CenterOut);
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Right);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random_v2);
 }
