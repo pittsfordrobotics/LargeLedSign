@@ -24,7 +24,7 @@
 
 #define TELEMETRYINTERVAL 2000     // Interval (msec) for updating the telemetry.
 
-#define DEFAULT_BRIGHTNESS 255  // Brightness should be between 0 and 255.
+#define DEFAULT_BRIGHTNESS 150  // Brightness should be between 0 and 255.
 #define LOW_BRIGHTNESS_PIN  12  // When this Digital pin # is pulled low, the default brightness will be much lower than normal.
 #define DEFAULT_BRIGHTNESS_LOW 20 // The default brightness to use when the "Low Brightness" pin has been pulled low.
 
