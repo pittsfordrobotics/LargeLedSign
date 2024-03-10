@@ -424,13 +424,13 @@ void setupStyleLists()
 
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
 
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_CenterOut);
     predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random_v2);
+    //predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
+    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Digit);
 
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Right);
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_CenterOut);
     predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random_v2);
+    //predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Right);
+    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Digit);
 
     predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random_v2);
     predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Right);

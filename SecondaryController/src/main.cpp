@@ -489,11 +489,19 @@ void readInputButton()
 
 void setupStyleList()
 {
+    // start
+    // rainbow, line, 255 speed, 255 hue inc
+    // update 75, speed 230, duration 150  (red-pink and blue-pink)
+    // solid red
+    // yellow: 255,180,0 solid
+    // solid green
+    // solid pink
+
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Lava_6inch);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_6inch);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_6inch);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Red_Solid);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Yellow_Solid);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Green_Solid);
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_Right);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_CenterOut);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_Right);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_CenterOut);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Right);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random_v2);
 }
