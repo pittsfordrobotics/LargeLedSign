@@ -107,8 +107,8 @@ class PixelBuffer {
     void resume();
 
   protected:
-    uint m_numPixels{0};
-    uint m_pixelBufferSize{0};
+    uint m_numPixels{0};       // Size of internal buffer
+    uint m_pixelBufferSize{0}; // Size of NeoPixel buffer
     ulong* m_pixelColors;
     uint m_digitsToLeft{0};
     uint m_digitsToRight{0};
