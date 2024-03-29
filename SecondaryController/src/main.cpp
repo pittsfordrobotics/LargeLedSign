@@ -59,6 +59,10 @@ void setup()
     {
         defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
     }
+    if (signType == PITSIGN_TYPE_ID) 
+    {
+        defaultBrightness = 255;
+    }
 
     pixelBuffer->setBrightness(defaultBrightness);
     currentBrightness = defaultBrightness;
@@ -71,6 +75,11 @@ void setup()
     newPatternData.displayPattern = DisplayPatternType::Solid;
     newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
     currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
+    if (signType == PITSIGN_TYPE_ID) 
+    {
+        newPatternData.color1 = Adafruit_NeoPixel::Color(255,0,0);
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
+    }
     btService.setPatternData(newPatternData);
 }
 
@@ -489,19 +498,10 @@ void readInputButton()
 
 void setupStyleList()
 {
-    // start
-    // rainbow, line, 255 speed, 255 hue inc
-    // update 75, speed 230, duration 150  (red-pink and blue-pink)
-    // solid red
-    // yellow: 255,180,0 solid
-    // solid green
-    // solid pink
-
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Lava_6inch);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_6inch);
     predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_6inch);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Red_Solid);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_6inch);
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Yellow_Solid);
     predefinedStyleList->addStyleToList(0, PredefinedStyles::Green_Solid);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
+    predefinedStyleList->addStyleToList(0, PredefinedStyles::Red_Solid);
 }
+ 

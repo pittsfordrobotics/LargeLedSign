@@ -16,6 +16,7 @@ int manualButtonSequenceNumber = 0;
 byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
+//PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Playoff_Blue_Small);
 PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
 
 // Settings that are updated via bluetooth

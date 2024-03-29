@@ -19,6 +19,7 @@ bool resetRequested = false;
 bool shouldIgnoreLogo = false;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
+ulong lastResync = 0;
 
 SignStatus lastServiceStatus;
 SignStatus currentServiceStatus;
@@ -86,11 +87,17 @@ void loop()
     readSettingsFromBLE();
     processManualInputs();
 
+    if (millis() > lastResync + SECONDARY_RESYNC_INTERVAL)
+    {
+        resetRequested = true;
+    }
+
     if (currentServiceStatus != lastServiceStatus || resetRequested)
     {
         resetRequested = false;
         updateAllSecondaries();
         lastServiceStatus = currentServiceStatus;
+        lastResync = millis();
     }
 
     updateTelemetry();

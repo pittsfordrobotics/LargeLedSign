@@ -220,11 +220,10 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.color1 = Blue;
             pattern.color2 = Pink;
-            pattern.displayPattern = DisplayPatternType::Random;
-            pattern.param1 = 150; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 150; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 75;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
-            return PredefinedStyle{"Blue-Pink 6inch", 230, pattern};
+            pattern.displayPattern = DisplayPatternType::Digit;
+            pattern.param1 = 1; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 1; // Duration, 0-255, scaled to 1-50
+            return PredefinedStyle{"Blue-Pink 6inch", 9, pattern};
         }
         case PredefinedStyles::RedPink_6inch:
         {
@@ -232,11 +231,10 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.colorPattern = ColorPatternType::TwoColor;
             pattern.color1 = Red;
             pattern.color2 = Pink;
-            pattern.displayPattern = DisplayPatternType::Random;
-            pattern.param1 = 150; // Duration, 0-255, scaled to 1-50
-            pattern.param2 = 150; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 75;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
-            return PredefinedStyle{"Blue-Pink 6inch", 230, pattern};
+            pattern.displayPattern = DisplayPatternType::Digit;
+            pattern.param1 = 1; // Duration, 0-255, scaled to 1-50
+            pattern.param2 = 1; // Duration, 0-255, scaled to 1-50
+            return PredefinedStyle{"Blue-Pink 6inch", 9, pattern};
         }
         case PredefinedStyles::Red_Solid:
         {
@@ -261,6 +259,36 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.displayPattern = DisplayPatternType::Solid;
             pattern.color1 = color(0, 255, 0);
             return PredefinedStyle{"Solid Green", 1, pattern};
+        }
+        case PredefinedStyles::Playoff_Blue:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::BackgroundPlusThree;
+            pattern.displayPattern = DisplayPatternType::Right;
+            pattern.color1 = color(0, 0, 255);
+            pattern.color2 = color(255, 0, 0);
+            pattern.color3 = Pink;
+            pattern.color4 = color(0, 200, 0);
+            pattern.param1 = 255;
+            pattern.param2 = 80;
+            pattern.param3 = 80;
+            pattern.param4 = 80;
+            return PredefinedStyle{"Playoff Blue", 255, pattern};
+        }
+        case PredefinedStyles::Playoff_Blue_Small:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::BackgroundPlusThree;
+            pattern.displayPattern = DisplayPatternType::Down;
+            pattern.color1 = color(0, 0, 255);
+            pattern.color2 = color(255, 0, 0);
+            pattern.color3 = Pink;
+            pattern.color4 = color(0, 200, 0);
+            pattern.param1 = 100;
+            pattern.param2 = 50;
+            pattern.param3 = 50;
+            pattern.param4 = 50;
+            return PredefinedStyle{"Playoff Blue", 245, pattern};
         }
         default:
         {
