@@ -16,8 +16,8 @@
 #define TM1637_DIO 10      // Digital pin # for the TM1637 data line
 #define TM1637_BRIGHTNESS 5  // Brightness of the TM1637, between 0 and 7
 
-#define LOWPOWERTHRESHOLD 7.0     // The voltage below which the system will go into "low power" mode.
-#define NORMALPOWERTHRESHOLD 7.4  // The voltage above which the system will recover from "low power" mode.
+#define LOWPOWERTHRESHOLD 6.7     // The voltage below which the system will go into "low power" mode.
+#define NORMALPOWERTHRESHOLD 7.2  // The voltage above which the system will recover from "low power" mode.
 #define VOLTAGEMULTIPLIER 4.83    // The value to multiply the analog reading by to get the actual voltage.
 
 #define MANUAL_INPUT_PINS 15, 16, 14      // Digital pin #s for the manual input buttons.

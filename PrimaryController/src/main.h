@@ -16,6 +16,7 @@
 
 #define CONNECTION_CHECK_INTERVAL 1500   // Number of milliseconds between checks to see if the secondaries are connected.
 #define MANUAL_INPUT_PINS 15, 9, 14, 10  // Digital pin #s for the manual input buttons.
+#define SECONDARY_RESYNC_INTERVAL 10000   // Resync secondaries (msec)
 
 #define TELEMETRYINTERVAL 5000     // Interval (msec) for updating the telemetry.
 #define MAX_SCAN_TIME 2000         // The amount of time (msec) to wait for a connection to a secondary peripheral.
