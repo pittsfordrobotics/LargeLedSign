@@ -1,6 +1,6 @@
-#include "StyleDefinitionBuilder.h"
+#include "CommonStyles.h"
 
-StyleDefinition StyleDefinitionBuilder::SolidColor(ulong color)
+StyleDefinition CommonStyles::SolidColor(ulong color)
 {
     PatternData pattern;
     pattern.displayPattern = DisplayPatternType::Solid;
@@ -10,7 +10,7 @@ StyleDefinition StyleDefinitionBuilder::SolidColor(ulong color)
     return StyleDefinition(pattern, 1);
 }
 
-StyleDefinition  StyleDefinitionBuilder::TwoColorRight(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
+StyleDefinition  CommonStyles::TwoColorRight(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
 {
     PatternData pattern;
     pattern.displayPattern = DisplayPatternType::Right;
@@ -22,7 +22,7 @@ StyleDefinition  StyleDefinitionBuilder::TwoColorRight(ulong color1, ulong color
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition StyleDefinitionBuilder::TwoColorRandom(ulong color1, ulong color2, byte duration1, byte duration2, byte updateAmount, byte speed)
+StyleDefinition CommonStyles::TwoColorRandom(ulong color1, ulong color2, byte duration1, byte duration2, byte updateAmount, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::TwoColor;
@@ -35,7 +35,7 @@ StyleDefinition StyleDefinitionBuilder::TwoColorRandom(ulong color1, ulong color
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition StyleDefinitionBuilder::TwoColorCenterOut(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
+StyleDefinition CommonStyles::TwoColorCenterOut(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::TwoColor;
@@ -47,7 +47,7 @@ StyleDefinition StyleDefinitionBuilder::TwoColorCenterOut(ulong color1, ulong co
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition StyleDefinitionBuilder::TwoColorDigit(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
+StyleDefinition CommonStyles::TwoColorDigit(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::TwoColor;
@@ -59,7 +59,7 @@ StyleDefinition StyleDefinitionBuilder::TwoColorDigit(ulong color1, ulong color2
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition StyleDefinitionBuilder::RainbowRight(byte hueIncrement, byte speed)
+StyleDefinition CommonStyles::RainbowRight(byte hueIncrement, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::Rainbow;
@@ -68,7 +68,7 @@ StyleDefinition StyleDefinitionBuilder::RainbowRight(byte hueIncrement, byte spe
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition StyleDefinitionBuilder::RainbowRandom(byte hueIncrement, byte updateAmount, byte speed)
+StyleDefinition CommonStyles::RainbowRandom(byte hueIncrement, byte updateAmount, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::Rainbow;
@@ -78,7 +78,7 @@ StyleDefinition StyleDefinitionBuilder::RainbowRandom(byte hueIncrement, byte up
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition StyleDefinitionBuilder::RainbowLava(byte hueIncrement, byte speed)
+StyleDefinition CommonStyles::RainbowLava(byte hueIncrement, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::Rainbow;

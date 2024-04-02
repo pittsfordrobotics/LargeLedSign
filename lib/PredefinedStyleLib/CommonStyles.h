@@ -1,11 +1,11 @@
-#ifndef STYLEDEFINITIONBUILDER_H
-#define STYLEDEFINITIONBUILDER_H
+#ifndef COMMONSTYLES_H
+#define COMMONSTYLES_H
 
 #include <Arduino.h>
 #include "StyleDefinition.h"
 #include <DisplayPatternLib.h>
 
-class StyleDefinitionBuilder
+class CommonStyles
 {
     public:
         static StyleDefinition SolidColor(ulong color);

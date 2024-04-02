@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <vector>
 #include "StyleDefinition.h"
-#include "StyleDefinitionBuilder.h"
+#include "CommonStyles.h"
 #include "Colors.h"
 
 class StyleList {

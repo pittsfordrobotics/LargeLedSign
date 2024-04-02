@@ -25,7 +25,7 @@ StyleDefinition StyleList::getStyle(uint listNumber, uint sequenceNumber)
     {
         // Either the button number doesn't exist or there are no sequences defined.
         // Return a default style
-        return StyleDefinitionBuilder::SolidColor(Colors::Pink);
+        return CommonStyles::SolidColor(Colors::Pink);
     }
     
     int index = sequenceNumber % m_styleLists[listNumber].size();

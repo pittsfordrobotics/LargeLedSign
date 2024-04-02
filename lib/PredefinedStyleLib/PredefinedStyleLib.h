@@ -8,7 +8,7 @@
 #include "PredefinedStyles.h"
 #include "PredefinedStyleList.h"
 #include "StyleDefinition.h"
-#include "StyleDefinitionBuilder.h"
+#include "CommonStyles.h"
 #include "Colors.h"
 #include "StyleList.h"
 
