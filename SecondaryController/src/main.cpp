@@ -24,7 +24,7 @@ PatternData currentPatternData;
 PatternData newPatternData;
 StyleDefinition lowPowerStyle = CommonStyles::LowPower();
 PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
-PredefinedStyleList* predefinedStyleList = new PredefinedStyleList(1);
+StyleList* manualStyleList = new StyleList(1);
 int buttonPressCount = 0;
 
 // Other internal state
@@ -482,7 +482,7 @@ void readInputButton()
         else
         {
             // Normal press.  Cycle through sign styles.
-            PredefinedStyle selectedStyle = predefinedStyleList->getStyle(0, buttonPressCount);
+            StyleDefinition selectedStyle = manualStyleList->getStyle(0, buttonPressCount);
             newSpeed = selectedStyle.getSpeed();
             newPatternData = selectedStyle.getPatternData();
 
@@ -498,10 +498,10 @@ void readInputButton()
 
 void setupStyleList()
 {
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::BluePink_6inch);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::RedPink_6inch);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Yellow_Solid);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Green_Solid);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Red_Solid);
+    manualStyleList->addStyleToList(0, CommonStyles::TwoColorDigit(Colors::Blue, Colors::Pink, 1, 1, 9));
+    manualStyleList->addStyleToList(0, CommonStyles::TwoColorDigit(Colors::Red, Colors::Pink, 1, 1, 9));
+    manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Yellow));
+    manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Green));
+    manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Red));
 }
  
