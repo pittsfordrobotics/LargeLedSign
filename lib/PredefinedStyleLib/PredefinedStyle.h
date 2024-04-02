@@ -2,7 +2,7 @@
 #define PREDEFINEDSTYLE_H
 
 #include <Arduino.h>
-#include <PatternData.h>
+#include <DisplayPatternLib.h>
 #include <vector>
 #include "PredefinedStyles.h"
 

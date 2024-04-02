@@ -1,7 +1,8 @@
 #ifndef PREDEFINEDSTYLES_H
 #define PREDEFINEDSTYLES_H
 
-enum class PredefinedStyles {
+enum class PredefinedStyles 
+{
     LowPower,
     Pink_Solid,
     RedPink_Right,

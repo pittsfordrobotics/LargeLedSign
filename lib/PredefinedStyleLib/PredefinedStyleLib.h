@@ -7,5 +7,9 @@
 #include "PredefinedStyle.h"
 #include "PredefinedStyles.h"
 #include "PredefinedStyleList.h"
+#include "StyleDefinition.h"
+#include "StyleDefinitionBuilder.h"
+#include "Colors.h"
+#include "StyleList.h"
 
 #endif
