@@ -86,3 +86,12 @@ StyleDefinition CommonStyles::RainbowLava(byte hueIncrement, byte speed)
     pattern.param1 = hueIncrement;
     return StyleDefinition(pattern, speed);
 }
+
+StyleDefinition CommonStyles::LowPower()
+{
+    PatternData pattern;
+    pattern.colorPattern = ColorPatternType::SingleColor;
+    pattern.displayPattern = DisplayPatternType::LowPower;
+    pattern.color1 = Colors::Red;
+    return StyleDefinition(pattern, 1);
+}

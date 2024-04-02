@@ -37,7 +37,7 @@ void startBLEService();
 void readSettingsFromBLE();
 void processManualInputs();
 void updateInputButtons();
-void setManualStyle(PredefinedStyle style);
+void setManualStyle(StyleDefinition style);
 void updateTelemetry();
 float getCalculatedBatteryVoltage();
 int getVoltageInputLevel();

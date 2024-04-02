@@ -13,7 +13,7 @@ StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 
 std::vector<PushButton *> manualInputButtons;
 std::vector<SecondaryClient *> allSecondaries;
-PredefinedStyleList* predefinedStyleList;
+StyleList* manualStyleList;
 ulong nextConnectionCheck = 0;
 bool resetRequested = false;
 bool shouldIgnoreLogo = false;
@@ -27,7 +27,7 @@ int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
 std::vector<long> secondaryTimestamps;
 
-PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
+StyleDefinition defaultStyle = CommonStyles::SolidColor(Colors::Pink);
 
 void setup()
 {
@@ -41,7 +41,7 @@ void setup()
         manualInputButtons.push_back(new PushButton(manualInputPins[i], INPUT_PULLUP));
     }
 
-    predefinedStyleList = new PredefinedStyleList(manualInputButtons.size());
+    manualStyleList = new StyleList(manualInputButtons.size());
     setupStyleLists();
 
     // If manual button 1 is pressed (ie, LOW), don't look for the logo.
@@ -147,7 +147,7 @@ void processManualInputs()
 
             // Get the vector corresponding to the button number (4 vectors; 1 per button),
             // then get the style by indexing into the vector.
-            PredefinedStyle selectedStyle = predefinedStyleList->getStyle(i, manualButtonSequenceNumber);
+            StyleDefinition selectedStyle = manualStyleList->getStyle(i, manualButtonSequenceNumber);
             setManualStyle(selectedStyle);
             manualInputButtons[i]->clearPress();
             lastManualButtonPressed = i;
@@ -155,7 +155,7 @@ void processManualInputs()
     }
 }
 
-void setManualStyle(PredefinedStyle style)
+void setManualStyle(StyleDefinition style)
 {
     currentServiceStatus.speed = style.getSpeed();
     currentServiceStatus.patternData = style.getPatternData();
@@ -426,21 +426,16 @@ void updateAllSecondaries()
 
 void setupStyleLists()
 {
-    // combine center 2 columns in the #8 sign
-    // Check sign drift
+    manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Pink));
 
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
+    manualStyleList->addStyleToList(1, CommonStyles::TwoColorRandom(Colors::Blue, Colors::Pink, 100, 100, 200, 220));
+    manualStyleList->addStyleToList(1, CommonStyles::TwoColorDigit(Colors::Blue, Colors::Pink, 20, 20, 150));
 
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random_v2);
-    //predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Right);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Digit);
+    manualStyleList->addStyleToList(2, CommonStyles::TwoColorRandom(Colors::Red, Colors::Pink, 100, 100, 200, 220));
+    manualStyleList->addStyleToList(2, CommonStyles::TwoColorDigit(Colors::Red, Colors::Pink, 20, 20, 150));
 
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random_v2);
-    //predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Right);
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Digit);
-
-    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Random_v2);
-    predefinedStyleList->addStyleToList(3, PredefinedStyles::Rainbow_Right);
+    manualStyleList->addStyleToList(3, CommonStyles::RainbowRandom(255, 50, 240));
+    manualStyleList->addStyleToList(3, CommonStyles::RainbowRight(120, 255));
 }
 
 void updateTelemetry()

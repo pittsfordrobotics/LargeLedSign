@@ -22,12 +22,10 @@ byte signType;
 byte signPosition;
 PatternData currentPatternData;
 PatternData newPatternData;
-PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
+StyleDefinition lowPowerStyle = CommonStyles::LowPower();
 PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
 PredefinedStyleList* predefinedStyleList = new PredefinedStyleList(1);
 int buttonPressCount = 0;
-
-PredefinedStyle testStyle = PredefinedStyles_new::SolidRed();
 
 // Other internal state
 int loopCounter = 0;              // Records the number of times the main loop ran since the last timing calculation.

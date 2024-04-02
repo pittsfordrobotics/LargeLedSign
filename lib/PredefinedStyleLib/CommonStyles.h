@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "StyleDefinition.h"
 #include <DisplayPatternLib.h>
+#include "Colors.h"
 
 class CommonStyles
 {
@@ -16,6 +17,7 @@ class CommonStyles
         static StyleDefinition RainbowRight(byte hueIncrement, byte speed);
         static StyleDefinition RainbowRandom(byte hueIncrement, byte updateAmound, byte speed);
         static StyleDefinition RainbowLava(byte hueIncrement, byte speed);
+        static StyleDefinition LowPower();
 };      
 
 #endif

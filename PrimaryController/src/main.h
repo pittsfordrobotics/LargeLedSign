@@ -29,7 +29,7 @@ void startBLEService();
 void readSettingsFromBLE();
 void processManualInputs();
 void updateInputButtons();
-void setManualStyle(PredefinedStyle style);
+void setManualStyle(StyleDefinition style);
 SecondaryClient* scanForSecondary();
 void consolidateTotalsAndWriteToSecondaries();
 void checkSecondaryConnections();

@@ -7,7 +7,7 @@ PixelBuffer* pixelBuffer;
 DisplayPattern* currentLightStyle;
 
 std::vector<PushButton *> manualInputButtons;
-PredefinedStyleList* predefinedStyleList;
+StyleList* manualStyleList;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 
@@ -15,9 +15,8 @@ int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
 byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
-PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
-//PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Playoff_Blue_Small);
-PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
+StyleDefinition defaultStyle = CommonStyles::SolidColor(Colors::Pink);
+StyleDefinition lowPowerStyle = CommonStyles::LowPower();
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULT_BRIGHTNESS;
@@ -127,7 +126,7 @@ void processManualInputs()
 
             // Get the vector corresponding to the button number (4 vectors; 1 per button),
             // then get the style by indexing into the vector.
-            PredefinedStyle selectedStyle = predefinedStyleList->getStyle(i, manualButtonSequenceNumber);
+            StyleDefinition selectedStyle = manualStyleList->getStyle(i, manualButtonSequenceNumber);
             setManualStyle(selectedStyle);
             manualInputButtons[i]->clearPress();
             lastManualButtonPressed = i;
@@ -135,7 +134,7 @@ void processManualInputs()
     }
 }
 
-void setManualStyle(PredefinedStyle style)
+void setManualStyle(StyleDefinition style)
 {
     newSpeed = style.getSpeed();
     newPatternData = style.getPatternData();
@@ -182,19 +181,19 @@ void readSettingsFromBLE()
 
 void setupStyleLists()
 {
-    predefinedStyleList = new PredefinedStyleList(manualInputButtons.size());
+    manualStyleList = new StyleList(manualInputButtons.size());
 
     // Styles for button 1 (id 0)
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random_v1);
-    predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
+    manualStyleList->addStyleToList(0, CommonStyles::RainbowRandom(255, 30, 245));
+    manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Pink));
 
     // Styles for button 2 (id 1)
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random_v1);
-    predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Digit);
+    manualStyleList->addStyleToList(1, CommonStyles::TwoColorRandom(Colors::Blue, Colors::Pink, 255, 255, 50, 255));
+    manualStyleList->addStyleToList(1, CommonStyles::TwoColorDigit(Colors::Blue, Colors::Pink, 20, 20, 150));
 
     // Styles for button 3 (id 2)
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random_v1);
-    predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Digit);
+    manualStyleList->addStyleToList(2, CommonStyles::TwoColorRandom(Colors::Red, Colors::Pink, 255, 255, 50, 255));
+    manualStyleList->addStyleToList(2, CommonStyles::TwoColorDigit(Colors::Red, Colors::Pink, 20, 20, 150));
 }
 
 void initializeIO()
