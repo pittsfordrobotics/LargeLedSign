@@ -1,7 +1,7 @@
 #include "main.h"
 
-std::vector<int> orderSelectorPins{ORDER_SELECTOR_PINS};     // Tells the controller which digit it's controlling (only the first pin is used so far)
-std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS}; // Tells the controller which digit it's controlling (only the first pin is used so far)
+//std::vector<int> orderSelectorPins{ORDER_SELECTOR_PINS};     // Tells the controller which digit it's controlling (only the first pin is used so far)
+//std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS}; // Tells the controller which digit it's controlling (only the first pin is used so far)
 
 // Main BLE service wrapper
 SecondaryPeripheral btService;
@@ -23,7 +23,7 @@ byte signPosition;
 PatternData currentPatternData;
 PatternData newPatternData;
 StyleDefinition lowPowerStyle = CommonStyles::LowPower();
-PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
+//PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
 StyleList* manualStyleList = new StyleList(1);
 int buttonPressCount = 0;
 
@@ -52,17 +52,19 @@ void setup()
     signType = getSignType();
     signPosition = getSignPosition();
 
-    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
+    //pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(0, 16);
+    pixelBuffer = PixelBuffer::FromJson("{}");
 
-    byte defaultBrightness = DEFAULT_BRIGHTNESS;
-    if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
-    {
-        defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
-    }
-    if (signType == PITSIGN_TYPE_ID) 
-    {
-        defaultBrightness = 255;
-    }
+    byte defaultBrightness = 20;
+    //byte defaultBrightness = DEFAULT_BRIGHTNESS;
+    // if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
+    // {
+    //     defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
+    // }
+    // if (signType == PITSIGN_TYPE_ID) 
+    // {
+    //     defaultBrightness = 255;
+    // }
 
     pixelBuffer->setBrightness(defaultBrightness);
     currentBrightness = defaultBrightness;
@@ -98,7 +100,7 @@ void loop()
 
     BLE.poll();
     emitTelemetry();
-    checkForLowPowerState();
+    //checkForLowPowerState();
 
     if (signType == PITSIGN_TYPE_ID && inLowPowerMode)
     {
@@ -123,34 +125,34 @@ void loop()
 // Initialize all input/output pins
 void initializeIO()
 {
-    Serial.println("Initializing I/O pins.");
-    for (uint i = 0; i < orderSelectorPins.size(); i++)
-    {
-        pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
-    }
+    // Serial.println("Initializing I/O pins.");
+    // for (uint i = 0; i < orderSelectorPins.size(); i++)
+    // {
+    //     pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
+    // }
 
-    for (uint i = 0; i < typeSelectorPins.size(); i++)
-    {
-        pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
-    }
+    // for (uint i = 0; i < typeSelectorPins.size(); i++)
+    // {
+    //     pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
+    // }
 
-    pinMode(VOLTAGEINPUTPIN, INPUT);
-    pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
-    pinMode(POWER_INDICATOR_PIN, OUTPUT);
+    // pinMode(VOLTAGEINPUTPIN, INPUT);
+    // pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
+    // pinMode(POWER_INDICATOR_PIN, OUTPUT);
 }
 
 byte getSignType()
 {
     // Pull the pin low to indicate active.
     byte type = 0;
-    for (uint i = 0; i < typeSelectorPins.size(); i++)
-    {
-        type = type << 1;
-        if (digitalRead(typeSelectorPins.at(i)) == LOW)
-        {
-            type++;
-        }
-    }
+    // for (uint i = 0; i < typeSelectorPins.size(); i++)
+    // {
+    //     type = type << 1;
+    //     if (digitalRead(typeSelectorPins.at(i)) == LOW)
+    //     {
+    //         type++;
+    //     }
+    // }
 
     return type;
 }
@@ -159,14 +161,14 @@ byte getSignPosition()
 {
     // Pull the pin low to indicate active.
     byte order = 0;
-    for (uint i = 0; i < orderSelectorPins.size(); i++)
-    {
-        order = order << 1;
-        if (digitalRead(orderSelectorPins.at(i)) == LOW)
-        {
-            order++;
-        }
-    }
+    // for (uint i = 0; i < orderSelectorPins.size(); i++)
+    // {
+    //     order = order << 1;
+    //     if (digitalRead(orderSelectorPins.at(i)) == LOW)
+    //     {
+    //         order++;
+    //     }
+    // }
 
     return order;
 }
@@ -366,7 +368,8 @@ float getCalculatedBatteryVoltage()
 // Read the raw value from the "voltage input" pin.
 int getVoltageInputLevel()
 {
-    return analogRead(VOLTAGEINPUTPIN);
+    //return analogRead(VOLTAGEINPUTPIN);
+    return 0;
 }
 
 // Calculate loop timing information and emit the current battery voltage level.
@@ -449,51 +452,51 @@ void turnOffPowerLed()
 
 void readInputButton()
 {
-    powerButton.update();
+    // powerButton.update();
 
-    if (powerButton.wasPressed())
-    {
-        if (powerButton.lastPressType() == ButtonPressType::Long)
-        {
-            // Long-press: Update our power state.
-            if (isOff)
-            {
-                // We're currently "off", so turn "on".
-                // Attempting to restart the BT service by restarting advertising
-                // nulls out the device's advertised name for some reason, even if
-                // we set it explicitly before restarting advertising.
-                // To get around this, just restart the entire system.
-                NVIC_SystemReset();
-            }
-            else
-            {
-                // We're currently "on", so turn "off".
-                isOff = true;
-                turnOffPowerLed();
+    // if (powerButton.wasPressed())
+    // {
+    //     if (powerButton.lastPressType() == ButtonPressType::Long)
+    //     {
+    //         // Long-press: Update our power state.
+    //         if (isOff)
+    //         {
+    //             // We're currently "off", so turn "on".
+    //             // Attempting to restart the BT service by restarting advertising
+    //             // nulls out the device's advertised name for some reason, even if
+    //             // we set it explicitly before restarting advertising.
+    //             // To get around this, just restart the entire system.
+    //             // NVIC_SystemReset(); **Doesn't exist for new platform!
+    //         }
+    //         else
+    //         {
+    //             // We're currently "on", so turn "off".
+    //             isOff = true;
+    //             turnOffPowerLed();
 
-                btService.disconnect();
-                btService.stop();
+    //             btService.disconnect();
+    //             btService.stop();
 
-                pixelBuffer->setBrightness(0);
-                pixelBuffer->displayPixels();
-                pixelBuffer->stop();
-            }
-        }
-        else
-        {
-            // Normal press.  Cycle through sign styles.
-            StyleDefinition selectedStyle = manualStyleList->getStyle(0, buttonPressCount);
-            newSpeed = selectedStyle.getSpeed();
-            newPatternData = selectedStyle.getPatternData();
+    //             pixelBuffer->setBrightness(0);
+    //             pixelBuffer->displayPixels();
+    //             pixelBuffer->stop();
+    //         }
+    //     }
+    //     else
+    //     {
+    //         // Normal press.  Cycle through sign styles.
+    //         StyleDefinition selectedStyle = manualStyleList->getStyle(0, buttonPressCount);
+    //         newSpeed = selectedStyle.getSpeed();
+    //         newPatternData = selectedStyle.getPatternData();
 
-            // Update the local BLE settings to reflect the new manual settings.
-            btService.setSpeed(newSpeed);
-            btService.setPatternData(newPatternData);
-            buttonPressCount++;
-        }
+    //         // Update the local BLE settings to reflect the new manual settings.
+    //         btService.setSpeed(newSpeed);
+    //         btService.setPatternData(newPatternData);
+    //         buttonPressCount++;
+    //     }
 
-        powerButton.clearPress();
-    }
+    //     powerButton.clearPress();
+    // }
 }
 
 void setupStyleList()

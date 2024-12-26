@@ -11,6 +11,7 @@
 class PixelBuffer {
   public:
     PixelBuffer(int gpioPin);
+    static PixelBuffer* FromJson(String jsonString);
 
     void initialize();
 

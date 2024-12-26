@@ -33,4 +33,3 @@ PixelBuffer* PixelBufferFactory::CreatePixelBufferForSignType(byte signType, int
 
     return pixelBuffer;
 }
-
