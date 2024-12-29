@@ -51,6 +51,11 @@ std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(String jsonS
 
     configs->push_back(config);
 
+    DisplayConfiguration* secondTest = new DisplayConfiguration(*config);
+    secondTest->m_gpioPin = 17;
+
+    configs->push_back(secondTest);
+
     return configs;
 }
 

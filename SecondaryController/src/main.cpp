@@ -8,6 +8,7 @@ SecondaryPeripheral btService;
 
 // Pixel and color data
 PixelBuffer *pixelBuffer;
+std::vector<PixelBuffer*> pixelBuffers;
 DisplayPattern *currentLightStyle;
 
 // Settings that are updated via bluetooth
@@ -55,11 +56,16 @@ void setup()
     //pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(0, 16);
     //pixelBuffer = PixelBuffer::FromJson("{}");
     
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson("{}");
-    pixelBuffer = new PixelBuffer(configs->at(0));
+    std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson("{}");
+    for (uint i = 0; i < displayConfigs->size(); i++)
+    {
+        pixelBuffers.push_back(new PixelBuffer(displayConfigs->at(i)));
+    }
 
-    //byte defaultBrightness = configs.at(0).getDefaultBrightness();
-    byte defaultBrightness = DEFAULT_BRIGHTNESS;
+    pixelBuffer = pixelBuffers.at(0);
+
+    byte defaultBrightness = displayConfigs->at(0)->getDefaultBrightness();
+    //byte defaultBrightness = DEFAULT_BRIGHTNESS;
     // if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
     // {
     //     defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
@@ -82,6 +88,7 @@ void setup()
     newPatternData.colorPattern = ColorPatternType::Rainbow;
     newPatternData.displayPattern = DisplayPatternType::Line;
     newPatternData.param1 = 150;
+    //currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
     currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
     if (signType == PITSIGN_TYPE_ID) 
     {
@@ -239,7 +246,12 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        pixelBuffer->setBrightness(newBrightness);
+        for (uint i = 0; i < pixelBuffers.size(); i++)
+        {
+            pixelBuffers.at(i)->setBrightness(newBrightness);
+        }
+
+        //pixelBuffer->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
 
@@ -280,10 +292,18 @@ void updateLEDs()
     // The current style shouldn't ever be null here, but check anyways.
     if (currentLightStyle)
     {
+        // *******
+        // Dang - light style directly updates the buffer.
+        //  Would need a new light style for each buffer?
+        //  Need to refactor.
         currentLightStyle->update();
     }
 
-    pixelBuffer->displayPixels();
+    for (uint i = 0; i < pixelBuffers.size(); i++)
+    {
+        pixelBuffers.at(i)->displayPixels();
+    }
+    //pixelBuffer->displayPixels();
 }
 
 // Check if the current battery voltage is too low to run the sign,
@@ -331,34 +351,34 @@ void checkForLowPowerState()
 
 void enterLowPowerMode()
 {
-    inLowPowerMode = true;
+    // inLowPowerMode = true;
 
-    // The pit sign has an explicit "low power" LED that we can use
-    // instead of blinking the display pixels.
-    if (signType == PITSIGN_TYPE_ID)
-    {
-        pixelBuffer->setBrightness(0);
-        pixelBuffer->displayPixels();
-        pixelBuffer->stop();
-    }
-    else
-    {
-        // Set up the "low power" display pattern.
-        // The next call to updateLEDs will set this pattern for us.
-        newBrightness = 255;
-        newPatternData = lowPowerStyle.getPatternData();
-        newSpeed = lowPowerStyle.getSpeed();
-        newSyncData++;
-    }
+    // // The pit sign has an explicit "low power" LED that we can use
+    // // instead of blinking the display pixels.
+    // if (signType == PITSIGN_TYPE_ID)
+    // {
+    //     pixelBuffer->setBrightness(0);
+    //     pixelBuffer->displayPixels();
+    //     pixelBuffer->stop();
+    // }
+    // else
+    // {
+    //     // Set up the "low power" display pattern.
+    //     // The next call to updateLEDs will set this pattern for us.
+    //     newBrightness = 255;
+    //     newPatternData = lowPowerStyle.getPatternData();
+    //     newSpeed = lowPowerStyle.getSpeed();
+    //     newSyncData++;
+    // }
 }
 
 void exitLowPowerMode()
 {
-    inLowPowerMode = false;
+    // inLowPowerMode = false;
 
-    pixelBuffer->resume();
-    pixelBuffer->setBrightness(currentBrightness);
-    newSyncData++;
+    // pixelBuffer->resume();
+    // pixelBuffer->setBrightness(currentBrightness);
+    // newSyncData++;
 }
 
 // Read the analog input from the "voltage input" pin and calculate the batter voltage.
@@ -425,25 +445,25 @@ void indicateBleFailure()
     Serial.println("Could not start BLE service!");
     while (true)
     {
-        // Turn all LEDs off except for the first one, which will blink red/blue.
-        pixelBuffer->setBrightness(255);
-        pixelBuffer->clearBuffer();
-        pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(0, 0, 255));
-        pixelBuffer->displayPixels();
-        delay(500);
+        // // Turn all LEDs off except for the first one, which will blink red/blue.
+        // pixelBuffer->setBrightness(255);
+        // pixelBuffer->clearBuffer();
+        // pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(0, 0, 255));
+        // pixelBuffer->displayPixels();
+        // delay(500);
 
-        pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
-        pixelBuffer->displayPixels();
-        delay(500);
+        // pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
+        // pixelBuffer->displayPixels();
+        // delay(500);
     }
 }
 
 void resetPixelBufferOffsets(SignOffsetData offsetData)
 {
-    pixelBuffer->setDigitsToLeft(offsetData.digitsToLeft);
-    pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
-    pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
-    pixelBuffer->setColsToRight(offsetData.columnsToRight);
+    // pixelBuffer->setDigitsToLeft(offsetData.digitsToLeft);
+    // pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
+    // pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
+    // pixelBuffer->setColsToRight(offsetData.columnsToRight);
 }
 
 void turnOnPowerLed()
