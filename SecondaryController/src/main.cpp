@@ -53,10 +53,10 @@ void setup()
     signPosition = getSignPosition();
 
     //pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(0, 16);
-    pixelBuffer = PixelBuffer::FromJson("{}");
+    //pixelBuffer = PixelBuffer::FromJson("{}");
     
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson("{}");
-    //pixelBuffer = new PixelBuffer(configs->at(0));
+    pixelBuffer = new PixelBuffer(configs->at(0));
 
     //byte defaultBrightness = configs.at(0).getDefaultBrightness();
     byte defaultBrightness = DEFAULT_BRIGHTNESS;

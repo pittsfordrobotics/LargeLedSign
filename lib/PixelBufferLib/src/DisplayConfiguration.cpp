@@ -12,44 +12,44 @@ std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(String jsonS
     config->m_numRows = 8;
     config->defaultBrightness = 15;
 
-    // // Map the pixel indices to rows and columns.
-    // // ROW 0 is at the TOP of the display.
-    // // COLUMN 0 is at the LEFT of the display.
-    // for (uint16_t col = 7; col >= 0; col--)
-    // {
-    //     std::vector<uint16_t> *rowVector = new std::vector<uint16_t>();
-    //     for (uint16_t row = 0; row < 8; row++)
-    //     {
-    //         if (row % 2 == 0)
-    //         {
-    //             rowVector->push_back(row * 8 + col);
-    //         }
-    //         else
-    //         {
-    //             rowVector->push_back(row * 8 + (7 - col));
-    //         }
-    //     }
-    //     config->m_rowPixelMapping.push_back(rowVector);
-    // }
+    // Map the pixel indices to rows and columns.
+    // ROW 0 is at the TOP of the display.
+    // COLUMN 0 is at the LEFT of the display.
+    for (int col = 7; col >= 0; col--)
+    {
+        std::vector<uint16_t> *rowVector = new std::vector<uint16_t>();
+        for (uint16_t row = 0; row < 8; row++)
+        {
+            if (row % 2 == 0)
+            {
+                rowVector->push_back(row * 8 + col);
+            }
+            else
+            {
+                rowVector->push_back(row * 8 + (7 - col));
+            }
+        }
+        config->m_rowPixelMapping.push_back(rowVector);
+    }
 
-    // for (uint16_t col = 7; col >= 0; col--)
-    // {
-    //     std::vector<uint16_t> *colVector = new std::vector<uint16_t>();
-    //     for (uint16_t row = 0; row < 8; row++)
-    //     {
-    //         colVector->push_back(col * 8 + row);
-    //     }
-    //     config->m_columnPixelMapping.push_back(colVector);
-    // }
+    for (int col = 7; col >= 0; col--)
+    {
+        std::vector<uint16_t> *colVector = new std::vector<uint16_t>();
+        for (uint16_t row = 0; row < 8; row++)
+        {
+            colVector->push_back(col * 8 + row);
+        }
+        config->m_columnPixelMapping.push_back(colVector);
+    }
 
-    // config->m_digitPixelMapping.push_back(new std::vector<uint16_t>());
+    config->m_digitPixelMapping.push_back(new std::vector<uint16_t>());
     
-    // for (uint i = 0; i < config->m_numPixels; i++)
-    // {
-    //     config->m_digitPixelMapping[0]->push_back(i);
-    // }
+    for (uint i = 0; i < config->m_numPixels; i++)
+    {
+        config->m_digitPixelMapping[0]->push_back(i);
+    }
 
-    // configs->push_back(config);
+    configs->push_back(config);
 
     return configs;
 }
