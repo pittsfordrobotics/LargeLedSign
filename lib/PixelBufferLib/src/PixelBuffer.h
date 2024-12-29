@@ -13,7 +13,6 @@ class PixelBuffer {
   public:
     PixelBuffer(int gpioPin);
     PixelBuffer(const DisplayConfiguration* displayConfiguration);
-    static PixelBuffer* FromJson(String jsonString);
 
     void initialize();
 

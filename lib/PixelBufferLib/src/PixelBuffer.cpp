@@ -63,55 +63,6 @@ PixelBuffer::PixelBuffer(const DisplayConfiguration* displayConfiguration)
     m_neoPixels->setBrightness(config.getDefaultBrightness());
 }
 
-PixelBuffer* PixelBuffer::FromJson(String jsonString)
-{
-    PixelBuffer* pixelBuffer = new PixelBuffer(16);
-    pixelBuffer->m_numPixels = 256;
-    pixelBuffer->m_pixelBufferSize = std::max((uint) PB_MINIMUM_PIXELS, pixelBuffer->m_numPixels);
-    pixelBuffer->m_pixelColors = new uint32_t[pixelBuffer->m_pixelBufferSize];
-
-    // Map the pixel indices to rows and columns.
-    // ROW 0 is at the TOP of the display.
-    // COLUMN 0 is at the LEFT of the display.
-    for (int col = 7; col >= 0; col--)
-    {
-        std::vector<int> *rowVector = new std::vector<int>();
-        for (int row = 0; row < 8; row++)
-        {
-            if (row % 2 == 0)
-            {
-                rowVector->push_back(row * 8 + col);
-            }
-            else
-            {
-                rowVector->push_back(row * 8 + (7 - col));
-            }
-        }
-        pixelBuffer->m_rows.push_back(rowVector);
-    }
-
-    for (int col = 7; col >= 0; col--)
-    {
-        std::vector<int> *colVector = new std::vector<int>();
-        for (int row = 0; row < 8; row++)
-        {
-            colVector->push_back(col * 8 + row);
-        }
-        pixelBuffer->m_columns.push_back(colVector);
-    }
-
-    pixelBuffer->m_digits.push_back(new std::vector<int>());
-    
-    for (uint i = 0; i < pixelBuffer->m_numPixels; i++)
-    {
-        pixelBuffer->m_digits[0]->push_back(i);
-    }
-
-    pixelBuffer->initialize();
-
-    return pixelBuffer;
-}
-
 void PixelBuffer::initialize()
 {
     m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
