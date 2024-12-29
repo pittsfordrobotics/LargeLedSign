@@ -5,12 +5,14 @@
 #include <Adafruit_NeoPixel.h>
 #include <vector>
 #include <algorithm>
+#include "DisplayConfiguration.h"
 
 #define PB_MINIMUM_PIXELS 360
 
 class PixelBuffer {
   public:
     PixelBuffer(int gpioPin);
+    PixelBuffer(const DisplayConfiguration* displayConfiguration);
     static PixelBuffer* FromJson(String jsonString);
 
     void initialize();

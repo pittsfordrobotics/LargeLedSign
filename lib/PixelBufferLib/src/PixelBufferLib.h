@@ -7,5 +7,6 @@
 #include <algorithm>
 #include "PixelBuffer.h"
 #include "PixelBufferFactory.h"
+#include "DisplayConfiguration.h"
 
 #endif

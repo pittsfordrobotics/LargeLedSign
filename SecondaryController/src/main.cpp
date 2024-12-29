@@ -54,9 +54,12 @@ void setup()
 
     //pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(0, 16);
     pixelBuffer = PixelBuffer::FromJson("{}");
+    
+    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson("{}");
+    //pixelBuffer = new PixelBuffer(configs->at(0));
 
-    byte defaultBrightness = 20;
-    //byte defaultBrightness = DEFAULT_BRIGHTNESS;
+    //byte defaultBrightness = configs.at(0).getDefaultBrightness();
+    byte defaultBrightness = DEFAULT_BRIGHTNESS;
     // if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
     // {
     //     defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
@@ -66,16 +69,19 @@ void setup()
     //     defaultBrightness = 255;
     // }
 
-    pixelBuffer->setBrightness(defaultBrightness);
+    //pixelBuffer->setBrightness(defaultBrightness);
     currentBrightness = defaultBrightness;
     newBrightness = defaultBrightness;
 
     startBLE();
 
     // Setup the default pattern to show prior to any BT connections
-    newPatternData.colorPattern = ColorPatternType::SingleColor;
-    newPatternData.displayPattern = DisplayPatternType::Solid;
-    newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
+    // newPatternData.colorPattern = ColorPatternType::SingleColor;
+    // newPatternData.displayPattern = DisplayPatternType::Solid;
+    // newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
+    newPatternData.colorPattern = ColorPatternType::Rainbow;
+    newPatternData.displayPattern = DisplayPatternType::Line;
+    newPatternData.param1 = 150;
     currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
     if (signType == PITSIGN_TYPE_ID) 
     {

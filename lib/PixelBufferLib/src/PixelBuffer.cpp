@@ -9,10 +9,64 @@ PixelBuffer::PixelBuffer(int gpioPin)
     m_gpioPin = gpioPin;
 }
 
+PixelBuffer::PixelBuffer(const DisplayConfiguration* displayConfiguration)
+{
+    // Todo: Could stash the config copy and reference the row-pixel, col-pixel, etc, maps
+    // directly from the config object instead of copying them to internal members.
+    DisplayConfiguration config(*displayConfiguration);
+    
+    m_gpioPin = config.getGpioPin();
+    m_numPixels = config.getNumberOfPixels();
+    m_pixelBufferSize = std::max((uint) PB_MINIMUM_PIXELS, m_numPixels);
+    m_pixelColors = new uint32_t[m_pixelBufferSize];
+
+    m_digitsToLeft = config.getDigitsToLeft();
+    m_digitsToRight = config.getDigitsToRight();
+    m_colsToLeft = config.getColumnsToLeft();
+    m_colsToRight = config.getColumnsToRight();
+
+    for (int row = 0; row < config.getRowPixelMapping().size(); row++)
+    {
+        std::vector<int>* rowMap = new std::vector<int>();
+        for (int pixel = 0; pixel < config.getRowPixelMapping().at(row)->size(); pixel++)
+        {
+            rowMap->push_back(config.getRowPixelMapping().at(row)->at(pixel));
+        }
+
+        m_rows.push_back(rowMap);
+    }
+
+    for (int col = 0; col < config.getColumnPixelMapping().size(); col++)
+    {
+        std::vector<int>* colMap = new std::vector<int>();
+        for (int pixel = 0; pixel < config.getColumnPixelMapping().at(col)->size(); pixel++)
+        {
+            colMap->push_back(config.getColumnPixelMapping().at(col)->at(pixel));
+        }
+
+        m_columns.push_back(colMap);
+    }
+
+    for (int digit = 0; digit < config.getDigitPixelMapping().size(); digit++)
+    {
+        std::vector<int>* digitMap = new std::vector<int>();
+        for (int pixel = 0; pixel < config.getDigitPixelMapping().at(digit)->size(); pixel++)
+        {
+            digitMap->push_back(config.getDigitPixelMapping().at(digit)->at(pixel));
+        }
+
+        m_digits.push_back(digitMap);
+    }
+
+    // Todo: Migrate brightness into initialize method.
+    initialize();
+    m_neoPixels->setBrightness(config.getDefaultBrightness());
+}
+
 PixelBuffer* PixelBuffer::FromJson(String jsonString)
 {
     PixelBuffer* pixelBuffer = new PixelBuffer(16);
-    pixelBuffer->m_numPixels = 64;
+    pixelBuffer->m_numPixels = 256;
     pixelBuffer->m_pixelBufferSize = std::max((uint) PB_MINIMUM_PIXELS, pixelBuffer->m_numPixels);
     pixelBuffer->m_pixelColors = new uint32_t[pixelBuffer->m_pixelBufferSize];
 
