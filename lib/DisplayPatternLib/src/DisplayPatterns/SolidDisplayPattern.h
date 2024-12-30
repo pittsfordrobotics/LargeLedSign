@@ -13,9 +13,7 @@ class SolidDisplayPattern : public DisplayPattern
         static std::vector<String> getParameterNames();
 
     protected:
-        virtual void updateInternal();
         virtual void updateInternal(PixelBuffer* pixelBuffer);
-        virtual void resetInternal();
         virtual void resetInternal(PixelBuffer* pixelBuffer);
 };
 

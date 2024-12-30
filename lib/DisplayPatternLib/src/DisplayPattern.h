@@ -20,20 +20,14 @@ class DisplayPattern {
         void setColorPattern(ColorPattern* colorPattern);
         void setSpeed(byte speed);
 
-        void update();
-        void reset();
-
-        // NEW
         bool update(PixelBuffer* pixelBuffer);
         void reset(PixelBuffer* pixelBuffer);
 
     protected:
         // Called by the "update" method when it's time to update the display.
-        virtual void updateInternal() = 0;
         virtual void updateInternal(PixelBuffer* pixelBuffer) = 0;
 
         // Called by the "reset" method to perform any pattern-specific reset logic.
-        virtual void resetInternal() = 0;
         virtual void resetInternal(PixelBuffer* pixelBuffer) = 0;
         
         ColorPattern* m_colorPattern;

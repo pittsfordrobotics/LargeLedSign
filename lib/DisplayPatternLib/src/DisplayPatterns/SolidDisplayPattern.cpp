@@ -4,17 +4,6 @@ SolidDisplayPattern::SolidDisplayPattern(PixelBuffer* pixelBuffer) : DisplayPatt
 {
 }
 
-void SolidDisplayPattern::resetInternal()
-{
-    m_colorPattern->reset();
-    m_pixelBuffer->fill(m_colorPattern->getNextColor());
-}
-
-void SolidDisplayPattern::updateInternal()
-{
-    m_pixelBuffer->fill(m_colorPattern->getNextColor());
-}
-
 void SolidDisplayPattern::resetInternal(PixelBuffer* pixelBuffer)
 {
     m_colorPattern->reset();
