@@ -1,6 +1,6 @@
 #include "SolidDisplayPattern.h"
 
-SolidDisplayPattern::SolidDisplayPattern(PixelBuffer* pixelBuffer) : DisplayPattern(pixelBuffer)
+SolidDisplayPattern::SolidDisplayPattern() : DisplayPattern()
 {
 }
 

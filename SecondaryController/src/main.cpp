@@ -92,11 +92,11 @@ void setup()
     newPatternData.colorPattern = ColorPatternType::Rainbow;
     newPatternData.displayPattern = DisplayPatternType::Line;
     newPatternData.param1 = 150;
-    currentLightStyle = PatternFactory::createForPatternData(newPatternData, neoPixelDisplay->getPixelBuffer());
+    currentLightStyle = PatternFactory::createForPatternData(newPatternData);
     if (signType == PITSIGN_TYPE_ID) 
     {
         newPatternData.color1 = Adafruit_NeoPixel::Color(255,0,0);
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, neoPixelDisplay->getPixelBuffer());
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData);
     }
     btService.setPatternData(newPatternData);
 }
@@ -286,7 +286,7 @@ void updateLEDs()
             delete currentLightStyle;
         }
 
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, neoPixelDisplay->getPixelBuffer());
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData);
         currentLightStyle->setSpeed(newSpeed);
         //currentLightStyle->reset();
         neoPixelDisplay->setDisplayPattern(currentLightStyle);

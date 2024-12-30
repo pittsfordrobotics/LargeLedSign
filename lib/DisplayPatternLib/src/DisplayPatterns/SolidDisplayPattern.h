@@ -8,7 +8,7 @@
 class SolidDisplayPattern : public DisplayPattern
 {
     public:
-        SolidDisplayPattern(PixelBuffer* pixelBuffer);
+        SolidDisplayPattern();
 
         static std::vector<String> getParameterNames();
 

@@ -16,7 +16,7 @@ enum class ShiftType {
 
 class SimpleShiftDisplayPattern : public DisplayPattern{
     public:
-        SimpleShiftDisplayPattern(ShiftType shiftType, PixelBuffer* pixelBuffer);
+        SimpleShiftDisplayPattern(ShiftType shiftType);
 
         static std::vector<String> getParameterNames();
 

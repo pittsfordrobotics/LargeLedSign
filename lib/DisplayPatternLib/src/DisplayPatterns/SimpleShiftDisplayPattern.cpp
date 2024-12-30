@@ -1,6 +1,6 @@
 #include "SimpleShiftDisplayPattern.h"
 
-SimpleShiftDisplayPattern::SimpleShiftDisplayPattern(ShiftType shiftType, PixelBuffer* pixelBuffer) : DisplayPattern(pixelBuffer)
+SimpleShiftDisplayPattern::SimpleShiftDisplayPattern(ShiftType shiftType) : DisplayPattern()
 {
     m_shiftType = shiftType;
 }

@@ -10,8 +10,6 @@
 class DisplayPattern {
     public:
         // Instantiates a new DisplayPattern.
-        // The PixelBuffer will survive destruction of the class,
-        DisplayPattern(PixelBuffer* pixelBuffer);
         DisplayPattern();
         virtual ~DisplayPattern();
 
@@ -31,7 +29,6 @@ class DisplayPattern {
         virtual void resetInternal(PixelBuffer* pixelBuffer) = 0;
         
         ColorPattern* m_colorPattern;
-        PixelBuffer* m_pixelBuffer;
 
     private:
         ulong m_nextUpdate{0};

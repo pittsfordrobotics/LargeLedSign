@@ -8,7 +8,7 @@
 class LowPowerDisplayPattern : public DisplayPattern
 {
     public:
-        LowPowerDisplayPattern(PixelBuffer* pixelBuffer);
+        LowPowerDisplayPattern();
 
         static std::vector<String> getParameterNames();
 

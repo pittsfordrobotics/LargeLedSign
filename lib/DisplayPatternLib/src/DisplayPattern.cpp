@@ -1,8 +1,7 @@
 #include "DisplayPattern.h"
 
-DisplayPattern::DisplayPattern(PixelBuffer* pixelBuffer)
+DisplayPattern::DisplayPattern()
 {
-    m_pixelBuffer = pixelBuffer;
 }
 
 DisplayPattern::~DisplayPattern()

@@ -1,6 +1,6 @@
 #include "RandomDisplayPattern.h"
 
-RandomDisplayPattern::RandomDisplayPattern(PixelBuffer* pixelBuffer) : DisplayPattern(pixelBuffer)
+RandomDisplayPattern::RandomDisplayPattern() : DisplayPattern()
 {
 }
 

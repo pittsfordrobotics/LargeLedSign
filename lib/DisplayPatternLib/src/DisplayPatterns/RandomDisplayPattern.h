@@ -9,7 +9,7 @@
 class RandomDisplayPattern : public DisplayPattern
 {
     public:
-        RandomDisplayPattern(PixelBuffer* pixelBuffer);
+        RandomDisplayPattern();
         void setUpdateAmount(byte updateAmount);
 
         static std::vector<String> getParameterNames();

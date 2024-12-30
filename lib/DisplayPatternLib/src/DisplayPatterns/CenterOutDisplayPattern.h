@@ -14,7 +14,6 @@ enum class CenterOutOrientation {
 
 class CenterOutDisplayPattern : public DisplayPattern {
     public:
-        CenterOutDisplayPattern(CenterOutOrientation orientation, PixelBuffer* pixelBuffer);
         CenterOutDisplayPattern(CenterOutOrientation orientation);
 
         static std::vector<String> getParameterNames();

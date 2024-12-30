@@ -1,10 +1,5 @@
 #include "CenterOutDisplayPattern.h"
 
-CenterOutDisplayPattern::CenterOutDisplayPattern(CenterOutOrientation orientation, PixelBuffer* pixelBuffer) : DisplayPattern(pixelBuffer)
-{
-    m_orientation = orientation;
-}
-
 CenterOutDisplayPattern::CenterOutDisplayPattern(CenterOutOrientation orientation) : DisplayPattern()
 {
     m_orientation = orientation;

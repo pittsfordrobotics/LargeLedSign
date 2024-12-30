@@ -1,6 +1,6 @@
 #include "LowPowerDisplayPattern.h"
 
-LowPowerDisplayPattern::LowPowerDisplayPattern(PixelBuffer* pixelBuffer) : DisplayPattern(pixelBuffer)
+LowPowerDisplayPattern::LowPowerDisplayPattern() : DisplayPattern()
 {
 }
 
