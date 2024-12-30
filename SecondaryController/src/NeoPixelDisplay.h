@@ -12,7 +12,8 @@ class NeoPixelDisplay
         NeoPixelDisplay(const DisplayConfiguration* displayConfiguration);
 
         void setBrightness(byte brightess);
-        void setDisplayPattern(DisplayPattern* displayPattern);
+        void setDisplayPattern(DisplayPattern* displayPattern) { m_displayPattern = displayPattern; }
+        DisplayPattern* getDisplayPattern() { return m_displayPattern; }
         void updateDisplay();
         void resetDisplay();
 
