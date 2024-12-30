@@ -7,10 +7,8 @@
 SecondaryPeripheral btService;
 
 // Pixel and color data
-//PixelBuffer *pixelBuffer;
-//std::vector<PixelBuffer*> pixelBuffers;
-
-NeoPixelDisplay *neoPixelDisplay;
+std::vector<NeoPixelDisplay*> neoPixelDisplays;
+//NeoPixelDisplay *neoPixelDisplay;
 DisplayPattern *currentLightStyle;
 
 // Settings that are updated via bluetooth
@@ -59,14 +57,14 @@ void setup()
     //pixelBuffer = PixelBuffer::FromJson("{}");
     
     std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson("{}");
-    // for (uint i = 0; i < displayConfigs->size(); i++)
-    // {
-    //     pixelBuffers.push_back(new PixelBuffer(displayConfigs->at(i)));
-    // }
+    for (uint i = 0; i < displayConfigs->size(); i++)
+    {
+        neoPixelDisplays.push_back(new NeoPixelDisplay(displayConfigs->at(i)));
+    }
 
     //pixelBuffer = new PixelBuffer(displayConfigs->at(0));
 
-    neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
+    //neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
 
     byte defaultBrightness = displayConfigs->at(0)->getDefaultBrightness();
     //byte defaultBrightness = DEFAULT_BRIGHTNESS;
@@ -89,6 +87,7 @@ void setup()
     // newPatternData.colorPattern = ColorPatternType::SingleColor;
     // newPatternData.displayPattern = DisplayPatternType::Solid;
     // newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
+    // Read default from JSON?
     newPatternData.colorPattern = ColorPatternType::Rainbow;
     newPatternData.displayPattern = DisplayPatternType::Line;
     newPatternData.param1 = 150;
@@ -249,13 +248,13 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        // for (uint i = 0; i < pixelBuffers.size(); i++)
-        // {
-        //     pixelBuffers.at(i)->setBrightness(newBrightness);
-        // }
+        for (uint i = 0; i < neoPixelDisplays.size(); i++)
+        {
+            neoPixelDisplays.at(i)->setBrightness(newBrightness);
+        }
 
         //pixelBuffer->setBrightness(newBrightness);
-        neoPixelDisplay->setBrightness(newBrightness);
+        //neoPixelDisplay->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
 
@@ -289,8 +288,13 @@ void updateLEDs()
         currentLightStyle = PatternFactory::createForPatternData(newPatternData);
         currentLightStyle->setSpeed(newSpeed);
         //currentLightStyle->reset();
-        neoPixelDisplay->setDisplayPattern(currentLightStyle);
-        neoPixelDisplay->resetDisplay();
+        //neoPixelDisplay->setDisplayPattern(currentLightStyle);
+        //neoPixelDisplay->resetDisplay();
+        for (int i = 0; i < neoPixelDisplays.size(); i++)
+        {
+            neoPixelDisplays.at(i)->setDisplayPattern(currentLightStyle);
+            neoPixelDisplays.at(i)->resetDisplay();
+        }
 
         currentPatternData = newPatternData;
     }
@@ -299,7 +303,11 @@ void updateLEDs()
     if (currentLightStyle)
     {
         //currentLightStyle->update();
-        neoPixelDisplay->updateDisplay();
+        //neoPixelDisplay->updateDisplay();
+        for (int i = 0; i < neoPixelDisplays.size(); i++)
+        {
+            neoPixelDisplays.at(i)->updateDisplay();
+        }
     }
 
     // for (uint i = 0; i < pixelBuffers.size(); i++)
