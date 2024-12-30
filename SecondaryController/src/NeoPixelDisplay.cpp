@@ -2,7 +2,7 @@
 
 NeoPixelDisplay::NeoPixelDisplay(const DisplayConfiguration* displayConfiguration)
 {
-    m_pixelBuffer = new PixelBuffer2(displayConfiguration);
+    m_pixelBuffer = new PixelBuffer(displayConfiguration);
     m_neoPixels = new Adafruit_NeoPixel(m_pixelBuffer->getPixelCount(), displayConfiguration->getGpioPin(), NEO_GRB + NEO_KHZ800);
     m_neoPixels->begin();
     m_neoPixels->clear();

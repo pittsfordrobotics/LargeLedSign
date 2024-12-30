@@ -22,15 +22,15 @@ class SimpleShiftDisplayPattern : public DisplayPattern{
 
     protected:
         virtual void updateInternal();
-        virtual void updateInternal(PixelBuffer2* pixelBuffer);
+        virtual void updateInternal(PixelBuffer* pixelBuffer);
         virtual void resetInternal();
-        virtual void resetInternal(PixelBuffer2* pixelBuffer);
+        virtual void resetInternal(PixelBuffer* pixelBuffer);
 
     private:
         int getNumberOfBlocksForPattern();
-        int getNumberOfBlocksForPattern(PixelBuffer2* pixelBuffer);
+        int getNumberOfBlocksForPattern(PixelBuffer* pixelBuffer);
         int getInitialIncrementAmount();
-        int getInitialIncrementAmount(PixelBuffer2* pixelBuffer);
+        int getInitialIncrementAmount(PixelBuffer* pixelBuffer);
         ShiftType m_shiftType{ShiftType::Right};
 };
 

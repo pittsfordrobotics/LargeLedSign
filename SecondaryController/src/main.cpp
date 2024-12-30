@@ -7,7 +7,7 @@
 SecondaryPeripheral btService;
 
 // Pixel and color data
-PixelBuffer *pixelBuffer;
+//PixelBuffer *pixelBuffer;
 //std::vector<PixelBuffer*> pixelBuffers;
 
 NeoPixelDisplay *neoPixelDisplay;
@@ -64,7 +64,7 @@ void setup()
     //     pixelBuffers.push_back(new PixelBuffer(displayConfigs->at(i)));
     // }
 
-    pixelBuffer = new PixelBuffer(displayConfigs->at(0));
+    //pixelBuffer = new PixelBuffer(displayConfigs->at(0));
 
     neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
 
@@ -92,11 +92,11 @@ void setup()
     newPatternData.colorPattern = ColorPatternType::Rainbow;
     newPatternData.displayPattern = DisplayPatternType::Line;
     newPatternData.param1 = 150;
-    currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
+    currentLightStyle = PatternFactory::createForPatternData(newPatternData, neoPixelDisplay->getPixelBuffer());
     if (signType == PITSIGN_TYPE_ID) 
     {
         newPatternData.color1 = Adafruit_NeoPixel::Color(255,0,0);
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData, neoPixelDisplay->getPixelBuffer());
     }
     btService.setPatternData(newPatternData);
 }
@@ -211,8 +211,8 @@ void startBLE()
     SignConfigurationData configData;
     configData.signType = signType;
     configData.signOrder = signPosition;
-    configData.columnCount = pixelBuffer->getColumnCount();
-    configData.pixelCount = pixelBuffer->getPixelCount();
+    //configData.columnCount = pixelBuffer->getColumnCount();
+    //configData.pixelCount = pixelBuffer->getPixelCount();
 
     // If the sign "position" is 0, then we'll assume we're standalone.
     String uuid = signPosition == 0
@@ -286,7 +286,7 @@ void updateLEDs()
             delete currentLightStyle;
         }
 
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData, neoPixelDisplay->getPixelBuffer());
         currentLightStyle->setSpeed(newSpeed);
         //currentLightStyle->reset();
         neoPixelDisplay->setDisplayPattern(currentLightStyle);

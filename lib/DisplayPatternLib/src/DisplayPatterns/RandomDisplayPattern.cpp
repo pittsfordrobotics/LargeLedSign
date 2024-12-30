@@ -18,7 +18,7 @@ void RandomDisplayPattern::resetInternal()
     m_pixelBuffer->fill(0);
 }
 
-void RandomDisplayPattern::resetInternal(PixelBuffer2* pixelBuffer)
+void RandomDisplayPattern::resetInternal(PixelBuffer* pixelBuffer)
 {
     m_colorPattern->reset();
     // Reset the background to black
@@ -36,7 +36,7 @@ void RandomDisplayPattern::updateInternal()
     m_pixelBuffer->fillRandomly(newColor, numPixelsToFill);
 }
 
-void RandomDisplayPattern::updateInternal(PixelBuffer2* pixelBuffer)
+void RandomDisplayPattern::updateInternal(PixelBuffer* pixelBuffer)
 {
     // Grab the next color and fill all needed random pixels with that color.
     // TBD: have the option to grab the next color for each pixel to be filled.

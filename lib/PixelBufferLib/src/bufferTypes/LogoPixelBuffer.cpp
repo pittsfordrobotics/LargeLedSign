@@ -1,6 +1,6 @@
 #include "LogoPixelBuffer.h"
 
-LogoPixelBuffer::LogoPixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
+LogoPixelBuffer::LogoPixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 {
     // 140 actual pixels
     // 23 columns, 24 rows

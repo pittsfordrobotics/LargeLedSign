@@ -15,13 +15,13 @@ void SolidDisplayPattern::updateInternal()
     m_pixelBuffer->fill(m_colorPattern->getNextColor());
 }
 
-void SolidDisplayPattern::resetInternal(PixelBuffer2* pixelBuffer)
+void SolidDisplayPattern::resetInternal(PixelBuffer* pixelBuffer)
 {
     m_colorPattern->reset();
     pixelBuffer->fill(m_colorPattern->getNextColor());
 }
 
-void SolidDisplayPattern::updateInternal(PixelBuffer2* pixelBuffer)
+void SolidDisplayPattern::updateInternal(PixelBuffer* pixelBuffer)
 {
     pixelBuffer->fill(m_colorPattern->getNextColor());
 }

@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include "DisplayPattern.h"
 #include "PixelBuffer.h"
-#include "PixelBuffer2.h"
 #include <vector>
 #include <algorithm>
 
@@ -22,9 +21,9 @@ class CenterOutDisplayPattern : public DisplayPattern {
 
     protected:
         virtual void updateInternal();
-        virtual void updateInternal(PixelBuffer2* pixelBuffer);
+        virtual void updateInternal(PixelBuffer* pixelBuffer);
         virtual void resetInternal();
-        virtual void resetInternal(PixelBuffer2* pixelBuffer);
+        virtual void resetInternal(PixelBuffer* pixelBuffer);
 
     private:
         CenterOutOrientation m_orientation{CenterOutOrientation::Horizontal};

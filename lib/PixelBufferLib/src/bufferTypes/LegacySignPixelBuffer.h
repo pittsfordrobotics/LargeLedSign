@@ -3,9 +3,9 @@
 
 #include <Arduino.h>
 #include <algorithm>
-#include "PixelBuffer.h"
+#include "PixelBuffer_Old.h"
 
-class LegacySignPixelBuffer : public PixelBuffer 
+class LegacySignPixelBuffer : public PixelBuffer_Old
 {
     public:
         LegacySignPixelBuffer(int gpioPin);

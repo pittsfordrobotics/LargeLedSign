@@ -1,6 +1,6 @@
 #include "Digit8PixelBuffer.h"
 
-Digit8PixelBuffer::Digit8PixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
+Digit8PixelBuffer::Digit8PixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 {
     // 356 actual pixels
     // 23 columns, 39 rows

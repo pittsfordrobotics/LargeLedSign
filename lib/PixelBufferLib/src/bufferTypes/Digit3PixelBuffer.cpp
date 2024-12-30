@@ -1,6 +1,6 @@
 #include "Digit3PixelBuffer.h"
 
-Digit3PixelBuffer::Digit3PixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
+Digit3PixelBuffer::Digit3PixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 {
     // 313 actual pixels
     // 23 columns, 39 rows

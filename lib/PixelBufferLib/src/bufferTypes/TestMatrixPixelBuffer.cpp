@@ -1,6 +1,6 @@
 #include "TestMatrixPixelBuffer.h"
 
-TestMatrixPixelBuffer::TestMatrixPixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
+TestMatrixPixelBuffer::TestMatrixPixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 {
     m_numPixels = 64;
     m_pixelBufferSize = std::max((uint) PB_MINIMUM_PIXELS, m_numPixels);

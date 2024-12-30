@@ -3,9 +3,9 @@
 
 #include <Arduino.h>
 #include <algorithm>
-#include "PixelBuffer.h"
+#include "PixelBuffer_Old.h"
 
-class Digit8PixelBuffer : public PixelBuffer 
+class Digit8PixelBuffer : public PixelBuffer_Old 
 {
     public:
         Digit8PixelBuffer(int gpioPin);

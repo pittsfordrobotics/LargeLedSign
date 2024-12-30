@@ -1,7 +1,7 @@
 #ifndef PIXELBUFFERFACTORY_H
 #define PIXELBUFFERFACTORY_H
 
-#include "PixelBuffer.h"
+#include "PixelBuffer_Old.h"
 #include "bufferTypes/Digit1PixelBuffer.h"
 #include "bufferTypes/Digit3PixelBuffer.h"
 #include "bufferTypes/Digit8PixelBuffer.h"
@@ -13,7 +13,7 @@
 class PixelBufferFactory
 {
     public:
-        static PixelBuffer* CreatePixelBufferForSignType(byte signType, int gpioPin);
+        static PixelBuffer_Old* CreatePixelBufferForSignType(byte signType, int gpioPin);
 };
 
 #endif

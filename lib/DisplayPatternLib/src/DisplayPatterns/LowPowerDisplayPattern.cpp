@@ -13,7 +13,7 @@ void LowPowerDisplayPattern::resetInternal()
     m_pixelBuffer->fill(0);
 }
 
-void LowPowerDisplayPattern::resetInternal(PixelBuffer2* pixelBuffer)
+void LowPowerDisplayPattern::resetInternal(PixelBuffer* pixelBuffer)
 {
     m_iterationCount = 0;
     m_colorPattern->reset();
@@ -40,7 +40,7 @@ void LowPowerDisplayPattern::updateInternal()
     m_iterationCount++;    
 }
 
-void LowPowerDisplayPattern::updateInternal(PixelBuffer2* pixelBuffer)
+void LowPowerDisplayPattern::updateInternal(PixelBuffer* pixelBuffer)
 {
     // We're just emitting a single blinking pixel.
     // Instead of calling m_colorPattern->getNextColor() each time,

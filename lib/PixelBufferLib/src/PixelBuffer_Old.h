@@ -1,19 +1,32 @@
-#ifndef PIXEL_BUFFER_2_H
-#define PIXEL_BUFFER_2_H
+#ifndef PIXEL_BUFFER_OLD_H
+#define PIXEL_BUFFER_OLD_H
 
 #include <Arduino.h>
+#include <Adafruit_NeoPixel.h>
 #include <vector>
 #include <algorithm>
 #include "DisplayConfiguration.h"
 
-class PixelBuffer2 {
+#define PB_MINIMUM_PIXELS 360
+
+class PixelBuffer_Old {
   public:
-    PixelBuffer2(const DisplayConfiguration* displayConfiguration);
+    PixelBuffer_Old(int gpioPin);
+    PixelBuffer_Old(const DisplayConfiguration* displayConfiguration);
+
+    void initialize();
+
+    void setDigitsToLeft(uint digitsToLeft) { m_digitsToLeft = digitsToLeft; }
+    void setDigitsToRight(uint digitsToRight) { m_digitsToRight = digitsToRight; }
+    void setColsToLeft(uint colsToLeft) { m_colsToLeft = colsToLeft; }
+    void setColsToRight(uint colsToRight) { m_colsToRight = colsToRight; }
 
     uint getDigitsToLeft() { return m_digitsToLeft; }
     uint getDigitsToRight() { return m_digitsToRight; }
     uint getColsToLeft() { return m_colsToLeft; }
     uint getColsToRight() { return m_colsToRight; }
+
+    void setBrightness(byte brightess);
 
     // Sets the first pixel in the buffer to the new color,
     // shifting all the pixels in the buffer to the right by one.
@@ -83,14 +96,22 @@ class PixelBuffer2 {
     // Set an individual pixel in the buffer to a color.
     void setPixel(uint pixel, ulong color);
 
-    ulong getPixel(uint pixel);
+    // Output the internal pixel buffer to the NeoPixel LEDs.
+    void displayPixels();
 
-    // Clears the internal pixel buffer.
+    // Clears the internal pixel buffer, but does not reset the NeoPixel LEDs.
     void clearBuffer();
-    
-  private:
-    uint m_numPixels{0};
-    ulong* m_pixelBuffer;;
+
+    // Stop processing any LED output updates.
+    void stop();
+
+    // Resume processing LED output updates.
+    void resume();
+
+  protected:
+    uint m_numPixels{0};       // Size of internal buffer
+    uint m_pixelBufferSize{0}; // Size of NeoPixel buffer
+    ulong* m_pixelColors;
     uint m_digitsToLeft{0};
     uint m_digitsToRight{0};
     uint m_colsToLeft{0};
@@ -98,7 +119,11 @@ class PixelBuffer2 {
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     std::vector<std::vector<int>*> m_digits;
-
+    
+  private:
+    bool m_isStopped{false};
+    int m_gpioPin;
+    Adafruit_NeoPixel* m_neoPixels;
     void setColorForMappedPixels(std::vector<int>* destination, ulong newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);

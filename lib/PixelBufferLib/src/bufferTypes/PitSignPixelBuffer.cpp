@@ -1,6 +1,6 @@
 #include "PitSignPixelBuffer.h"
 
-PitSignPixelBuffer::PitSignPixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
+PitSignPixelBuffer::PitSignPixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 {
     // 272 actual pixels
     // 54 total columns, 17 rows

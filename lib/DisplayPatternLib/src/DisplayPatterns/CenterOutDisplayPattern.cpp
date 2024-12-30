@@ -70,7 +70,7 @@ void CenterOutDisplayPattern::resetInternal()
     }    
 }
 
-void CenterOutDisplayPattern::resetInternal(PixelBuffer2* pixelBuffer)
+void CenterOutDisplayPattern::resetInternal(PixelBuffer* pixelBuffer)
 {
     m_colorPattern->reset();
     if (m_orientation == CenterOutOrientation::Vertical)
@@ -157,7 +157,7 @@ void CenterOutDisplayPattern::updateInternal()
     }
 }
 
-void CenterOutDisplayPattern::updateInternal(PixelBuffer2* pixelBuffer)
+void CenterOutDisplayPattern::updateInternal(PixelBuffer* pixelBuffer)
 {
     ulong newColor = m_colorPattern->getNextColor();
 

@@ -16,9 +16,12 @@ class NeoPixelDisplay
         void updateDisplay();
         void resetDisplay();
 
+        // Temp
+        PixelBuffer* getPixelBuffer() { return m_pixelBuffer; }
+
     private:
         Adafruit_NeoPixel* m_neoPixels;
-        PixelBuffer2* m_pixelBuffer;
+        PixelBuffer* m_pixelBuffer;
         DisplayPattern* m_displayPattern;
 
         void outputPixels();

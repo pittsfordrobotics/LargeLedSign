@@ -17,7 +17,7 @@ void SimpleShiftDisplayPattern::resetInternal()
     }
 }
 
-void SimpleShiftDisplayPattern::resetInternal(PixelBuffer2* pixelBuffer)
+void SimpleShiftDisplayPattern::resetInternal(PixelBuffer* pixelBuffer)
 {
     m_colorPattern->reset();
     m_colorPattern->incrementOnly(getInitialIncrementAmount());
@@ -59,7 +59,7 @@ void SimpleShiftDisplayPattern::updateInternal()
     }
 }
 
-void SimpleShiftDisplayPattern::updateInternal(PixelBuffer2* pixelBuffer)
+void SimpleShiftDisplayPattern::updateInternal(PixelBuffer* pixelBuffer)
 {
     ulong newColor = m_colorPattern->getNextColor();
 
@@ -104,7 +104,7 @@ int SimpleShiftDisplayPattern::getInitialIncrementAmount()
     }
 }
 
-int SimpleShiftDisplayPattern::getInitialIncrementAmount(PixelBuffer2* pixelBuffer)
+int SimpleShiftDisplayPattern::getInitialIncrementAmount(PixelBuffer* pixelBuffer)
 {
     switch (m_shiftType)
     {
@@ -135,7 +135,7 @@ int SimpleShiftDisplayPattern::getNumberOfBlocksForPattern()
     }
 }
 
-int SimpleShiftDisplayPattern::getNumberOfBlocksForPattern(PixelBuffer2* pixelBuffer)
+int SimpleShiftDisplayPattern::getNumberOfBlocksForPattern(PixelBuffer* pixelBuffer)
 {
     switch (m_shiftType)
     {

@@ -1,6 +1,6 @@
 #include "LegacySignPixelBuffer.h"
 
-LegacySignPixelBuffer::LegacySignPixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
+LegacySignPixelBuffer::LegacySignPixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 {
     m_numPixels = 458;
     m_pixelBufferSize = m_numPixels;

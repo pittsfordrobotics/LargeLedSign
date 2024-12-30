@@ -1,25 +1,13 @@
 #include "PixelBuffer.h"
 
-// All pixel buffers will have at least this many pixels, even if not used.
-// This is done to help the signs stay in sync.
-uint minimumPixelsInBuffer = 360;
-
-PixelBuffer::PixelBuffer(int gpioPin)
-{
-    m_gpioPin = gpioPin;
-}
-
 PixelBuffer::PixelBuffer(const DisplayConfiguration* displayConfiguration)
 {
     // Todo: Could stash the config copy and reference the row-pixel, col-pixel, etc, maps
     // directly from the config object instead of copying them to internal members.
     DisplayConfiguration config(*displayConfiguration);
-    
-    m_gpioPin = config.getGpioPin();
-    m_numPixels = config.getNumberOfPixels();
-    m_pixelBufferSize = std::max((uint) PB_MINIMUM_PIXELS, m_numPixels);
-    m_pixelColors = new uint32_t[m_pixelBufferSize];
 
+    m_numPixels = config.getNumberOfPixels();
+    m_pixelBuffer = new uint32_t[m_numPixels];
     m_digitsToLeft = config.getDigitsToLeft();
     m_digitsToRight = config.getDigitsToRight();
     m_colsToLeft = config.getColumnsToLeft();
@@ -58,64 +46,17 @@ PixelBuffer::PixelBuffer(const DisplayConfiguration* displayConfiguration)
         m_digits.push_back(digitMap);
     }
 
-    // Todo: Migrate brightness into initialize method.
-    initialize();
-    m_neoPixels->setBrightness(config.getDefaultBrightness());
-}
-
-void PixelBuffer::initialize()
-{
-    m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
     clearBuffer();
-    m_neoPixels->begin();
-    m_neoPixels->clear();
 }
 
 void PixelBuffer::clearBuffer()
 {
-    for (uint i = 0; i < m_pixelBufferSize; i++)
+    for (uint i = 0; i < m_numPixels; i++)
     {
-        m_pixelColors[i] = 0;
+        m_pixelBuffer[i] = 0;
     }
 }
 
-void PixelBuffer::stop()
-{
-    m_isStopped = true;
-}
-
-void PixelBuffer::resume()
-{
-    m_isStopped = false;
-}
-
-void PixelBuffer::displayPixels()
-{
-    if (m_isStopped)
-    {
-        return;
-    }
-
-    for (uint i = 0; i < m_pixelBufferSize; i++)
-    {
-        m_neoPixels->setPixelColor(i, m_pixelColors[i]);
-    }
-
-    unsigned long start = millis();
-    m_neoPixels->show();
-
-    // I have no idea why, but if we exit immediately and try to read BLE settings,
-    // the BLE readings are sometimes corrupt.  If we wait until the "show" is done
-    // and delay a tiny bit more, things are stable.
-    while (!m_neoPixels->canShow())
-    {
-        // wait for the "show" to complete
-    }
-    while (millis() - start < 10)
-    {
-        // wait until at least 10 msec have passed since starting the "show"
-    }
-}
 
 uint PixelBuffer::getColumnCount()
 {
@@ -132,26 +73,31 @@ uint PixelBuffer::getPixelCount()
     return m_numPixels;
 }
 
-void PixelBuffer::setBrightness(byte brightness)
-{
-    m_neoPixels->setBrightness(brightness);
-}
-
 void PixelBuffer::setPixel(unsigned int pixel, ulong color)
 {
-    if (pixel >= m_pixelBufferSize)
+    if (pixel >= m_numPixels)
     {
         return;
     }
 
-    m_pixelColors[pixel] = color;
+    m_pixelBuffer[pixel] = color;
+}
+
+ulong PixelBuffer::getPixel(uint pixel)
+{
+    if (pixel >= m_numPixels)
+    {
+        return 0;
+    }
+
+    return m_pixelBuffer[pixel];
 }
 
 void PixelBuffer::fill(ulong newColor)
 {
-    for (uint i = 0; i < m_pixelBufferSize; i++)
+    for (uint i = 0; i < m_numPixels; i++)
     {
-        m_pixelColors[i] = newColor;
+        m_pixelBuffer[i] = newColor;
     }
 }
 
@@ -160,28 +106,28 @@ void PixelBuffer::fillRandomly(ulong newColor, uint numberOfPixels)
     for (uint i = 0; i < numberOfPixels; i++)
     {
         int pixel = random(0, m_numPixels);
-        m_pixelColors[pixel] = newColor;
+        m_pixelBuffer[pixel] = newColor;
     }
 }
 
 void PixelBuffer::shiftPixelsRight(ulong newColor)
 {
-    for (uint i = m_pixelBufferSize - 1; i >= 1; i--)
+    for (uint i = m_numPixels - 1; i >= 1; i--)
     {
-        m_pixelColors[i] = m_pixelColors[i - 1];
+        m_pixelBuffer[i] = m_pixelBuffer[i - 1];
     }
 
-    m_pixelColors[0] = newColor;
+    m_pixelBuffer[0] = newColor;
 }
 
 void PixelBuffer::shiftPixelsLeft(ulong newColor)
 {
-    for (uint i = 0; i < m_pixelBufferSize - 1; i++)
+    for (uint i = 0; i < m_numPixels - 1; i++)
     {
-        m_pixelColors[i] = m_pixelColors[i + 1];
+        m_pixelBuffer[i] = m_pixelBuffer[i + 1];
     }
 
-    m_pixelColors[m_numPixels - 1] = newColor;
+    m_pixelBuffer[m_numPixels - 1] = newColor;
 }
 
 void PixelBuffer::shiftColumnsRight(ulong newColor)
@@ -231,12 +177,12 @@ void PixelBuffer::shiftDigitsRight(ulong newColor)
 
 void PixelBuffer::shiftLine(ulong newColor)
 {
-    for (uint i = m_pixelBufferSize - 1; i > 0; i--)
+    for (uint i = m_numPixels - 1; i > 0; i--)
     {
-        m_pixelColors[i] = m_pixelColors[i - 1];
+        m_pixelBuffer[i] = m_pixelBuffer[i - 1];
     }
 
-    m_pixelColors[0] = newColor;
+    m_pixelBuffer[0] = newColor;
 }
 
 void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, ulong newColor, uint startingBlock)
@@ -246,7 +192,7 @@ void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlo
         std::vector<int> *source = pixelBlocks.at(i - 1);
         std::vector<int> *destination = pixelBlocks.at(i);
         // Find the color of the first pixel in the source column, and set the destination column to that color.
-        uint32_t previousColor = m_pixelColors[source->at(0)];
+        uint32_t previousColor = m_pixelBuffer[source->at(0)];
         setColorForMappedPixels(destination, previousColor);
     }
 
@@ -260,7 +206,7 @@ void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBloc
         std::vector<int> *source = pixelBlocks.at(i + 1);
         std::vector<int> *destination = pixelBlocks.at(i);
         // Find the color of the first pixel in the source column, and set the destination column to that color.
-        uint32_t previousColor = m_pixelColors[source->at(0)];
+        uint32_t previousColor = m_pixelBuffer[source->at(0)];
         setColorForMappedPixels(destination, previousColor);
     }
 
@@ -272,6 +218,6 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_
     for (uint i = 0; i < destination->size(); i++)
     {
         int pixelIndex = destination->at(i);
-        m_pixelColors[pixelIndex] = newColor;
+        m_pixelBuffer[pixelIndex] = newColor;
     }
 }

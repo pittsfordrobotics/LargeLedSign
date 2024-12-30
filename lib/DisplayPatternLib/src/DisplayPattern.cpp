@@ -47,7 +47,7 @@ void DisplayPattern::update()
     updateInternal();
 }
 
-void DisplayPattern::reset(PixelBuffer2* pixelBuffer)
+void DisplayPattern::reset(PixelBuffer* pixelBuffer)
 {
     if (m_colorPattern)
     {
@@ -55,7 +55,7 @@ void DisplayPattern::reset(PixelBuffer2* pixelBuffer)
     }
 }
 
-bool DisplayPattern::update(PixelBuffer2* pixelBuffer)
+bool DisplayPattern::update(PixelBuffer* pixelBuffer)
 {
     if (!m_colorPattern)
     {

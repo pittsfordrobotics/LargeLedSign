@@ -1,8 +1,8 @@
 #include "PixelBufferFactory.h"
 
-PixelBuffer* PixelBufferFactory::CreatePixelBufferForSignType(byte signType, int gpioPin)
+PixelBuffer_Old* PixelBufferFactory::CreatePixelBufferForSignType(byte signType, int gpioPin)
 {
-    PixelBuffer* pixelBuffer;
+    PixelBuffer_Old* pixelBuffer;
 
     switch (signType)
     {
