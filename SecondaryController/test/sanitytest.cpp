@@ -17,7 +17,5 @@ int main(int argc, char **argv) {
 
     RUN_TEST(sanity_test);
     
-    UNITY_END();
-
-    return 0;
+    return UNITY_END();
 }
