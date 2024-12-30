@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "DisplayPattern.h"
 #include "PixelBuffer.h"
+#include "PixelBuffer2.h"
 
 class LowPowerDisplayPattern : public DisplayPattern
 {
@@ -14,7 +15,9 @@ class LowPowerDisplayPattern : public DisplayPattern
 
     protected:
         virtual void updateInternal();
+        virtual void updateInternal(PixelBuffer2* pixelBuffer);
         virtual void resetInternal();
+        virtual void resetInternal(PixelBuffer2* pixelBuffer);
 
     private:
         uint m_iterationCount{0};

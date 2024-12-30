@@ -14,7 +14,9 @@ class SolidDisplayPattern : public DisplayPattern
 
     protected:
         virtual void updateInternal();
+        virtual void updateInternal(PixelBuffer2* pixelBuffer);
         virtual void resetInternal();
+        virtual void resetInternal(PixelBuffer2* pixelBuffer);
 };
 
 #endif

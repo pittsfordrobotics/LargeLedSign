@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include "PixelBuffer.h"
+#include "PixelBuffer2.h"
 #include "PixelBufferFactory.h"
 #include "DisplayConfiguration.h"
 

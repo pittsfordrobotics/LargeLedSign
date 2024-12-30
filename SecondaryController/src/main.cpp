@@ -8,7 +8,9 @@ SecondaryPeripheral btService;
 
 // Pixel and color data
 PixelBuffer *pixelBuffer;
-std::vector<PixelBuffer*> pixelBuffers;
+//std::vector<PixelBuffer*> pixelBuffers;
+
+NeoPixelDisplay *neoPixelDisplay;
 DisplayPattern *currentLightStyle;
 
 // Settings that are updated via bluetooth
@@ -57,12 +59,14 @@ void setup()
     //pixelBuffer = PixelBuffer::FromJson("{}");
     
     std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson("{}");
-    for (uint i = 0; i < displayConfigs->size(); i++)
-    {
-        pixelBuffers.push_back(new PixelBuffer(displayConfigs->at(i)));
-    }
+    // for (uint i = 0; i < displayConfigs->size(); i++)
+    // {
+    //     pixelBuffers.push_back(new PixelBuffer(displayConfigs->at(i)));
+    // }
 
-    pixelBuffer = pixelBuffers.at(0);
+    pixelBuffer = new PixelBuffer(displayConfigs->at(0));
+
+    neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
 
     byte defaultBrightness = displayConfigs->at(0)->getDefaultBrightness();
     //byte defaultBrightness = DEFAULT_BRIGHTNESS;
@@ -88,7 +92,6 @@ void setup()
     newPatternData.colorPattern = ColorPatternType::Rainbow;
     newPatternData.displayPattern = DisplayPatternType::Line;
     newPatternData.param1 = 150;
-    //currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
     currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
     if (signType == PITSIGN_TYPE_ID) 
     {
@@ -246,12 +249,13 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        for (uint i = 0; i < pixelBuffers.size(); i++)
-        {
-            pixelBuffers.at(i)->setBrightness(newBrightness);
-        }
+        // for (uint i = 0; i < pixelBuffers.size(); i++)
+        // {
+        //     pixelBuffers.at(i)->setBrightness(newBrightness);
+        // }
 
         //pixelBuffer->setBrightness(newBrightness);
+        neoPixelDisplay->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
 
@@ -284,7 +288,9 @@ void updateLEDs()
 
         currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
         currentLightStyle->setSpeed(newSpeed);
-        currentLightStyle->reset();
+        //currentLightStyle->reset();
+        neoPixelDisplay->setDisplayPattern(currentLightStyle);
+        neoPixelDisplay->resetDisplay();
 
         currentPatternData = newPatternData;
     }
@@ -292,17 +298,14 @@ void updateLEDs()
     // The current style shouldn't ever be null here, but check anyways.
     if (currentLightStyle)
     {
-        // *******
-        // Dang - light style directly updates the buffer.
-        //  Would need a new light style for each buffer?
-        //  Need to refactor.
-        currentLightStyle->update();
+        //currentLightStyle->update();
+        neoPixelDisplay->updateDisplay();
     }
 
-    for (uint i = 0; i < pixelBuffers.size(); i++)
-    {
-        pixelBuffers.at(i)->displayPixels();
-    }
+    // for (uint i = 0; i < pixelBuffers.size(); i++)
+    // {
+    //     pixelBuffers.at(i)->displayPixels();
+    // }
     //pixelBuffer->displayPixels();
 }
 

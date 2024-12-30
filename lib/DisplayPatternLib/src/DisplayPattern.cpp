@@ -46,3 +46,29 @@ void DisplayPattern::update()
     m_nextUpdate = millis() + m_iterationDelay;
     updateInternal();
 }
+
+void DisplayPattern::reset(PixelBuffer2* pixelBuffer)
+{
+    if (m_colorPattern)
+    {
+        resetInternal(pixelBuffer);
+    }
+}
+
+bool DisplayPattern::update(PixelBuffer2* pixelBuffer)
+{
+    if (!m_colorPattern)
+    {
+        return false;
+    }
+    
+    if (millis() < m_nextUpdate)
+    {
+        return false;
+    }
+
+    m_nextUpdate = millis() + m_iterationDelay;
+    updateInternal(pixelBuffer);
+    
+    return true;
+}
