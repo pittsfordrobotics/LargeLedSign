@@ -35,6 +35,7 @@ ulong lastBtTimestampUpdate = 0;  // The last time the 'timestamp' BT characteri
 byte inLowPowerMode = false;      // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 bool isOff = false;
+volatile bool isInitialized = false;
 
 // Main entry point for the program --
 // This is run once at startup.
@@ -101,6 +102,8 @@ void setup()
     }
 
     btService.setPatternData(newPatternData);
+
+    isInitialized = true;
 }
 
 // Main loop --
@@ -137,6 +140,18 @@ void loop()
     }
 
     // Apply any updates that were received via BLE or manually
+    //updateLEDs();
+}
+
+void setup1()
+{
+    while(!isInitialized) {}
+}
+
+void loop1()
+{
+    // Check for threading issues!!!
+    // Serial.println("Looping");
     updateLEDs();
 }
 
