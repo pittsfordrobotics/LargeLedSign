@@ -6,7 +6,6 @@
 #include <MathUtils.h>
 #include <PixelBufferLib.h>
 #include <vector>
-#include <map>
 
 class DisplayPattern {
     public:
@@ -32,8 +31,8 @@ class DisplayPattern {
         ColorPattern* m_colorPattern;
 
     private:
+        ulong m_nextUpdate{0};
         uint m_iterationDelay{0};
-        std::map<PixelBuffer*, ulong> m_lastUpdateTimes{};
 };
 
 #endif

@@ -37,21 +37,12 @@ bool DisplayPattern::update(PixelBuffer* pixelBuffer)
         return false;
     }
     
-    // Find the last time this buffer was updated.
-    if (m_lastUpdateTimes.find(pixelBuffer) == m_lastUpdateTimes.end())
-    {
-        // Not found. Add the initial value of 0.
-        m_lastUpdateTimes[pixelBuffer] = 0;
-    }
-
-    ulong nextUpdate = m_lastUpdateTimes[pixelBuffer];
-
     if (millis() < m_nextUpdate)
     {
         return false;
     }
 
-    m_lastUpdateTimes[pixelBuffer] = millis() + m_iterationDelay;
+    m_nextUpdate = millis() + m_iterationDelay;
     updateInternal(pixelBuffer);
     
     return true;
