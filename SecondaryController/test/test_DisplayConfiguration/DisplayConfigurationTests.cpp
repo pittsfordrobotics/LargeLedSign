@@ -18,25 +18,38 @@ void sanityTest() {
 void parseJsonWithEmptyString() {
     const char* jsonString = "";
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
-    TEST_ASSERT_EQUAL(0, configs->size());
+    TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
 void parseJsonWithEmptyObject() {
     const char* jsonString = "{}";
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
-    TEST_ASSERT_EQUAL(0, configs->size());
+    TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
 void parseJsonWithEmptyDisplayArray() {
     const char* jsonString = "{\"displays\":[]}";
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
-    TEST_ASSERT_EQUAL(0, configs->size());
+    TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
 void parseFullTestMatrixJson() {
     const char* jsonString = fullTestMatrixJson();
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
-    TEST_ASSERT_EQUAL(1, configs->size());
+    TEST_ASSERT_EQUAL_MESSAGE(1, configs->size(), "Expected 1 display configuration");
+    TEST_ASSERT_EQUAL_MESSAGE(16, config->getGpioPin(), "GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(64, config->getNumberOfPixels(), "Number of pixels is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(15, config->getDefaultBrightness(), "Default brightness is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, config->getRowsAbove(), "Rows above is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(2, config->getRowsBelow(), "Rows below is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(3, config->getColumnsToLeft(), "Columns to left is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(4, config->getColumnsToRight(), "Columns to right is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(5, config->getDigitsToLeft(), "Digits to left is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(6, config->getDigitsToRight(), "Digits to right is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(8, config->getColumnPixelMapping().size(), "Column pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(8, config->getRowPixelMapping().size(), "Row pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, config->getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(64, config->getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
 }
 
 int main(int argc, char **argv) {
