@@ -6,7 +6,7 @@ PitSignPixelBuffer::PitSignPixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
     // 54 total columns, 17 rows
     m_numPixels = 272;
     m_pixelBufferSize = m_numPixels;
-    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_pixelColors = new unsigned long[m_pixelBufferSize];
 
     m_columns.push_back(new std::vector<int>{3, 75});
     m_columns.push_back(new std::vector<int>{0, 6, 72, 78});

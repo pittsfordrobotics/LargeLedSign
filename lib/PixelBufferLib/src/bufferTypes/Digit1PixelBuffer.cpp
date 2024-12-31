@@ -5,8 +5,8 @@ Digit1PixelBuffer::Digit1PixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
     // 216 actual pixels
     // 18 columns, 40 rows
     m_numPixels = 216;
-    m_pixelBufferSize = std::max((uint) PB_MINIMUM_PIXELS, m_numPixels);
-    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_pixelBufferSize = std::max((unsigned int) PB_MINIMUM_PIXELS, m_numPixels);
+    m_pixelColors = new unsigned long[m_pixelBufferSize];
 
     m_columns.push_back(new std::vector<int>{ 180, 189, 198 });
     m_columns.push_back(new std::vector<int>{ 185, 194, 203 });
@@ -70,7 +70,7 @@ Digit1PixelBuffer::Digit1PixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 
     m_digits.push_back(new std::vector<int>());
     
-    for (uint i = 0; i < m_numPixels; i++)
+    for (int i = 0; i < m_numPixels; i++)
     {
         m_digits[0]->push_back(i);
     }

@@ -2,7 +2,7 @@
 
 // All pixel buffers will have at least this many pixels, even if not used.
 // This is done to help the signs stay in sync.
-uint minimumPixelsInBuffer = 360;
+unsigned int minimumPixelsInBuffer = 360;
 
 PixelBuffer_Old::PixelBuffer_Old(int gpioPin)
 {
@@ -17,8 +17,8 @@ PixelBuffer_Old::PixelBuffer_Old(const DisplayConfiguration* displayConfiguratio
     
     m_gpioPin = config.getGpioPin();
     m_numPixels = config.getNumberOfPixels();
-    m_pixelBufferSize = std::max((uint) PB_MINIMUM_PIXELS, m_numPixels);
-    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_pixelBufferSize = std::max((unsigned int) PB_MINIMUM_PIXELS, m_numPixels);
+    m_pixelColors = new unsigned long[m_pixelBufferSize];
 
     m_digitsToLeft = config.getDigitsToLeft();
     m_digitsToRight = config.getDigitsToRight();
@@ -60,20 +60,15 @@ PixelBuffer_Old::PixelBuffer_Old(const DisplayConfiguration* displayConfiguratio
 
     // Todo: Migrate brightness into initialize method.
     initialize();
-    m_neoPixels->setBrightness(config.getDefaultBrightness());
 }
 
 void PixelBuffer_Old::initialize()
 {
-    m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
-    clearBuffer();
-    m_neoPixels->begin();
-    m_neoPixels->clear();
 }
 
 void PixelBuffer_Old::clearBuffer()
 {
-    for (uint i = 0; i < m_pixelBufferSize; i++)
+    for (unsigned int i = 0; i < m_pixelBufferSize; i++)
     {
         m_pixelColors[i] = 0;
     }
@@ -91,53 +86,28 @@ void PixelBuffer_Old::resume()
 
 void PixelBuffer_Old::displayPixels()
 {
-    if (m_isStopped)
-    {
-        return;
-    }
-
-    for (uint i = 0; i < m_pixelBufferSize; i++)
-    {
-        m_neoPixels->setPixelColor(i, m_pixelColors[i]);
-    }
-
-    unsigned long start = millis();
-    m_neoPixels->show();
-
-    // I have no idea why, but if we exit immediately and try to read BLE settings,
-    // the BLE readings are sometimes corrupt.  If we wait until the "show" is done
-    // and delay a tiny bit more, things are stable.
-    while (!m_neoPixels->canShow())
-    {
-        // wait for the "show" to complete
-    }
-    while (millis() - start < 10)
-    {
-        // wait until at least 10 msec have passed since starting the "show"
-    }
 }
 
-uint PixelBuffer_Old::getColumnCount()
+unsigned int PixelBuffer_Old::getColumnCount()
 {
     return m_columns.size();
 }
 
-uint PixelBuffer_Old::getRowCount()
+unsigned int PixelBuffer_Old::getRowCount()
 {
     return m_rows.size();
 }
 
-uint PixelBuffer_Old::getPixelCount()
+unsigned int PixelBuffer_Old::getPixelCount()
 {
     return m_numPixels;
 }
 
 void PixelBuffer_Old::setBrightness(byte brightness)
 {
-    m_neoPixels->setBrightness(brightness);
 }
 
-void PixelBuffer_Old::setPixel(unsigned int pixel, ulong color)
+void PixelBuffer_Old::setPixel(unsigned int pixel, unsigned long color)
 {
     if (pixel >= m_pixelBufferSize)
     {
@@ -147,26 +117,26 @@ void PixelBuffer_Old::setPixel(unsigned int pixel, ulong color)
     m_pixelColors[pixel] = color;
 }
 
-void PixelBuffer_Old::fill(ulong newColor)
+void PixelBuffer_Old::fill(unsigned long newColor)
 {
-    for (uint i = 0; i < m_pixelBufferSize; i++)
+    for (unsigned int i = 0; i < m_pixelBufferSize; i++)
     {
         m_pixelColors[i] = newColor;
     }
 }
 
-void PixelBuffer_Old::fillRandomly(ulong newColor, uint numberOfPixels)
+void PixelBuffer_Old::fillRandomly(unsigned long newColor, unsigned int numberOfPixels)
 {
-    for (uint i = 0; i < numberOfPixels; i++)
+    for (unsigned int i = 0; i < numberOfPixels; i++)
     {
         int pixel = random(0, m_numPixels);
         m_pixelColors[pixel] = newColor;
     }
 }
 
-void PixelBuffer_Old::shiftPixelsRight(ulong newColor)
+void PixelBuffer_Old::shiftPixelsRight(unsigned long newColor)
 {
-    for (uint i = m_pixelBufferSize - 1; i >= 1; i--)
+    for (unsigned int i = m_pixelBufferSize - 1; i >= 1; i--)
     {
         m_pixelColors[i] = m_pixelColors[i - 1];
     }
@@ -174,9 +144,9 @@ void PixelBuffer_Old::shiftPixelsRight(ulong newColor)
     m_pixelColors[0] = newColor;
 }
 
-void PixelBuffer_Old::shiftPixelsLeft(ulong newColor)
+void PixelBuffer_Old::shiftPixelsLeft(unsigned long newColor)
 {
-    for (uint i = 0; i < m_pixelBufferSize - 1; i++)
+    for (unsigned int i = 0; i < m_pixelBufferSize - 1; i++)
     {
         m_pixelColors[i] = m_pixelColors[i + 1];
     }
@@ -184,54 +154,54 @@ void PixelBuffer_Old::shiftPixelsLeft(ulong newColor)
     m_pixelColors[m_numPixels - 1] = newColor;
 }
 
-void PixelBuffer_Old::shiftColumnsRight(ulong newColor)
+void PixelBuffer_Old::shiftColumnsRight(unsigned long newColor)
 {
     shiftPixelBlocksRight(m_columns, newColor, 0);
 }
 
-void PixelBuffer_Old::shiftColumnsRight(ulong newColor, uint startingColumn)
+void PixelBuffer_Old::shiftColumnsRight(unsigned long newColor, unsigned int startingColumn)
 {
     shiftPixelBlocksRight(m_columns, newColor, startingColumn);
 }
 
-void PixelBuffer_Old::shiftColumnsLeft(ulong newColor)
+void PixelBuffer_Old::shiftColumnsLeft(unsigned long newColor)
 {
     shiftPixelBlocksLeft(m_columns, newColor, m_columns.size() - 1);
 }
 
-void PixelBuffer_Old::shiftColumnsLeft(ulong newColor, uint startingColumn)
+void PixelBuffer_Old::shiftColumnsLeft(unsigned long newColor, unsigned int startingColumn)
 {
     shiftPixelBlocksLeft(m_columns, newColor, startingColumn);
 }
 
-void PixelBuffer_Old::shiftRowsUp(ulong newColor)
+void PixelBuffer_Old::shiftRowsUp(unsigned long newColor)
 {
     shiftPixelBlocksLeft(m_rows, newColor, m_rows.size() - 1);
 }
 
-void PixelBuffer_Old::shiftRowsUp(ulong newColor, uint startingRow)
+void PixelBuffer_Old::shiftRowsUp(unsigned long newColor, unsigned int startingRow)
 {
     shiftPixelBlocksLeft(m_rows, newColor, startingRow);
 }
 
-void PixelBuffer_Old::shiftRowsDown(ulong newColor)
+void PixelBuffer_Old::shiftRowsDown(unsigned long newColor)
 {
     shiftPixelBlocksRight(m_rows, newColor, 0);
 }
 
-void PixelBuffer_Old::shiftRowsDown(ulong newColor, uint startingRow)
+void PixelBuffer_Old::shiftRowsDown(unsigned long newColor, unsigned int startingRow)
 {
     shiftPixelBlocksRight(m_rows, newColor, startingRow);
 }
 
-void PixelBuffer_Old::shiftDigitsRight(ulong newColor)
+void PixelBuffer_Old::shiftDigitsRight(unsigned long newColor)
 {
     shiftPixelBlocksRight(m_digits, newColor, 0);
 }
 
-void PixelBuffer_Old::shiftLine(ulong newColor)
+void PixelBuffer_Old::shiftLine(unsigned long newColor)
 {
-    for (uint i = m_pixelBufferSize - 1; i > 0; i--)
+    for (unsigned int i = m_pixelBufferSize - 1; i > 0; i--)
     {
         m_pixelColors[i] = m_pixelColors[i - 1];
     }
@@ -239,9 +209,9 @@ void PixelBuffer_Old::shiftLine(ulong newColor)
     m_pixelColors[0] = newColor;
 }
 
-void PixelBuffer_Old::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, ulong newColor, uint startingBlock)
+void PixelBuffer_Old::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, unsigned long newColor, unsigned int startingBlock)
 {
-    for (uint i = pixelBlocks.size() - 1; i > startingBlock; i--)
+    for (unsigned int i = pixelBlocks.size() - 1; i > startingBlock; i--)
     {
         std::vector<int> *source = pixelBlocks.at(i - 1);
         std::vector<int> *destination = pixelBlocks.at(i);
@@ -253,9 +223,9 @@ void PixelBuffer_Old::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixe
     setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
 }
 
-void PixelBuffer_Old::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks, ulong newColor, uint startingBlock)
+void PixelBuffer_Old::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks, unsigned long newColor, unsigned int startingBlock)
 {
-    for (uint i = 0; i < startingBlock; i++)
+    for (unsigned int i = 0; i < startingBlock; i++)
     {
         std::vector<int> *source = pixelBlocks.at(i + 1);
         std::vector<int> *destination = pixelBlocks.at(i);
@@ -267,9 +237,9 @@ void PixelBuffer_Old::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixel
     setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
 }
 
-void PixelBuffer_Old::setColorForMappedPixels(std::vector<int> *destination, uint32_t newColor)
+void PixelBuffer_Old::setColorForMappedPixels(std::vector<int> *destination, unsigned long newColor)
 {
-    for (uint i = 0; i < destination->size(); i++)
+    for (unsigned int i = 0; i < destination->size(); i++)
     {
         int pixelIndex = destination->at(i);
         m_pixelColors[pixelIndex] = newColor;

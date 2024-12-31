@@ -9,7 +9,7 @@ Digit8PixelBuffer::Digit8PixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
     //m_pixelColors = new uint32_t[m_pixelBufferSize];
 
     m_pixelBufferSize = 356; // number of pixels in the neopixel buffer
-    m_pixelColors = new uint32_t[m_numPixels];
+    m_pixelColors = new unsigned long[m_numPixels];
 
     //0
     m_columns.push_back(new std::vector<int>{ 0, 9, 18, 27, 36, 240, 249, 258, 267, 276, 308, 351});
@@ -90,7 +90,7 @@ Digit8PixelBuffer::Digit8PixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 
     m_digits.push_back(new std::vector<int>());
     
-    for (uint i = 0; i < m_numPixels; i++)
+    for (int i = 0; i < m_numPixels; i++)
     {
         m_digits[0]->push_back(i);
     }

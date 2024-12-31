@@ -3,8 +3,8 @@
 TestMatrixPixelBuffer::TestMatrixPixelBuffer(int gpioPin) : PixelBuffer_Old(gpioPin)
 {
     m_numPixels = 64;
-    m_pixelBufferSize = std::max((uint) PB_MINIMUM_PIXELS, m_numPixels);
-    m_pixelColors = new uint32_t[m_pixelBufferSize];
+    m_pixelBufferSize = std::max((unsigned int) PB_MINIMUM_PIXELS, m_numPixels);
+    m_pixelColors = new unsigned long[m_pixelBufferSize];
 
     // Map the pixel indices to rows, columns.
     // ROW 0 is at the TOP of the display.
@@ -38,7 +38,7 @@ TestMatrixPixelBuffer::TestMatrixPixelBuffer(int gpioPin) : PixelBuffer_Old(gpio
 
     m_digits.push_back(new std::vector<int>());
     
-    for (uint i = 0; i < m_numPixels; i++)
+    for (int i = 0; i < m_numPixels; i++)
     {
         m_digits[0]->push_back(i);
     }

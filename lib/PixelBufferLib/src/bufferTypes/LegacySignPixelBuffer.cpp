@@ -4,7 +4,7 @@ LegacySignPixelBuffer::LegacySignPixelBuffer(int gpioPin) : PixelBuffer_Old(gpio
 {
     m_numPixels = 458;
     m_pixelBufferSize = m_numPixels;
-    m_pixelColors = new uint32_t[m_numPixels];
+    m_pixelColors = new unsigned long[m_numPixels];
 
     // Map the pixel indices to rows, columns, and digits.
     // ROW 0 is at the TOP of the display.

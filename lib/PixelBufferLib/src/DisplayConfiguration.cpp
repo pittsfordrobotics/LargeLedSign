@@ -44,7 +44,7 @@ std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(String jsonS
 
     config->m_digitPixelMapping.push_back(new std::vector<uint16_t>());
     
-    for (uint i = 0; i < config->m_numPixels; i++)
+    for (int i = 0; i < config->m_numPixels; i++)
     {
         config->m_digitPixelMapping[0]->push_back(i);
     }
