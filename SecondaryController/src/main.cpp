@@ -54,7 +54,8 @@ void setup()
     signType = getSignType();
     signPosition = getSignPosition();
 
-    std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson("{}");
+    const char* dummyJson = "{}";
+    std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson(dummyJson);
     for (uint i = 0; i < displayConfigs->size(); i++)
     {
         NeoPixelDisplay* display = new NeoPixelDisplay(displayConfigs->at(i));

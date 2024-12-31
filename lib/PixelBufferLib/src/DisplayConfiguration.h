@@ -3,11 +3,12 @@
 
 #include <Arduino.h>
 #include <vector>
+#include <ArduinoJson.h>
 
 class DisplayConfiguration
 {
     public:
-        static std::vector<DisplayConfiguration*>* ParseJson(String jsonString);
+        static std::vector<DisplayConfiguration*>* ParseJson(const char* jsonString);
         DisplayConfiguration(const DisplayConfiguration& other);
         
         byte getDefaultBrightness() { return defaultBrightness; }

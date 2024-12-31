@@ -1,8 +1,24 @@
 #include "DisplayConfiguration.h"
 
-std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(String jsonString)
+std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(const char* jsonString)
 {
     std::vector<DisplayConfiguration*>* configs = new std::vector<DisplayConfiguration*>();
+
+    JsonDocument configDoc;
+    DeserializationError err = deserializeJson(configDoc, jsonString);
+
+    if (err == DeserializationError::EmptyInput)
+    {
+        return configs;
+    }
+
+    if (err != DeserializationError::Ok)
+    {
+        Serial.print("Error parsing JSON for the display configuration: ");
+        Serial.println(err.c_str());
+        return configs;
+    }
+
     DisplayConfiguration* config = new DisplayConfiguration();
     
     // Todo: actually read the input
