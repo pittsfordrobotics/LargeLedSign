@@ -5,10 +5,12 @@
 #include <vector>
 #include <ArduinoJson.h>
 
+#define DISPLAY_CONFIG_DEFAULTBRIGHTNESS 170
+
 class DisplayConfiguration
 {
     public:
-        static std::vector<DisplayConfiguration*>* ParseJson(const char* jsonString);
+        static std::vector<DisplayConfiguration*>* ParseJson(const char* jsonString, size_t length);
         DisplayConfiguration(const DisplayConfiguration& other);
         
         byte getDefaultBrightness() { return defaultBrightness; }
@@ -29,6 +31,10 @@ class DisplayConfiguration
         DisplayConfiguration& operator=(const DisplayConfiguration& other);
 
     private:
+        static void debugPrint(const char* message);
+        static void debugPrintln(const char* message);
+        static DisplayConfiguration* parseDisplayEntryFromJsonVariant(JsonVariant display, byte defaultBrightness);
+
         DisplayConfiguration();
 
         byte defaultBrightness{255};

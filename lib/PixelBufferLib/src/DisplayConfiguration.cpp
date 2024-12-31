@@ -1,25 +1,60 @@
 #include "DisplayConfiguration.h"
 
-std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(const char* jsonString)
+std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(const char* jsonString, size_t length)
 {
     std::vector<DisplayConfiguration*>* configs = new std::vector<DisplayConfiguration*>();
 
     JsonDocument configDoc;
-    DeserializationError err = deserializeJson(configDoc, jsonString);
-
+    DeserializationError err = deserializeJson(configDoc, jsonString, length);
+    
     if (err == DeserializationError::EmptyInput)
     {
+        debugPrint("Display configuration JSON string was empty.");
         return configs;
     }
 
     if (err != DeserializationError::Ok)
     {
-        Serial.print("Error parsing JSON for the display configuration: ");
-        Serial.println(err.c_str());
+        debugPrint("Error parsing display configuration JSON: ");
+        debugPrint(err.c_str());
         return configs;
     }
 
+    if (configDoc.isNull())
+    {
+        debugPrint("Display configuration JSON was null after parsing.");
+        return configs;
+    }
+
+    byte defaultBrightness = DISPLAY_CONFIG_DEFAULTBRIGHTNESS;
+    // The default for a byte value is 0 if the key is not present, so explicitly check for it.
+    if (configDoc["defaultBrightness"].is<JsonVariant>())
+    {
+        defaultBrightness = configDoc["defaultBrightness"].as<byte>();
+    }
+
+    JsonArray displays = configDoc["displays"].as<JsonArray>();
+    if (displays.isNull())
+    {
+        debugPrint("No displays found in the configuration.");
+        return configs;
+    }
+
+    for (JsonVariant display : displays)
+    {
+        DisplayConfiguration* config = parseDisplayEntryFromJsonVariant(display, defaultBrightness);
+        if (config != nullptr)
+        {
+            configs->push_back(config);
+        }
+    }
+
+
+    return configs;
+
     DisplayConfiguration* config = new DisplayConfiguration();
+
+
     
     // Todo: actually read the input
     config->m_gpioPin = 16;
@@ -106,4 +141,89 @@ void DisplayConfiguration::copy(const DisplayConfiguration& other)
     this->m_rowsBelow = other.m_rowsBelow;
     this->m_columnPixelMapping = other.m_columnPixelMapping;
     this->m_rowPixelMapping = other.m_rowPixelMapping;
+}
+
+DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(JsonVariant display, byte defaultBrightness)
+{
+    DisplayConfiguration* config = new DisplayConfiguration();
+
+    if (display.isNull())
+    {
+        debugPrint("Display entry was null.");
+        return nullptr;
+    }
+
+    debugPrint("Parsing display entry: ");
+    if (display["name"].is<JsonVariant>())
+    {
+        const char* name = display["name"].as<const char*>();
+        debugPrintln(name);
+    }
+    else
+    {
+        debugPrintln("<<no name>>");
+    }
+
+    if (!display["disabled"].is<JsonVariant>())
+    {
+        if (display["disabled"].as<bool>())
+        {
+            debugPrint("Display entry is disabled.");
+            return nullptr;
+        }
+    }
+
+    if (!display["gpioPin"].is<JsonVariant>())
+    {
+        debugPrint("Display entry did not contain a GPIO pin.");
+        return nullptr;
+    }
+    config->m_gpioPin = display["gpioPin"].as<uint8_t>();
+
+    if (!display["numberOfPixels"].is<JsonVariant>())
+    {
+        debugPrint("Display entry did not contain the number of pixels.");
+        return nullptr;
+    }
+    config->m_numPixels = display["numberOfPixels"].as<uint16_t>();
+
+    if (display["defaultBrightness"].is<JsonVariant>())
+    {
+        config->defaultBrightness = display["defaultBrightness"].as<byte>();
+    }
+    else
+    {
+        config->defaultBrightness = defaultBrightness;
+    }
+
+    // The following properties are optional. If not specified, assume the default value of 0.
+    config->m_rowsAbove = display["rowsAbove"].as<uint16_t>();
+    config->m_rowsBelow = display["rowsBelow"].as<uint16_t>();
+    config->m_colsToLeft = display["columnsToLeft"].as<uint16_t>();
+    config->m_colsToRight = display["columnsToRight"].as<uint16_t>();
+    config->m_digitsToLeft = display["digitsToLeft"].as<uint16_t>();
+    config->m_digitsToRight = display["digitsToRight"].as<uint16_t>();
+
+    // Parse the pixel mappings
+
+
+    return config;
+}
+
+void DisplayConfiguration::debugPrint(const char* message)
+{
+#ifdef PIO_UNIT_TESTING
+    printf("%s", message);
+#else
+    Serial.print(message);
+#endif      
+}
+
+void DisplayConfiguration::debugPrintln(const char* message)
+{
+#ifdef PIO_UNIT_TESTING
+    printf("%s\n", message);
+#else
+    Serial.println(message);
+#endif      
 }
