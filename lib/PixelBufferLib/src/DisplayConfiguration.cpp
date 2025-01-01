@@ -49,64 +49,6 @@ std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(const char* 
         }
     }
 
-
-    return configs;
-
-    DisplayConfiguration* config = new DisplayConfiguration();
-
-
-    
-    // Todo: actually read the input
-    config->m_gpioPin = 16;
-    config->m_numPixels = 256;
-    config->m_numCols = 8;
-    config->m_numRows = 8;
-    config->defaultBrightness = 15;
-
-    // Map the pixel indices to rows and columns.
-    // ROW 0 is at the TOP of the display.
-    // COLUMN 0 is at the LEFT of the display.
-    for (int col = 7; col >= 0; col--)
-    {
-        std::vector<uint16_t> *rowVector = new std::vector<uint16_t>();
-        for (uint16_t row = 0; row < 8; row++)
-        {
-            if (row % 2 == 0)
-            {
-                rowVector->push_back(row * 8 + col);
-            }
-            else
-            {
-                rowVector->push_back(row * 8 + (7 - col));
-            }
-        }
-        config->m_rowPixelMapping.push_back(rowVector);
-    }
-
-    for (int col = 7; col >= 0; col--)
-    {
-        std::vector<uint16_t> *colVector = new std::vector<uint16_t>();
-        for (uint16_t row = 0; row < 8; row++)
-        {
-            colVector->push_back(col * 8 + row);
-        }
-        config->m_columnPixelMapping.push_back(colVector);
-    }
-
-    config->m_digitPixelMapping.push_back(new std::vector<uint16_t>());
-    
-    for (int i = 0; i < config->m_numPixels; i++)
-    {
-        config->m_digitPixelMapping[0]->push_back(i);
-    }
-
-    configs->push_back(config);
-
-    DisplayConfiguration* secondTest = new DisplayConfiguration(*config);
-    secondTest->m_gpioPin = 17;
-
-    configs->push_back(secondTest);
-
     return configs;
 }
 
@@ -205,7 +147,86 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
     config->m_digitsToRight = display["digitsToRight"].as<uint16_t>();
 
     // Parse the pixel mappings
+    if (!display["columnPixelMapping"].is<JsonArray>())
+    {
+        debugPrint("Display entry did not contain a valid column pixel mapping.");
+        return nullptr;
+    }
 
+    JsonArray columnMapping = display["columnPixelMapping"].as<JsonArray>();
+    for (int i = 0; i < columnMapping.size(); i++)
+    {
+        std::vector<uint16_t>* columnPixels = new std::vector<uint16_t>();
+        if (!columnMapping[i].is<JsonArray>())
+        {
+            debugPrint("Column pixel mapping entry was not an array.");
+            return nullptr;
+        }
+
+        for (JsonVariant pixel : columnMapping[i].as<JsonArray>())
+        {
+            columnPixels->push_back(pixel.as<uint16_t>());
+        }
+
+        config->m_columnPixelMapping.push_back(columnPixels);
+    }
+
+    if (!display["rowPixelMapping"].is<JsonArray>())
+    {
+        debugPrint("Display entry did not contain a valid row pixel mapping.");
+        return nullptr;
+    }
+
+    JsonArray rowMapping = display["rowPixelMapping"].as<JsonArray>();
+    for (int i = 0; i < rowMapping.size(); i++)
+    {
+        std::vector<uint16_t>* rowPixels = new std::vector<uint16_t>();
+        if (!rowMapping[i].is<JsonArray>())
+        {
+            debugPrint("Row pixel mapping entry was not an array.");
+            return nullptr;
+        }
+
+        for (JsonVariant pixel : rowMapping[i].as<JsonArray>())
+        {
+            rowPixels->push_back(pixel.as<uint16_t>());
+        }
+
+        config->m_rowPixelMapping.push_back(rowPixels);
+    }
+
+    if (!display["digitPixelMapping"].is<JsonArray>())
+    {
+        // If not defined, put all pixels in a single digit.
+        debugPrint("Display entry did not contain a valid digit pixel mapping. Assuming all pixels are in a single digit.");
+        std::vector<uint16_t>* digitPixels = new std::vector<uint16_t>();
+        for (int i = 0; i < config->m_numPixels; i++)
+        {
+            digitPixels->push_back(i);
+        }
+
+        config->m_digitPixelMapping.push_back(digitPixels);
+    }
+    else
+    {
+        JsonArray digitMapping = display["digitPixelMapping"].as<JsonArray>();
+        for (int i = 0; i < digitMapping.size(); i++)
+        {
+            std::vector<uint16_t>* digitPixels = new std::vector<uint16_t>();
+            if (!digitMapping[i].is<JsonArray>())
+            {
+                debugPrint("Digit pixel mapping entry was not an array.");
+                return nullptr;
+            }
+
+            for (JsonVariant pixel : digitMapping[i].as<JsonArray>())
+            {
+                digitPixels->push_back(pixel.as<uint16_t>());
+            }
+
+            config->m_digitPixelMapping.push_back(digitPixels);
+        }
+    }
 
     return config;
 }

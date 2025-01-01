@@ -1,9 +1,11 @@
 #include <Arduino.h>
 #include <unity.h>
 #include <vector>
+#include <string>
 #include "DisplayConfiguration.h"
 
 const char* fullTestMatrixJson();
+const char* minimalTestMatrixJson();
 
 void setUp(void) {
 }
@@ -37,6 +39,7 @@ void parseFullTestMatrixJson() {
     const char* jsonString = fullTestMatrixJson();
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(1, configs->size(), "Expected 1 display configuration");
+    DisplayConfiguration* config = configs->at(0);
     TEST_ASSERT_EQUAL_MESSAGE(16, config->getGpioPin(), "GPIO pin is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(64, config->getNumberOfPixels(), "Number of pixels is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(15, config->getDefaultBrightness(), "Default brightness is not correct.");
@@ -47,7 +50,59 @@ void parseFullTestMatrixJson() {
     TEST_ASSERT_EQUAL_MESSAGE(5, config->getDigitsToLeft(), "Digits to left is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(6, config->getDigitsToRight(), "Digits to right is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(8, config->getColumnPixelMapping().size(), "Column pixel mapping size is not correct.");
+    int expectedFirstColumnNumbers[] = {56,48,40,32,24,16,8,0};
+    for (int i = 0; i < config->getColumnPixelMapping().size(); i++) {
+        std::vector<uint16_t>* column = config->getColumnPixelMapping().at(i);
+        std::string colNum = std::to_string(i);
+        TEST_ASSERT_EQUAL_MESSAGE(8, column->size(), ("Column pixel mapping size is not correct. Column: " + colNum).c_str());
+        TEST_ASSERT_EQUAL_MESSAGE(expectedFirstColumnNumbers[i], column->at(0), ("First pixel in column is not correct. Column: " + colNum).c_str());
+    }
+
     TEST_ASSERT_EQUAL_MESSAGE(8, config->getRowPixelMapping().size(), "Row pixel mapping size is not correct.");
+    int expectedFirstRowNumbers[] = {56,57,58,59,60,61,62,63};
+    for (int i = 0; i < config->getRowPixelMapping().size(); i++) {
+        std::vector<uint16_t>* row = config->getRowPixelMapping().at(i);
+        std::string rowNum = std::to_string(i);
+        TEST_ASSERT_EQUAL_MESSAGE(8, row->size(), ("Row pixel mapping size is not correct. Row: " + rowNum).c_str());
+        TEST_ASSERT_EQUAL_MESSAGE(expectedFirstRowNumbers[i], row->at(0), ("First pixel in row is not correct. Row: " + rowNum).c_str());
+    }
+
+    TEST_ASSERT_EQUAL_MESSAGE(1, config->getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(64, config->getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
+}
+
+void parseMinimalTestMatrixJson() {
+    const char* jsonString = minimalTestMatrixJson();
+    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    TEST_ASSERT_EQUAL_MESSAGE(1, configs->size(), "Expected 1 display configuration");
+    DisplayConfiguration* config = configs->at(0);
+    TEST_ASSERT_EQUAL_MESSAGE(16, config->getGpioPin(), "GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(64, config->getNumberOfPixels(), "Number of pixels is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(100, config->getDefaultBrightness(), "Default brightness is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getRowsAbove(), "Rows above is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getRowsBelow(), "Rows below is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getColumnsToLeft(), "Columns to left is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getColumnsToRight(), "Columns to right is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getDigitsToLeft(), "Digits to left is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getDigitsToRight(), "Digits to right is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(8, config->getColumnPixelMapping().size(), "Column pixel mapping size is not correct.");
+    int expectedFirstColumnNumbers[] = {56,48,40,32,24,16,8,0};
+    for (int i = 0; i < config->getColumnPixelMapping().size(); i++) {
+        std::vector<uint16_t>* column = config->getColumnPixelMapping().at(i);
+        std::string colNum = std::to_string(i);
+        TEST_ASSERT_EQUAL_MESSAGE(8, column->size(), ("Column pixel mapping size is not correct. Column: " + colNum).c_str());
+        TEST_ASSERT_EQUAL_MESSAGE(expectedFirstColumnNumbers[i], column->at(0), ("First pixel in column is not correct. Column: " + colNum).c_str());
+    }
+
+    TEST_ASSERT_EQUAL_MESSAGE(8, config->getRowPixelMapping().size(), "Row pixel mapping size is not correct.");
+    int expectedFirstRowNumbers[] = {56,57,58,59,60,61,62,63};
+    for (int i = 0; i < config->getRowPixelMapping().size(); i++) {
+        std::vector<uint16_t>* row = config->getRowPixelMapping().at(i);
+        std::string rowNum = std::to_string(i);
+        TEST_ASSERT_EQUAL_MESSAGE(8, row->size(), ("Row pixel mapping size is not correct. Row: " + rowNum).c_str());
+        TEST_ASSERT_EQUAL_MESSAGE(expectedFirstRowNumbers[i], row->at(0), ("First pixel in row is not correct. Row: " + rowNum).c_str());
+    }
+
     TEST_ASSERT_EQUAL_MESSAGE(1, config->getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(64, config->getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
 }
@@ -60,6 +115,7 @@ int main(int argc, char **argv) {
     RUN_TEST(parseJsonWithEmptyObject);
     RUN_TEST(parseJsonWithEmptyDisplayArray);
     RUN_TEST(parseFullTestMatrixJson);
+    RUN_TEST(parseMinimalTestMatrixJson);
     
     return UNITY_END();
 }
@@ -104,6 +160,40 @@ const char* fullTestMatrixJson()
             "            \"digitPixelMapping\":"
             "            ["
             "                [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63]"
+            "            ]"
+            "        }"
+            "    ]"
+            "}";
+}
+
+const char* minimalTestMatrixJson()
+{
+    return  "{"
+            "    \"defaultBrightness\": 100,"
+            "    \"displays\": ["
+            "        {"
+            "            \"name\": \"TestMatrix1\","
+            "            \"gpioPin\": 16,"
+            "            \"numberOfPixels\": 64,"
+            "            \"columnPixelMapping\": ["
+            "                [56,57,58,59,60,61,62,63],"
+            "                [48,49,50,51,52,53,54,55],"
+            "                [40,41,42,43,44,45,46,47],"
+            "                [32,33,34,35,36,37,38,39],"
+            "                [24,25,26,27,28,29,30,31],"
+            "                [16,17,18,19,20,21,22,23],"
+            "                [8,9,10,11,12,13,14,15],"
+            "                [0,1,2,3,4,5,6,7]"
+            "            ],"
+            "            \"rowPixelMapping\": ["
+            "                [56,55,40,39,24,23,8,7],"
+            "                [57,54,41,38,25,22,9,6],"
+            "                [58,53,42,37,26,21,10,5],"
+            "                [59,52,43,36,27,20,11,4],"
+            "                [60,51,44,35,28,19,12,3],"
+            "                [61,50,45,34,29,18,13,2],"
+            "                [62,49,46,33,30,17,14,1],"
+            "                [63,48,47,32,31,16,15,0]"
             "            ]"
             "        }"
             "    ]"
