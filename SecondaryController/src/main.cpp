@@ -105,7 +105,11 @@ void setup()
 // This method is called continously.
 void loop()
 {
-    readInputButton();
+    //readInputButton();
+    if (digitalRead(D9) == LOW)
+    {
+        rp2040.restart();
+    }
 
     if (isOff)
     {
@@ -167,6 +171,7 @@ void initializeIO()
     // pinMode(VOLTAGEINPUTPIN, INPUT);
     // pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
     // pinMode(POWER_INDICATOR_PIN, OUTPUT);
+    pinMode(D9, INPUT_PULLUP);
 }
 
 // byte getSignType()
@@ -536,6 +541,7 @@ void turnOffPowerLed()
 
 void readInputButton()
 {
+    //rp2040.restart();
     // powerButton.update();
 
     // if (powerButton.wasPressed())
