@@ -2,6 +2,7 @@
 #define SECONDARYCONTROLLER_MAIN_H
 
 #include <Arduino.h>
+#include <SD.h>
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoBLE.h>
 #include <vector>
@@ -44,6 +45,8 @@
 
 #define PITSIGN_TYPE_ID 10  // The "type id" for the pit sign
 
+#define SDCARD_CHIPSELECT 10 // The digital pin # for the SD card chip select.
+
 // Function prototypes
 void initializeIO();
 void startBLE();
@@ -63,5 +66,6 @@ void readInputButton();
 void turnOnPowerLed();
 void turnOffPowerLed();
 void setupStyleList();
+const char* getSdFileContents(String filename);
 
 #endif

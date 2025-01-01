@@ -228,6 +228,8 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
         }
     }
 
+    debugPrintln("Display entry parsed successfully.");
+    
     return config;
 }
 

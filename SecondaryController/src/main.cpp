@@ -42,8 +42,9 @@ volatile bool isInitialized = false;
 void setup()
 {
     // Delay for debugging
-    delay(INITIALDELAY);
     Serial.begin(9600);
+    delay(INITIALDELAY);
+    delay(3000);
     Serial.println("Starting...");
     lastTelemetryTimestamp = millis();
 
@@ -54,8 +55,9 @@ void setup()
     signType = getSignType();
     signPosition = getSignPosition();
 
-    const char* dummyJson = "{}";
-    std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson(dummyJson);
+    
+    const char* fileJson = getSdFileContents("displayconfiguration.json");
+    std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson(fileJson, strlen(fileJson));
     for (uint i = 0; i < displayConfigs->size(); i++)
     {
         NeoPixelDisplay* display = new NeoPixelDisplay(displayConfigs->at(i));
@@ -63,8 +65,11 @@ void setup()
         neoPixelDisplays.push_back(display);
     }
 
-    byte defaultBrightness = displayConfigs->at(0)->getDefaultBrightness();
-    //byte defaultBrightness = DEFAULT_BRIGHTNESS;
+    Serial.print("Number of displays configured: ");
+    Serial.println(neoPixelDisplays.size());
+
+    //byte defaultBrightness = displayConfigs->at(0)->getDefaultBrightness();
+    byte defaultBrightness = DEFAULT_BRIGHTNESS;
     // if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
     // {
     //     defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
@@ -121,7 +126,7 @@ void loop()
     }
 
     BLE.poll();
-    emitTelemetry();
+    //emitTelemetry();
     //checkForLowPowerState();
 
     if (signType == PITSIGN_TYPE_ID && inLowPowerMode)
@@ -572,3 +577,34 @@ void setupStyleList()
     manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Red));
 }
  
+const char* getSdFileContents(String filename)
+{
+    Serial.println("Initializing SD card...");
+    if (!SD.begin(SDCARD_CHIPSELECT))
+    {
+        Serial.println("SD card initialization failed!");
+        return "";
+    }
+
+    Serial.println("Reading file '" + filename + "' from SD card.");
+    File displayConfigFile = SD.open(filename);
+
+    if (!displayConfigFile)
+    {
+        Serial.println("Could not open file!");
+        return "";
+    }
+
+    size_t fileSize = displayConfigFile.size();
+
+    Serial.println("Reading file.");
+    char* fileContents = new char[fileSize + 1];
+    displayConfigFile.readBytes(fileContents, fileSize);
+
+    Serial.println("File read successfully.");
+
+    displayConfigFile.close();
+    SD.end();
+
+    return fileContents;
+}
