@@ -6,6 +6,8 @@
 
 const char* fullTestMatrixJson();
 const char* minimalTestMatrixJson();
+const char* disabledDisplayJson();
+const char* defaultBrightnessTestJson();
 
 void setUp(void) {
 }
@@ -107,6 +109,22 @@ void parseMinimalTestMatrixJson() {
     TEST_ASSERT_EQUAL_MESSAGE(64, config->getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
 }
 
+void disabledDisplaysAreSkipped() {
+    const char* jsonString = disabledDisplayJson();
+    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    TEST_ASSERT_EQUAL_MESSAGE(2, configs->size(), "Expected 2 display configurations");
+    TEST_ASSERT_EQUAL_MESSAGE(16, configs->at(0)->getGpioPin(), "First display GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(18, configs->at(1)->getGpioPin(), "Second display GPIO pin is not correct.");
+}
+
+void defaultBrightnessIsSet() {
+    const char* jsonString = defaultBrightnessTestJson();
+    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    TEST_ASSERT_EQUAL_MESSAGE(2, configs->size(), "Expected 2 display configuration");
+    TEST_ASSERT_EQUAL_MESSAGE(DISPLAY_CONFIG_DEFAULTBRIGHTNESS, configs->at(0)->getDefaultBrightness(), "Default brightness for the first display should be the global default value.");
+    TEST_ASSERT_EQUAL_MESSAGE(99, configs->at(1)->getDefaultBrightness(), "Default brightness for the second display should have been read from the config.");
+}
+
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
@@ -116,6 +134,8 @@ int main(int argc, char **argv) {
     RUN_TEST(parseJsonWithEmptyDisplayArray);
     RUN_TEST(parseFullTestMatrixJson);
     RUN_TEST(parseMinimalTestMatrixJson);
+    RUN_TEST(disabledDisplaysAreSkipped);
+    RUN_TEST(defaultBrightnessIsSet);
     
     return UNITY_END();
 }
@@ -195,6 +215,60 @@ const char* minimalTestMatrixJson()
             "                [62,49,46,33,30,17,14,1],"
             "                [63,48,47,32,31,16,15,0]"
             "            ]"
+            "        }"
+            "    ]"
+            "}";
+}
+
+const char* disabledDisplayJson()
+{
+    return  "{"
+            "    \"displays\": ["
+            "        {"
+            "            \"name\": \"Dummy1\","
+            "            \"gpioPin\": 16,"
+            "            \"numberOfPixels\": 4,"
+            "            \"columnPixelMapping\": [[0,1,2,3]],"
+            "            \"rowPixelMapping\": [[0,1,2,3]]"
+            "        },"
+            "        {"
+            "            \"name\": \"Dummy2\","
+            "            \"disabled\": true,"
+            "            \"gpioPin\": 17,"
+            "            \"numberOfPixels\": 4,"
+            "            \"columnPixelMapping\": [[0,1,2,3]],"
+            "            \"rowPixelMapping\": [[0,1,2,3]]"
+            "        },"
+            "        {"
+            "            \"name\": \"Dummy3\","
+            "            \"disabled\": false,"
+            "            \"gpioPin\": 18,"
+            "            \"numberOfPixels\": 4,"
+            "            \"columnPixelMapping\": [[0,1,2,3]],"
+            "            \"rowPixelMapping\": [[0,1,2,3]]"
+            "        }"
+            "    ]"
+            "}";
+}
+
+const char* defaultBrightnessTestJson()
+{
+    return  "{"
+            "    \"displays\": ["
+            "        {"
+            "            \"name\": \"Dummy1\","
+            "            \"gpioPin\": 16,"
+            "            \"numberOfPixels\": 4,"
+            "            \"columnPixelMapping\": [[0,1,2,3]],"
+            "            \"rowPixelMapping\": [[0,1,2,3]]"
+            "        },"
+            "        {"
+            "            \"name\": \"Dummy2\","
+            "            \"defaultBrightness\": 99,"
+            "            \"gpioPin\": 17,"
+            "            \"numberOfPixels\": 4,"
+            "            \"columnPixelMapping\": [[0,1,2,3]],"
+            "            \"rowPixelMapping\": [[0,1,2,3]]"
             "        }"
             "    ]"
             "}";
