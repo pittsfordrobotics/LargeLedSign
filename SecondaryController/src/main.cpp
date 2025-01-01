@@ -18,9 +18,9 @@ byte currentSpeed = DEFAULT_SPEED;
 byte newSpeed = DEFAULT_SPEED;
 ulong currentSyncData = 0;
 ulong newSyncData = 0;
-SignOffsetData currentOffsetData;
-byte signType;
-byte signPosition;
+//SignOffsetData currentOffsetData;
+//byte signType;
+//byte signPosition;
 PatternData currentPatternData;
 PatternData newPatternData;
 StyleDefinition lowPowerStyle = CommonStyles::LowPower();
@@ -52,8 +52,8 @@ void setup()
     setupStyleList();
     initializeIO();
     turnOnPowerLed();
-    signType = getSignType();
-    signPosition = getSignPosition();
+    // signType = getSignType();
+    // signPosition = getSignPosition();
 
     configureLedDisplays();
 
@@ -83,11 +83,11 @@ void setup()
     newPatternData.displayPattern = DisplayPatternType::Line;
     newPatternData.param1 = 150;
     //currentLightStyle = PatternFactory::createForPatternData(newPatternData);
-    if (signType == PITSIGN_TYPE_ID) 
-    {
-        newPatternData.color1 = Adafruit_NeoPixel::Color(255,0,0);
-        //currentLightStyle = PatternFactory::createForPatternData(newPatternData);
-    }
+    // if (signType == PITSIGN_TYPE_ID) 
+    // {
+    //     newPatternData.color1 = Adafruit_NeoPixel::Color(255,0,0);
+    //     //currentLightStyle = PatternFactory::createForPatternData(newPatternData);
+    // }
 
     for (int i = 0; i < neoPixelDisplays.size(); i++)
     {
@@ -118,15 +118,15 @@ void loop()
     //emitTelemetry();
     //checkForLowPowerState();
 
-    if (signType == PITSIGN_TYPE_ID && inLowPowerMode)
-    {
-        // The "pit" sign blinks a dedicated LED and doesn't use the main sign pixels.
-        turnOffPowerLed();
-        delay(500);
-        turnOnPowerLed();
-        delay(500);
-        return;
-    }
+    // if (signType == PITSIGN_TYPE_ID && inLowPowerMode)
+    // {
+    //     // The "pit" sign blinks a dedicated LED and doesn't use the main sign pixels.
+    //     turnOffPowerLed();
+    //     delay(500);
+    //     turnOnPowerLed();
+    //     delay(500);
+    //     return;
+    // }
 
     if (!inLowPowerMode)
     {
@@ -169,37 +169,37 @@ void initializeIO()
     // pinMode(POWER_INDICATOR_PIN, OUTPUT);
 }
 
-byte getSignType()
-{
-    // Pull the pin low to indicate active.
-    byte type = 0;
-    // for (uint i = 0; i < typeSelectorPins.size(); i++)
-    // {
-    //     type = type << 1;
-    //     if (digitalRead(typeSelectorPins.at(i)) == LOW)
-    //     {
-    //         type++;
-    //     }
-    // }
+// byte getSignType()
+// {
+//     // Pull the pin low to indicate active.
+//     byte type = 0;
+//     // for (uint i = 0; i < typeSelectorPins.size(); i++)
+//     // {
+//     //     type = type << 1;
+//     //     if (digitalRead(typeSelectorPins.at(i)) == LOW)
+//     //     {
+//     //         type++;
+//     //     }
+//     // }
 
-    return type;
-}
+//     return type;
+// }
 
-byte getSignPosition()
-{
-    // Pull the pin low to indicate active.
-    byte order = 0;
-    // for (uint i = 0; i < orderSelectorPins.size(); i++)
-    // {
-    //     order = order << 1;
-    //     if (digitalRead(orderSelectorPins.at(i)) == LOW)
-    //     {
-    //         order++;
-    //     }
-    // }
+// byte getSignPosition()
+// {
+//     // Pull the pin low to indicate active.
+//     byte order = 0;
+//     // for (uint i = 0; i < orderSelectorPins.size(); i++)
+//     // {
+//     //     order = order << 1;
+//     //     if (digitalRead(orderSelectorPins.at(i)) == LOW)
+//     //     {
+//     //         order++;
+//     //     }
+//     // }
 
-    return order;
-}
+//     return order;
+// }
 
 void configureLedDisplays()
 {
@@ -268,12 +268,12 @@ void startBLE()
 // Read the BLE settings to see if any have been changed.
 void readBleSettings()
 {
-    SignOffsetData newOffsetData = btService.getSignOffsetData();
-    if (newOffsetData != currentOffsetData)
-    {
-        resetPixelBufferOffsets(newOffsetData);
-        currentOffsetData = newOffsetData;
-    }
+    // SignOffsetData newOffsetData = btService.getSignOffsetData();
+    // if (newOffsetData != currentOffsetData)
+    // {
+    //     resetPixelBufferOffsets(newOffsetData);
+    //     currentOffsetData = newOffsetData;
+    // }
 
     newPatternData = btService.getPatternData();
     newBrightness = btService.getBrightness();
@@ -516,13 +516,13 @@ void indicateBleFailure()
     }
 }
 
-void resetPixelBufferOffsets(SignOffsetData offsetData)
-{
-    // pixelBuffer->setDigitsToLeft(offsetData.digitsToLeft);
-    // pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
-    // pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
-    // pixelBuffer->setColsToRight(offsetData.columnsToRight);
-}
+// void resetPixelBufferOffsets(SignOffsetData offsetData)
+// {
+//     // pixelBuffer->setDigitsToLeft(offsetData.digitsToLeft);
+//     // pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
+//     // pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
+//     // pixelBuffer->setColsToRight(offsetData.columnsToRight);
+// }
 
 void turnOnPowerLed()
 {
