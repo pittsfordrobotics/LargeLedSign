@@ -55,18 +55,7 @@ void setup()
     signType = getSignType();
     signPosition = getSignPosition();
 
-    
-    const char* fileJson = getSdFileContents("displayconfiguration.json");
-    std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson(fileJson, strlen(fileJson));
-    for (uint i = 0; i < displayConfigs->size(); i++)
-    {
-        NeoPixelDisplay* display = new NeoPixelDisplay(displayConfigs->at(i));
-        display->setBrightness(displayConfigs->at(i)->getDefaultBrightness());
-        neoPixelDisplays.push_back(display);
-    }
-
-    Serial.print("Number of displays configured: ");
-    Serial.println(neoPixelDisplays.size());
+    configureLedDisplays();
 
     //byte defaultBrightness = displayConfigs->at(0)->getDefaultBrightness();
     byte defaultBrightness = DEFAULT_BRIGHTNESS;
@@ -212,42 +201,68 @@ byte getSignPosition()
     return order;
 }
 
+void configureLedDisplays()
+{
+    // Configure LED display(s)
+    const char* fileJson = getSdFileContents("displayconfiguration.json");
+    std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson(fileJson, strlen(fileJson));
+    for (uint i = 0; i < displayConfigs->size(); i++)
+    {
+        NeoPixelDisplay* display = new NeoPixelDisplay(displayConfigs->at(i));
+        display->setBrightness(displayConfigs->at(i)->getDefaultBrightness());
+        neoPixelDisplays.push_back(display);
+    }
+
+    Serial.print("Number of displays configured: ");
+    Serial.println(neoPixelDisplays.size());
+}
+
 // Set the initial BLE characteristic values and start the BLE service.
 void startBLE()
 {
-    Serial.print("Initializing for sign in position ");
-    Serial.print(signPosition);
-    Serial.print(" and type ");
-    Serial.println(signType);
-
-    String localName = "3181 LED Controller ";
-    localName.concat(signPosition);
-    localName.concat("-");
-    localName.concat(signType);
+    const char* configFile = getSdFileContents("bluetooth.json");
+    BluetoothConfig* config = BluetoothConfig::ParseJson(configFile, strlen(configFile));
+    Serial.print("Starting BLE service with uuid: ");
+    Serial.print(config->getUuid());
+    Serial.print(" and local name: ");
+    Serial.println(config->getLocalName());
 
     // Start the actual BLE engine.
     if (!BLE.begin())
     {
+        Serial.println("Could not start BLE service!");
         indicateBleFailure();
     }
 
     SignConfigurationData configData;
-    configData.signType = signType;
-    configData.signOrder = signPosition;
+    //configData.signType = signType;
+    //configData.signOrder = signPosition;
     //configData.columnCount = pixelBuffer->getColumnCount();
     //configData.pixelCount = pixelBuffer->getPixelCount();
 
     // If the sign "position" is 0, then we'll assume we're standalone.
-    String uuid = signPosition == 0
-                      ? BTCOMMON_PRIMARYCONTROLLER_UUID
-                      : BTCOMMON_SECONDARYCONTROLLER_UUID;
+    // String uuid = signPosition == 0
+    //                   ? BTCOMMON_PRIMARYCONTROLLER_UUID
+    //                   : BTCOMMON_SECONDARYCONTROLLER_UUID;
 
-    btService.initialize(uuid, localName);
+    btService.initialize(config->getUuid(), config->getLocalName());
+    Serial.println("BLE service initialized.");
     btService.setBrightness(currentBrightness);
     btService.setSpeed(currentSpeed);
     btService.setSignConfigurationData(configData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
+
+    // Clean up
+    if (configFile)
+    {
+        delete configFile;
+    }
+
+    if (config)
+    {
+        delete config;
+    }
 }
 
 // Read the BLE settings to see if any have been changed.
