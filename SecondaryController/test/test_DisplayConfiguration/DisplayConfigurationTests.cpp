@@ -19,19 +19,25 @@ void sanityTest() {
     TEST_ASSERT_EQUAL(1, 1);
 }
 
-void parseJsonWithEmptyString() {
+void emptyStringGivesNoConfigs() {
     const char* jsonString = "";
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
-void parseJsonWithEmptyObject() {
+void emptyObjectGivesNoConfigs() {
     const char* jsonString = "{}";
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
-void parseJsonWithEmptyDisplayArray() {
+void invalidJsonGivesNoConfigs() {
+    const char* jsonString = "NotJson";
+    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
+}
+
+void emptyDisplayArrayGivesNoConfigs() {
     const char* jsonString = "{\"displays\":[]}";
     std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
@@ -129,9 +135,10 @@ int main(int argc, char **argv) {
     UNITY_BEGIN();
 
     RUN_TEST(sanityTest);
-    RUN_TEST(parseJsonWithEmptyString);
-    RUN_TEST(parseJsonWithEmptyObject);
-    RUN_TEST(parseJsonWithEmptyDisplayArray);
+    RUN_TEST(emptyStringGivesNoConfigs);
+    RUN_TEST(emptyObjectGivesNoConfigs);
+    RUN_TEST(emptyDisplayArrayGivesNoConfigs);
+    RUN_TEST(invalidJsonGivesNoConfigs);
     RUN_TEST(parseFullTestMatrixJson);
     RUN_TEST(parseMinimalTestMatrixJson);
     RUN_TEST(disabledDisplaysAreSkipped);
