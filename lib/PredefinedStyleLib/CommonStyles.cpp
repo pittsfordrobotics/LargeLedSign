@@ -1,6 +1,6 @@
 #include "CommonStyles.h"
 
-StyleDefinition CommonStyles::SolidColor(ulong color)
+StyleDefinition CommonStyles::SolidColor(unsigned long color)
 {
     PatternData pattern;
     pattern.displayPattern = DisplayPatternType::Solid;
@@ -10,7 +10,7 @@ StyleDefinition CommonStyles::SolidColor(ulong color)
     return StyleDefinition(pattern, 1);
 }
 
-StyleDefinition  CommonStyles::TwoColorRight(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
+StyleDefinition  CommonStyles::TwoColorRight(unsigned long color1, unsigned long color2, byte duration1, byte duration2, byte speed)
 {
     PatternData pattern;
     pattern.displayPattern = DisplayPatternType::Right;
@@ -22,7 +22,7 @@ StyleDefinition  CommonStyles::TwoColorRight(ulong color1, ulong color2, byte du
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition CommonStyles::TwoColorRandom(ulong color1, ulong color2, byte duration1, byte duration2, byte updateAmount, byte speed)
+StyleDefinition CommonStyles::TwoColorRandom(unsigned long color1, unsigned long color2, byte duration1, byte duration2, byte updateAmount, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::TwoColor;
@@ -35,7 +35,7 @@ StyleDefinition CommonStyles::TwoColorRandom(ulong color1, ulong color2, byte du
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition CommonStyles::TwoColorCenterOut(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
+StyleDefinition CommonStyles::TwoColorCenterOut(unsigned long color1, unsigned long color2, byte duration1, byte duration2, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::TwoColor;
@@ -47,7 +47,7 @@ StyleDefinition CommonStyles::TwoColorCenterOut(ulong color1, ulong color2, byte
     return StyleDefinition(pattern, speed);
 }
 
-StyleDefinition CommonStyles::TwoColorDigit(ulong color1, ulong color2, byte duration1, byte duration2, byte speed)
+StyleDefinition CommonStyles::TwoColorDigit(unsigned long color1, unsigned long color2, byte duration1, byte duration2, byte speed)
 {
     PatternData pattern;
     pattern.colorPattern = ColorPatternType::TwoColor;

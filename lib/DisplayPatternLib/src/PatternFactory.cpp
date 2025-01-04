@@ -13,7 +13,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
     ColorPattern* colorPattern = createColorPatternForPatternData(patternData);
     DisplayPattern* displayPattern;
 
-    uint startOfDisplayParameters = colorPattern->getNumberOfParameters();
+    unsigned int startOfDisplayParameters = colorPattern->getNumberOfParameters();
 
     switch (patternData.displayPattern)
     {
@@ -193,7 +193,7 @@ String PatternFactory::getKnownDisplayPatterns()
     return knownPatterns;
 }
 
-String PatternFactory::getColorPatternString(String patternName, ColorPatternType patternType, uint numberOfColors, std::vector<String> parameterNames)
+String PatternFactory::getColorPatternString(String patternName, ColorPatternType patternType, unsigned int numberOfColors, std::vector<String> parameterNames)
 {
     // Format:
     // <name>,<number>,<#colors>,<param1>,...
@@ -201,7 +201,7 @@ String PatternFactory::getColorPatternString(String patternName, ColorPatternTyp
     patternString += "," + String(static_cast<byte>(patternType));
     patternString += "," + String(numberOfColors);
     
-    for (uint i = 0; i < parameterNames.size(); i++)
+    for (unsigned int i = 0; i < parameterNames.size(); i++)
     {
         patternString += "," + parameterNames[i];
     }
@@ -216,7 +216,7 @@ String PatternFactory::getDisplayPatternString(String patternName, DisplayPatter
     String patternString = patternName;
     patternString += "," + String(static_cast<byte>(patternType));
     
-    for (uint i = 0; i < parameterNames.size(); i++)
+    for (unsigned int i = 0; i < parameterNames.size(); i++)
     {
         patternString += "," + parameterNames[i];
     }

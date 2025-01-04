@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <unity.h>
 #include <vector>
-#include <string>
 #include "DisplayConfiguration.h"
 
 const char* fullTestMatrixJson();
@@ -13,10 +12,6 @@ void setUp(void) {
 }
 
 void tearDown(void) {
-}
-
-void sanityTest() {
-    TEST_ASSERT_EQUAL(1, 1);
 }
 
 void emptyStringGivesNoConfigs() {
@@ -134,7 +129,6 @@ void defaultBrightnessIsSet() {
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
-    RUN_TEST(sanityTest);
     RUN_TEST(emptyStringGivesNoConfigs);
     RUN_TEST(emptyObjectGivesNoConfigs);
     RUN_TEST(emptyDisplayArrayGivesNoConfigs);

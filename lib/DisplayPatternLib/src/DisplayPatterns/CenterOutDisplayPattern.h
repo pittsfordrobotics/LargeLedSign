@@ -24,7 +24,7 @@ class CenterOutDisplayPattern : public DisplayPattern {
 
     private:
         CenterOutOrientation m_orientation{CenterOutOrientation::Horizontal};
-        uint m_centerLine;
+        unsigned int m_centerLine;
 };
 
 #endif

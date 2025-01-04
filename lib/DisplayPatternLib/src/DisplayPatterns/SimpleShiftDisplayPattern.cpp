@@ -19,7 +19,7 @@ void SimpleShiftDisplayPattern::resetInternal(PixelBuffer* pixelBuffer)
 
 void SimpleShiftDisplayPattern::updateInternal(PixelBuffer* pixelBuffer)
 {
-    ulong newColor = m_colorPattern->getNextColor();
+    unsigned long newColor = m_colorPattern->getNextColor();
 
     switch (m_shiftType)
     {

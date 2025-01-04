@@ -1,6 +1,6 @@
 #include "BackgroundPlusThree.h"
 
-BackgroundPlusThree::BackgroundPlusThree(ulong background, ulong color1, ulong color2, ulong color3)
+BackgroundPlusThree::BackgroundPlusThree(unsigned long background, unsigned long color1, unsigned long color2, unsigned long color3)
 {
     m_backgroundColor = background;
     m_color1 = color1;
@@ -40,7 +40,7 @@ void BackgroundPlusThree::reset()
     }
 }
 
-ulong BackgroundPlusThree::getNextColor()
+unsigned long BackgroundPlusThree::getNextColor()
 {
     // Check the size of the sequence list just in case.
     if (m_colorSequence.size() == 0)
@@ -49,12 +49,12 @@ ulong BackgroundPlusThree::getNextColor()
     }
 
     m_iterationCount = m_iterationCount % m_colorSequence.size();
-    ulong color = m_colorSequence[m_iterationCount];
+    unsigned long color = m_colorSequence[m_iterationCount];
     m_iterationCount++;
     return color;
 }
 
-uint BackgroundPlusThree::getNumberOfParameters()
+unsigned int BackgroundPlusThree::getNumberOfParameters()
 {
     return getParameterNames().size();
 }
@@ -91,7 +91,7 @@ byte BackgroundPlusThree::convertDuration(byte duration)
     return convertedDuration;
 }
 
-void BackgroundPlusThree::incrementOnly(uint incrementAmount)
+void BackgroundPlusThree::incrementOnly(unsigned int incrementAmount)
 {
     m_iterationCount = incrementAmount;
 }

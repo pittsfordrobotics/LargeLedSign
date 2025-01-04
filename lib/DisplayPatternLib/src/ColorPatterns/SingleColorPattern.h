@@ -7,17 +7,17 @@
 class SingleColorPattern : public ColorPattern
 {
     public:
-        SingleColorPattern(ulong color);
+        SingleColorPattern(unsigned long color);
 
         virtual void reset();
-        virtual ulong getNextColor();
-        virtual void incrementOnly(uint incrementAmount);
-        virtual uint getNumberOfParameters();
+        virtual unsigned long getNextColor();
+        virtual void incrementOnly(unsigned int incrementAmount);
+        virtual unsigned int getNumberOfParameters();
 
         static std::vector<String> getParameterNames();
 
     private:
-        ulong m_color{0};
+        unsigned long m_color{0};
 };
 
 #endif

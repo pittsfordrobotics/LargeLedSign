@@ -10,14 +10,14 @@
 class StyleList {
     public:
         // The default constructor.
-        StyleList(uint numberOfLists);
+        StyleList(unsigned int numberOfLists);
 
-        void addStyleToList(uint listNumber, const StyleDefinition& style);
+        void addStyleToList(unsigned int listNumber, const StyleDefinition& style);
 
         // Gets the style associated with the given list and sequence number.
         // The sequence number will "wrap around" if needed.
         // If there are no styles associated with the list, the default style will be returned.
-        StyleDefinition getStyle(uint listNumber, uint sequenceNumber);
+        StyleDefinition getStyle(unsigned int listNumber, unsigned int sequenceNumber);
 
     private:
         std::vector<std::vector<StyleDefinition>> m_styleLists;

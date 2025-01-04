@@ -1,14 +1,14 @@
 #include "StyleList.h"
 
-StyleList::StyleList(uint numberOfLists)
+StyleList::StyleList(unsigned int numberOfLists)
 {
-    for (uint i = 0; i < numberOfLists; i++)
+    for (unsigned int i = 0; i < numberOfLists; i++)
     {
         m_styleLists.push_back(std::vector<StyleDefinition>());
     }
 }
 
-void StyleList::addStyleToList(uint listNumber, const StyleDefinition& style)
+void StyleList::addStyleToList(unsigned int listNumber, const StyleDefinition& style)
 {
     if (listNumber >= m_styleLists.size())
     {
@@ -18,7 +18,7 @@ void StyleList::addStyleToList(uint listNumber, const StyleDefinition& style)
     m_styleLists[listNumber].push_back(style);
 }
 
-StyleDefinition StyleList::getStyle(uint listNumber, uint sequenceNumber)
+StyleDefinition StyleList::getStyle(unsigned int listNumber, unsigned int sequenceNumber)
 {
     if (listNumber >= m_styleLists.size()
         || m_styleLists[listNumber].size() == 0)

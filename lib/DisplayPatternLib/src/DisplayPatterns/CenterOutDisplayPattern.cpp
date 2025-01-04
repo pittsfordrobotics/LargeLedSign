@@ -67,7 +67,7 @@ void CenterOutDisplayPattern::resetInternal(PixelBuffer* pixelBuffer)
 
 void CenterOutDisplayPattern::updateInternal(PixelBuffer* pixelBuffer)
 {
-    ulong newColor = m_colorPattern->getNextColor();
+    unsigned long newColor = m_colorPattern->getNextColor();
 
     if (m_orientation == CenterOutOrientation::Vertical)
     {
@@ -88,7 +88,7 @@ void CenterOutDisplayPattern::updateInternal(PixelBuffer* pixelBuffer)
         }
         else
         {
-            uint localCenter = m_centerLine - pixelBuffer->getColsToLeft();
+            unsigned int localCenter = m_centerLine - pixelBuffer->getColsToLeft();
             pixelBuffer->shiftColumnsLeft(newColor, localCenter);
             if (localCenter < pixelBuffer->getColumnCount() - 1) {
                 pixelBuffer->shiftColumnsRight(newColor, localCenter + 1);

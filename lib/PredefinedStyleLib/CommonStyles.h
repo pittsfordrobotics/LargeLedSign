@@ -9,11 +9,11 @@
 class CommonStyles
 {
     public:
-        static StyleDefinition SolidColor(ulong color);
-        static StyleDefinition TwoColorRight(ulong color1, ulong color2, byte duration1, byte duration2, byte speed);
-        static StyleDefinition TwoColorRandom(ulong color1, ulong color2, byte duration1, byte duration2, byte updateAmount, byte speed);
-        static StyleDefinition TwoColorCenterOut(ulong color1, ulong color2, byte duration1, byte duration2, byte speed);
-        static StyleDefinition TwoColorDigit(ulong color1, ulong color2, byte duration1, byte duration2, byte speed);
+        static StyleDefinition SolidColor(unsigned long color);
+        static StyleDefinition TwoColorRight(unsigned long color1, unsigned long color2, byte duration1, byte duration2, byte speed);
+        static StyleDefinition TwoColorRandom(unsigned long color1, unsigned long color2, byte duration1, byte duration2, byte updateAmount, byte speed);
+        static StyleDefinition TwoColorCenterOut(unsigned long color1, unsigned long color2, byte duration1, byte duration2, byte speed);
+        static StyleDefinition TwoColorDigit(unsigned long color1, unsigned long color2, byte duration1, byte duration2, byte speed);
         static StyleDefinition RainbowRight(byte hueIncrement, byte speed);
         static StyleDefinition RainbowRandom(byte hueIncrement, byte updateAmound, byte speed);
         static StyleDefinition RainbowLava(byte hueIncrement, byte speed);

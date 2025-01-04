@@ -2,7 +2,7 @@
 #define COLORFADEPATTERN_H
 
 #include <Arduino.h>
-#include "Adafruit_NeoPixel.h"
+#include "NeoPixelUtils.h"
 #include "ColorPattern.h"
 #include <MathUtils.h>
 #include <vector>
@@ -10,14 +10,14 @@
 class ColorFadePattern : public ColorPattern
 {
     public:
-        ColorFadePattern(ulong color1, ulong color2);
-        ColorFadePattern(ulong color1, ulong color2, ulong color3);
-        ColorFadePattern(ulong color1, ulong color2, ulong color3, ulong color4);
+        ColorFadePattern(unsigned long color1, unsigned long color2);
+        ColorFadePattern(unsigned long color1, unsigned long color2, unsigned long color3);
+        ColorFadePattern(unsigned long color1, unsigned long color2, unsigned long color3, unsigned long color4);
 
         virtual void reset();
-        virtual ulong getNextColor();
-        virtual void incrementOnly(uint incrementAmount);
-        virtual uint getNumberOfParameters();
+        virtual unsigned long getNextColor();
+        virtual void incrementOnly(unsigned int incrementAmount);
+        virtual unsigned int getNumberOfParameters();
 
         void setColorDuration(byte duration);
         void setFadeInDuration(byte duration);
@@ -31,10 +31,10 @@ class ColorFadePattern : public ColorPattern
         byte m_fadeInDuration{0};
         byte m_fadeOutDuration{0};
         byte m_fadedDuration{1};
-        ulong m_iterationCount{0};
+        unsigned long m_iterationCount{0};
 
-        std::vector<ulong> m_colors;
-        std::vector<ulong> m_colorSequence;
+        std::vector<unsigned long> m_colors;
+        std::vector<unsigned long> m_colorSequence;
         byte convertColorDuration(byte duration);
         byte convertFadeInOutDuration(byte duration);
 

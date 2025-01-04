@@ -1,6 +1,6 @@
 #include "TwoColorPattern.h"
 
-TwoColorPattern::TwoColorPattern(ulong color1, ulong color2)
+TwoColorPattern::TwoColorPattern(unsigned long color1, unsigned long color2)
 {
     m_color1 = color1;
     m_color2 = color2;
@@ -22,7 +22,7 @@ void TwoColorPattern::reset()
     }
 }
 
-ulong TwoColorPattern::getNextColor()
+unsigned long TwoColorPattern::getNextColor()
 {
     // Check the size of the sequence list just in case.
     if (m_colorSequence.size() == 0)
@@ -31,12 +31,12 @@ ulong TwoColorPattern::getNextColor()
     }
 
     m_iterationCount = m_iterationCount % m_colorSequence.size();
-    ulong color = m_colorSequence[m_iterationCount];
+    unsigned long color = m_colorSequence[m_iterationCount];
     m_iterationCount++;
     return color;
 }
 
-uint TwoColorPattern::getNumberOfParameters()
+unsigned int TwoColorPattern::getNumberOfParameters()
 {
     return getParameterNames().size();
 }
@@ -63,7 +63,7 @@ byte TwoColorPattern::convertDuration(byte duration)
     return convertedDuration;
 }
 
-void TwoColorPattern::incrementOnly(uint incrementAmount)
+void TwoColorPattern::incrementOnly(unsigned int incrementAmount)
 {
     m_iterationCount = incrementAmount;
 }

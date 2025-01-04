@@ -1,6 +1,6 @@
 #include "TwoColorFadePattern.h"
 
-TwoColorFadePattern::TwoColorFadePattern(ulong color1, ulong color2)
+TwoColorFadePattern::TwoColorFadePattern(unsigned long color1, unsigned long color2)
 {
     m_color1 = color1;
     m_color2 = color2;
@@ -10,7 +10,7 @@ TwoColorFadePattern::TwoColorFadePattern(ulong color1, ulong color2)
 
 double TwoColorFadePattern::applyBrightnessGamma(double inputBrightness) {
         byte inputScale = 255 * inputBrightness;
-        byte outputScale = Adafruit_NeoPixel::gamma8(inputScale);
+        byte outputScale = NeoPixelUtils::gamma8(inputScale);
         
         return (double)outputScale / 255.0;
 }
@@ -32,7 +32,7 @@ void TwoColorFadePattern::reset()
     for (int i = m_fadeOutDuration - 1; i >=0; i--)
     {
         double scaling = applyBrightnessGamma((double)(i + 1)/(m_fadeOutDuration + 1));
-        ulong color = Adafruit_NeoPixel::Color(color1Red * scaling, color1Green * scaling, color1Blue * scaling);
+        unsigned long color = NeoPixelUtils::Color(color1Red * scaling, color1Green * scaling, color1Blue * scaling);
         m_colorSequence.push_back(color);
     }
 
@@ -49,7 +49,7 @@ void TwoColorFadePattern::reset()
     for (int i = 0; i < m_fadeInDuration; i++)
     {
         double scaling =  applyBrightnessGamma((double)(i + 1)/(m_fadeInDuration + 1));
-        ulong color = Adafruit_NeoPixel::Color(color2Red * scaling, color2Green * scaling, color2Blue * scaling);
+        unsigned long color = NeoPixelUtils::Color(color2Red * scaling, color2Green * scaling, color2Blue * scaling);
         m_colorSequence.push_back(color);
     }
 
@@ -63,7 +63,7 @@ void TwoColorFadePattern::reset()
     for (int i = m_fadeOutDuration -1; i >= 0; i--)
     {
         double scaling =  applyBrightnessGamma((double)(i + 1)/(m_fadeOutDuration + 1));
-        ulong color = Adafruit_NeoPixel::Color(color2Red * scaling, color2Green * scaling, color2Blue * scaling);
+        unsigned long color = NeoPixelUtils::Color(color2Red * scaling, color2Green * scaling, color2Blue * scaling);
         m_colorSequence.push_back(color);
     }
 
@@ -77,12 +77,12 @@ void TwoColorFadePattern::reset()
     for (int i = 0; i < m_fadeInDuration; i++)
     {
         double scaling =  applyBrightnessGamma((double)(i + 1)/(m_fadeInDuration + 1));
-        ulong color = Adafruit_NeoPixel::Color(color1Red * scaling, color1Green * scaling, color1Blue * scaling);
+        unsigned long color = NeoPixelUtils::Color(color1Red * scaling, color1Green * scaling, color1Blue * scaling);
         m_colorSequence.push_back(color);
     }
 }
 
-ulong TwoColorFadePattern::getNextColor()
+unsigned long TwoColorFadePattern::getNextColor()
 {
     // Check the size of the sequence list just in case.
     if (m_colorSequence.size() == 0)
@@ -91,12 +91,12 @@ ulong TwoColorFadePattern::getNextColor()
     }
 
     m_iterationCount = m_iterationCount % m_colorSequence.size();
-    ulong color = m_colorSequence[m_iterationCount];
+    unsigned long color = m_colorSequence[m_iterationCount];
     m_iterationCount++;
     return color;
 }
 
-uint TwoColorFadePattern::getNumberOfParameters()
+unsigned int TwoColorFadePattern::getNumberOfParameters()
 {
     return getParameterNames().size();
 }
@@ -143,7 +143,7 @@ byte TwoColorFadePattern::convertFadeInOutDuration(byte duration)
     return convertedDuration;
 }
 
-void TwoColorFadePattern::incrementOnly(uint incrementAmount)
+void TwoColorFadePattern::incrementOnly(unsigned int incrementAmount)
 {
     m_iterationCount = incrementAmount;
 }

@@ -9,14 +9,14 @@ void RainbowColorPattern::reset()
     m_currentHue = 0;
 }
 
-ulong RainbowColorPattern::getNextColor()
+unsigned long RainbowColorPattern::getNextColor()
 {
-    ulong color = Adafruit_NeoPixel::ColorHSV(m_currentHue);
+    unsigned long color = NeoPixelUtils::ColorHSV(m_currentHue);
     m_currentHue += m_hueIncrement;
     return color;
 }
 
-uint RainbowColorPattern::getNumberOfParameters()
+unsigned int RainbowColorPattern::getNumberOfParameters()
 {
     return getParameterNames().size();
 }
@@ -26,7 +26,7 @@ void RainbowColorPattern::setHueIncrement(byte hueIncrement)
     m_hueIncrement = MathUtils::rescaleInput(5, 1000, hueIncrement);
 }
 
-void RainbowColorPattern::incrementOnly(uint incrementAmount)
+void RainbowColorPattern::incrementOnly(unsigned int incrementAmount)
 {
     m_currentHue += incrementAmount * m_hueIncrement;
 }

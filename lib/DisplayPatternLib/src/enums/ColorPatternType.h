@@ -15,4 +15,45 @@ enum class ColorPatternType : byte
 	BackgroundPlusThree = 7
 };
 
+class ColorPatternTypeHelper
+{
+	public:
+		static ColorPatternType fromString(String type)
+		{
+			if (type.equalsIgnoreCase("blank"))
+			{
+				return ColorPatternType::Blank;
+			}
+			if (type.equalsIgnoreCase("singlecolor"))
+			{
+				return ColorPatternType::SingleColor;
+			}
+			if (type.equalsIgnoreCase("twocolor"))
+			{
+				return ColorPatternType::TwoColor;
+			}
+			if (type.equalsIgnoreCase("rainbow"))
+			{
+				return ColorPatternType::Rainbow;
+			}
+			if (type.equalsIgnoreCase("twocolorfade"))
+			{
+				return ColorPatternType::TwoColorFade;
+			}
+			if (type.equalsIgnoreCase("threecolorfade"))
+			{
+				return ColorPatternType::ThreeColorFade;
+			}
+			if (type.equalsIgnoreCase("fourcolorfade"))
+			{
+				return ColorPatternType::FourColorFade;
+			}
+			if (type.equalsIgnoreCase("backgroundplusthree"))
+			{
+				return ColorPatternType::BackgroundPlusThree;
+			}
+			return ColorPatternType::Blank;
+		}
+};
+
 #endif

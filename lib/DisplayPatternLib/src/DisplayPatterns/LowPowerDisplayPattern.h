@@ -17,7 +17,7 @@ class LowPowerDisplayPattern : public DisplayPattern
         virtual void resetInternal(PixelBuffer* pixelBuffer);
 
     private:
-        uint m_iterationCount{0};
+        unsigned int m_iterationCount{0};
 };
 
 #endif

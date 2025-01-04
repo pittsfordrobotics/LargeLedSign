@@ -31,8 +31,8 @@ class DisplayPattern {
         ColorPattern* m_colorPattern;
 
     private:
-        ulong m_nextUpdate{0};
-        uint m_iterationDelay{0};
+        unsigned long m_nextUpdate{0};
+        unsigned int m_iterationDelay{0};
 };
 
 #endif
