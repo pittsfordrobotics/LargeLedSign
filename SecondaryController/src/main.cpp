@@ -239,7 +239,7 @@ void startBLE()
         indicateBleFailure();
     }
 
-    SignConfigurationData configData;
+    //SignConfigurationData configData;
     //configData.signType = signType;
     //configData.signOrder = signPosition;
     //configData.columnCount = pixelBuffer->getColumnCount();
@@ -254,7 +254,7 @@ void startBLE()
     Serial.println("BLE service initialized.");
     btService.setBrightness(currentBrightness);
     btService.setSpeed(currentSpeed);
-    btService.setSignConfigurationData(configData);
+    //btService.setSignConfigurationData(configData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
 
