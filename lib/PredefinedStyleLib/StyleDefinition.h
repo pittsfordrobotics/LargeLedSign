@@ -15,6 +15,8 @@ class StyleDefinition
         void setPatternData(PatternData patternData) { m_patternData = patternData; };
         byte getSpeed() { return m_speed; };
         void setSpeed(byte speed) { m_speed = speed; };
+        String getName() { return m_name; };
+        void setName(String name) { m_name = name; };
 
 		StyleDefinition& operator=(const StyleDefinition& other);
 		bool operator==(const StyleDefinition& other);
@@ -23,6 +25,7 @@ class StyleDefinition
     private:
         PatternData m_patternData;
         byte m_speed;
+        String m_name{""};
 };
 
 #endif
