@@ -7,6 +7,7 @@ StyleConfiguration::StyleConfiguration()
 StyleConfiguration StyleConfiguration::ParseJson(const char* jsonString, size_t length)
 {
     StyleConfiguration styleConfiguration;
+    styleConfiguration.m_defaultStyle = getUnknownDefaultStyle();
 
     JsonDocument configDoc;
     DeserializationError err = deserializeJson(configDoc, jsonString, length);
@@ -30,11 +31,15 @@ StyleConfiguration StyleConfiguration::ParseJson(const char* jsonString, size_t 
         return styleConfiguration;
     }
 
+    String defaultStyleName("");
+    bool defaultStyleSet = false;
+    
     if (configDoc["defaultStyleName"].is<JsonVariant>())
     {
         // For some reason, the as<String> method doesn't work here, so using the as<std::string> method instead.
+        // I'm using the Arduino String class here since it's an easier class to use.
         std::string name = configDoc["defaultStyleName"].as<std::string>();
-        styleConfiguration.m_defaultStyleName = String(name.c_str());
+        defaultStyleName = String(name.c_str());
     }
 
     if (configDoc["predefinedStyles"].is<JsonArray>())
@@ -46,6 +51,14 @@ StyleConfiguration StyleConfiguration::ParseJson(const char* jsonString, size_t 
             if (tryParseStyleEntry(style, styleDefinition))
             {
                 styleConfiguration.m_styles.push_back(styleDefinition);
+                
+                // See if this style is supposed to be the default style.
+                if (!defaultStyleSet || defaultStyleName.equalsIgnoreCase(styleDefinition.getName()))
+                {
+                    // Either it's the first valid style in the list, or it's the one named as the default.
+                    styleConfiguration.m_defaultStyle = styleDefinition;
+                    defaultStyleSet = true;
+                }
             }
         }
     }
@@ -109,20 +122,20 @@ bool StyleConfiguration::tryParseStyleEntry(JsonVariant style, StyleDefinition& 
     styleDefinition.setPatternData(patternData);
     styleDefinition.setSpeed(style["speed"].as<byte>());
 
-    // if (style.containsKey("patternData"))    
-    // {
-    //     JsonObject patternDataJson = style["patternData"].as<JsonObject>();
-    //     patternData.pattern = patternDataJson["pattern"].as<String>();
-    //     patternData.color = patternDataJson["color"].as<unsigned long>();
-    // }
-
-    // byte speed = 100;
-    // if (style.containsKey("speed"))
-    // {
-    //     speed = style["speed"].as<byte>();
-    // }
-
     return true;
+}
+
+StyleDefinition StyleConfiguration::getUnknownDefaultStyle()
+{
+    PatternData patternData;
+    patternData.colorPattern = ColorPatternType::SingleColor;
+    patternData.displayPattern = DisplayPatternType::Solid;
+    patternData.color1 = Colors::Pink;
+
+    StyleDefinition styleDefinition(patternData, 1);
+    styleDefinition.setName("UnknownDefault");
+
+    return styleDefinition;
 }
 
 void StyleConfiguration::debugPrint(const char* message)
