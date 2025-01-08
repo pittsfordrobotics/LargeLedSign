@@ -23,6 +23,7 @@ ulong newSyncData = 0;
 //byte signPosition;
 PatternData currentPatternData;
 PatternData newPatternData;
+StyleConfiguration styleConfig;
 StyleDefinition lowPowerStyle = CommonStyles::LowPower();
 //PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
 StyleList* manualStyleList = new StyleList(1);
@@ -49,50 +50,29 @@ void setup()
     lastTelemetryTimestamp = millis();
 
     // Initialize components
+    initializeStyles();
     setupStyleList();
     initializeIO();
     turnOnPowerLed();
-    // signType = getSignType();
-    // signPosition = getSignPosition();
 
     configureLedDisplays();
 
-    //byte defaultBrightness = displayConfigs->at(0)->getDefaultBrightness();
     byte defaultBrightness = DEFAULT_BRIGHTNESS;
-    // if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
-    // {
-    //     defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
-    // }
-    // if (signType == PITSIGN_TYPE_ID) 
-    // {
-    //     defaultBrightness = 255;
-    // }
-
-    //pixelBuffer->setBrightness(defaultBrightness);
     currentBrightness = defaultBrightness;
     newBrightness = defaultBrightness;
 
     startBLE();
 
     // Setup the default pattern to show prior to any BT connections
-    // newPatternData.colorPattern = ColorPatternType::SingleColor;
-    // newPatternData.displayPattern = DisplayPatternType::Solid;
-    // newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
-    // Read default from JSON?
-    newPatternData.colorPattern = ColorPatternType::Rainbow;
-    newPatternData.displayPattern = DisplayPatternType::Line;
-    newPatternData.param1 = 150;
-    //currentLightStyle = PatternFactory::createForPatternData(newPatternData);
-    // if (signType == PITSIGN_TYPE_ID) 
-    // {
-    //     newPatternData.color1 = Adafruit_NeoPixel::Color(255,0,0);
-    //     //currentLightStyle = PatternFactory::createForPatternData(newPatternData);
-    // }
+    newPatternData = styleConfig.getDefaultStyle().getPatternData();
+    currentPatternData = newPatternData;
+    newSpeed = styleConfig.getDefaultStyle().getSpeed();
+    currentSpeed = newSpeed;
 
     for (int i = 0; i < neoPixelDisplays.size(); i++)
     {
         DisplayPattern* defaultPattern = PatternFactory::createForPatternData(newPatternData);
-        defaultPattern->setSpeed(DEFAULT_SPEED);
+        defaultPattern->setSpeed(newSpeed);
         neoPixelDisplays.at(i)->setDisplayPattern(PatternFactory::createForPatternData(newPatternData));
     }
 
@@ -174,38 +154,6 @@ void initializeIO()
     pinMode(D9, INPUT_PULLUP);
 }
 
-// byte getSignType()
-// {
-//     // Pull the pin low to indicate active.
-//     byte type = 0;
-//     // for (uint i = 0; i < typeSelectorPins.size(); i++)
-//     // {
-//     //     type = type << 1;
-//     //     if (digitalRead(typeSelectorPins.at(i)) == LOW)
-//     //     {
-//     //         type++;
-//     //     }
-//     // }
-
-//     return type;
-// }
-
-// byte getSignPosition()
-// {
-//     // Pull the pin low to indicate active.
-//     byte order = 0;
-//     // for (uint i = 0; i < orderSelectorPins.size(); i++)
-//     // {
-//     //     order = order << 1;
-//     //     if (digitalRead(orderSelectorPins.at(i)) == LOW)
-//     //     {
-//     //         order++;
-//     //     }
-//     // }
-
-//     return order;
-// }
-
 void configureLedDisplays()
 {
     // Configure LED display(s)
@@ -239,22 +187,10 @@ void startBLE()
         indicateBleFailure();
     }
 
-    //SignConfigurationData configData;
-    //configData.signType = signType;
-    //configData.signOrder = signPosition;
-    //configData.columnCount = pixelBuffer->getColumnCount();
-    //configData.pixelCount = pixelBuffer->getPixelCount();
-
-    // If the sign "position" is 0, then we'll assume we're standalone.
-    // String uuid = signPosition == 0
-    //                   ? BTCOMMON_PRIMARYCONTROLLER_UUID
-    //                   : BTCOMMON_SECONDARYCONTROLLER_UUID;
-
     btService.initialize(config->getUuid(), config->getLocalName());
     Serial.println("BLE service initialized.");
     btService.setBrightness(currentBrightness);
     btService.setSpeed(currentSpeed);
-    //btService.setSignConfigurationData(configData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
 
@@ -273,13 +209,6 @@ void startBLE()
 // Read the BLE settings to see if any have been changed.
 void readBleSettings()
 {
-    // SignOffsetData newOffsetData = btService.getSignOffsetData();
-    // if (newOffsetData != currentOffsetData)
-    // {
-    //     resetPixelBufferOffsets(newOffsetData);
-    //     currentOffsetData = newOffsetData;
-    // }
-
     newPatternData = btService.getPatternData();
     newBrightness = btService.getBrightness();
     newSyncData = btService.getSyncData();
@@ -297,8 +226,6 @@ void updateLEDs()
             neoPixelDisplays.at(i)->setBrightness(newBrightness);
         }
 
-        //pixelBuffer->setBrightness(newBrightness);
-        //neoPixelDisplay->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
 
@@ -324,16 +251,6 @@ void updateLEDs()
 
     if (shouldResetStyle)
     {
-        // if (currentLightStyle)
-        // {
-        //     delete currentLightStyle;
-        // }
-
-        //currentLightStyle = PatternFactory::createForPatternData(newPatternData);
-        //currentLightStyle->setSpeed(newSpeed);
-        //currentLightStyle->reset();
-        //neoPixelDisplay->setDisplayPattern(currentLightStyle);
-        //neoPixelDisplay->resetDisplay();
         for (int i = 0; i < neoPixelDisplays.size(); i++)
         {
             DisplayPattern* oldStyle = neoPixelDisplays.at(i)->getDisplayPattern();
@@ -351,22 +268,10 @@ void updateLEDs()
         currentPatternData = newPatternData;
     }
 
-    // The current style shouldn't ever be null here, but check anyways.
-    // if (currentLightStyle)
-    // {
-        //currentLightStyle->update();
-        //neoPixelDisplay->updateDisplay();
-        for (int i = 0; i < neoPixelDisplays.size(); i++)
-        {
-            neoPixelDisplays.at(i)->updateDisplay();
-        }
-    //}
-
-    // for (uint i = 0; i < pixelBuffers.size(); i++)
-    // {
-    //     pixelBuffers.at(i)->displayPixels();
-    // }
-    //pixelBuffer->displayPixels();
+    for (int i = 0; i < neoPixelDisplays.size(); i++)
+    {
+        neoPixelDisplays.at(i)->updateDisplay();
+    }
 }
 
 // Check if the current battery voltage is too low to run the sign,
@@ -541,7 +446,6 @@ void turnOffPowerLed()
 
 void readInputButton()
 {
-    //rp2040.restart();
     // powerButton.update();
 
     // if (powerButton.wasPressed())
@@ -557,6 +461,7 @@ void readInputButton()
     //             // we set it explicitly before restarting advertising.
     //             // To get around this, just restart the entire system.
     //             // NVIC_SystemReset(); **Doesn't exist for new platform!
+    //             // rp2040.restart();
     //         }
     //         else
     //         {
@@ -596,6 +501,14 @@ void setupStyleList()
     manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Yellow));
     manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Green));
     manualStyleList->addStyleToList(0, CommonStyles::SolidColor(Colors::Red));
+}
+
+void initializeStyles()
+{
+    const char* styleConfigContents = getSdFileContents("displayStyles.json");
+    styleConfig = StyleConfiguration::ParseJson(styleConfigContents, strlen(styleConfigContents));
+    Serial.print("Number of styles loaded: ");
+    Serial.println(styleConfig.getStyles().size());
 }
  
 const char* getSdFileContents(String filename)

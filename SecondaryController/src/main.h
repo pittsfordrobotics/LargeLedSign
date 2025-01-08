@@ -15,6 +15,7 @@
 #include <PushButton.h>
 #include "NeoPixelDisplay.h"
 #include "Bluetooth\BluetoothConfig.h"
+#include "StyleConfiguration.h"
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
@@ -50,6 +51,7 @@
 
 // Function prototypes
 void initializeIO();
+void initializeStyles();
 void startBLE();
 void configureLedDisplays();
 void readBleSettings();
