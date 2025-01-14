@@ -8,8 +8,6 @@ SecondaryPeripheral btService;
 
 // Pixel and color data
 std::vector<NeoPixelDisplay*> neoPixelDisplays;
-//NeoPixelDisplay *neoPixelDisplay;
-//DisplayPattern *currentLightStyle;
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULT_BRIGHTNESS;
@@ -18,9 +16,6 @@ byte currentSpeed = DEFAULT_SPEED;
 byte newSpeed = DEFAULT_SPEED;
 ulong currentSyncData = 0;
 ulong newSyncData = 0;
-//SignOffsetData currentOffsetData;
-//byte signType;
-//byte signPosition;
 PatternData currentPatternData;
 PatternData newPatternData;
 StyleConfiguration styleConfig;
@@ -86,11 +81,6 @@ void setup()
 void loop()
 {
     //readInputButton();
-    if (digitalRead(D9) == LOW)
-    {
-        rp2040.restart();
-    }
-
     if (isOff)
     {
         // If we're supposed to be off, do nothing.
@@ -117,9 +107,6 @@ void loop()
         // See if any settings have been changed via BLE and apply them if necessary.
         readBleSettings();
     }
-
-    // Apply any updates that were received via BLE or manually
-    //updateLEDs();
 }
 
 void setup1()
@@ -130,7 +117,6 @@ void setup1()
 void loop1()
 {
     // Check for threading issues!!!
-    // Serial.println("Looping");
     updateLEDs();
 }
 
@@ -151,7 +137,6 @@ void initializeIO()
     // pinMode(VOLTAGEINPUTPIN, INPUT);
     // pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
     // pinMode(POWER_INDICATOR_PIN, OUTPUT);
-    pinMode(D9, INPUT_PULLUP);
 }
 
 void configureLedDisplays()
