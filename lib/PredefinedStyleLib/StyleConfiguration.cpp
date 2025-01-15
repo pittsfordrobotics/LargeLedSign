@@ -4,10 +4,10 @@ StyleConfiguration::StyleConfiguration()
 {
 }
 
-StyleConfiguration StyleConfiguration::ParseJson(const char* jsonString, size_t length)
+StyleConfiguration* StyleConfiguration::ParseJson(const char* jsonString, size_t length)
 {
-    StyleConfiguration styleConfiguration;
-    styleConfiguration.m_defaultStyle = getUnknownDefaultStyle();
+    StyleConfiguration* styleConfiguration = new StyleConfiguration();
+    styleConfiguration->m_defaultStyle = getUnknownDefaultStyle();
 
     JsonDocument configDoc;
     DeserializationError err = deserializeJson(configDoc, jsonString, length);
@@ -50,13 +50,13 @@ StyleConfiguration StyleConfiguration::ParseJson(const char* jsonString, size_t 
             StyleDefinition styleDefinition;
             if (tryParseStyleEntry(style, styleDefinition))
             {
-                styleConfiguration.m_styles.push_back(styleDefinition);
+                styleConfiguration->m_styles.push_back(styleDefinition);
                 
                 // See if this style is supposed to be the default style.
                 if (!defaultStyleSet || defaultStyleName.equalsIgnoreCase(styleDefinition.getName()))
                 {
                     // Either it's the first valid style in the list, or it's the one named as the default.
-                    styleConfiguration.m_defaultStyle = styleDefinition;
+                    styleConfiguration->m_defaultStyle = styleDefinition;
                     defaultStyleSet = true;
                 }
             }

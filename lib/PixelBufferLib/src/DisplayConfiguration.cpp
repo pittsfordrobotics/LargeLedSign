@@ -1,8 +1,8 @@
 #include "DisplayConfiguration.h"
 
-std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(const char* jsonString, size_t length)
+std::vector<DisplayConfiguration>* DisplayConfiguration::ParseJson(const char* jsonString, size_t length)
 {
-    std::vector<DisplayConfiguration*>* configs = new std::vector<DisplayConfiguration*>();
+    std::vector<DisplayConfiguration>* configs = new std::vector<DisplayConfiguration>();
 
     JsonDocument configDoc;
     DeserializationError err = deserializeJson(configDoc, jsonString, length);
@@ -42,8 +42,8 @@ std::vector<DisplayConfiguration*>* DisplayConfiguration::ParseJson(const char* 
 
     for (JsonVariant display : displays)
     {
-        DisplayConfiguration* config = parseDisplayEntryFromJsonVariant(display, defaultBrightness);
-        if (config != nullptr)
+        DisplayConfiguration config;
+        if (tryParseDisplayEntryFromJsonVariant(display, defaultBrightness, config))
         {
             configs->push_back(config);
         }
@@ -73,6 +73,7 @@ DisplayConfiguration& DisplayConfiguration::operator=(const DisplayConfiguration
 
 void DisplayConfiguration::copy(const DisplayConfiguration& other)
 {
+    this->m_defaultBrightness = other.m_defaultBrightness;
     this->m_gpioPin = other.m_gpioPin;
     this->m_numPixels = other.m_numPixels;
     this->m_numCols = other.m_numCols;
@@ -81,18 +82,19 @@ void DisplayConfiguration::copy(const DisplayConfiguration& other)
     this->m_colsToRight = other.m_colsToRight;
     this->m_rowsAbove = other.m_rowsAbove;
     this->m_rowsBelow = other.m_rowsBelow;
+    this->m_digitsToLeft = other.m_digitsToLeft;
+    this->m_digitsToRight = other.m_digitsToRight;
+    this->m_digitPixelMapping = other.m_digitPixelMapping;
     this->m_columnPixelMapping = other.m_columnPixelMapping;
     this->m_rowPixelMapping = other.m_rowPixelMapping;
 }
 
-DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(JsonVariant display, byte defaultBrightness)
+bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant display, byte defaultBrightness, DisplayConfiguration& config)
 {
-    DisplayConfiguration* config = new DisplayConfiguration();
-
     if (display.isNull())
     {
         debugPrintln("Display entry was null.");
-        return nullptr;
+        return false;
     }
 
     debugPrint("Parsing display entry: ");
@@ -111,46 +113,46 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
         if (display["disabled"].as<bool>())
         {
             debugPrintln("Display entry is disabled.");
-            return nullptr;
+            return false;
         }
     }
 
     if (!display["gpioPin"].is<JsonVariant>())
     {
         debugPrintln("Display entry did not contain a GPIO pin.");
-        return nullptr;
+        return false;
     }
-    config->m_gpioPin = display["gpioPin"].as<uint8_t>();
+    config.m_gpioPin = display["gpioPin"].as<uint8_t>();
 
     if (!display["numberOfPixels"].is<JsonVariant>())
     {
         debugPrintln("Display entry did not contain the number of pixels.");
-        return nullptr;
+        return false;
     }
-    config->m_numPixels = display["numberOfPixels"].as<uint16_t>();
+    config.m_numPixels = display["numberOfPixels"].as<uint16_t>();
 
     if (display["defaultBrightness"].is<JsonVariant>())
     {
-        config->defaultBrightness = display["defaultBrightness"].as<byte>();
+        config.m_defaultBrightness = display["defaultBrightness"].as<byte>();
     }
     else
     {
-        config->defaultBrightness = defaultBrightness;
+        config.m_defaultBrightness = defaultBrightness;
     }
 
     // The following properties are optional. If not specified, assume the default value of 0.
-    config->m_rowsAbove = display["rowsAbove"].as<uint16_t>();
-    config->m_rowsBelow = display["rowsBelow"].as<uint16_t>();
-    config->m_colsToLeft = display["columnsToLeft"].as<uint16_t>();
-    config->m_colsToRight = display["columnsToRight"].as<uint16_t>();
-    config->m_digitsToLeft = display["digitsToLeft"].as<uint16_t>();
-    config->m_digitsToRight = display["digitsToRight"].as<uint16_t>();
+    config.m_rowsAbove = display["rowsAbove"].as<uint16_t>();
+    config.m_rowsBelow = display["rowsBelow"].as<uint16_t>();
+    config.m_colsToLeft = display["columnsToLeft"].as<uint16_t>();
+    config.m_colsToRight = display["columnsToRight"].as<uint16_t>();
+    config.m_digitsToLeft = display["digitsToLeft"].as<uint16_t>();
+    config.m_digitsToRight = display["digitsToRight"].as<uint16_t>();
 
     // Parse the pixel mappings
     if (!display["columnPixelMapping"].is<JsonArray>())
     {
         debugPrintln("Display entry did not contain a valid column pixel mapping.");
-        return nullptr;
+        return false;
     }
 
     JsonArray columnMapping = display["columnPixelMapping"].as<JsonArray>();
@@ -160,7 +162,7 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
         if (!columnMapping[i].is<JsonArray>())
         {
             debugPrintln("Column pixel mapping entry was not an array.");
-            return nullptr;
+            return false;
         }
 
         for (JsonVariant pixel : columnMapping[i].as<JsonArray>())
@@ -168,13 +170,13 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
             columnPixels->push_back(pixel.as<uint16_t>());
         }
 
-        config->m_columnPixelMapping.push_back(columnPixels);
+        config.m_columnPixelMapping.push_back(columnPixels);
     }
 
     if (!display["rowPixelMapping"].is<JsonArray>())
     {
         debugPrintln("Display entry did not contain a valid row pixel mapping.");
-        return nullptr;
+        return false;
     }
 
     JsonArray rowMapping = display["rowPixelMapping"].as<JsonArray>();
@@ -184,7 +186,7 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
         if (!rowMapping[i].is<JsonArray>())
         {
             debugPrintln("Row pixel mapping entry was not an array.");
-            return nullptr;
+            return false;
         }
 
         for (JsonVariant pixel : rowMapping[i].as<JsonArray>())
@@ -192,7 +194,7 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
             rowPixels->push_back(pixel.as<uint16_t>());
         }
 
-        config->m_rowPixelMapping.push_back(rowPixels);
+        config.m_rowPixelMapping.push_back(rowPixels);
     }
 
     if (!display["digitPixelMapping"].is<JsonArray>())
@@ -200,12 +202,12 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
         // If not defined, put all pixels in a single digit.
         debugPrintln("Display entry did not contain a valid digit pixel mapping. Assuming all pixels are in a single digit.");
         std::vector<uint16_t>* digitPixels = new std::vector<uint16_t>();
-        for (int i = 0; i < config->m_numPixels; i++)
+        for (int i = 0; i < config.m_numPixels; i++)
         {
             digitPixels->push_back(i);
         }
 
-        config->m_digitPixelMapping.push_back(digitPixels);
+        config.m_digitPixelMapping.push_back(digitPixels);
     }
     else
     {
@@ -216,7 +218,7 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
             if (!digitMapping[i].is<JsonArray>())
             {
                 debugPrintln("Digit pixel mapping entry was not an array.");
-                return nullptr;
+                return false;
             }
 
             for (JsonVariant pixel : digitMapping[i].as<JsonArray>())
@@ -224,13 +226,13 @@ DisplayConfiguration* DisplayConfiguration::parseDisplayEntryFromJsonVariant(Jso
                 digitPixels->push_back(pixel.as<uint16_t>());
             }
 
-            config->m_digitPixelMapping.push_back(digitPixels);
+            config.m_digitPixelMapping.push_back(digitPixels);
         }
     }
 
     debugPrintln("Display entry parsed successfully.");
     
-    return config;
+    return true;
 }
 
 void DisplayConfiguration::debugPrint(const char* message)

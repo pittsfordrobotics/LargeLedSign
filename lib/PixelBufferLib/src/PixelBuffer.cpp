@@ -1,10 +1,10 @@
 #include "PixelBuffer.h"
 
-PixelBuffer::PixelBuffer(const DisplayConfiguration* displayConfiguration)
+PixelBuffer::PixelBuffer(const DisplayConfiguration& displayConfiguration)
 {
     // Todo: Could stash the config copy and reference the row-pixel, col-pixel, etc, maps
     // directly from the config object instead of copying them to internal members.
-    DisplayConfiguration config(*displayConfiguration);
+    DisplayConfiguration config(displayConfiguration);
 
     m_numPixels = config.getNumberOfPixels();
     m_pixelBuffer = new unsigned long[m_numPixels];

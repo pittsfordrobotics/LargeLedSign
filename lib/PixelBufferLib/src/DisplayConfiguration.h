@@ -10,10 +10,10 @@
 class DisplayConfiguration
 {
     public:
-        static std::vector<DisplayConfiguration*>* ParseJson(const char* jsonString, size_t length);
+        static std::vector<DisplayConfiguration>* ParseJson(const char* jsonString, size_t length);
         DisplayConfiguration(const DisplayConfiguration& other);
         
-        byte getDefaultBrightness() { return defaultBrightness; }
+        byte getDefaultBrightness() { return m_defaultBrightness; }
         uint8_t getGpioPin() const { return m_gpioPin; }
         uint16_t getNumberOfPixels() { return m_numPixels; }
         uint16_t getNumberOfRows() { return m_numRows; }
@@ -33,11 +33,11 @@ class DisplayConfiguration
     private:
         static void debugPrint(const char* message);
         static void debugPrintln(const char* message);
-        static DisplayConfiguration* parseDisplayEntryFromJsonVariant(JsonVariant display, byte defaultBrightness);
+        static bool tryParseDisplayEntryFromJsonVariant(JsonVariant display, byte defaultBrightness, DisplayConfiguration& config);
 
         DisplayConfiguration();
 
-        byte defaultBrightness{255};
+        byte m_defaultBrightness{255};
         uint8_t m_gpioPin{0};
         uint16_t m_numPixels{0};
         uint16_t m_numCols{0};

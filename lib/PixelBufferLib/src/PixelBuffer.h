@@ -8,7 +8,7 @@
 
 class PixelBuffer {
   public:
-    PixelBuffer(const DisplayConfiguration* displayConfiguration);
+    PixelBuffer(const DisplayConfiguration& displayConfiguration);
 
     unsigned int getDigitsToLeft() { return m_digitsToLeft; }
     unsigned int getDigitsToRight() { return m_digitsToRight; }

@@ -9,7 +9,7 @@
 class NeoPixelDisplay
 {
     public:
-        NeoPixelDisplay(const DisplayConfiguration* displayConfiguration);
+        NeoPixelDisplay(const DisplayConfiguration& displayConfiguration);
 
         void setBrightness(byte brightess);
         void setDisplayPattern(DisplayPattern* displayPattern) { m_displayPattern = displayPattern; }

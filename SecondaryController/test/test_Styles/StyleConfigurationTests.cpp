@@ -19,54 +19,54 @@ void tearDown(void) {
 
 void emptyStringGivesNoStyles() {
     const char* jsonString = "";
-    StyleConfiguration config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
-    verifyUnknownDefaultStyle(config.getDefaultStyle());
-    TEST_ASSERT_EQUAL_MESSAGE(0, config.getStyles().size(), "Number of styles is not correct.");
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    verifyUnknownDefaultStyle(config->getDefaultStyle());
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getStyles().size(), "Number of styles is not correct.");
 }
 
 void emptyObjectGivesNoStyles() {
     const char* jsonString = "{}";
-    StyleConfiguration config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
-    verifyUnknownDefaultStyle(config.getDefaultStyle());
-    TEST_ASSERT_EQUAL_MESSAGE(0, config.getStyles().size(), "Number of styles is not correct.");
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    verifyUnknownDefaultStyle(config->getDefaultStyle());
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getStyles().size(), "Number of styles is not correct.");
 }
 
 void invalidJsonGivesNoStyles() {
     const char* jsonString = "NotJson";
-    StyleConfiguration config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
-    verifyUnknownDefaultStyle(config.getDefaultStyle());
-    TEST_ASSERT_EQUAL_MESSAGE(0, config.getStyles().size(), "Number of styles is not correct.");
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    verifyUnknownDefaultStyle(config->getDefaultStyle());
+    TEST_ASSERT_EQUAL_MESSAGE(0, config->getStyles().size(), "Number of styles is not correct.");
 }
 
 void configWithNoDefaultParsesCorrectly() {
     const char* jsonString = noDefault();
-    StyleConfiguration config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
     // Default style should be the first style in the list.
-    StyleDefinition defaultStyle = config.getDefaultStyle();
+    StyleDefinition defaultStyle = config->getDefaultStyle();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("SolidRed", defaultStyle.getName().c_str(), "Default style name is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(1, config.getStyles().size(), "Number of styles is not correct.");
-    StyleDefinition style = config.getStyles().at(0);
+    TEST_ASSERT_EQUAL_MESSAGE(1, config->getStyles().size(), "Number of styles is not correct.");
+    StyleDefinition style = config->getStyles().at(0);
     // Just verify the name of the style - the style contents are verified other tests.
     TEST_ASSERT_EQUAL_STRING_MESSAGE("SolidRed", style.getName().c_str(), "Style name is not correct.");
 }
 
 void invalidDefaultNameUsesExpectedDefault() {
     const char* jsonString = invalidDefaultName();
-    StyleConfiguration config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
-    StyleDefinition defaultStyle = config.getDefaultStyle();
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    StyleDefinition defaultStyle = config->getDefaultStyle();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", defaultStyle.getName().c_str(), "Default style name is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(1, config.getStyles().size(), "Number of styles is not correct.");
-    StyleDefinition style = config.getStyles().at(0);
+    TEST_ASSERT_EQUAL_MESSAGE(1, config->getStyles().size(), "Number of styles is not correct.");
+    StyleDefinition style = config->getStyles().at(0);
     // Just verify the name of the style - the style contents are verified other tests.
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", style.getName().c_str(), "Style name is not correct.");
 }
 
 void singlePinkStyleParsesCorrectly() {
     const char* jsonString = singlePinkStyle();
-    StyleConfiguration config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", config.getDefaultStyle().getName().c_str(), "Default style name is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(1, config.getStyles().size(), "Number of styles is not correct.");
-    StyleDefinition style = config.getStyles().at(0);
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", config->getDefaultStyle().getName().c_str(), "Default style name is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, config->getStyles().size(), "Number of styles is not correct.");
+    StyleDefinition style = config->getStyles().at(0);
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", style.getName().c_str(), "Style name is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(ColorPatternType::SingleColor, style.getPatternData().colorPattern, "Color pattern is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(DisplayPatternType::Solid, style.getPatternData().displayPattern, "Display pattern is not correct.");
@@ -76,22 +76,22 @@ void singlePinkStyleParsesCorrectly() {
 
 void fullListParsesCorrectly() {
     const char* jsonString = multipleStyles();
-    StyleConfiguration config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("RedPink", config.getDefaultStyle().getName().c_str(), "Default style name is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(3, config.getStyles().size(), "Number of styles is not correct.");
-    StyleDefinition style0 = config.getStyles().at(0);
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("RedPink", config->getDefaultStyle().getName().c_str(), "Default style name is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(3, config->getStyles().size(), "Number of styles is not correct.");
+    StyleDefinition style0 = config->getStyles().at(0);
     TEST_ASSERT_EQUAL_STRING_MESSAGE("RainbowLava", style0.getName().c_str(), "Style name (0) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(ColorPatternType::Rainbow, style0.getPatternData().colorPattern, "Color pattern (0) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(DisplayPatternType::Line, style0.getPatternData().displayPattern, "Display pattern (0) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(200, style0.getSpeed(), "Speed (0) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(123, style0.getPatternData().param1, "Param1 (0) is not correct.");
-    StyleDefinition style1 = config.getStyles().at(1);
+    StyleDefinition style1 = config->getStyles().at(1);
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", style1.getName().c_str(), "Style name (1) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(ColorPatternType::SingleColor, style1.getPatternData().colorPattern, "Color pattern (1) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(DisplayPatternType::Solid, style1.getPatternData().displayPattern, "Display pattern (1) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(1, style1.getSpeed(), "Speed (1) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(0xE616A1, style1.getPatternData().color1, "Color1 (1) is not correct.");
-    StyleDefinition style2 = config.getStyles().at(2);
+    StyleDefinition style2 = config->getStyles().at(2);
     TEST_ASSERT_EQUAL_STRING_MESSAGE("RedPink", style2.getName().c_str(), "Style name (2) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(ColorPatternType::TwoColor, style2.getPatternData().colorPattern, "Color pattern (2) is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(DisplayPatternType::Right, style2.getPatternData().displayPattern, "Display pattern (2) is not correct.");
@@ -104,11 +104,11 @@ void fullListParsesCorrectly() {
 
 void invalidStyleEntriesAreSkipped() {
     const char* jsonString = invalidStyleEntries();
-    StyleConfiguration config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
-    TEST_ASSERT_EQUAL_MESSAGE(3, config.getStyles().size(), "Number of styles is not correct.");
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("RainbowLava", config.getStyles().at(0).getName().c_str(), "Style name (0) is not correct.");
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", config.getStyles().at(1).getName().c_str(), "Style name (1) is not correct.");
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("RedPink", config.getStyles().at(2).getName().c_str(), "Style name (2) is not correct.");
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    TEST_ASSERT_EQUAL_MESSAGE(3, config->getStyles().size(), "Number of styles is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("RainbowLava", config->getStyles().at(0).getName().c_str(), "Style name (0) is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", config->getStyles().at(1).getName().c_str(), "Style name (1) is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("RedPink", config->getStyles().at(2).getName().c_str(), "Style name (2) is not correct.");
 }
 
 int main(int argc, char **argv) {

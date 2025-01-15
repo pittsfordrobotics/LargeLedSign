@@ -16,114 +16,114 @@ void tearDown(void) {
 
 void emptyStringGivesNoConfigs() {
     const char* jsonString = "";
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
 void emptyObjectGivesNoConfigs() {
     const char* jsonString = "{}";
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
 void invalidJsonGivesNoConfigs() {
     const char* jsonString = "NotJson";
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
 void emptyDisplayArrayGivesNoConfigs() {
     const char* jsonString = "{\"displays\":[]}";
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
 }
 
 void parseFullTestMatrixJson() {
     const char* jsonString = fullTestMatrixJson();
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(1, configs->size(), "Expected 1 display configuration");
-    DisplayConfiguration* config = configs->at(0);
-    TEST_ASSERT_EQUAL_MESSAGE(16, config->getGpioPin(), "GPIO pin is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(64, config->getNumberOfPixels(), "Number of pixels is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(15, config->getDefaultBrightness(), "Default brightness is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(1, config->getRowsAbove(), "Rows above is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(2, config->getRowsBelow(), "Rows below is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(3, config->getColumnsToLeft(), "Columns to left is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(4, config->getColumnsToRight(), "Columns to right is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(5, config->getDigitsToLeft(), "Digits to left is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(6, config->getDigitsToRight(), "Digits to right is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(8, config->getColumnPixelMapping().size(), "Column pixel mapping size is not correct.");
+    DisplayConfiguration config = configs->at(0);
+    TEST_ASSERT_EQUAL_MESSAGE(16, config.getGpioPin(), "GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(64, config.getNumberOfPixels(), "Number of pixels is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(15, config.getDefaultBrightness(), "Default brightness is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, config.getRowsAbove(), "Rows above is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(2, config.getRowsBelow(), "Rows below is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(3, config.getColumnsToLeft(), "Columns to left is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(4, config.getColumnsToRight(), "Columns to right is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(5, config.getDigitsToLeft(), "Digits to left is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(6, config.getDigitsToRight(), "Digits to right is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(8, config.getColumnPixelMapping().size(), "Column pixel mapping size is not correct.");
     int expectedFirstColumnNumbers[] = {56,48,40,32,24,16,8,0};
-    for (int i = 0; i < config->getColumnPixelMapping().size(); i++) {
-        std::vector<uint16_t>* column = config->getColumnPixelMapping().at(i);
+    for (int i = 0; i < config.getColumnPixelMapping().size(); i++) {
+        std::vector<uint16_t>* column = config.getColumnPixelMapping().at(i);
         std::string colNum = std::to_string(i);
         TEST_ASSERT_EQUAL_MESSAGE(8, column->size(), ("Column pixel mapping size is not correct. Column: " + colNum).c_str());
         TEST_ASSERT_EQUAL_MESSAGE(expectedFirstColumnNumbers[i], column->at(0), ("First pixel in column is not correct. Column: " + colNum).c_str());
     }
 
-    TEST_ASSERT_EQUAL_MESSAGE(8, config->getRowPixelMapping().size(), "Row pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(8, config.getRowPixelMapping().size(), "Row pixel mapping size is not correct.");
     int expectedFirstRowNumbers[] = {56,57,58,59,60,61,62,63};
-    for (int i = 0; i < config->getRowPixelMapping().size(); i++) {
-        std::vector<uint16_t>* row = config->getRowPixelMapping().at(i);
+    for (int i = 0; i < config.getRowPixelMapping().size(); i++) {
+        std::vector<uint16_t>* row = config.getRowPixelMapping().at(i);
         std::string rowNum = std::to_string(i);
         TEST_ASSERT_EQUAL_MESSAGE(8, row->size(), ("Row pixel mapping size is not correct. Row: " + rowNum).c_str());
         TEST_ASSERT_EQUAL_MESSAGE(expectedFirstRowNumbers[i], row->at(0), ("First pixel in row is not correct. Row: " + rowNum).c_str());
     }
 
-    TEST_ASSERT_EQUAL_MESSAGE(1, config->getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(64, config->getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, config.getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(64, config.getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
 }
 
 void parseMinimalTestMatrixJson() {
     const char* jsonString = minimalTestMatrixJson();
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(1, configs->size(), "Expected 1 display configuration");
-    DisplayConfiguration* config = configs->at(0);
-    TEST_ASSERT_EQUAL_MESSAGE(16, config->getGpioPin(), "GPIO pin is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(64, config->getNumberOfPixels(), "Number of pixels is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(100, config->getDefaultBrightness(), "Default brightness is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(0, config->getRowsAbove(), "Rows above is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(0, config->getRowsBelow(), "Rows below is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(0, config->getColumnsToLeft(), "Columns to left is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(0, config->getColumnsToRight(), "Columns to right is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(0, config->getDigitsToLeft(), "Digits to left is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(0, config->getDigitsToRight(), "Digits to right is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(8, config->getColumnPixelMapping().size(), "Column pixel mapping size is not correct.");
+    DisplayConfiguration config = configs->at(0);
+    TEST_ASSERT_EQUAL_MESSAGE(16, config.getGpioPin(), "GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(64, config.getNumberOfPixels(), "Number of pixels is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(100, config.getDefaultBrightness(), "Default brightness is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config.getRowsAbove(), "Rows above is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config.getRowsBelow(), "Rows below is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config.getColumnsToLeft(), "Columns to left is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config.getColumnsToRight(), "Columns to right is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config.getDigitsToLeft(), "Digits to left is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, config.getDigitsToRight(), "Digits to right is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(8, config.getColumnPixelMapping().size(), "Column pixel mapping size is not correct.");
     int expectedFirstColumnNumbers[] = {56,48,40,32,24,16,8,0};
-    for (int i = 0; i < config->getColumnPixelMapping().size(); i++) {
-        std::vector<uint16_t>* column = config->getColumnPixelMapping().at(i);
+    for (int i = 0; i < config.getColumnPixelMapping().size(); i++) {
+        std::vector<uint16_t>* column = config.getColumnPixelMapping().at(i);
         std::string colNum = std::to_string(i);
         TEST_ASSERT_EQUAL_MESSAGE(8, column->size(), ("Column pixel mapping size is not correct. Column: " + colNum).c_str());
         TEST_ASSERT_EQUAL_MESSAGE(expectedFirstColumnNumbers[i], column->at(0), ("First pixel in column is not correct. Column: " + colNum).c_str());
     }
 
-    TEST_ASSERT_EQUAL_MESSAGE(8, config->getRowPixelMapping().size(), "Row pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(8, config.getRowPixelMapping().size(), "Row pixel mapping size is not correct.");
     int expectedFirstRowNumbers[] = {56,57,58,59,60,61,62,63};
-    for (int i = 0; i < config->getRowPixelMapping().size(); i++) {
-        std::vector<uint16_t>* row = config->getRowPixelMapping().at(i);
+    for (int i = 0; i < config.getRowPixelMapping().size(); i++) {
+        std::vector<uint16_t>* row = config.getRowPixelMapping().at(i);
         std::string rowNum = std::to_string(i);
         TEST_ASSERT_EQUAL_MESSAGE(8, row->size(), ("Row pixel mapping size is not correct. Row: " + rowNum).c_str());
         TEST_ASSERT_EQUAL_MESSAGE(expectedFirstRowNumbers[i], row->at(0), ("First pixel in row is not correct. Row: " + rowNum).c_str());
     }
 
-    TEST_ASSERT_EQUAL_MESSAGE(1, config->getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(64, config->getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, config.getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(64, config.getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
 }
 
 void disabledDisplaysAreSkipped() {
     const char* jsonString = disabledDisplayJson();
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(2, configs->size(), "Expected 2 display configurations");
-    TEST_ASSERT_EQUAL_MESSAGE(16, configs->at(0)->getGpioPin(), "First display GPIO pin is not correct.");
-    TEST_ASSERT_EQUAL_MESSAGE(18, configs->at(1)->getGpioPin(), "Second display GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(16, configs->at(0).getGpioPin(), "First display GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(18, configs->at(1).getGpioPin(), "Second display GPIO pin is not correct.");
 }
 
 void defaultBrightnessIsSet() {
     const char* jsonString = defaultBrightnessTestJson();
-    std::vector<DisplayConfiguration*>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
+    std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(2, configs->size(), "Expected 2 display configuration");
-    TEST_ASSERT_EQUAL_MESSAGE(DISPLAY_CONFIG_DEFAULTBRIGHTNESS, configs->at(0)->getDefaultBrightness(), "Default brightness for the first display should be the global default value.");
-    TEST_ASSERT_EQUAL_MESSAGE(99, configs->at(1)->getDefaultBrightness(), "Default brightness for the second display should have been read from the config.");
+    TEST_ASSERT_EQUAL_MESSAGE(DISPLAY_CONFIG_DEFAULTBRIGHTNESS, configs->at(0).getDefaultBrightness(), "Default brightness for the first display should be the global default value.");
+    TEST_ASSERT_EQUAL_MESSAGE(99, configs->at(1).getDefaultBrightness(), "Default brightness for the second display should have been read from the config.");
 }
 
 int main(int argc, char **argv) {

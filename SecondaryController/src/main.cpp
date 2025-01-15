@@ -18,7 +18,7 @@ ulong currentSyncData = 0;
 ulong newSyncData = 0;
 PatternData currentPatternData;
 PatternData newPatternData;
-StyleConfiguration styleConfig;
+StyleConfiguration* styleConfig;
 StyleDefinition lowPowerStyle = CommonStyles::LowPower();
 //PushButton powerButton(POWER_BUTTON_INPUT_PIN, INPUT_PULLUP);
 StyleList* manualStyleList = new StyleList(1);
@@ -59,9 +59,9 @@ void setup()
     startBLE();
 
     // Setup the default pattern to show prior to any BT connections
-    newPatternData = styleConfig.getDefaultStyle().getPatternData();
+    newPatternData = styleConfig->getDefaultStyle().getPatternData();
     currentPatternData = newPatternData;
-    newSpeed = styleConfig.getDefaultStyle().getSpeed();
+    newSpeed = styleConfig->getDefaultStyle().getSpeed();
     currentSpeed = newSpeed;
 
     for (int i = 0; i < neoPixelDisplays.size(); i++)
@@ -143,11 +143,11 @@ void configureLedDisplays()
 {
     // Configure LED display(s)
     const char* fileJson = getSdFileContents("displayconfiguration.json");
-    std::vector<DisplayConfiguration*>* displayConfigs = DisplayConfiguration::ParseJson(fileJson, strlen(fileJson));
+    std::vector<DisplayConfiguration>* displayConfigs = DisplayConfiguration::ParseJson(fileJson, strlen(fileJson));
     for (uint i = 0; i < displayConfigs->size(); i++)
     {
         NeoPixelDisplay* display = new NeoPixelDisplay(displayConfigs->at(i));
-        display->setBrightness(displayConfigs->at(i)->getDefaultBrightness());
+        display->setBrightness(displayConfigs->at(i).getDefaultBrightness());
         neoPixelDisplays.push_back(display);
     }
 
@@ -493,7 +493,7 @@ void initializeStyles()
     const char* styleConfigContents = getSdFileContents("displayStyles.json");
     styleConfig = StyleConfiguration::ParseJson(styleConfigContents, strlen(styleConfigContents));
     Serial.print("Number of styles loaded: ");
-    Serial.println(styleConfig.getStyles().size());
+    Serial.println(styleConfig->getStyles().size());
 }
  
 const char* getSdFileContents(String filename)

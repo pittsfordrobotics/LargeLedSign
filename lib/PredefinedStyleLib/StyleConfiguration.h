@@ -10,7 +10,7 @@
 class StyleConfiguration
 {
     public:
-        static StyleConfiguration ParseJson(const char* jsonString, size_t length);
+        static StyleConfiguration* ParseJson(const char* jsonString, size_t length);
 
         StyleDefinition& getDefaultStyle() { return m_defaultStyle; };
         std::vector<StyleDefinition>& getStyles() { return m_styles; };
