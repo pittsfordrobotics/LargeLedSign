@@ -2,26 +2,20 @@
 #define PUSHBUTTON_H
 
 #include <Arduino.h>
+#include "GenericButton.h"
 
 #define PUSHBUTTON_DEBOUNCE_INTERVAL 50
 #define PUSHBUTTON_LONGPRESS 500
 #define DOUBLETAP_INTERVAL 150
 
-enum class ButtonPressType {
-    None,
-    Normal,
-    Long,
-    Double
-};
-
-class PushButton {
+class PushButton : public GenericButton {
     public:
         PushButton(int pinNumber, PinMode pinMode);
-        void update();
-        bool wasPressed();
-        ButtonPressType lastPressType();
+        virtual void update();
+        virtual bool wasPressed();
+        virtual ButtonPressType lastPressType();
+        virtual void clearPress();
         PinStatus rawPinStatus();
-        void clearPress();
     
     private:
         int m_pinNumber{0};

@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-#include "PushButton.h"
+#include "GenericButton.h"
 
 typedef void (*buttonActionProcessor)(String actionName, std::vector<String> arguments);
 
@@ -20,7 +20,7 @@ class ButtonProcessor
 
     public:
         ButtonProcessor();
-        void addButtonDefinition(String buttonName, int pinNumber, PinMode pinMode);
+        void addButtonDefinition(String buttonName, GenericButton* button);
 
         //void addTapAction(String buttonName, String actionName, std::vector<String> arguments = std::vector<String>());
         //void addLongTapAction(String buttonName, String actionName, std::vector<String> arguments = std::vector<String>());
@@ -38,7 +38,7 @@ class ButtonProcessor
 
     private:
         buttonActionProcessor m_actionProcessor;
-        std::map<String, PushButton*> m_buttonMap;
+        std::map<String, GenericButton*> m_buttonMap;
         std::vector<ButtonAction> m_tapActions;
         std::vector<ButtonAction> m_longTapActions;
 };

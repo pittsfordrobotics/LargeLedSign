@@ -109,11 +109,13 @@ void loop()
     }
 }
 
+// Setup for the second core
 void setup1()
 {
     while(!isInitialized) {}
 }
 
+// Main loop for the second core
 void loop1()
 {
     // Check for threading issues!!!
@@ -139,6 +141,35 @@ void initializeIO()
     // pinMode(POWER_INDICATOR_PIN, OUTPUT);
 }
 
+typedef void (*action)();
+
+void doAction(action tapAction)
+{
+    tapAction();
+}
+
+void doActionNoTypeDef(void (*otherAction)())
+{
+    otherAction();
+}
+
+void actionTest()
+{
+    action a = [] {
+        Serial.println("Action test");
+    };
+
+    doAction(a);
+
+    doAction([] {
+        Serial.println("Action test 2");
+    });
+
+    doActionNoTypeDef([] {
+        Serial.println("Action test 3");
+    });
+}
+
 void configureLedDisplays()
 {
     // Configure LED display(s)
@@ -153,6 +184,10 @@ void configureLedDisplays()
 
     Serial.print("Number of displays configured: ");
     Serial.println(neoPixelDisplays.size());
+
+    if (fileJson) {
+        delete fileJson;
+    }
 }
 
 // Set the initial BLE characteristic values and start the BLE service.
@@ -494,6 +529,11 @@ void initializeStyles()
     styleConfig = StyleConfiguration::ParseJson(styleConfigContents, strlen(styleConfigContents));
     Serial.print("Number of styles loaded: ");
     Serial.println(styleConfig->getStyles().size());
+
+    if (styleConfigContents)
+    {
+        delete styleConfigContents;
+    }
 }
  
 const char* getSdFileContents(String filename)

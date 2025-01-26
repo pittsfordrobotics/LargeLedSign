@@ -4,15 +4,15 @@ ButtonProcessor::ButtonProcessor()
 {
 }
 
-void ButtonProcessor::addButtonDefinition(String buttonName, int pinNumber, PinMode pinMode)
+void ButtonProcessor::addButtonDefinition(String buttonName, GenericButton* button)
 {
     if (m_buttonMap.find(buttonName) != m_buttonMap.end())
     {
         // button already exists
+        Serial.println("Button with name '" + buttonName + "' already exists");
         return;
     }
 
-    PushButton* button = new PushButton(pinNumber, pinMode);
     m_buttonMap[buttonName] = button;
 }
 
@@ -20,6 +20,7 @@ void ButtonProcessor::addTapAction(std::vector<String> buttonNames, String actio
 {
     if (buttonNames.size() == 0)
     {
+        Serial.println("No buttons specified for tap action");
         return;
     }
 
@@ -51,6 +52,7 @@ void ButtonProcessor::addLongTapAction(std::vector<String> buttonNames, String a
 {
     if (buttonNames.size() == 0)
     {
+        Serial.println("No buttons specified for long tap action");
         return;
     }
 
