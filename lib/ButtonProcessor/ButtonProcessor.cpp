@@ -6,20 +6,33 @@ ButtonProcessor::ButtonProcessor()
 
 void ButtonProcessor::addButtonDefinition(String buttonName, GenericButton* button)
 {
-    // if (m_buttonMap.find(buttonName) != m_buttonMap.end())
-    // {
-    //     // button already exists
-    //     debugPrint("Button with name '");
-    //     debugPrint(buttonName.c_str());
-    //     debugPrintln("' already exists");
-    //     return;
-    // }
+    if (m_buttonMap.find(buttonName) != m_buttonMap.end())
+    {
+        // button already exists
+        debugPrint("Button with name '");
+        debugPrint(buttonName.c_str());
+        debugPrintln("' already exists");
+        return;
+    }
 
-    m_buttonMap.insert(std::pair<String, GenericButton*>(buttonName, button));
-    //m_buttonMap[buttonName] = button;
+    m_buttonMap[buttonName] = button;
 }
 
 void ButtonProcessor::addTapAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments)
+{
+    addAction(buttonNames, actionName, arguments, m_tapActions);
+}
+
+void ButtonProcessor::addLongTapAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments)
+{
+    addAction(buttonNames, actionName, arguments, m_longTapActions);
+}
+
+void ButtonProcessor::addAction(
+    std::vector<String>& buttonNames, 
+    String& actionName, 
+    std::vector<String>& arguments, 
+    std::vector<ButtonAction*>& actionList)
 {
     if (buttonNames.size() == 0)
     {
@@ -37,41 +50,12 @@ void ButtonProcessor::addTapAction(std::vector<String> buttonNames, String actio
     }
 
     ButtonAction* action = new ButtonAction(buttonNames, actionName, arguments);
-    m_tapActions.push_back(action);
+    actionList.push_back(action);
 
     // Keep them sorted by the number of buttons in the combination
     std::sort(
-        m_tapActions.begin(),
-        m_tapActions.end(),
-        [](ButtonAction* &a, ButtonAction* &b)
-            { return a->getButtonNames().size() > b->getButtonNames().size(); });
-}
-
-void ButtonProcessor::addLongTapAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments)
-{
-    if (buttonNames.size() == 0)
-    {
-        debugPrintln("No buttons specified for long tap action");
-        return;
-    }
-
-    for (String buttonName : buttonNames)
-    {
-        if (m_buttonMap.find(buttonName) == m_buttonMap.end())
-        {
-            // button by that name doesn't exist.  Ignore the tap action.
-            return;
-        }
-    }
-
-    ButtonAction* action = new ButtonAction(buttonNames, actionName, arguments);
-
-    m_longTapActions.push_back(action);
-
-    // Keep them sorted by the number of buttons in the combination
-    std::sort(
-        m_longTapActions.begin(),
-        m_longTapActions.end(),
+        actionList.begin(),
+        actionList.end(),
         [](ButtonAction* &a, ButtonAction* &b)
             { return a->getButtonNames().size() > b->getButtonNames().size(); });
 }
@@ -88,9 +72,14 @@ void ButtonProcessor::update() {
     {
         lookForAndExecuteAction(m_tapActions, ButtonPressType::Normal);
     }
+
+    // Reset all the buttons
+    for (auto const& mapEntry : m_buttonMap) {
+        mapEntry.second->clearPress();
+    }
 }
 
-bool ButtonProcessor::lookForAndExecuteAction(std::vector<ButtonAction*> actionsToProcess, ButtonPressType pressType)
+bool ButtonProcessor::lookForAndExecuteAction(std::vector<ButtonAction*>& actionsToProcess, ButtonPressType pressType)
 {
     for (ButtonAction* buttonAction : actionsToProcess) {
         bool allPressed = true;
@@ -107,10 +96,6 @@ bool ButtonProcessor::lookForAndExecuteAction(std::vector<ButtonAction*> actions
             if (m_actionProcessor)
             {
                 m_actionProcessor(buttonAction->getId(), buttonAction->getActionName(), buttonAction->getArguments());
-            }
-            
-            for (String buttonName : buttonAction->getButtonNames()) {
-                m_buttonMap[buttonName]->clearPress();
             }
             
             return true;

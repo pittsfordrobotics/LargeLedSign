@@ -40,11 +40,13 @@ void buttonsWithNoActions() {
     bp.addButtonDefinition("Button1", button1);
     bp.addButtonDefinition("Button2", button2);
     bp.update();
-    TEST_ASSERT_TRUE(button1->wasUpdateCalled());
-    TEST_ASSERT_TRUE(button2->wasUpdateCalled());
+    TEST_ASSERT_TRUE_MESSAGE(button1->wasUpdateCalled(), "Button 1 should have been updated.");
+    TEST_ASSERT_TRUE_MESSAGE(button2->wasUpdateCalled(), "Button 2 should have been updated.");
     button1->setPressType(ButtonPressType::Normal);
     button2->setPressType(ButtonPressType::Long);
     bp.update();
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button1->lastPressType(), "Button 1 should have been reset.");
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button2->lastPressType(), "Button 2 should have been reset.");
 }
 
 void undefinedActionProcessorDoesNothing() {
