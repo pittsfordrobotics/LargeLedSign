@@ -31,6 +31,7 @@ class ButtonProcessor
 
         void debugPrint(const char* message);
         void debugPrintln(const char* message);
+        bool lookForAndExecuteAction(std::vector<ButtonAction*> actionsToProcess, ButtonPressType pressType);
 };
 
 #endif

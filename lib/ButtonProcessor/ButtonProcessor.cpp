@@ -81,40 +81,22 @@ void ButtonProcessor::update() {
     for (auto const& mapEntry : m_buttonMap) {
         mapEntry.second->update();
     }
-    // Look for long tap actions first, then tap actions
-    for (ButtonAction* longTapAction : m_longTapActions) {
-        bool allPressed = true;
 
-        for (String buttonName : longTapAction->getButtonNames()) {
-            if (!m_buttonMap[buttonName]->wasPressed() || m_buttonMap[buttonName]->lastPressType() != ButtonPressType::Long) 
-            {
-                allPressed = false;
-            }
-        }
+    bool actionProcessed = lookForAndExecuteAction(m_longTapActions, ButtonPressType::Long);
 
-        if (allPressed)
-        {
-            if (m_actionProcessor)
-            {
-                m_actionProcessor(longTapAction->getId(), longTapAction->getActionName(), longTapAction->getArguments());
-            }
-            
-            for (String buttonName : longTapAction->getButtonNames()) {
-                m_buttonMap[buttonName]->clearPress();
-            }
-            
-            return;
-        }
-    }
-
-    // No long tap actions found, so check for tap actions
-    for (ButtonAction* tapAction : m_tapActions)
+    if (!actionProcessed)
     {
+        lookForAndExecuteAction(m_tapActions, ButtonPressType::Normal);
+    }
+}
+
+bool ButtonProcessor::lookForAndExecuteAction(std::vector<ButtonAction*> actionsToProcess, ButtonPressType pressType)
+{
+    for (ButtonAction* buttonAction : actionsToProcess) {
         bool allPressed = true;
 
-        for (String buttonName : tapAction->getButtonNames())
-        {
-            if (!m_buttonMap[buttonName]->wasPressed() || m_buttonMap[buttonName]->lastPressType() != ButtonPressType::Normal)
+        for (String buttonName : buttonAction->getButtonNames()) {
+            if (!m_buttonMap[buttonName]->wasPressed() || m_buttonMap[buttonName]->lastPressType() != pressType) 
             {
                 allPressed = false;
             }
@@ -124,17 +106,18 @@ void ButtonProcessor::update() {
         {
             if (m_actionProcessor)
             {
-                m_actionProcessor(tapAction->getId(), tapAction->getActionName(), tapAction->getArguments());
+                m_actionProcessor(buttonAction->getId(), buttonAction->getActionName(), buttonAction->getArguments());
             }
-
-            for (String buttonName : tapAction->getButtonNames())
-            {
+            
+            for (String buttonName : buttonAction->getButtonNames()) {
                 m_buttonMap[buttonName]->clearPress();
             }
-
-            return;
+            
+            return true;
         }
     }
+
+    return false;
 }
 
 void ButtonProcessor::debugPrint(const char* message)
