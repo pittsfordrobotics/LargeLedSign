@@ -6,29 +6,16 @@
 #include <map>
 #include <algorithm>
 #include "GenericButton.h"
+#include "ButtonAction.h"
 
-typedef void (*buttonActionProcessor)(String actionName, std::vector<String> arguments);
+typedef void (*buttonActionProcessor)(int callerId, String actionName, std::vector<String> arguments);
 
 class ButtonProcessor
 {
-    struct ButtonAction
-        {
-            std::vector<String> buttonNames;
-            String actionName;
-            std::vector<String> arguments;
-        };
-
     public:
         ButtonProcessor();
         void addButtonDefinition(String buttonName, GenericButton* button);
 
-        //void addTapAction(String buttonName, String actionName, std::vector<String> arguments = std::vector<String>());
-        //void addLongTapAction(String buttonName, String actionName, std::vector<String> arguments = std::vector<String>());
-
-        //void addCombinationAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments = std::vector<String>());
-        //void addCombinationLongTapAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments = std::vector<String>());
-
-        // consolidated: for a single button, just use one name.
         void addTapAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments = std::vector<String>());
         void addLongTapAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments = std::vector<String>());
 
@@ -37,10 +24,13 @@ class ButtonProcessor
         void update();
 
     private:
-        buttonActionProcessor m_actionProcessor;
+        buttonActionProcessor m_actionProcessor{nullptr};
         std::map<String, GenericButton*> m_buttonMap;
-        std::vector<ButtonAction> m_tapActions;
-        std::vector<ButtonAction> m_longTapActions;
+        std::vector<ButtonAction*> m_tapActions;
+        std::vector<ButtonAction*> m_longTapActions;
+
+        void debugPrint(const char* message);
+        void debugPrintln(const char* message);
 };
 
 #endif
