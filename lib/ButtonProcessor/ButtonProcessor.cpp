@@ -44,7 +44,7 @@ void ButtonProcessor::addAction(
     {
         if (m_buttonMap.find(buttonName) == m_buttonMap.end())
         {
-            // button by that name doesn't exist.  Ignore the tap action.
+            // button by that name doesn't exist.  Ignore the action.
             return;
         }
     }
@@ -70,12 +70,15 @@ void ButtonProcessor::update() {
 
     if (!actionProcessed)
     {
-        lookForAndExecuteAction(m_tapActions, ButtonPressType::Normal);
+        actionProcessed = lookForAndExecuteAction(m_tapActions, ButtonPressType::Normal);
     }
 
-    // Reset all the buttons
-    for (auto const& mapEntry : m_buttonMap) {
-        mapEntry.second->clearPress();
+    // If an action was run, reset all the buttons
+    if (actionProcessed)
+    {
+        for (auto const& mapEntry : m_buttonMap) {
+            mapEntry.second->clearPress();
+        }
     }
 }
 

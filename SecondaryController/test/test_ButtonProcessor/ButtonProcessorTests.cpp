@@ -45,8 +45,9 @@ void buttonsWithNoActions() {
     button1->setPressType(ButtonPressType::Normal);
     button2->setPressType(ButtonPressType::Long);
     bp.update();
-    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button1->lastPressType(), "Button 1 should have been reset.");
-    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button2->lastPressType(), "Button 2 should have been reset.");
+    // No action was done, so the buttons shouldn't have been reset.
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::Normal, button1->lastPressType(), "Button 1 should have been reset.");
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::Long, button2->lastPressType(), "Button 2 should have been reset.");
 }
 
 void undefinedActionProcessorDoesNothing() {
@@ -66,6 +67,7 @@ void undefinedActionProcessorDoesNothing() {
 }
 
 void simpleActionsWithProcessor() {
+    resetActionParameters();
     ButtonProcessor bp;
     bp.setActionProcessor(processAction);
     MockButton* button1 = new MockButton();
@@ -97,6 +99,39 @@ void simpleActionsWithProcessor() {
     TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button1->lastPressType(), "Button1 should have been reset after long tap.");
 }
 
+void buttonsClearAfterAction() {
+    resetActionParameters();
+    ButtonProcessor bp;
+    bp.setActionProcessor(processAction);
+    MockButton* button1 = new MockButton();
+    MockButton* button2 = new MockButton();
+    bp.addButtonDefinition("Button1", button1);
+    bp.addButtonDefinition("Button2", button2);
+    bp.addTapAction({"Button1"}, "Action1");
+    button1->setPressType(ButtonPressType::Normal);
+    button2->setPressType(ButtonPressType::Normal);
+    bp.update();
+    // Both buttons should have been reset after the action.
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Action1", lastActionName.c_str(), "Button action was not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button1->lastPressType(), "Button1 should have been reset after long tap.");
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button2->lastPressType(), "Button2 should have been reset after long tap.");
+}
+
+void duplicateButtonsAreIgnored() {
+    resetActionParameters();
+    ButtonProcessor bp;
+    bp.setActionProcessor(processAction);
+    MockButton* button1 = new MockButton();
+    MockButton* button2 = new MockButton();
+    bp.addButtonDefinition("Button", button1);
+    // Button 2 should be ignored.
+    bp.addButtonDefinition("Button", button2);
+    bp.addTapAction({"Button"}, "Action1");
+    button2->setPressType(ButtonPressType::Normal);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("", lastActionName.c_str(), "No action should have been run.");
+}
+
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
@@ -104,6 +139,8 @@ int main(int argc, char **argv) {
     RUN_TEST(buttonsWithNoActions);
     RUN_TEST(undefinedActionProcessorDoesNothing);
     RUN_TEST(simpleActionsWithProcessor);
+    RUN_TEST(buttonsClearAfterAction);
+    RUN_TEST(duplicateButtonsAreIgnored);
     
     return UNITY_END();
 }
