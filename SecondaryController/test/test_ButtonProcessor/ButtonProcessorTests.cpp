@@ -132,6 +132,47 @@ void duplicateButtonsAreIgnored() {
     TEST_ASSERT_EQUAL_STRING_MESSAGE("", lastActionName.c_str(), "No action should have been run.");
 }
 
+void combinationActionTests() {
+    resetActionParameters();
+    ButtonProcessor bp;
+    bp.setActionProcessor(processAction);
+    MockButton* button1 = new MockButton();
+    MockButton* button2 = new MockButton();
+    MockButton* button3 = new MockButton();
+    bp.addButtonDefinition("Button1", button1);
+    bp.addButtonDefinition("Button2", button2);
+    bp.addButtonDefinition("Button3", button3);
+    bp.addTapAction({"Button1", "Button2"}, "Action1-2");
+    bp.addTapAction({"Button2"}, "Action2"); // This action shouldn't be called
+    bp.addTapAction({"Button1", "Button2", "Button3"}, "Action1-2-3");
+    button1->setPressType(ButtonPressType::Normal);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("", lastActionName.c_str(), "No action should have been run.");
+    button2->setPressType(ButtonPressType::Normal);
+    button3->setPressType(ButtonPressType::Normal);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Action1-2-3", lastActionName.c_str(), "Button1/2/3 action was not correct.");
+    button1->setPressType(ButtonPressType::Normal);
+    button2->setPressType(ButtonPressType::Normal);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Action1-2", lastActionName.c_str(), "Button1/2 action was not correct.");
+}
+
+void unknownButtonNamesInActionsAreIgnored() {
+    resetActionParameters();
+    ButtonProcessor bp;
+    bp.setActionProcessor(processAction);
+    MockButton* button1 = new MockButton();
+    MockButton* button2 = new MockButton();
+    bp.addButtonDefinition("Button1", button1);
+    bp.addButtonDefinition("Button2", button2);
+    bp.addTapAction({"ButtonX", "Button1"}, "Action1");
+    bp.addTapAction({"ButtonY"}, "Action2");
+    button1->setPressType(ButtonPressType::Normal);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("", lastActionName.c_str(), "No action should have been done.");
+}
+
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
@@ -141,6 +182,8 @@ int main(int argc, char **argv) {
     RUN_TEST(simpleActionsWithProcessor);
     RUN_TEST(buttonsClearAfterAction);
     RUN_TEST(duplicateButtonsAreIgnored);
+    RUN_TEST(combinationActionTests);
+    RUN_TEST(unknownButtonNamesInActionsAreIgnored);
     
     return UNITY_END();
 }
