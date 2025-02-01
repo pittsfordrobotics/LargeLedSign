@@ -2,7 +2,7 @@
 #define PUSHBUTTON_H
 
 #include <Arduino.h>
-#include "GenericButton.h"
+#include "../ButtonProcessor/GenericButton.h"
 
 #define PUSHBUTTON_DEBOUNCE_INTERVAL 50
 #define PUSHBUTTON_LONGPRESS 500

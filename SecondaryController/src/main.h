@@ -12,7 +12,7 @@
 #include <SignDataLib.h>
 #include <DisplayPatternLib.h>
 #include <PredefinedStyleLib.h>
-#include <PushButton.h>
+#include "ArduinoPushButton/PushButton.h"
 #include "NeoPixelDisplay.h"
 #include "Bluetooth\BluetoothConfig.h"
 #include "StyleConfiguration.h"

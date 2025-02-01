@@ -2,8 +2,9 @@
 #include <unity.h>
 #include <vector>
 
-#include "ButtonProcessor.h"
-#include "MockButton.h"
+#include "../src/ButtonProcessor/ButtonProcessor.cpp"
+#include "../src/ButtonProcessor/ButtonAction.cpp"
+#include "../src/ButtonProcessor/MockButton.cpp"
 
 int lastCallerId(-1);
 String lastActionName("");
