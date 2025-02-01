@@ -70,6 +70,7 @@ void ButtonProcessor::update() {
 
     if (!actionProcessed)
     {
+        // No long tap actions were processed, so look for normal tap actions.
         actionProcessed = lookForAndExecuteAction(m_tapActions, ButtonPressType::Normal);
     }
 

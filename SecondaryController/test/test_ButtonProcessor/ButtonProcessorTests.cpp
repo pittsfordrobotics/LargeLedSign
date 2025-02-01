@@ -151,6 +151,7 @@ void combinationActionTests() {
     button2->setPressType(ButtonPressType::Normal);
     button3->setPressType(ButtonPressType::Normal);
     bp.update();
+    // Largest combination should have been run.
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Action1-2-3", lastActionName.c_str(), "Button1/2/3 action was not correct.");
     button1->setPressType(ButtonPressType::Normal);
     button2->setPressType(ButtonPressType::Normal);
@@ -171,6 +172,58 @@ void unknownButtonNamesInActionsAreIgnored() {
     button1->setPressType(ButtonPressType::Normal);
     bp.update();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("", lastActionName.c_str(), "No action should have been done.");
+}
+
+void validateActionArguments() {
+    resetActionParameters();
+    ButtonProcessor bp;
+    bp.setActionProcessor(processAction);
+    MockButton* button1 = new MockButton();
+    MockButton* button2 = new MockButton();
+    MockButton* button3 = new MockButton();
+    bp.addButtonDefinition("Button1", button1);
+    bp.addButtonDefinition("Button2", button2);
+    bp.addButtonDefinition("Button3", button2);
+    bp.addTapAction({"Button1"}, "Action1", {"arg1"});
+    bp.addTapAction({"Button2"}, "Action2", {"argx", "argy"});
+    bp.addTapAction({"Button3"}, "Action3", {"arga", "argb", "argc"});
+    bp.addLongTapAction({"Button1"}, "Action4");
+    bp.addLongTapAction({"Button2"}, "Action5", {"foo"});
+    button1->setPressType(ButtonPressType::Normal);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Action1", lastActionName.c_str(), "Action1 should have been done.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, lastArguments.size(), "Action1 should have 1 argument.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("arg1", lastArguments.at(0).c_str(), "Action1's argument is not correct.");
+
+    resetActionParameters();
+    button2->setPressType(ButtonPressType::Normal);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Action2", lastActionName.c_str(), "Action2 should have been done.");
+    TEST_ASSERT_EQUAL_MESSAGE(2, lastArguments.size(), "Action2 should have 2 arguments.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("argx", lastArguments.at(0).c_str(), "Action2's first argument is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("argy", lastArguments.at(0).c_str(), "Action2's second argument is not correct.");
+
+    resetActionParameters();
+    button3->setPressType(ButtonPressType::Normal);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Action3", lastActionName.c_str(), "Action3 should have been done.");
+    TEST_ASSERT_EQUAL_MESSAGE(3, lastArguments.size(), "Action3 should have 3 arguments.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("arga", lastArguments.at(0).c_str(), "Action3's first argument is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("argb", lastArguments.at(0).c_str(), "Action3's second argument is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("argc", lastArguments.at(0).c_str(), "Action3's third argument is not correct.");
+
+    resetActionParameters();
+    button1->setPressType(ButtonPressType::Long);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Action4", lastActionName.c_str(), "Action4 should have been done.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, lastArguments.size(), "Action4 should have no arguments.");
+
+    resetActionParameters();
+    button2->setPressType(ButtonPressType::Long);
+    bp.update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Action5", lastActionName.c_str(), "Action5 should have been done.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, lastArguments.size(), "Action5 should have 1 argument.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("foo", lastArguments.at(0).c_str(), "Action5's argument is not correct.");
 }
 
 int main(int argc, char **argv) {
