@@ -1,7 +1,7 @@
 #ifndef MOCK_BUTTON_H
 #define MOCK_BUTTON_H
 
-#include "GenericButton.h"
+#include "..\src\ButtonProcessor\GenericButton.h"
 
 class MockButton : public GenericButton
 {
