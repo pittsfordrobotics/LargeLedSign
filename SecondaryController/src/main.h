@@ -7,7 +7,7 @@
 #include <ArduinoBLE.h>
 #include <vector>
 #include <PixelBufferLib.h>
-#include <BluetoothCommon.h>
+#include "Bluetooth\BluetoothCommon.h"
 #include "Bluetooth\SecondaryPeripheral.h"
 #include <SignDataLib.h>
 #include <DisplayPatternLib.h>
