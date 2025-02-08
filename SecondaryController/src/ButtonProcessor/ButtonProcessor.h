@@ -8,7 +8,7 @@
 #include "GenericButton.h"
 #include "ButtonAction.h"
 
-typedef void (*buttonActionProcessor)(int callerId, String actionName, std::vector<String> arguments);
+typedef void (*ButtonActionProcessor)(int callerId, String actionName, std::vector<String> arguments);
 
 class ButtonProcessor
 {
@@ -19,12 +19,12 @@ class ButtonProcessor
         void addTapAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments = std::vector<String>());
         void addLongTapAction(std::vector<String> buttonNames, String actionName, std::vector<String> arguments = std::vector<String>());
 
-        void setActionProcessor(buttonActionProcessor actionProcessor) { m_actionProcessor = actionProcessor; }
+        void setActionProcessor(ButtonActionProcessor actionProcessor) { m_actionProcessor = actionProcessor; }
         
         void update();
 
     private:
-        buttonActionProcessor m_actionProcessor{nullptr};
+        ButtonActionProcessor m_actionProcessor{nullptr};
         std::map<String, GenericButton*> m_buttonMap;
         std::vector<ButtonAction*> m_tapActions;
         std::vector<ButtonAction*> m_longTapActions;
