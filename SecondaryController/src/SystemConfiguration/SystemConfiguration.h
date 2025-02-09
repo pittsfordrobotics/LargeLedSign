@@ -6,6 +6,7 @@
 #include <vector>
 #include <ArduinoJson.h>
 #include "..\ButtonProcessor\ButtonProcessor.h"
+#include "..\Utils\DebugUtils.h"
 
 typedef GenericButton* (*ButtonFactory)(int gpioPin);
 

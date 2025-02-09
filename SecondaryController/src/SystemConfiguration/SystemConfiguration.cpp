@@ -13,20 +13,20 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     
     if (err == DeserializationError::EmptyInput)
     {
-        //debugPrintln("Display configuration JSON string was empty.");
+        DebugUtils::println("Display configuration JSON string was empty.");
         return config;
     }
 
     if (err != DeserializationError::Ok)
     {
-        //debugPrint("Error parsing display configuration JSON: ");
-        //debugPrintln(err.c_str());
+        DebugUtils::print("Error parsing display configuration JSON: ");
+        DebugUtils::println(err.c_str());
         return config;
     }
 
     if (configDoc.isNull())
     {
-        //debugPrintln("Display configuration JSON was null after parsing.");
+        DebugUtils::println("Display configuration JSON was null after parsing.");
         return config;
     }
 
@@ -43,14 +43,14 @@ SystemConfiguration* SystemConfiguration::ParseJson(
 void SystemConfiguration::configureButtonProcessor(JsonVariant buttonConfigs, ButtonFactory buttonFactory) {
     if (!buttonConfigs["definitions"].is<JsonVariant>())
     {
-        //debugPrintln("Button definitions were missing.");
+        DebugUtils::println("Button definitions were missing.");
         return;
     }
 
     JsonArray definitions = buttonConfigs["definitions"].as<JsonArray>();
     if (definitions.isNull() || definitions.size() == 0)
     {
-        //debugPrintln("Button definitions were null or empty.");
+        DebugUtils::println("Button definitions were null or empty.");
         return;
     }
 
@@ -58,14 +58,14 @@ void SystemConfiguration::configureButtonProcessor(JsonVariant buttonConfigs, Bu
 
     if (!buttonConfigs["actions"].is<JsonVariant>())
     {
-        //debugPrintln("Button actions were missing.");
+        DebugUtils::println("Button actions were missing.");
         return;
     }
 
     JsonArray actions = buttonConfigs["actions"].as<JsonArray>();
     if (actions.isNull() || actions.size() == 0)
     {
-        //debugPrintln("Button actions were null or empty.");
+        DebugUtils::println("Button actions were null or empty.");
         return;
     }
 
@@ -78,13 +78,13 @@ void SystemConfiguration::addButtonDefinitions(JsonArray definitions, ButtonFact
     {
         if (definition["enabled"].is<JsonVariant>() && (!definition["enabled"].as<bool>()))
         {
-            // button definition is disabled. skip it.
+            DebugUtils::println("Skipping disabled button definition.");
             continue;
         }
         
         if (!definition["id"].is<JsonVariant>() || !definition["gpioPin"].is<JsonVariant>())
         {
-            // Id or gpioPin is missing. skip it.
+            DebugUtils::println("Skipping button definition with missing gpioPin.");
             continue;
         }
 
@@ -104,20 +104,20 @@ void SystemConfiguration::addButtonActions(JsonArray actions)
     {
         if (action["enabled"].is<JsonVariant>() && (!action["enabled"].as<bool>()))
         {
-            // action is disabled. skip it.
+            DebugUtils::println("Skipping disabled button action.");
             continue;
         }
 
         if (!action["buttonIds"].is<JsonVariant>())
         {
-            //debugPrintln("Button action is missing button IDs.");
+            DebugUtils::println("Skipping button action with invalid ids.");
             continue;
         }
 
         std::vector<String> buttonIds = getStringList(action["buttonIds"]);
         if (buttonIds.size() == 0)
         {
-            //debugPrintln("Button action has no valid button IDs.");
+            DebugUtils::println("Skipping button action with no valid ids.");
             continue;
         }
 
