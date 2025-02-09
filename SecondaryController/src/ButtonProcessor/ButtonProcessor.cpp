@@ -9,9 +9,9 @@ void ButtonProcessor::addButtonDefinition(String buttonName, GenericButton* butt
     if (m_buttonMap.find(buttonName) != m_buttonMap.end())
     {
         // button already exists
-        debugPrint("Button with name '");
-        debugPrint(buttonName.c_str());
-        debugPrintln("' already exists");
+        ("Button with name '");
+        DebugUtils::print(buttonName.c_str());
+        DebugUtils::println("' already exists");
         return;
     }
 
@@ -36,7 +36,7 @@ void ButtonProcessor::addAction(
 {
     if (buttonNames.size() == 0)
     {
-        debugPrintln("No buttons specified for tap action");
+        DebugUtils::println("No buttons specified for tap action");
         return;
     }
 
@@ -107,22 +107,4 @@ bool ButtonProcessor::lookForAndExecuteAction(std::vector<ButtonAction*>& action
     }
 
     return false;
-}
-
-void ButtonProcessor::debugPrint(const char* message)
-{
-#ifdef PIO_UNIT_TESTING
-    printf("%s", message);
-#else
-    Serial.print(message);
-#endif      
-}
-
-void ButtonProcessor::debugPrintln(const char* message)
-{
-#ifdef PIO_UNIT_TESTING
-    printf("%s\n", message);
-#else
-    Serial.println(message);
-#endif      
 }
