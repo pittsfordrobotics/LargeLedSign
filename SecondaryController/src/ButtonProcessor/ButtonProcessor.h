@@ -24,6 +24,8 @@ class ButtonProcessor
         
         void update();
 
+        std::vector<GenericButton*> getButtons();
+
     private:
         ButtonActionProcessor m_actionProcessor{nullptr};
         std::map<String, GenericButton*> m_buttonMap;

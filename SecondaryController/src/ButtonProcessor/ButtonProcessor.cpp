@@ -60,6 +60,16 @@ void ButtonProcessor::addAction(
             { return a->getButtonNames().size() > b->getButtonNames().size(); });
 }
 
+std::vector<GenericButton*> ButtonProcessor::getButtons() {
+    std::vector<GenericButton*> buttons;
+
+    for (auto const& mapEntry : m_buttonMap) {
+        buttons.push_back(mapEntry.second);
+    }
+
+    return buttons;
+}
+
 void ButtonProcessor::update() {
     // Update all the buttons
     for (auto const& mapEntry : m_buttonMap) {

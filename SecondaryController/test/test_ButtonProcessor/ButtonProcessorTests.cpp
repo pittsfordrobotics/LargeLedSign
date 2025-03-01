@@ -7,7 +7,7 @@
 #include "../src/ButtonProcessor/ButtonProcessor.cpp"
 #include "../src/ButtonProcessor/ButtonAction.cpp"
 #include "../src/Utils/DebugUtils.cpp"
-#include "MockButton.h"
+#include "../TestHelpers/MockButton.cpp"
 
 int lastCallerId(-1);
 String lastActionName("");
