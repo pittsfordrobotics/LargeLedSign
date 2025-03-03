@@ -105,7 +105,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 255; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 255; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 50;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            pattern.param3 = 75;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Red-Pink Random", 255, pattern};
         }
         case PredefinedStyles::RedPink_Random_v2:
@@ -129,7 +129,7 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.displayPattern = DisplayPatternType::Random;
             pattern.param1 = 255; // Duration, 0-255, scaled to 1-50
             pattern.param2 = 255; // Duration, 0-255, scaled to 1-50
-            pattern.param3 = 50;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
+            pattern.param3 = 75;  // Percent of pixels to update each iteration, 0-255, scaled to 1-50.
             return PredefinedStyle{"Blue-Pink Random", 255, pattern};
         }
         case PredefinedStyles::BluePink_Random_v2:
