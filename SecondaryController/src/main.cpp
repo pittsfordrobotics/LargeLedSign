@@ -37,6 +37,11 @@ volatile bool isInitialized = false;
 // This is run once at startup.
 void setup()
 {
+    // Initialize SPI to use different pins than the default.
+    //SPI.setSCK(0);
+    //SPI.setMOSI(0);
+    //SPI.setMISO(0);
+    
     // Delay for debugging
     Serial.begin(9600);
     delay(INITIALDELAY);
