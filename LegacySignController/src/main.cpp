@@ -27,6 +27,8 @@ byte newSpeed;
 PatternData currentPatternData;
 PatternData newPatternData;
 
+volatile bool isInitialized = false;
+
 void setup()
 {
     Serial.begin(9600);
@@ -64,6 +66,7 @@ void setup()
     }
 
     startBLEService();
+    isInitialized = true;
 }
 
 void loop()
@@ -89,6 +92,20 @@ void loop()
         processManualInputs();
     }
 
+    // moved the LED update to the second core
+    // updateLEDs();
+}
+
+// Setup for the second core
+void setup1()
+{
+    while(!isInitialized) {}
+}
+
+// Main loop for the second core
+void loop1()
+{
+    // Check for threading issues!!!
     updateLEDs();
 }
 
