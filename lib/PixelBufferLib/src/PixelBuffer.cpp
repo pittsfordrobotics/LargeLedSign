@@ -96,6 +96,17 @@ void PixelBuffer::setPixel(unsigned int pixel, ulong color)
     m_pixelColors[pixel] = color;
 }
 
+void PixelBuffer::setRowColor(uint row, ulong newColor)
+{
+    if (row >= m_rows.size())
+    {
+        return;
+    }
+
+    std::vector<int> *destination = m_rows.at(row);
+    setColorForMappedPixels(destination, newColor);
+}
+
 void PixelBuffer::fill(ulong newColor)
 {
     for (uint i = 0; i < m_pixelBufferSize; i++)
