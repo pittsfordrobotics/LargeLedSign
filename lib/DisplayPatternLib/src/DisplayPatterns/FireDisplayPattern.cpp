@@ -31,7 +31,15 @@ void FireDisplayPattern::resetInternal()
 void FireDisplayPattern::updateInternal()
 {
     // Reference: https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/#LEDStripEffectFire
-
+    //
+    // From the site:
+    // Cooling indicates how fast a flame cools down. More cooling means shorter flames, and the recommended 
+    // values are between 20 and 100. 50 seems the nicest.
+    //
+    // Sparking indicates the chance (out of 255) that a spark will ignite. A higher value makes the fire 
+    // more active. Suggested values lay between 50 and 200, with my personal preference being 120.
+    //
+    
     int cooldown;
     int numRows = m_rowHeats.size();
 
