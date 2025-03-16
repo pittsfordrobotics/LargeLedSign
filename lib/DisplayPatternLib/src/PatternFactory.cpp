@@ -88,6 +88,15 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
+        case DisplayPatternType::Fire:
+        {
+            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            pattern->setSparkingAmount(params[startOfDisplayParameters]);
+            pattern->setCoolingAmount(params[startOfDisplayParameters + 1]);
+            displayPattern = pattern;
+            break;
+        }
         default:
         {
             SolidDisplayPattern* pattern = new SolidDisplayPattern(pixelBuffer);
@@ -189,6 +198,7 @@ String PatternFactory::getKnownDisplayPatterns()
     //knownPatterns += ";" + getDisplayPatternString("CenterOut-V", DisplayPatternType::CenterOutVertical, CenterOutDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("CenterOut", DisplayPatternType::CenterOutHorizontal, CenterOutDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("Line", DisplayPatternType::Line, SimpleShiftDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Fire", DisplayPatternType::Fire, FireDisplayPattern::getParameterNames());
 
     return knownPatterns;
 }

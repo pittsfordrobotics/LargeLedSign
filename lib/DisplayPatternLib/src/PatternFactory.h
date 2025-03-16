@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "DisplayPattern.h"
+#include "DisplayPatterns\FireDisplayPattern.h"
 #include "DisplayPatterns\SolidDisplayPattern.h"
 #include "DisplayPatterns\SimpleShiftDisplayPattern.h"
 #include "DisplayPatterns\RandomDisplayPattern.h"
