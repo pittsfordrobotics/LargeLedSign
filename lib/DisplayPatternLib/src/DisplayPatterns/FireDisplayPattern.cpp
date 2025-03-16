@@ -39,7 +39,7 @@ void FireDisplayPattern::updateInternal()
     // Sparking indicates the chance (out of 255) that a spark will ignite. A higher value makes the fire 
     // more active. Suggested values lay between 50 and 200, with my personal preference being 120.
     //
-    
+
     int cooldown;
     int numRows = m_rowHeats.size();
 
@@ -112,7 +112,7 @@ void FireDisplayPattern::setRowHeatColor(int row, byte temperature)
         blue = 0;
     }
 
-    ulong color = Adafruit_NeoPixel::Color(0, 0, 0);
+    ulong color = Adafruit_NeoPixel::Color(red, green, blue);
     m_pixelBuffer->setRowColor(row, color);
 }
 
