@@ -31,8 +31,6 @@ class FireDisplayPattern : public DisplayPattern
         std::vector<int> m_rowHeats;
 
         void setRowHeatColor(int row, byte heat);
-        void setRowHeatColor2(int row, byte heat);
-        ulong HSLtoRGB(const byte hue, const byte saturation, const byte lightness);
         void GeneratePallet();
 };
 
