@@ -24,12 +24,16 @@ class FireDisplayPattern : public DisplayPattern
     private:
         byte m_sparking{120};
         byte m_cooling{50};
+        ulong m_heatColors[256];
         
         // This will initialized to the number of rows in the pixel buffer.
         // It maintains the current "heat" level for each row.
         std::vector<int> m_rowHeats;
 
         void setRowHeatColor(int row, byte heat);
+        void setRowHeatColor2(int row, byte heat);
+        ulong HSLtoRGB(const byte hue, const byte saturation, const byte lightness);
+        void GeneratePallet();
 };
 
 #endif

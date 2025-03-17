@@ -42,17 +42,18 @@ void setup()
     }
 
     initializeIO();
-
+    int signType = LEGACY_SIGN_TYPE;
     if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
     {
         currentBrightness = DEFAULT_BRIGHTNESS_LOW;
         newBrightness = DEFAULT_BRIGHTNESS_LOW;
+        signType = 0; // Test matrix
     }
 
     display.setDisplay("---1");
     setupStyleLists();
     display.setDisplay("---2");
-    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(LEGACY_SIGN_TYPE, DATA_OUT);
+    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
     pixelBuffer->setBrightness(currentBrightness);
     display.setDisplay("---3");
 
