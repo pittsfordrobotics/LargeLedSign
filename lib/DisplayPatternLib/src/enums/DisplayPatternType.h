@@ -16,7 +16,8 @@ enum class DisplayPatternType : byte
 	CenterOutHorizontal = 8,
 	Line = 9,
     LowPower = 10,
-    Fire = 11
+    Fire = 11,
+    Fire2 = 12
 };
 
 #endif

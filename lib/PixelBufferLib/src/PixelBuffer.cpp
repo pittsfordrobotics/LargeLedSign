@@ -76,6 +76,11 @@ uint PixelBuffer::getRowCount()
     return m_rows.size();
 }
 
+uint PixelBuffer::getDigitCount()
+{
+    return m_digits.size();
+}
+
 uint PixelBuffer::getPixelCount()
 {
     return m_numPixels;
@@ -234,4 +239,36 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_
         int pixelIndex = destination->at(i);
         m_pixelColors[pixelIndex] = newColor;
     }
+}
+
+const std::vector<std::vector<int>*>& PixelBuffer::getAllRows()
+{
+    return m_rows;
+}
+
+const std::vector<std::vector<int>*> PixelBuffer::getRowsForDigit(uint digit)
+{
+    std::vector<std::vector<int>*> rowsForDigit;
+    if (digit >= m_digits.size())
+    {
+        return rowsForDigit;
+    }
+
+    // Loop over all rows, find out which rows exist in the digit and have pixels in the digit.
+    std::vector<int>* pixelsInDigit = m_digits[digit];
+    for (std::vector<int>* row : m_rows)
+    {
+        std::vector<int>* rowInDigit = new std::vector<int>();
+        rowsForDigit.push_back(rowInDigit);
+
+        for (int pixel : *row)
+        {
+            if (std::find(pixelsInDigit->begin(), pixelsInDigit->end(), pixel) != pixelsInDigit->end())
+            {
+                rowInDigit->push_back(pixel);
+            }
+        }
+    }
+
+    return rowsForDigit;
 }
