@@ -1,17 +1,11 @@
 #include "FireDisplayPattern.h"
 
-FireDisplayPattern::FireDisplayPattern(PixelBuffer *pixelBuffer, bool useIndividualDigits) : DisplayPattern(pixelBuffer)
+FireDisplayPattern::FireDisplayPattern(PixelBuffer *pixelBuffer, FirePatternType patternType) : DisplayPattern(pixelBuffer)
 {
-    m_useIndividualDigits = useIndividualDigits;
-    GeneratePallet();
-    // Ensure we call reset at least once to set up the row heats list.
-    m_rowsForDigits.clear();
-    
-    for (uint digitNumber = 0; digitNumber < pixelBuffer->getDigitCount(); digitNumber++)
-    {
-        m_rowsForDigits.push_back(pixelBuffer->getRowsForDigit(digitNumber));
-    }
+    m_patternType = patternType;
+    generatePallet();
 
+    // Ensure we call reset at least once to set up the row heats list.
     resetInternal();
 }
 
@@ -28,58 +22,67 @@ void FireDisplayPattern::setCoolingAmount(byte coolingAmount)
 void FireDisplayPattern::resetInternal()
 {
     m_pixelBuffer->fill(0);
-
-    // Initialize row heats to 0
-    m_rowHeats.clear();
-    for (uint i = 0; i < m_pixelBuffer->getRowCount(); i++)
+    m_combinedRowGroups.clear();
+    
+    switch (m_patternType)
     {
-        m_rowHeats.push_back(0);
+        case FirePatternType::Digit:
+            populateCombinedGroupsForDigits();
+            break;
+        case FirePatternType::Solid:
+        default:
+            m_combinedRowGroups.push_back(m_pixelBuffer->getAllRows());
+            break;
     }
 
-    // Initialize digit-based row heats
-    m_rowHeatsPerDigit.clear();
-    for (std::vector<std::vector<int>*> rowsInDigit : m_rowsForDigits)
+    // Initialize the row heat groups based on the row groupings
+    // and set all the initial heats to 0
+    m_combinedRowHeats.clear();
+    
+    for (std::vector<std::vector<int>*> rowGroup : m_combinedRowGroups)
     {
-        std::vector<int> rowHeatsForDigit;
-        for (uint i = 0; i < rowsInDigit.size(); i++)
+        std::vector<int> rowHeatsForGroup;
+        for (std::vector<int>* rows : rowGroup)
         {
-            rowHeatsForDigit.push_back(0);
+            rowHeatsForGroup.push_back(0);
         }
 
-        m_rowHeatsPerDigit.push_back(rowHeatsForDigit);
+        m_combinedRowHeats.push_back(rowHeatsForGroup);
     }
 }
 
 void FireDisplayPattern::updateInternal()
 {
-    if (m_useIndividualDigits)
+    for (int group = 0; group < m_combinedRowGroups.size(); group++)
     {
-        for (int digit = 0; digit < m_rowHeatsPerDigit.size(); digit++)
+        updateRowHeats(m_combinedRowHeats[group]);
+        int numRows = m_combinedRowHeats[group].size();
+        for (int row = 0; row < numRows; row++)
         {
-            updateRowHeats(m_rowHeatsPerDigit[digit]);
-            int numRows = m_rowHeatsPerDigit[digit].size();
-            for (int row = 0; row < numRows; row++)
+            byte temperature = m_combinedRowHeats[group][row];
+            ulong color = m_heatColors[temperature];
+            for (int pixel : *(m_combinedRowGroups[group][numRows - row - 1]))
             {
-                byte temperature = m_rowHeatsPerDigit[digit][row];
-                ulong color = m_heatColors[temperature];
-                for (int pixel : *(m_rowsForDigits[digit][numRows - row - 1]))
-                {
-                    m_pixelBuffer->setPixel(pixel, color);
-                }
+                m_pixelBuffer->setPixel(pixel, color);
             }
         }
     }
-    else
-    {
-        updateRowHeats(m_rowHeats);
-        int numRows = m_rowHeats.size();
+}
 
-        for (int j = 0; j < numRows; j++)
-        {
-            // Invert the rows -- the top row is 0.
-            setRowHeatColor(numRows - j - 1, m_rowHeats[j]);
-        }
-    }
+void FireDisplayPattern::populateCombinedGroupsForIndividualColumns()
+{
+    // Get the full list of columns and rows.
+    // Each column will be a grouping.
+    // Find what row each column's pixels are in to get the row mappings.
+    // If a column doesn't have a pixel in a specific row, add and empty pixel list for that row.
+}
+
+void FireDisplayPattern::populateCombinedGroupsForDigits()
+{
+    for (uint digitNumber = 0; digitNumber < m_pixelBuffer->getDigitCount(); digitNumber++)
+    {
+        m_combinedRowGroups.push_back(m_pixelBuffer->getRowsForDigit(digitNumber));
+    }    
 }
 
 void FireDisplayPattern::updateRowHeats(std::vector<int> &rowHeats)
@@ -141,7 +144,7 @@ std::vector<String> FireDisplayPattern::getParameterNames()
     return parameterNames;
 }
 
-void FireDisplayPattern::GeneratePallet()
+void FireDisplayPattern::generatePallet()
 {
     // generate the temperature-to-color pallet.
     for(int temperature = 0; temperature < 256; temperature++)

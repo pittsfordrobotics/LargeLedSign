@@ -17,7 +17,8 @@ enum class DisplayPatternType : byte
 	Line = 9,
     LowPower = 10,
     Fire = 11,
-    Fire2 = 12
+    Fire2 = 12,
+    Fire3 = 13
 };
 
 #endif

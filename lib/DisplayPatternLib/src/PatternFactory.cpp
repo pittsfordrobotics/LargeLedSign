@@ -90,7 +90,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::Fire:
         {
-            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer);
+            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, FirePatternType::Solid);
             pattern->setColorPattern(colorPattern);
             pattern->setSparkingAmount(params[startOfDisplayParameters]);
             pattern->setCoolingAmount(params[startOfDisplayParameters + 1]);
@@ -99,7 +99,16 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::Fire2:
         {
-            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, true);
+            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, FirePatternType::Digit);
+            pattern->setColorPattern(colorPattern);
+            pattern->setSparkingAmount(params[startOfDisplayParameters]);
+            pattern->setCoolingAmount(params[startOfDisplayParameters + 1]);
+            displayPattern = pattern;
+            break;
+        }
+        case DisplayPatternType::Fire3:
+        {
+            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, FirePatternType::IndividualRows);
             pattern->setColorPattern(colorPattern);
             pattern->setSparkingAmount(params[startOfDisplayParameters]);
             pattern->setCoolingAmount(params[startOfDisplayParameters + 1]);
@@ -209,6 +218,7 @@ String PatternFactory::getKnownDisplayPatterns()
     knownPatterns += ";" + getDisplayPatternString("Line", DisplayPatternType::Line, SimpleShiftDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("Fire", DisplayPatternType::Fire, FireDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("Fire2", DisplayPatternType::Fire2, FireDisplayPattern::getParameterNames());
+    knownPatterns += ";" + getDisplayPatternString("Fire3", DisplayPatternType::Fire3, FireDisplayPattern::getParameterNames());
 
     return knownPatterns;
 }

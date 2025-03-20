@@ -8,10 +8,17 @@
 #include <MathUtils.h>
 #include <vector>
 
+enum class FirePatternType : byte
+{
+    Solid = 0,
+    Digit = 1,
+    IndividualRows = 2
+};
+
 class FireDisplayPattern : public DisplayPattern
 {
     public:
-        FireDisplayPattern(PixelBuffer* pixelBuffer, bool useIndividualDigits = false);
+        FireDisplayPattern(PixelBuffer* pixelBuffer, FirePatternType patternType);
         void setSparkingAmount(byte sparkingAmount);
         void setCoolingAmount(byte coolingAmount);
 
@@ -22,24 +29,23 @@ class FireDisplayPattern : public DisplayPattern
         virtual void resetInternal();
 
     private:
-        bool m_useIndividualDigits{false};
+        FirePatternType m_patternType{FirePatternType::Solid};
         byte m_sparking{120};
         byte m_cooling{50};
         ulong m_heatColors[256];
         
-        // This will initialized to the number of rows in the pixel buffer.
-        // It maintains the current "heat" level for each row.
-        std::vector<int> m_rowHeats;
-        std::vector<std::vector<int>> m_rowHeatsPerDigit;
+        // Maintains the current "heat" level for each row grouping.
+        std::vector<std::vector<int>> m_combinedRowHeats;
 
-        // ICK
-        // List of digits, each of which contains a list of rows,
+        // List of row groups (ex: digits), each of which contains a list of rows,
         // each of which contains the set of pixels in the row.
-        std::vector<std::vector<std::vector<int>*>> m_rowsForDigits;
+        std::vector<std::vector<std::vector<int>*>> m_combinedRowGroups;
 
         void setRowHeatColor(int row, byte heat);
         void updateRowHeats(std::vector<int> &rowHeats);
-        void GeneratePallet();
+        void generatePallet();
+        void populateCombinedGroupsForDigits();
+        void populateCombinedGroupsForIndividualColumns();
 };
 
 #endif
