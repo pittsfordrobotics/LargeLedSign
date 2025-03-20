@@ -117,6 +117,12 @@ void processManualInputs()
     if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == ButtonPressType::Long)
     {
         manualInputButtons[0]->clearPress();
+        setManualStyle(PredefinedStyle::getPredefinedStyle(PredefinedStyles::Fire));
+    }
+
+    if (manualInputButtons[1]->wasPressed() && manualInputButtons[1]->lastPressType() == ButtonPressType::Long)
+    {
+        manualInputButtons[1]->clearPress();
         displayBatteryVoltage();
     }
 
