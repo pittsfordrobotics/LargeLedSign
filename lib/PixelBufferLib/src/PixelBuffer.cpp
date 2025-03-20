@@ -246,6 +246,11 @@ const std::vector<std::vector<int>*>& PixelBuffer::getAllRows()
     return m_rows;
 }
 
+const std::vector<std::vector<int>*>& PixelBuffer::getAllColumns()
+{
+    return m_columns;
+}
+
 const std::vector<std::vector<int>*> PixelBuffer::getRowsForDigit(uint digit)
 {
     std::vector<std::vector<int>*> rowsForDigit;

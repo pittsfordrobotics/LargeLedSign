@@ -102,6 +102,9 @@ class PixelBuffer {
     // Get the row-to-pixel mapping for all rows.
     const std::vector<std::vector<int>*>& getAllRows();
 
+    // Get the column-to-pixel mapping for all columns.
+    const std::vector<std::vector<int>*>& getAllColumns();
+
     // Get the row-to-pixel mapping for a specific digit.
     // This method calculates the intersection of rows and digits, and can be expensive to call.
     const std::vector<std::vector<int>*> getRowsForDigit(uint digit);
