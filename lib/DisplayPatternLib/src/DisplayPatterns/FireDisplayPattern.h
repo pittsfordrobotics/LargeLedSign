@@ -39,11 +39,12 @@ class FireDisplayPattern : public DisplayPattern
 
         // List of row groups (ex: digits), each of which contains a list of rows,
         // each of which contains the set of pixels in the row.
-        std::vector<std::vector<std::vector<int>*>> m_combinedRowGroups;
+        std::vector<std::vector<std::vector<int>>> m_combinedRowGroups;
 
         void setRowHeatColor(int row, byte heat);
         void updateRowHeats(std::vector<int> &rowHeats);
         void generatePallet();
+        void populateAllRows();
         void populateCombinedGroupsForDigits();
         void populateCombinedGroupsForIndividualColumns();
 };

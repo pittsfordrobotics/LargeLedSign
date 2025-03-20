@@ -34,7 +34,7 @@ void FireDisplayPattern::resetInternal()
             break;
         case FirePatternType::Solid:
         default:
-            m_combinedRowGroups.push_back(m_pixelBuffer->getAllRows());
+            populateAllRows();
             break;
     }
 
@@ -42,10 +42,10 @@ void FireDisplayPattern::resetInternal()
     // and set all the initial heats to 0
     m_combinedRowHeats.clear();
     
-    for (std::vector<std::vector<int>*> rowGroup : m_combinedRowGroups)
+    for (std::vector<std::vector<int>> rowGroup : m_combinedRowGroups)
     {
         std::vector<int> rowHeatsForGroup;
-        for (std::vector<int>* rows : rowGroup)
+        for (std::vector<int> rows : rowGroup)
         {
             rowHeatsForGroup.push_back(0);
         }
@@ -64,12 +64,28 @@ void FireDisplayPattern::updateInternal()
         {
             byte temperature = m_combinedRowHeats[group][row];
             ulong color = m_heatColors[temperature];
-            for (int pixel : *(m_combinedRowGroups[group][numRows - row - 1]))
+            for (int pixel : m_combinedRowGroups[group][numRows - row - 1])
             {
                 m_pixelBuffer->setPixel(pixel, color);
             }
         }
     }
+}
+
+void FireDisplayPattern::populateAllRows()
+{
+    std::vector<std::vector<int>> allRows;
+    for (std::vector<int>* row : m_pixelBuffer->getAllRows())
+    {
+        std::vector<int> pixelsInRow;
+        for (int pixel : *row)
+        {
+            pixelsInRow.push_back(pixel);
+        }
+        allRows.push_back(pixelsInRow);
+    }
+
+    m_combinedRowGroups.push_back(allRows);
 }
 
 void FireDisplayPattern::populateCombinedGroupsForIndividualColumns()
@@ -82,15 +98,15 @@ void FireDisplayPattern::populateCombinedGroupsForIndividualColumns()
     std::vector<std::vector<int>*> rows = m_pixelBuffer->getAllRows();
     for(std::vector<int>* column : columns)
     {
-        std::vector<std::vector<int>*> rowGroup;
+        std::vector<std::vector<int>> rowGroup;
         for (std::vector<int>* row : rows)
         {
-            std::vector<int>* pixelsInRow = new std::vector<int>();
+            std::vector<int> pixelsInRow;
             for (int pixel : *column)
             {
                 if (std::find(row->begin(), row->end(), pixel) != row->end())
                 {
-                    pixelsInRow->push_back(pixel);
+                    pixelsInRow.push_back(pixel);
                 }
             }
 
@@ -105,8 +121,19 @@ void FireDisplayPattern::populateCombinedGroupsForDigits()
 {
     for (uint digitNumber = 0; digitNumber < m_pixelBuffer->getDigitCount(); digitNumber++)
     {
-        m_combinedRowGroups.push_back(m_pixelBuffer->getRowsForDigit(digitNumber));
-    }    
+        std::vector<std::vector<int>> digitRows;
+        for (std::vector<int>* row : m_pixelBuffer->getRowsForDigit(digitNumber))
+        {
+            std::vector<int> rowPixels;
+            for (int pixel : *row)
+            {
+                rowPixels.push_back(pixel);
+            }
+            digitRows.push_back(rowPixels);
+        }
+
+        m_combinedRowGroups.push_back(digitRows);
+    }
 }
 
 void FireDisplayPattern::updateRowHeats(std::vector<int> &rowHeats)
