@@ -26,6 +26,9 @@ void FireDisplayPattern::resetInternal()
     
     switch (m_patternType)
     {
+        case FirePatternType::IndividualRows:
+            populateCombinedGroupsForIndividualColumns();
+            break;
         case FirePatternType::Digit:
             populateCombinedGroupsForDigits();
             break;
@@ -75,6 +78,27 @@ void FireDisplayPattern::populateCombinedGroupsForIndividualColumns()
     // Each column will be a grouping.
     // Find what row each column's pixels are in to get the row mappings.
     // If a column doesn't have a pixel in a specific row, add and empty pixel list for that row.
+    std::vector<std::vector<int>*> columns = m_pixelBuffer->getAllColumns();
+    std::vector<std::vector<int>*> rows = m_pixelBuffer->getAllRows();
+    for(std::vector<int>* column : columns)
+    {
+        std::vector<std::vector<int>*> rowGroup;
+        for (std::vector<int>* row : rows)
+        {
+            std::vector<int>* pixelsInRow = new std::vector<int>();
+            for (int pixel : *column)
+            {
+                if (std::find(row->begin(), row->end(), pixel) != row->end())
+                {
+                    pixelsInRow->push_back(pixel);
+                }
+            }
+
+            rowGroup.push_back(pixelsInRow);
+        }
+
+        m_combinedRowGroups.push_back(rowGroup);
+    }
 }
 
 void FireDisplayPattern::populateCombinedGroupsForDigits()
