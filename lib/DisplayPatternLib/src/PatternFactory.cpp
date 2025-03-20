@@ -88,7 +88,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
-        case DisplayPatternType::Fire:
+        case DisplayPatternType::Fire3:
         {
             FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, FirePatternType::Solid);
             pattern->setColorPattern(colorPattern);
@@ -106,7 +106,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
-        case DisplayPatternType::Fire3:
+        case DisplayPatternType::Fire:
         {
             FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, FirePatternType::IndividualRows);
             pattern->setColorPattern(colorPattern);
@@ -217,8 +217,8 @@ String PatternFactory::getKnownDisplayPatterns()
     knownPatterns += ";" + getDisplayPatternString("CenterOut", DisplayPatternType::CenterOutHorizontal, CenterOutDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("Line", DisplayPatternType::Line, SimpleShiftDisplayPattern::getParameterNames());
     knownPatterns += ";" + getDisplayPatternString("Fire", DisplayPatternType::Fire, FireDisplayPattern::getParameterNames());
-    knownPatterns += ";" + getDisplayPatternString("Fire2", DisplayPatternType::Fire2, FireDisplayPattern::getParameterNames());
-    knownPatterns += ";" + getDisplayPatternString("Fire3", DisplayPatternType::Fire3, FireDisplayPattern::getParameterNames());
+    //knownPatterns += ";" + getDisplayPatternString("Fire2", DisplayPatternType::Fire2, FireDisplayPattern::getParameterNames());
+    //knownPatterns += ";" + getDisplayPatternString("Fire3", DisplayPatternType::Fire3, FireDisplayPattern::getParameterNames());
 
     return knownPatterns;
 }
