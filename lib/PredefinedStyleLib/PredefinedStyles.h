@@ -25,7 +25,8 @@ enum class PredefinedStyles {
     Green_Solid,
     Playoff_Blue,
     Playoff_Blue_Small,
-    Playoff_Red
+    Playoff_Red,
+    Fire
 };
 
 #endif

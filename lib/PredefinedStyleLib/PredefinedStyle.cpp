@@ -290,6 +290,16 @@ PredefinedStyle PredefinedStyle::getPredefinedStyle(PredefinedStyles styleName)
             pattern.param4 = 50;
             return PredefinedStyle{"Playoff Blue", 245, pattern};
         }
+        case PredefinedStyles::Fire:
+        {
+            PatternData pattern;
+            pattern.colorPattern = ColorPatternType::SingleColor;
+            pattern.displayPattern = DisplayPatternType::Fire;
+            pattern.color1 = color(0, 0, 0);
+            pattern.param1 = 75; // Sparking amount
+            pattern.param2 = 100; // Cooling amount
+            return PredefinedStyle{"Fire", 200, pattern};
+        }
         default:
         {
             PatternData pattern;
