@@ -35,6 +35,8 @@ byte inLowPowerMode = false;      // Indicates the system should be in "low powe
 
 bool isOff = false;
 
+volatile bool isInitialized = false;
+
 // Main entry point for the program --
 // This is run once at startup.
 void setup()
@@ -81,6 +83,8 @@ void setup()
         currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
     }
     btService.setPatternData(newPatternData);
+
+    isInitialized = true;
 }
 
 // Main loop --
@@ -116,7 +120,20 @@ void loop()
         readBleSettings();
     }
 
+    // Move LED updates to the second core.
     // Apply any updates that were received via BLE or manually
+    // updateLEDs();
+}
+
+// Setup for the second core
+void setup1()
+{
+    while(!isInitialized) {}
+}
+
+// Main loop for the second core
+void loop1()
+{
     updateLEDs();
 }
 
@@ -463,7 +480,8 @@ void readInputButton()
                 // nulls out the device's advertised name for some reason, even if
                 // we set it explicitly before restarting advertising.
                 // To get around this, just restart the entire system.
-                NVIC_SystemReset();
+                // NVIC_SystemReset();
+                rp2040.restart();
             }
             else
             {
