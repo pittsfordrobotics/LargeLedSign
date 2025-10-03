@@ -53,16 +53,9 @@ void PixelBuffer::displayPixels()
     unsigned long start = millis();
     m_neoPixels->show();
 
-    // I have no idea why, but if we exit immediately and try to read BLE settings,
-    // the BLE readings are sometimes corrupt.  If we wait until the "show" is done
-    // and delay a tiny bit more, things are stable.
     while (!m_neoPixels->canShow())
     {
         // wait for the "show" to complete
-    }
-    while (millis() - start < 10)
-    {
-        // wait until at least 10 msec have passed since starting the "show"
     }
 }
 
