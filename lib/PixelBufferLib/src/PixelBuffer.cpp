@@ -3,10 +3,6 @@
 #include "Arduino.h"
 #include "PixelBuffer.h"
 
-// All pixel buffers will have at least this many pixels, even if not used.
-// This is done to help the signs stay in sync.
-uint minimumPixelsInBuffer = 360;
-
 PixelBuffer::PixelBuffer(int gpioPin)
 {
     m_gpioPin = gpioPin;
