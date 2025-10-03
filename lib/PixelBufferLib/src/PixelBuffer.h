@@ -10,8 +10,6 @@
 
 class PixelBuffer {
   public:
-    PixelBuffer(int gpioPin);
-
     void initialize();
 
     void setDigitsToLeft(uint digitsToLeft) { m_digitsToLeft = digitsToLeft; }
@@ -122,6 +120,8 @@ class PixelBuffer {
     void resume();
 
   protected:
+    PixelBuffer(int gpioPin);
+
     uint m_numPixels{0};       // Size of internal buffer
     uint m_pixelBufferSize{0}; // Size of NeoPixel buffer
     ulong* m_pixelColors;
