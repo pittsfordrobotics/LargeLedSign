@@ -39,6 +39,7 @@ void processManualInputs();
 void updateInputButtons();
 void setManualStyle(PredefinedStyle style);
 void updateTelemetry();
+void updateLedTelemetry();
 float getCalculatedBatteryVoltage();
 int getVoltageInputLevel();
 void displayBatteryVoltage();

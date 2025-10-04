@@ -10,6 +10,8 @@
 
 class PixelBuffer {
   public:
+    // Todo: pass in the number of rows/columns in the constructor
+    // instead of needing to use m_rows/m_columns directly.
     void initialize();
 
     void setDigitsToLeft(uint digitsToLeft) { m_digitsToLeft = digitsToLeft; }
@@ -23,6 +25,11 @@ class PixelBuffer {
     uint getColsToRight() { return m_colsToRight; }
 
     void setBrightness(byte brightess);
+
+    // Sets the row and column for a specific pixel in the buffer.
+    // Exposing publicly for eventual use by clients.
+    // Currently it's only used internally during initialzation for back-compat.
+    void setRowAndColumnForPixel(uint pixel, uint row, uint column);
 
     // Sets the first pixel in the buffer to the new color,
     // shifting all the pixels in the buffer to the right by one.
@@ -67,10 +74,6 @@ class PixelBuffer {
     // Sets the pixels in the leftmost digit to the new color,
     // shifting all the digit colors one place to the right.
     void shiftDigitsRight(ulong newColor);
-
-    // Sets the first pixel in the line to the new color,
-    // shifting all other pixel colors one place further down the line.
-    void shiftLine(ulong newColor);
 
     // Sets a random assortment of pixels in the buffer to the given color.
     void fillRandomly(ulong newColor, uint numberOfPixels);
@@ -140,6 +143,13 @@ class PixelBuffer {
     void setColorForMappedPixels(std::vector<int>* destination, ulong newColor);
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
+    
+    // Update the color in the color map and write through to the pixel buffer if a pixel exists at that location.
+    void setColorInPixelMap(uint row, uint column, ulong color);
+
+    // Row, then column. Value is the pixel index or -1 if no pixel at that location.
+    std::vector<std::vector<int>> m_pixelMap;
+    std::vector<std::vector<ulong>> m_colorMap;
 };
 
 #endif
