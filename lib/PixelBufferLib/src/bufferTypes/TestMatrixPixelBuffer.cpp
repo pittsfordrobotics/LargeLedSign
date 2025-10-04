@@ -27,6 +27,13 @@ TestMatrixPixelBuffer::TestMatrixPixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
         m_rows.push_back(rowVector);
     }
 
+    // TEST:
+    // Simulate a 40x40 display matrix for stress testing.
+    for (int i = 0; i < 32; i++)
+    {
+        m_rows.push_back(new std::vector<int>());
+    }
+
     for (int col = 7; col >= 0; col--)
     {
         std::vector<int> *colVector = new std::vector<int>();
@@ -35,6 +42,13 @@ TestMatrixPixelBuffer::TestMatrixPixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
             colVector->push_back(col * 8 + row);
         }
         m_columns.push_back(colVector);
+    }
+
+    // TEST:
+    // Simulate a 40x40 display matrix for stress testing.
+    for (int i = 0; i < 32; i++)
+    {
+        m_columns.push_back(new std::vector<int>());
     }
 
     m_digits.push_back(new std::vector<int>());

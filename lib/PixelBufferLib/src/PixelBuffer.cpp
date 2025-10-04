@@ -5,6 +5,7 @@
 
 PixelBuffer::PixelBuffer(int gpioPin)
 {
+    Serial.println("Constructing PixelBuffer...");
     // Todo: numPixels should be passed in here instead of set later.
     // m_pixelColors should be set here based on numPixels.
     m_gpioPin = gpioPin;
@@ -12,6 +13,7 @@ PixelBuffer::PixelBuffer(int gpioPin)
 
 void PixelBuffer::initialize()
 {
+    Serial.println("Initializing PixelBuffer...");
     // Back-compat: deduce the number of rows/columns from the m_rows and m_columns vectors.
     // Initialize all entries to -1 to indicate no pixel at that location.
     //m_pixelMap.resize(m_rows.size(), std::vector<int>(m_columns.size(), -1));
@@ -269,12 +271,22 @@ void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlo
     {
         std::vector<int> *source = pixelBlocks.at(i - 1);
         std::vector<int> *destination = pixelBlocks.at(i);
+        if (source->size() == 0 || destination->size() == 0)
+        {
+            // source or destination is empty -- skip it.
+            // this is an artifact of testing the new matrix code using empty rows/columns.
+            continue;
+        }
+
         // Find the color of the first pixel in the source column, and set the destination column to that color.
         uint32_t previousColor = m_pixelColors[source->at(0)];
         setColorForMappedPixels(destination, previousColor);
     }
 
-    setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
+    if (startingBlock < pixelBlocks.size())
+    {
+        setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
+    }
 }
 
 void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks, ulong newColor, uint startingBlock)
@@ -288,8 +300,12 @@ void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBloc
         setColorForMappedPixels(destination, previousColor);
     }
 
-    setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
+    if (startingBlock < pixelBlocks.size())
+    {
+        setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
+    }
 }
+
 
 void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_t newColor)
 {
