@@ -16,7 +16,6 @@ void PixelBuffer::initialize()
     Serial.println("Initializing PixelBuffer...");
     // Back-compat: deduce the number of rows/columns from the m_rows and m_columns vectors.
     // Initialize all entries to -1 to indicate no pixel at that location.
-    //m_pixelMap.resize(m_rows.size(), std::vector<int>(m_columns.size(), -1));
     for (uint i = 0; i < m_rows.size(); i++)
     {
         m_pixelMap.push_back(std::vector<int>(m_columns.size(), -1));
@@ -24,7 +23,6 @@ void PixelBuffer::initialize()
     }
 
     // Initialize the color map to black (0) for all pixels.
-    //m_colorMap.resize(m_rows.size(), std::vector<ulong>(m_columns.size(), 0));
     
     // More back-compat: populate the pixel map based on the row/column vectors.
     for (int pixelNumber = 0; pixelNumber < m_numPixels; pixelNumber++)
@@ -153,8 +151,6 @@ void PixelBuffer::setRowColor(uint row, ulong newColor)
         return;
     }
 
-    //std::vector<int> *destination = m_rows.at(row);
-    //setColorForMappedPixels(destination, newColor);
     for (uint col = 0; col < m_columns.size(); col++)
     {
         setColorInPixelMap(row, col, newColor);
@@ -213,8 +209,6 @@ void PixelBuffer::shiftPixelsLeft(ulong newColor)
 
 void PixelBuffer::shiftColumnsRight(ulong newColor)
 {
-    // shiftPixelBlocksRight(m_columns, newColor, 0);
-
     // Shift all columns to the right, then fill the first column with the new color.
     for (uint row = 0; row < m_rows.size(); row++)
     {
@@ -227,6 +221,8 @@ void PixelBuffer::shiftColumnsRight(ulong newColor)
     }
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftColumnsRight(ulong newColor, uint startingColumn)
 {
     shiftPixelBlocksRight(m_columns, newColor, startingColumn);
@@ -234,9 +230,6 @@ void PixelBuffer::shiftColumnsRight(ulong newColor, uint startingColumn)
 
 void PixelBuffer::shiftColumnsLeft(ulong newColor)
 {
-    // Shift all columns to the left, then fill the last column with the new color.
-    //shiftPixelBlocksLeft(m_columns, newColor, m_columns.size() - 1);
-
     // Shift all columns to the left, then fill the last column with the new color.
     for (uint row = 0; row < m_rows.size(); row++)
     {
@@ -249,6 +242,8 @@ void PixelBuffer::shiftColumnsLeft(ulong newColor)
     }
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftColumnsLeft(ulong newColor, uint startingColumn)
 {
     shiftPixelBlocksLeft(m_columns, newColor, startingColumn);
@@ -256,8 +251,6 @@ void PixelBuffer::shiftColumnsLeft(ulong newColor, uint startingColumn)
 
 void PixelBuffer::shiftRowsUp(ulong newColor)
 {
-    // shiftPixelBlocksLeft(m_rows, newColor, m_rows.size() - 1);
-
     // Shift all rows up, then fill the last row with the new color.
     for (uint col = 0; col < m_columns.size(); col++)
     {
@@ -270,6 +263,8 @@ void PixelBuffer::shiftRowsUp(ulong newColor)
     }
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftRowsUp(ulong newColor, uint startingRow)
 {
     shiftPixelBlocksLeft(m_rows, newColor, startingRow);
@@ -277,12 +272,7 @@ void PixelBuffer::shiftRowsUp(ulong newColor, uint startingRow)
 
 void PixelBuffer::shiftRowsDown(ulong newColor)
 {
-    shiftPixelBlocksRight(m_rows, newColor, 0);
-    return;
-
     // Shift all rows down, then fill the first row with the new color.
-    // Todo: Make this cleaner by setting a RowCount/ColumnCount property.
-    // For now, rely on the count of m_rows / m_columns.
     for (uint col = 0; col < m_columns.size(); col++)
     {
         for (uint row = m_rows.size() - 1; row > 0; row--)
@@ -294,11 +284,15 @@ void PixelBuffer::shiftRowsDown(ulong newColor)
     }
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftRowsDown(ulong newColor, uint startingRow)
 {
     shiftPixelBlocksRight(m_rows, newColor, startingRow);
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftDigitsRight(ulong newColor)
 {
     shiftPixelBlocksRight(m_digits, newColor, 0);

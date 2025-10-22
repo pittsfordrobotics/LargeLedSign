@@ -135,7 +135,6 @@ class PixelBuffer {
     uint m_digitsToRight{0};
     uint m_colsToLeft{0};
     uint m_colsToRight{0};
-    // Make rows/cols private.
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     std::vector<std::vector<int>*> m_digits;
