@@ -153,8 +153,25 @@ void PixelBuffer::setRowColor(uint row, ulong newColor)
         return;
     }
 
-    std::vector<int> *destination = m_rows.at(row);
-    setColorForMappedPixels(destination, newColor);
+    //std::vector<int> *destination = m_rows.at(row);
+    //setColorForMappedPixels(destination, newColor);
+    for (uint col = 0; col < m_columns.size(); col++)
+    {
+        setColorInPixelMap(row, col, newColor);
+    }
+}
+
+void PixelBuffer::setColumnColor(uint column, ulong newColor)
+{
+    if (column >= m_columns.size())
+    {
+        return;
+    }
+
+    for (uint row = 0; row < m_rows.size(); row++)
+    {
+        setColorInPixelMap(row, column, newColor);
+    }
 }
 
 void PixelBuffer::fill(ulong newColor)
@@ -199,7 +216,7 @@ void PixelBuffer::shiftColumnsRight(ulong newColor)
     // shiftPixelBlocksRight(m_columns, newColor, 0);
 
     // Shift all columns to the right, then fill the first column with the new color.
-    for (uint row = 0; row < m_colorMap.size(); row++)
+    for (uint row = 0; row < m_rows.size(); row++)
     {
         for (uint col = m_columns.size() - 1; col > 0; col--)
         {
@@ -218,7 +235,18 @@ void PixelBuffer::shiftColumnsRight(ulong newColor, uint startingColumn)
 void PixelBuffer::shiftColumnsLeft(ulong newColor)
 {
     // Shift all columns to the left, then fill the last column with the new color.
-    shiftPixelBlocksLeft(m_columns, newColor, m_columns.size() - 1);
+    //shiftPixelBlocksLeft(m_columns, newColor, m_columns.size() - 1);
+
+    // Shift all columns to the left, then fill the last column with the new color.
+    for (uint row = 0; row < m_rows.size(); row++)
+    {
+        for (uint col = 0; col < m_columns.size() - 1; col++)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row][col+1]);
+        }
+
+        setColorInPixelMap(row, m_columns.size() - 1, newColor);
+    }
 }
 
 void PixelBuffer::shiftColumnsLeft(ulong newColor, uint startingColumn)
@@ -228,7 +256,18 @@ void PixelBuffer::shiftColumnsLeft(ulong newColor, uint startingColumn)
 
 void PixelBuffer::shiftRowsUp(ulong newColor)
 {
-    shiftPixelBlocksLeft(m_rows, newColor, m_rows.size() - 1);
+    // shiftPixelBlocksLeft(m_rows, newColor, m_rows.size() - 1);
+
+    // Shift all rows up, then fill the last row with the new color.
+    for (uint col = 0; col < m_columns.size(); col++)
+    {
+        for (uint row = 0; row < m_rows.size() - 1; row++)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row+1][col]);
+        }
+
+        setColorInPixelMap(m_rows.size() - 1, col, newColor);
+    }
 }
 
 void PixelBuffer::shiftRowsUp(ulong newColor, uint startingRow)
@@ -305,7 +344,6 @@ void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBloc
         setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
     }
 }
-
 
 void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_t newColor)
 {

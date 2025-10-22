@@ -99,6 +99,9 @@ class PixelBuffer {
 
     // Set all pixels in the given row to the given color.
     void setRowColor(uint row, ulong newColor);
+    
+    // Set all pixels in the given column to the given color.
+    void setColumnColor(uint column, ulong newColor);
 
     // Get the row-to-pixel mapping for all rows.
     const std::vector<std::vector<int>*>& getAllRows();
@@ -132,6 +135,7 @@ class PixelBuffer {
     uint m_digitsToRight{0};
     uint m_colsToLeft{0};
     uint m_colsToRight{0};
+    // Make rows/cols private.
     std::vector<std::vector<int>*> m_columns;
     std::vector<std::vector<int>*> m_rows;
     std::vector<std::vector<int>*> m_digits;
