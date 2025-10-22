@@ -10,6 +10,9 @@ LegacySignPixelBuffer::LegacySignPixelBuffer(int gpioPin) : PixelBuffer(gpioPin)
     // ROW 0 is at the TOP of the display.
     // COLUMN 0 is at the LEFT of the display.
     // DIGIT 0 is at the LEFT of the display.
+    // 20 rows
+    // 73 columns
+    // 4 digits
 
     //
     // Set up row map

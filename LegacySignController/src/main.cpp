@@ -10,6 +10,8 @@ std::vector<PushButton *> manualInputButtons;
 PredefinedStyleList* predefinedStyleList;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
+ulong ledLoopCounter = 0;
+ulong lastLedTelemetryTimestamp = 0;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
@@ -108,6 +110,7 @@ void loop1()
 {
     // Check for threading issues!!!
     updateLEDs();
+    updateLedTelemetry();
 }
 
 void processManualInputs()
@@ -327,6 +330,26 @@ void updateTelemetry()
         Serial.print(rawLevel);
         Serial.print("; calculated voltage: ");
         Serial.println(voltage);
+    }
+}
+
+void updateLedTelemetry()
+{
+    ledLoopCounter++;
+    unsigned long timestamp = millis();
+
+    if (timestamp > lastLedTelemetryTimestamp + TELEMETRYINTERVAL)
+    {
+        // Calculate loop timing data
+        unsigned long diff = timestamp - lastLedTelemetryTimestamp;
+        double timePerIteration = (double)diff / ledLoopCounter;
+        Serial.print(ledLoopCounter);
+        Serial.print(" LED iterations done in ");
+        Serial.print(diff);
+        Serial.print(" msec; avg msec per iteration: ");
+        Serial.println(timePerIteration);
+        lastLedTelemetryTimestamp = timestamp;
+        ledLoopCounter = 0;
     }
 }
 

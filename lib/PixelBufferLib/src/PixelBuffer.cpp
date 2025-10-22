@@ -3,21 +3,71 @@
 #include "Arduino.h"
 #include "PixelBuffer.h"
 
-// All pixel buffers will have at least this many pixels, even if not used.
-// This is done to help the signs stay in sync.
-uint minimumPixelsInBuffer = 360;
-
 PixelBuffer::PixelBuffer(int gpioPin)
 {
+    Serial.println("Constructing PixelBuffer...");
+    // Todo: numPixels should be passed in here instead of set later.
+    // m_pixelColors should be set here based on numPixels.
     m_gpioPin = gpioPin;
 }
 
 void PixelBuffer::initialize()
 {
+    Serial.println("Initializing PixelBuffer...");
+    // Back-compat: deduce the number of rows/columns from the m_rows and m_columns vectors.
+    // Initialize all entries to -1 to indicate no pixel at that location.
+    for (uint i = 0; i < m_rows.size(); i++)
+    {
+        m_pixelMap.push_back(std::vector<int>(m_columns.size(), -1));
+        m_colorMap.push_back(std::vector<ulong>(m_columns.size(), 0));
+    }
+
+    // Initialize the color map to black (0) for all pixels.
+    
+    // More back-compat: populate the pixel map based on the row/column vectors.
+    for (int pixelNumber = 0; pixelNumber < m_numPixels; pixelNumber++)
+    {
+        for (int row = 0; row < m_rows.size(); row++)
+        {
+            std::vector<int>* rowPixels = m_rows.at(row);
+            if (std::find(rowPixels->begin(), rowPixels->end(), pixelNumber) != rowPixels->end())
+            {
+                // Found the pixel in this row.
+                for (int column = 0; column < m_columns.size(); column++)
+                {
+                    std::vector<int>* columnPixels = m_columns.at(column);
+                    if (std::find(columnPixels->begin(), columnPixels->end(), pixelNumber) != columnPixels->end())
+                    {
+                        // Found the pixel in this column.
+                        setRowAndColumnForPixel(pixelNumber, row, column);
+                        break;
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
     m_neoPixels = new Adafruit_NeoPixel(m_pixelBufferSize, m_gpioPin, NEO_GRB + NEO_KHZ800);
     clearBuffer();
     m_neoPixels->begin();
     m_neoPixels->clear();
+}
+
+void PixelBuffer::setRowAndColumnForPixel(uint pixel, uint row, uint column)
+{
+    if (row >= m_pixelMap.size())
+    {
+        return;
+    }
+
+    if (column >= m_pixelMap[row].size())
+    {
+        return;
+    }
+
+    m_pixelMap[row][column] = pixel;
 }
 
 void PixelBuffer::clearBuffer()
@@ -53,16 +103,9 @@ void PixelBuffer::displayPixels()
     unsigned long start = millis();
     m_neoPixels->show();
 
-    // I have no idea why, but if we exit immediately and try to read BLE settings,
-    // the BLE readings are sometimes corrupt.  If we wait until the "show" is done
-    // and delay a tiny bit more, things are stable.
     while (!m_neoPixels->canShow())
     {
         // wait for the "show" to complete
-    }
-    while (millis() - start < 10)
-    {
-        // wait until at least 10 msec have passed since starting the "show"
     }
 }
 
@@ -108,8 +151,23 @@ void PixelBuffer::setRowColor(uint row, ulong newColor)
         return;
     }
 
-    std::vector<int> *destination = m_rows.at(row);
-    setColorForMappedPixels(destination, newColor);
+    for (uint col = 0; col < m_columns.size(); col++)
+    {
+        setColorInPixelMap(row, col, newColor);
+    }
+}
+
+void PixelBuffer::setColumnColor(uint column, ulong newColor)
+{
+    if (column >= m_columns.size())
+    {
+        return;
+    }
+
+    for (uint row = 0; row < m_rows.size(); row++)
+    {
+        setColorInPixelMap(row, column, newColor);
+    }
 }
 
 void PixelBuffer::fill(ulong newColor)
@@ -151,9 +209,20 @@ void PixelBuffer::shiftPixelsLeft(ulong newColor)
 
 void PixelBuffer::shiftColumnsRight(ulong newColor)
 {
-    shiftPixelBlocksRight(m_columns, newColor, 0);
+    // Shift all columns to the right, then fill the first column with the new color.
+    for (uint row = 0; row < m_rows.size(); row++)
+    {
+        for (uint col = m_columns.size() - 1; col > 0; col--)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row][col-1]);
+        }
+
+        setColorInPixelMap(row, 0, newColor);
+    }
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftColumnsRight(ulong newColor, uint startingColumn)
 {
     shiftPixelBlocksRight(m_columns, newColor, startingColumn);
@@ -161,9 +230,20 @@ void PixelBuffer::shiftColumnsRight(ulong newColor, uint startingColumn)
 
 void PixelBuffer::shiftColumnsLeft(ulong newColor)
 {
-    shiftPixelBlocksLeft(m_columns, newColor, m_columns.size() - 1);
+    // Shift all columns to the left, then fill the last column with the new color.
+    for (uint row = 0; row < m_rows.size(); row++)
+    {
+        for (uint col = 0; col < m_columns.size() - 1; col++)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row][col+1]);
+        }
+
+        setColorInPixelMap(row, m_columns.size() - 1, newColor);
+    }
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftColumnsLeft(ulong newColor, uint startingColumn)
 {
     shiftPixelBlocksLeft(m_columns, newColor, startingColumn);
@@ -171,9 +251,20 @@ void PixelBuffer::shiftColumnsLeft(ulong newColor, uint startingColumn)
 
 void PixelBuffer::shiftRowsUp(ulong newColor)
 {
-    shiftPixelBlocksLeft(m_rows, newColor, m_rows.size() - 1);
+    // Shift all rows up, then fill the last row with the new color.
+    for (uint col = 0; col < m_columns.size(); col++)
+    {
+        for (uint row = 0; row < m_rows.size() - 1; row++)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row+1][col]);
+        }
+
+        setColorInPixelMap(m_rows.size() - 1, col, newColor);
+    }
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftRowsUp(ulong newColor, uint startingRow)
 {
     shiftPixelBlocksLeft(m_rows, newColor, startingRow);
@@ -181,27 +272,30 @@ void PixelBuffer::shiftRowsUp(ulong newColor, uint startingRow)
 
 void PixelBuffer::shiftRowsDown(ulong newColor)
 {
-    shiftPixelBlocksRight(m_rows, newColor, 0);
+    // Shift all rows down, then fill the first row with the new color.
+    for (uint col = 0; col < m_columns.size(); col++)
+    {
+        for (uint row = m_rows.size() - 1; row > 0; row--)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row-1][col]);
+        }
+
+        setColorInPixelMap(0, col, newColor);
+    }
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftRowsDown(ulong newColor, uint startingRow)
 {
     shiftPixelBlocksRight(m_rows, newColor, startingRow);
 }
 
+// Update to use the new pixel map.
+// Currently only used by the CenterOut pattern.
 void PixelBuffer::shiftDigitsRight(ulong newColor)
 {
     shiftPixelBlocksRight(m_digits, newColor, 0);
-}
-
-void PixelBuffer::shiftLine(ulong newColor)
-{
-    for (uint i = m_pixelBufferSize - 1; i > 0; i--)
-    {
-        m_pixelColors[i] = m_pixelColors[i - 1];
-    }
-
-    m_pixelColors[0] = newColor;
 }
 
 void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, ulong newColor, uint startingBlock)
@@ -210,12 +304,22 @@ void PixelBuffer::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlo
     {
         std::vector<int> *source = pixelBlocks.at(i - 1);
         std::vector<int> *destination = pixelBlocks.at(i);
+        if (source->size() == 0 || destination->size() == 0)
+        {
+            // source or destination is empty -- skip it.
+            // this is an artifact of testing the new matrix code using empty rows/columns.
+            continue;
+        }
+
         // Find the color of the first pixel in the source column, and set the destination column to that color.
         uint32_t previousColor = m_pixelColors[source->at(0)];
         setColorForMappedPixels(destination, previousColor);
     }
 
-    setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
+    if (startingBlock < pixelBlocks.size())
+    {
+        setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
+    }
 }
 
 void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks, ulong newColor, uint startingBlock)
@@ -229,7 +333,10 @@ void PixelBuffer::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBloc
         setColorForMappedPixels(destination, previousColor);
     }
 
-    setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
+    if (startingBlock < pixelBlocks.size())
+    {
+        setColorForMappedPixels(pixelBlocks.at(startingBlock), newColor);
+    }
 }
 
 void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_t newColor)
@@ -238,6 +345,26 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_
     {
         int pixelIndex = destination->at(i);
         m_pixelColors[pixelIndex] = newColor;
+    }
+}
+
+void PixelBuffer::setColorInPixelMap(uint row, uint column, ulong color)
+{
+    // Since this is private for now, we could remove the guard clauses for better performance.
+    if (row >= m_colorMap.size())
+    {
+        return;
+    }
+
+    if (column >= m_colorMap[row].size())
+    {
+        return;
+    }
+
+    m_colorMap[row][column] = color;
+    if (m_pixelMap[row][column] != -1)
+    {
+        m_pixelColors[m_pixelMap[row][column]] = color;
     }
 }
 
