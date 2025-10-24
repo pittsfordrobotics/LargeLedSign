@@ -115,6 +115,24 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
+        case DisplayPatternType::Rotation:
+        {
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(true, pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            pattern->setNumberOfRays(params[startOfDisplayParameters]);
+            pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
+            displayPattern = pattern;
+            break;
+        }
+        case DisplayPatternType::RotationCCW:
+        {
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(false, pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            pattern->setNumberOfRays(params[startOfDisplayParameters]);
+            pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
+            displayPattern = pattern;
+            break;
+        }
         default:
         {
             SolidDisplayPattern* pattern = new SolidDisplayPattern(pixelBuffer);

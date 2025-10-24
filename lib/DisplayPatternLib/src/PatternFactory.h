@@ -9,6 +9,7 @@
 #include "DisplayPatterns\RandomDisplayPattern.h"
 #include "DisplayPatterns\CenterOutDisplayPattern.h"
 #include "DisplayPatterns\LowPowerDisplayPattern.h"
+#include "DisplayPatterns\RotationDisplayPattern.h"
 #include "ColorPatterns\ColorPattern.h"
 #include "ColorPatterns\ColorFadePattern.h"
 #include "ColorPatterns\RainbowColorPattern.h"

@@ -12,13 +12,15 @@ enum class DisplayPatternType : byte
     Down = 4,
     Digit = 5,
     Random = 6,
-	CenterOutVertical = 7,
-	CenterOutHorizontal = 8,
-	Line = 9,
+    CenterOutVertical = 7,
+    CenterOutHorizontal = 8,
+    Line = 9,
     LowPower = 10,
     Fire = 11,
     Fire2 = 12,
-    Fire3 = 13
+    Fire3 = 13,
+    Rotation = 14,
+    RotationCCW = 15
 };
 
 #endif

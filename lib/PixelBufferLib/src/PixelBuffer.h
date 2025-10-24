@@ -94,8 +94,11 @@ class PixelBuffer {
 
     uint getDigitCount();
 
-    // Set an individual pixel in the buffer to a color.
+    // Set an individual pixel in the raw pixel buffer to a color.
     void setPixel(uint pixel, ulong color);
+
+    // Set the color of a specific pixel in the row/column map.
+    void setColorInPixelMap(uint row, uint column, ulong color);
 
     // Set all pixels in the given row to the given color.
     void setRowColor(uint row, ulong newColor);
@@ -147,9 +150,6 @@ class PixelBuffer {
     void shiftPixelBlocksRight(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
     void shiftPixelBlocksLeft(std::vector<std::vector<int>*> pixelBlocks, ulong newColor, uint startingBlock);
     
-    // Update the color in the color map and write through to the pixel buffer if a pixel exists at that location.
-    void setColorInPixelMap(uint row, uint column, ulong color);
-
     // Row, then column. Value is the pixel index or -1 if no pixel at that location.
     std::vector<std::vector<int>> m_pixelMap;
     std::vector<std::vector<ulong>> m_colorMap;
