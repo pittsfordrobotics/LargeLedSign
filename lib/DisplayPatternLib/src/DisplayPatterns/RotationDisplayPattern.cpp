@@ -54,9 +54,16 @@ void RotationDisplayPattern::updateInternal()
                 angleToPixelDeg += 360.0f;
             }
 
-            if (isAngleInRange(angleToPixelDeg, m_currentAngleDeg, newAngleDeg))
+            float rayAngleIncrement = 360.0f / m_numberOfRays;
+            for (uint rayIndex = 0; rayIndex < m_numberOfRays; rayIndex++)
             {
-                m_pixelBuffer->setColorInPixelMap(row, col, currentColor);
+                float adjustedStartAngle = m_currentAngleDeg + rayIndex * rayAngleIncrement;
+                float adjustedEndAngle = newAngleDeg + rayIndex * rayAngleIncrement;
+
+                if (isAngleInRange(angleToPixelDeg, adjustedStartAngle, adjustedEndAngle))
+                {
+                    m_pixelBuffer->setColorInPixelMap(row, col, currentColor);
+                }
             }
         }
     }
@@ -72,19 +79,34 @@ void RotationDisplayPattern::updateInternal()
     }
 }
 
+// This method assumes that endAngle = startAngle +/- some increment.
+// It assumes that no angle-wrapping has been applied to the start or end angles.
 boolean RotationDisplayPattern::isAngleInRange(float angleToCheck, float startAngle, float endAngle)
 {
-    if (startAngle < endAngle)
+    float normalizedStartAngle = startAngle;
+    float normalizedEndAngle = endAngle;
+
+    if (startAngle > 360.0f && endAngle > 360.0f)
+    {
+        normalizedStartAngle -= 360.0f;
+        normalizedEndAngle -= 360.0f;
+    }
+    if (startAngle < 0.0f && endAngle < 0.0f)
+    {
+        normalizedStartAngle += 360.0f;
+        normalizedEndAngle += 360.0f;
+    }
+    if (normalizedStartAngle < normalizedEndAngle)
     {
         // angle is increasing
-        if (angleToCheck >= startAngle && angleToCheck < endAngle)
+        if (angleToCheck >= normalizedStartAngle && angleToCheck < normalizedEndAngle)
         {
             return true;
         }
         // Check if we've wrapped around past 360 degrees
-        if (endAngle >= 360.0f)
+        if (normalizedEndAngle >= 360.0f)
         {
-            if (angleToCheck + 360 >= startAngle && angleToCheck + 360 < endAngle)
+            if (angleToCheck + 360 >= normalizedStartAngle && angleToCheck + 360 < normalizedEndAngle)
             {
                 return true;
             }
@@ -93,14 +115,14 @@ boolean RotationDisplayPattern::isAngleInRange(float angleToCheck, float startAn
     else
     {
         // angle is decreasing
-        if (angleToCheck <= startAngle && angleToCheck > endAngle)
+        if (angleToCheck <= normalizedStartAngle && angleToCheck > normalizedEndAngle)
         {
             return true;
         }
         // Check if we've wrapped around past 0 degrees
-        if (endAngle < 0.0f)
+        if (normalizedEndAngle < 0.0f)
         {
-            if (angleToCheck - 360 <= startAngle && angleToCheck - 360 > endAngle)
+            if (angleToCheck - 360 <= normalizedStartAngle && angleToCheck - 360 > normalizedEndAngle)
             {
                 return true;
             }
