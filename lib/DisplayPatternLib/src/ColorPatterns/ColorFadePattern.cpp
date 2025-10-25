@@ -91,6 +91,12 @@ ulong ColorFadePattern::getNextColor()
 void ColorFadePattern::setColorDuration(byte duration)
 {
     m_colorDuration = convertColorDuration(duration);
+
+    // Make sure we display the color for at least 1 cycle.
+    if (m_colorDuration < 1)
+    {
+        m_colorDuration = 1;
+    }
 }
 
 void ColorFadePattern::setFadeInDuration(byte duration)
@@ -110,10 +116,10 @@ void ColorFadePattern::setFadedDuration(byte duration)
 
 byte ColorFadePattern::convertColorDuration(byte duration)
 {
-    int convertedDuration = MathUtils::rescaleInput(1, 50, duration);
-    if (convertedDuration < 1)
+    int convertedDuration = MathUtils::rescaleInput(0, 50, duration);
+    if (convertedDuration < 0)
     {
-        convertedDuration = 1;
+        convertedDuration = 0;
     }
 
     return convertedDuration;
