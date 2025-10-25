@@ -26,6 +26,7 @@ class RotationDisplayPattern : public DisplayPattern
         float m_centerRow{0.0f};
         float m_centerColumn{0.0f};
         float m_currentAngleDeg{0.0f};
+        std::vector<std::vector<float>> m_pixelAnglesDeg;
 };
 
 #endif

@@ -29,13 +29,30 @@ void RotationDisplayPattern::resetInternal()
     // TODO: take into account offsets for columns to left/right
     m_centerRow = m_pixelBuffer->getRowCount() / 2.0f;
     m_centerColumn = m_pixelBuffer->getColumnCount() / 2.0f;
+
+    // Calculate the angle from the center to each pixel.
+    for (int row = 0; row < m_pixelBuffer->getRowCount(); row++)
+    {
+        std::vector<float> anglesInRow;
+        for (int col = 0; col < m_pixelBuffer->getColumnCount(); col++)
+        {
+            float deltaY = row - m_centerRow;
+            float deltaX = col - m_centerColumn;
+            float angleToPixelDeg = std::atan2(deltaY, deltaX) * (180.0f / M_PI);
+            if (angleToPixelDeg < 0.0f)
+            {
+                angleToPixelDeg += 360.0f;
+            }
+
+            anglesInRow.push_back(angleToPixelDeg);
+        }
+        
+        m_pixelAnglesDeg.push_back(anglesInRow);
+    }
 }
 
 void RotationDisplayPattern::updateInternal()
 {
-    // Hard code 1 degree per update for now.
-    // Only 1 "ray" for now.
-
     // Due to the fact that the pixel buffer's row and column numbers start
     // at 0 in the top-left, an increasing angle is clockwise.
     float newAngleDeg = m_isClockwise ? m_currentAngleDeg + m_angleIncrementDeg : m_currentAngleDeg - m_angleIncrementDeg;
@@ -45,15 +62,7 @@ void RotationDisplayPattern::updateInternal()
     {
         for (int col = 0; col < m_pixelBuffer->getColumnCount(); col++)
         {
-            // Calculate angle from center to this pixel.
-            float deltaY = row - m_centerRow;
-            float deltaX = col - m_centerColumn;
-            float angleToPixelDeg = std::atan2(deltaY, deltaX) * (180.0f / M_PI);
-            if (angleToPixelDeg < 0.0f)
-            {
-                angleToPixelDeg += 360.0f;
-            }
-
+            float angleToPixelDeg = m_pixelAnglesDeg[row][col];
             float rayAngleIncrement = 360.0f / m_numberOfRays;
             for (uint rayIndex = 0; rayIndex < m_numberOfRays; rayIndex++)
             {
