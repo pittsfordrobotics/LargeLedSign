@@ -350,7 +350,6 @@ void PixelBuffer::setColorForMappedPixels(std::vector<int> *destination, uint32_
 
 void PixelBuffer::setColorInPixelMap(uint row, uint column, ulong color)
 {
-    // Since this is private for now, we could remove the guard clauses for better performance.
     if (row >= m_colorMap.size())
     {
         return;
