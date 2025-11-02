@@ -1,16 +1,17 @@
 #include "RotationDisplayPattern.h"
 
-RotationDisplayPattern::RotationDisplayPattern(boolean isClockwise, PixelBuffer *pixelBuffer) : DisplayPattern(pixelBuffer), m_isClockwise(isClockwise)
+RotationDisplayPattern::RotationDisplayPattern(boolean isClockwise, boolean isSpotLight, PixelBuffer *pixelBuffer) : DisplayPattern(pixelBuffer)
 {
     m_isClockwise = isClockwise;
+    m_isSpotLight = isSpotLight;
 }
 
 void RotationDisplayPattern::setNumberOfRays(byte unscaledValue)
 {
-    int numberOfRays = MathUtils::rescaleInput(1, 5, unscaledValue);
-    if (numberOfRays > 4)
+    int numberOfRays = MathUtils::rescaleInput(1, 7, unscaledValue);
+    if (numberOfRays > 6)
     {
-        numberOfRays = 4;
+        numberOfRays = 6;
     }
 
     m_numberOfRays = numberOfRays;
@@ -24,6 +25,12 @@ void RotationDisplayPattern::setAngleIncrementDeg(byte unscaledValue)
 void RotationDisplayPattern::resetInternal()
 {
     m_colorPattern->reset();
+    m_spotLightColors.clear();
+
+    for (int i = 0; i < m_numberOfRays; i++)
+    {
+        m_spotLightColors.push_back(m_colorPattern->getNextColor());
+    }
 
     // Calculate center point
     // TODO: take into account offsets for columns to left/right
@@ -71,7 +78,14 @@ void RotationDisplayPattern::updateInternal()
 
                 if (isAngleInRange(angleToPixelDeg, adjustedStartAngle, adjustedEndAngle))
                 {
-                    m_pixelBuffer->setColorInPixelMap(row, col, currentColor);
+                    if (m_isSpotLight)
+                    {
+                        m_pixelBuffer->setColorInPixelMap(row, col, m_spotLightColors[rayIndex]);
+                    }
+                    else
+                    {
+                        m_pixelBuffer->setColorInPixelMap(row, col, currentColor);
+                    }
                 }
             }
         }
@@ -92,53 +106,38 @@ void RotationDisplayPattern::updateInternal()
 // It assumes that no angle-wrapping has been applied to the start or end angles.
 boolean RotationDisplayPattern::isAngleInRange(float angleToCheck, float startAngle, float endAngle)
 {
-    float normalizedStartAngle = startAngle;
-    float normalizedEndAngle = endAngle;
+    float normalizedStartAngle = normalizeAngle(startAngle);
+    float normalizedEndAngle = normalizeAngle(endAngle);
+    float normalizedAngleToCheck = normalizeAngle(angleToCheck);
 
-    if (startAngle > 360.0f && endAngle > 360.0f)
-    {
-        normalizedStartAngle -= 360.0f;
-        normalizedEndAngle -= 360.0f;
-    }
-    if (startAngle < 0.0f && endAngle < 0.0f)
-    {
-        normalizedStartAngle += 360.0f;
-        normalizedEndAngle += 360.0f;
-    }
-    if (normalizedStartAngle < normalizedEndAngle)
+    if (startAngle < endAngle)
     {
         // angle is increasing
-        if (angleToCheck >= normalizedStartAngle && angleToCheck < normalizedEndAngle)
-        {
-            return true;
+        if (normalizedStartAngle <= normalizedEndAngle) {
+            return normalizedAngleToCheck >= normalizedStartAngle && normalizedAngleToCheck <= normalizedEndAngle;
         }
-        // Check if we've wrapped around past 360 degrees
-        if (normalizedEndAngle >= 360.0f)
-        {
-            if (angleToCheck + 360 >= normalizedStartAngle && angleToCheck + 360 < normalizedEndAngle)
-            {
-                return true;
-            }
-        }
+        // Wraparound case
+        return normalizedAngleToCheck >= normalizedStartAngle || normalizedAngleToCheck <= normalizedEndAngle;
     }
     else
     {
         // angle is decreasing
-        if (angleToCheck <= normalizedStartAngle && angleToCheck > normalizedEndAngle)
-        {
-            return true;
+        if (normalizedEndAngle <= normalizedStartAngle) {
+            return normalizedAngleToCheck >= normalizedEndAngle && normalizedAngleToCheck <= normalizedStartAngle;
         }
-        // Check if we've wrapped around past 0 degrees
-        if (normalizedEndAngle < 0.0f)
-        {
-            if (angleToCheck - 360 <= normalizedStartAngle && angleToCheck - 360 > normalizedEndAngle)
-            {
-                return true;
-            }
-        }
+        // Wraparound case
+        return normalizedAngleToCheck >= normalizedEndAngle || normalizedAngleToCheck <= normalizedStartAngle;
+    }
+}
+
+float RotationDisplayPattern::normalizeAngle(float angle)
+{
+    angle = fmod(angle, 360.0);
+    if (angle < 0) {
+        angle += 360.0;
     }
 
-    return false;
+    return angle;
 }
 
 std::vector<String> RotationDisplayPattern::getParameterNames()

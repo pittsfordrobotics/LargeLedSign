@@ -14,7 +14,6 @@
 #include "ColorPatterns\ColorFadePattern.h"
 #include "ColorPatterns\RainbowColorPattern.h"
 #include "ColorPatterns\SingleColorPattern.h"
-#include "ColorPatterns\TwoColorFadePattern.h"
 #include "ColorPatterns\TwoColorPattern.h"
 #include "ColorPatterns\BackgroundPlusThree.h"
 #include <PixelBuffer.h>

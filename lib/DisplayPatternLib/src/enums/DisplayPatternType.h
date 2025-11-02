@@ -20,7 +20,9 @@ enum class DisplayPatternType : byte
     Fire2 = 12,
     Fire3 = 13,
     Rotation = 14,
-    RotationCCW = 15
+    RotationCCW = 15,
+    SpotLight = 16,
+    SpotLightCCW = 17
 };
 
 #endif

@@ -117,7 +117,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::Rotation:
         {
-            RotationDisplayPattern* pattern = new RotationDisplayPattern(true, pixelBuffer);
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(true, false, pixelBuffer);
             pattern->setColorPattern(colorPattern);
             pattern->setNumberOfRays(params[startOfDisplayParameters]);
             pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
@@ -126,7 +126,25 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::RotationCCW:
         {
-            RotationDisplayPattern* pattern = new RotationDisplayPattern(false, pixelBuffer);
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(false, false, pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            pattern->setNumberOfRays(params[startOfDisplayParameters]);
+            pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
+            displayPattern = pattern;
+            break;
+        }
+        case DisplayPatternType::SpotLight:
+        {
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(true, true, pixelBuffer);
+            pattern->setColorPattern(colorPattern);
+            pattern->setNumberOfRays(params[startOfDisplayParameters]);
+            pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
+            displayPattern = pattern;
+            break;
+        }
+        case DisplayPatternType::SpotLightCCW:
+        {
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(false, true, pixelBuffer);
             pattern->setColorPattern(colorPattern);
             pattern->setNumberOfRays(params[startOfDisplayParameters]);
             pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
