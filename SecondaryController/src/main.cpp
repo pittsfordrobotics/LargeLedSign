@@ -39,6 +39,10 @@ bool isOff = false;
 // This is run once at startup.
 void setup()
 {
+    SPI.setSCK(0);
+    SPI.setMOSI(0);
+    SPI.setMISO(0);
+
     // Delay for debugging
     delay(INITIALDELAY);
     Serial.begin(9600);
