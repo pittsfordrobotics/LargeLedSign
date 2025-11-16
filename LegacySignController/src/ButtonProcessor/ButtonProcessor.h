@@ -9,6 +9,8 @@
 #include "ButtonAction.h"
 #include "Utils\DebugUtils.h"
 
+// The "ButtonActionProcessor" is a function pointer type for processing button actions.
+// It accepts the caller button ID, action name, and a list of string arguments.
 typedef void (*ButtonActionProcessor)(int callerId, String actionName, std::vector<String> arguments);
 
 class ButtonProcessor
