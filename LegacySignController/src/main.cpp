@@ -6,7 +6,7 @@ StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 PixelBuffer* pixelBuffer;
 DisplayPattern* currentLightStyle;
 
-std::vector<PushButton *> manualInputButtons;
+std::vector<GenericButton *> manualInputButtons;
 PredefinedStyleList* predefinedStyleList;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
@@ -40,7 +40,7 @@ void setup()
     std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
     for (uint i = 0; i < manualInputPins.size(); i++)
     {
-        manualInputButtons.push_back(new PushButton(manualInputPins[i], INPUT_PULLUP));
+        manualInputButtons.push_back(new ArduinoPushButton(manualInputPins[i], INPUT_PULLUP));
     }
 
     initializeIO();

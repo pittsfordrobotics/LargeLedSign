@@ -4,10 +4,11 @@
 #include <algorithm>
 #include <BluetoothCommon.h>
 #include <DisplayPatternLib.h>
-#include <PushButton.h>
+//#include <PushButton.h>
 #include <StatusDisplay.h>
 #include <PredefinedStyleLib.h>
 #include <PixelBufferLib.h>
+#include "ArduinoPushButton/ArduinoPushButton.h"
 
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
 #define VOLTAGEINPUTPIN 29     // GPIO pin # for the analog input to detect battery voltage level.
