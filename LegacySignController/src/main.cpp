@@ -34,8 +34,68 @@ volatile bool isInitialized = false;
 void setup()
 {
     Serial.begin(9600);
-    delay(500);
+    delay(2000);
     Serial.println("Starting...");
+
+    /* ****************************** */
+    /*      SD Card test code         */
+    /* ****************************** */
+
+    Serial.println("Initializing SD card...");
+
+    // Common pins for all signs:
+    // MISO/CIPO: GPIO 4
+    // MOSI/COPI: GPIO 19
+    // SCK: GPIO 18
+    // CS: DIO 8
+    // The only valid GPIO pins for MISO are 0, 4, 16, 20 for SPI; 8, 12, 24, 28 for SPI1
+    
+    SPI.setSCK(18);
+    SPI.setMOSI(19);
+    SPI.setMISO(4);
+
+    Serial.println("Set pins.");
+
+    if (!SD.begin(8))
+    {
+        while(true){
+            delay(1000);
+            Serial.println("SD card initialization failed!");
+        }
+    }
+
+    Serial.println("Reading file from SD card.");
+    File displayConfigFile = SD.open("TEST.TXT");
+
+    if (!displayConfigFile)
+    {
+        while(true){
+            delay(1000);
+            Serial.println("Could not open file!");
+        }
+    }
+
+    size_t fileSize = displayConfigFile.size();
+
+    Serial.println("Reading file.");
+    char* fileContents = new char[fileSize + 1];
+    displayConfigFile.readBytes(fileContents, fileSize);
+
+    Serial.println("File read successfully.");
+
+    displayConfigFile.close();
+    SD.end();
+    String fileContentsStr(fileContents, fileSize);
+
+    while(true){
+        delay(1000);
+        Serial.print("File contents: ");
+        Serial.println(fileContentsStr);
+    }
+
+    /* ****************************** */
+    /*      End SD Card test code     */
+    /* ****************************** */
 
     std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
     for (uint i = 0; i < manualInputPins.size(); i++)
