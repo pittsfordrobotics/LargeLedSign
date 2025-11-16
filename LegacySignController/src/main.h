@@ -7,8 +7,8 @@
 #include <StatusDisplay.h>
 #include <PredefinedStyleLib.h>
 #include <PixelBufferLib.h>
-#include "ButtonProcessor/ButtonProcessor.h"
 #include "ArduinoPushButton/ArduinoPushButton.h"
+#include "ButtonProcessor/ButtonProcessor.h"
 
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
 #define VOLTAGEINPUTPIN 29     // GPIO pin # for the analog input to detect battery voltage level.
@@ -34,11 +34,8 @@
 // Function prototypes
 void initializeIO();
 void initializeButtonProcessor();
-//void setupStyleLists();
 void startBLEService();
 void readSettingsFromBLE();
-//void processManualInputs();
-//void updateInputButtons();
 void setManualStyle(PredefinedStyle style);
 void updateTelemetry();
 void updateLedTelemetry();

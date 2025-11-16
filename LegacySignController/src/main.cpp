@@ -7,8 +7,6 @@ PixelBuffer* pixelBuffer;
 DisplayPattern* currentLightStyle;
 ButtonProcessor buttonProcessor;
 
-//std::vector<GenericButton *> manualInputButtons;
-//PredefinedStyleList* predefinedStyleList;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
@@ -19,7 +17,6 @@ int manualButtonSequenceNumber = 0;
 byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
-//PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Playoff_Blue_Small);
 PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
 
 // Settings that are updated via bluetooth
@@ -38,12 +35,6 @@ void setup()
     delay(500);
     Serial.println("Starting...");
 
-    // std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
-    // for (uint i = 0; i < manualInputPins.size(); i++)
-    // {
-    //     manualInputButtons.push_back(new ArduinoPushButton(manualInputPins[i], INPUT_PULLUP));
-    // }
-
     initializeIO();
     initializeButtonProcessor();
     int signType = LEGACY_SIGN_TYPE;
@@ -55,7 +46,6 @@ void setup()
     }
 
     display.setDisplay("---1");
-    //setupStyleLists();
     display.setDisplay("---2");
     pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
     pixelBuffer->setBrightness(currentBrightness);
@@ -67,11 +57,50 @@ void setup()
         display.setDisplay("E-1");
         while (true)
         {
+            Serial.println("BLE initialization failed!");
+            delay(1000);
         }
     }
 
     startBLEService();
     isInitialized = true;
+}
+
+void loop()
+{
+    BLE.poll();
+    display.update();
+    updateTelemetry();
+    checkForLowPowerState();
+
+    if (btService.isConnected())
+    {
+        // Something is connected via BT.
+        // Set the display to "--" to show something connected to us.
+        // Display it as "temporary" since it's a low-priority message.
+        display.displayTemporary(" --", 200);
+    }
+
+    if (!inLowPowerMode)
+    {
+        // Only process inputs if we're not in low power mode.
+        readSettingsFromBLE();
+        buttonProcessor.update();
+    }
+}
+
+// Setup for the second core
+void setup1()
+{
+    while(!isInitialized) {}
+}
+
+// Main loop for the second core
+void loop1()
+{
+    // Check for threading issues!!!
+    updateLEDs();
+    updateLedTelemetry();
 }
 
 void initializeButtonProcessor()
@@ -94,176 +123,6 @@ void initializeButtonProcessor()
     buttonProcessor.addLongTapAction({"2"}, "disconnectBT");
 }
 
-void loop()
-{
-    BLE.poll();
-    display.update();
-    updateTelemetry();
-    checkForLowPowerState();
-
-    if (btService.isConnected())
-    {
-        // Something is connected via BT.
-        // Set the display to "--" to show something connected to us.
-        // Display it as "temporary" since it's a low-priority message.
-        display.displayTemporary(" --", 200);
-    }
-
-    if (!inLowPowerMode)
-    {
-        // Only process inputs if we're not in low power mode.
-        readSettingsFromBLE();
-        //updateInputButtons();
-        //processManualInputs();
-        buttonProcessor.update();
-    }
-
-    // moved the LED update to the second core
-    // updateLEDs();
-}
-
-// Setup for the second core
-void setup1()
-{
-    while(!isInitialized) {}
-}
-
-// Main loop for the second core
-void loop1()
-{
-    // Check for threading issues!!!
-    updateLEDs();
-    updateLedTelemetry();
-}
-
-void ProcessButtonAction(int callerId, String actionName, std::vector<String> arguments)
-{
-    if (actionName == "batteryVoltage")
-    {
-        displayBatteryVoltage();
-        return;
-    }
-
-    if (actionName == "disconnectBT")
-    {
-        btService.disconnect();
-        return;
-    }
-
-    if (actionName == "changeStyle")
-    {
-        if (arguments.size() < 1)
-        {
-            // Invalid number of arguments. Set to Pink_Solid as a default.
-            setManualStyle(PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid));
-            return;
-        }
-
-        if (callerId == lastManualButtonPressed)
-        {
-            manualButtonSequenceNumber = (manualButtonSequenceNumber + 1) % arguments.size();
-        }
-        else
-        {
-            manualButtonSequenceNumber = 0;
-        }
-
-        lastManualButtonPressed = callerId;
-
-        // Get styleName from argument list, based on the number of times the callerId was pressed.
-        String styleName = arguments[manualButtonSequenceNumber];
-        PredefinedStyles styleEnum;
-
-        // Map the string to the enum
-        // Eventualy move this to the display configuration when implemented.
-        if (styleName == "Fire")
-        {
-            styleEnum = PredefinedStyles::Fire;
-        }
-        else if (styleName == "Rainbow")
-        {
-            styleEnum = PredefinedStyles::Rainbow_Random_v1;
-        }
-        else if (styleName == "Pink")
-        {
-            styleEnum = PredefinedStyles::Pink_Solid;
-        }
-        else if (styleName == "BluePinkDigit")
-        {
-            styleEnum = PredefinedStyles::BluePink_Digit;
-        }
-        else if (styleName == "BluePinkRandom")
-        {
-            styleEnum = PredefinedStyles::BluePink_Random_v1;
-        }
-        else if (styleName == "RedPinkDigit")
-        {
-            styleEnum = PredefinedStyles::RedPink_Digit;
-        }
-        else if (styleName == "RedPinkRandom")
-        {
-            styleEnum = PredefinedStyles::RedPink_Random_v1;
-        }
-        else
-        {
-            // Unrecognized style name -- default to Pink_Solid
-            styleEnum = PredefinedStyles::Pink_Solid;
-        }
-
-        PredefinedStyle style = PredefinedStyle::getPredefinedStyle(styleEnum);
-        setManualStyle(style);
-    }
-}
-
-// void processManualInputs()
-// {
-//     // First look for any long-presses that happened.
-//     // If button 1 (id 0) was long-pressed, display battery voltages for the clients.
-//     if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == ButtonPressType::Long)
-//     {
-//         manualInputButtons[0]->clearPress();
-//         setManualStyle(PredefinedStyle::getPredefinedStyle(PredefinedStyles::Fire));
-//     }
-
-//     if (manualInputButtons[1]->wasPressed() && manualInputButtons[1]->lastPressType() == ButtonPressType::Long)
-//     {
-//         manualInputButtons[1]->clearPress();
-//         displayBatteryVoltage();
-//     }
-
-//     // If button 3 (id 2) was long-pressed, force-disconnect any BT clients.
-//     if (manualInputButtons[2]->wasPressed() && manualInputButtons[2]->lastPressType() == ButtonPressType::Long)
-//     {
-//         manualInputButtons[2]->clearPress();
-//         btService.disconnect();
-//     }
-
-//     // Next look for any button presses that indicate style changes.
-//     // If the same button was pressed previously, cycle through the styles.
-//     for (uint i = 0; i < manualInputButtons.size(); i++)
-//     {
-//         if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Normal)
-//         {
-//             if ((int)i == lastManualButtonPressed)
-//             {
-//                 // This button was pressed last time -- cycle through the sequence.
-//                 manualButtonSequenceNumber++;
-//             }
-//             else
-//             {
-//                 manualButtonSequenceNumber = 0;
-//             }
-
-//             // Get the vector corresponding to the button number (4 vectors; 1 per button),
-//             // then get the style by indexing into the vector.
-//             PredefinedStyle selectedStyle = predefinedStyleList->getStyle(i, manualButtonSequenceNumber);
-//             setManualStyle(selectedStyle);
-//             manualInputButtons[i]->clearPress();
-//             lastManualButtonPressed = i;
-//         }
-//     }
-// }
-
 void setManualStyle(PredefinedStyle style)
 {
     newSpeed = style.getSpeed();
@@ -273,14 +132,6 @@ void setManualStyle(PredefinedStyle style)
     btService.setSpeed(newSpeed);
     btService.setPatternData(newPatternData);
 }
-
-// void updateInputButtons()
-// {
-//     for (uint i = 0; i < manualInputButtons.size(); i++)
-//     {
-//         manualInputButtons[i]->update();
-//     }
-// }
 
 void startBLEService()
 {
@@ -308,23 +159,6 @@ void readSettingsFromBLE()
     newSpeed = btService.getSpeed();
     newPatternData = btService.getPatternData();
 }
-
-// void setupStyleLists()
-// {
-//     predefinedStyleList = new PredefinedStyleList(manualInputButtons.size());
-
-//     // Styles for button 1 (id 0)
-//     predefinedStyleList->addStyleToList(0, PredefinedStyles::Rainbow_Random_v1);
-//     predefinedStyleList->addStyleToList(0, PredefinedStyles::Pink_Solid);
-
-//     // Styles for button 2 (id 1)
-//     predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Random_v1);
-//     predefinedStyleList->addStyleToList(1, PredefinedStyles::BluePink_Digit);
-
-//     // Styles for button 3 (id 2)
-//     predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Random_v1);
-//     predefinedStyleList->addStyleToList(2, PredefinedStyles::RedPink_Digit);
-// }
 
 void initializeIO()
 {
@@ -494,4 +328,83 @@ void updateLEDs()
     }
 
     pixelBuffer->displayPixels();    
+}
+
+void ProcessButtonAction(int callerId, String actionName, std::vector<String> arguments)
+{
+    if (actionName == "batteryVoltage")
+    {
+        displayBatteryVoltage();
+        return;
+    }
+
+    if (actionName == "disconnectBT")
+    {
+        btService.disconnect();
+        return;
+    }
+
+    if (actionName == "changeStyle")
+    {
+        if (arguments.size() < 1)
+        {
+            // Invalid number of arguments. Set to Pink_Solid as a default.
+            setManualStyle(PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid));
+            return;
+        }
+
+        if (callerId == lastManualButtonPressed)
+        {
+            manualButtonSequenceNumber = (manualButtonSequenceNumber + 1) % arguments.size();
+        }
+        else
+        {
+            manualButtonSequenceNumber = 0;
+        }
+
+        lastManualButtonPressed = callerId;
+
+        // Get styleName from argument list, based on the number of times the callerId was pressed.
+        String styleName = arguments[manualButtonSequenceNumber];
+        PredefinedStyles styleEnum;
+
+        // Map the string to the enum
+        // Eventualy move this to the display configuration when implemented.
+        if (styleName == "Fire")
+        {
+            styleEnum = PredefinedStyles::Fire;
+        }
+        else if (styleName == "Rainbow")
+        {
+            styleEnum = PredefinedStyles::Rainbow_Random_v1;
+        }
+        else if (styleName == "Pink")
+        {
+            styleEnum = PredefinedStyles::Pink_Solid;
+        }
+        else if (styleName == "BluePinkDigit")
+        {
+            styleEnum = PredefinedStyles::BluePink_Digit;
+        }
+        else if (styleName == "BluePinkRandom")
+        {
+            styleEnum = PredefinedStyles::BluePink_Random_v1;
+        }
+        else if (styleName == "RedPinkDigit")
+        {
+            styleEnum = PredefinedStyles::RedPink_Digit;
+        }
+        else if (styleName == "RedPinkRandom")
+        {
+            styleEnum = PredefinedStyles::RedPink_Random_v1;
+        }
+        else
+        {
+            // Unrecognized style name -- default to Pink_Solid
+            styleEnum = PredefinedStyles::Pink_Solid;
+        }
+
+        PredefinedStyle style = PredefinedStyle::getPredefinedStyle(styleEnum);
+        setManualStyle(style);
+    }
 }
