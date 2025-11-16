@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <BluetoothCommon.h>
 #include <DisplayPatternLib.h>
-//#include <PushButton.h>
 #include <StatusDisplay.h>
 #include <PredefinedStyleLib.h>
 #include <PixelBufferLib.h>
