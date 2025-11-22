@@ -66,7 +66,6 @@ bool DisplayPattern::update(PixelMap* pixelMap)
 {
     if (!m_colorPattern)
     {
-        Serial.println("No color pattern set; cannot update display pattern.");
         return false;
     }
     
@@ -75,7 +74,6 @@ bool DisplayPattern::update(PixelMap* pixelMap)
         return false;
     }
 
-    Serial.println("Updating display pattern...");
     m_nextUpdate = millis() + m_iterationDelay;
     updateInternal(pixelMap);
     return true;

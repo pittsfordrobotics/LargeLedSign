@@ -27,7 +27,6 @@ void NeoPixelDisplay::updateDisplay()
 
     if (m_displayPattern)
     {
-        // TODO: implement DisplayPattern update method that works with PixelMap
         wasUpdated = m_displayPattern->update(m_pixelMap);
     }
 
@@ -41,7 +40,6 @@ void NeoPixelDisplay::resetDisplay()
 {
     if (m_displayPattern)
     {
-        // TODO: implement DisplayPattern reset method that works with PixelMap
         m_displayPattern->reset(m_pixelMap);
     }
     

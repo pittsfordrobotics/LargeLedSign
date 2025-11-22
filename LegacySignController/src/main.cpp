@@ -3,7 +3,6 @@
 // Global variables
 CommonPeripheral btService;
 StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
-//PixelBuffer* pixelBuffer;
 NeoPixelDisplay* neoPixelDisplay;
 DisplayPattern* currentLightStyle;
 ButtonProcessor buttonProcessor;
@@ -50,17 +49,19 @@ void setup()
     display.setDisplay("---2");
 
     //
-    // Read from config -- also is hard coded!!!
+    // Read from config!!!
     //
-    std::vector<DisplayConfiguration>* displayConfigs = DisplayConfigFactory::createForTestMatrix();
-    Serial.print("MAIN - Number of display configs: ");
-    Serial.println(displayConfigs->size());
+    std::vector<DisplayConfiguration>* displayConfigs;
+    if (signType == 0)
+    {
+        displayConfigs = DisplayConfigFactory::createForTestMatrix();
+    }
+    else
+    {
+        displayConfigs = DisplayConfigFactory::createForLegacySign();
+    }
 
-    DisplayConfiguration displayConfig = DisplayConfigFactory::createForTestMatrix()->at(0);
-    Serial.print("MAIN - Number of pixels in config: ");
-    Serial.println(displayConfig.getNumberOfPixels());
-
-    neoPixelDisplay = new NeoPixelDisplay(displayConfig);
+    neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
     neoPixelDisplay->setBrightness(currentBrightness);
     newPatternData = defaultStyle.getPatternData();
     currentPatternData = newPatternData;
@@ -68,8 +69,6 @@ void setup()
     initialPattern->setSpeed(defaultStyle.getSpeed());
     neoPixelDisplay->setDisplayPattern(initialPattern);
 
-    //pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
-    //pixelBuffer->setBrightness(currentBrightness);
     display.setDisplay("---3");
 
     if (!BLE.begin())
@@ -332,16 +331,6 @@ void updateLEDs()
 
     if (currentPatternData != newPatternData)
     {
-        // if (currentLightStyle)
-        // {
-        //     delete currentLightStyle;
-        // }
-
-        // //currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
-        // currentLightStyle = PatternFactory::createForPatternData(newPatternData, nullptr);
-        // currentLightStyle->setSpeed(newSpeed);
-        // currentLightStyle->reset();
-
         DisplayPattern* oldPattern = neoPixelDisplay->getDisplayPattern();;
         DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData, nullptr);
         newPattern->setSpeed(newSpeed);
@@ -356,13 +345,6 @@ void updateLEDs()
         currentPatternData = newPatternData;
     }
 
-    // The current style shouldn't ever be null here, but check anyways.
-    //if (currentLightStyle)
-    //{
-    //    currentLightStyle->update();
-    //}
-
-    //pixelBuffer->displayPixels();    
     neoPixelDisplay->updateDisplay();
 }
 
