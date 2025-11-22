@@ -15,6 +15,12 @@ void NeoPixelDisplay::setBrightness(byte brightness)
     m_neoPixels->setBrightness(brightness);
 }
 
+void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)
+{
+    m_displayPattern = displayPattern;
+    m_displayPattern->reset(m_pixelMap);
+}
+
 void NeoPixelDisplay::updateDisplay()
 {
     bool wasUpdated = false;
