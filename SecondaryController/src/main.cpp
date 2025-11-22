@@ -463,7 +463,9 @@ void readInputButton()
                 // nulls out the device's advertised name for some reason, even if
                 // we set it explicitly before restarting advertising.
                 // To get around this, just restart the entire system.
-                NVIC_SystemReset();
+                //
+                // **** 
+                //NVIC_SystemReset();
             }
             else
             {
