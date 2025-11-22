@@ -3,14 +3,13 @@
 PixelMap::PixelMap(const DisplayConfiguration& displayConfiguration)
 {
     initializeFromConfiguration(displayConfiguration);
+    initializeInternalMaps();
     clearBuffer();
 }
 
 void PixelMap::initializeFromConfiguration(const DisplayConfiguration& displayConfiguration)
 {
     DisplayConfiguration config(displayConfiguration);
-    Serial.print("PixelMap - Number of pixels in config: ");
-    Serial.print(config.getNumberOfPixels());
 
     m_numPixels = config.getNumberOfPixels();
     m_pixelColors = new unsigned long[m_numPixels];

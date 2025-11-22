@@ -29,6 +29,7 @@ class SimpleShiftDisplayPattern : public DisplayPattern{
 
     private:
         int getNumberOfBlocksForPattern();
+        int getNumberOfBlocksForPattern(PixelMap* pixelMap);
         int getInitialIncrementAmount();
         ShiftType m_shiftType{ShiftType::Right};
 };

@@ -22,7 +22,7 @@ void SimpleShiftDisplayPattern::resetInternal(PixelMap* pixelMap)
     m_colorPattern->reset();
     m_colorPattern->incrementOnly(getInitialIncrementAmount());
 
-    int numberOfBlocks = getNumberOfBlocksForPattern();
+    int numberOfBlocks = getNumberOfBlocksForPattern(pixelMap);
     for (int i = 0; i < numberOfBlocks; i++)
     {
         updateInternal(pixelMap);
@@ -114,6 +114,22 @@ int SimpleShiftDisplayPattern::getNumberOfBlocksForPattern()
         case ShiftType::Up:
         case ShiftType::Down:
             return m_pixelBuffer->getRowCount();
+        default:
+            // All lights in the sign use the same color
+            return 1;
+    }
+}
+
+int SimpleShiftDisplayPattern::getNumberOfBlocksForPattern(PixelMap* pixelMap)
+{
+    switch (m_shiftType)
+    {
+        case ShiftType::Right:
+        case ShiftType::Left:
+            return pixelMap->getColumnCount();
+        case ShiftType::Up:
+        case ShiftType::Down:
+            return pixelMap->getRowCount();
         default:
             // All lights in the sign use the same color
             return 1;
