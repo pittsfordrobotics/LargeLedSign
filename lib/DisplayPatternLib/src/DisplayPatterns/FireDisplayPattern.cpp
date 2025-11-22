@@ -54,6 +54,41 @@ void FireDisplayPattern::resetInternal()
     }
 }
 
+void FireDisplayPattern::resetInternal(PixelMap* pixelMap)
+{
+    pixelMap->fill(0);
+    m_combinedRowGroups.clear();
+    
+    switch (m_patternType)
+    {
+        case FirePatternType::IndividualRows:
+            populateCombinedGroupsForIndividualColumns();
+            break;
+        case FirePatternType::Digit:
+            populateCombinedGroupsForDigits();
+            break;
+        case FirePatternType::Solid:
+        default:
+            populateAllRows();
+            break;
+    }
+
+    // Initialize the row heat groups based on the row groupings
+    // and set all the initial heats to 0
+    m_combinedRowHeats.clear();
+    
+    for (std::vector<std::vector<int>> rowGroup : m_combinedRowGroups)
+    {
+        std::vector<int> rowHeatsForGroup;
+        for (std::vector<int> rows : rowGroup)
+        {
+            rowHeatsForGroup.push_back(0);
+        }
+
+        m_combinedRowHeats.push_back(rowHeatsForGroup);
+    }
+}
+
 void FireDisplayPattern::updateInternal()
 {
     for (int group = 0; group < m_combinedRowGroups.size(); group++)
@@ -67,6 +102,24 @@ void FireDisplayPattern::updateInternal()
             for (int pixel : m_combinedRowGroups[group][numRows - row - 1])
             {
                 m_pixelBuffer->setPixel(pixel, color);
+            }
+        }
+    }
+}
+
+void FireDisplayPattern::updateInternal(PixelMap* pixelMap)
+{
+    for (int group = 0; group < m_combinedRowGroups.size(); group++)
+    {
+        updateRowHeats(m_combinedRowHeats[group]);
+        int numRows = m_combinedRowHeats[group].size();
+        for (int row = 0; row < numRows; row++)
+        {
+            byte temperature = m_combinedRowHeats[group][row];
+            ulong color = m_heatColors[temperature];
+            for (int pixel : m_combinedRowGroups[group][numRows - row - 1])
+            {
+                pixelMap->setPixel(pixel, color);
             }
         }
     }

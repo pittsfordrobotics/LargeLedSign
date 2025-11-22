@@ -22,12 +22,13 @@ void NeoPixelDisplay::updateDisplay()
     if (m_displayPattern)
     {
         // TODO: implement DisplayPattern update method that works with PixelMap
-        //wasUpdated = m_displayPattern->update(m_pixelMap);
+        wasUpdated = m_displayPattern->update(m_pixelMap);
     }
 
     if (wasUpdated)
     {
         outputPixels();
+        Serial.println("Display updated");
     }
 }
 
@@ -36,7 +37,7 @@ void NeoPixelDisplay::resetDisplay()
     if (m_displayPattern)
     {
         // TODO: implement DisplayPattern reset method that works with PixelMap
-        //m_displayPattern->reset(m_pixelMap);
+        m_displayPattern->reset(m_pixelMap);
     }
     
     outputPixels();
@@ -44,6 +45,12 @@ void NeoPixelDisplay::resetDisplay()
 
 void NeoPixelDisplay::outputPixels()
 {
+    Serial.println("Outputting pixels to NeoPixel strip...");
+    Serial.print("Pixel count: ");
+    Serial.print(m_pixelMap->getPixelCount());
+    Serial.print(" Pixel 0: ");
+    Serial.println(m_pixelMap->getPixel(0), HEX);
+
     for (uint i = 0; i < m_pixelMap->getPixelCount(); i++)
     {
         m_neoPixels->setPixelColor(i, m_pixelMap->getPixel(i));

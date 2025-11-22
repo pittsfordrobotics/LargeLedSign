@@ -14,13 +14,16 @@ enum class CenterOutOrientation {
 
 class CenterOutDisplayPattern : public DisplayPattern {
     public:
+        CenterOutDisplayPattern();
         CenterOutDisplayPattern(CenterOutOrientation orientation, PixelBuffer* pixelBuffer);
 
         static std::vector<String> getParameterNames();
 
     protected:
         virtual void updateInternal();
+        virtual void updateInternal(PixelMap* pixelMap);
         virtual void resetInternal();
+        virtual void resetInternal(PixelMap* pixelMap);
 
     private:
         CenterOutOrientation m_orientation{CenterOutOrientation::Horizontal};

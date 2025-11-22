@@ -6,6 +6,7 @@
 class RotationDisplayPattern : public DisplayPattern
 {
     public:
+        RotationDisplayPattern();
         RotationDisplayPattern(boolean isClockwise, boolean isSpotLight, PixelBuffer *pixels);
 
         static std::vector<String> getParameterNames();
@@ -15,7 +16,9 @@ class RotationDisplayPattern : public DisplayPattern
 
     protected:
         virtual void resetInternal();
+        virtual void resetInternal(PixelMap* pixelMap);
         virtual void updateInternal();
+        virtual void updateInternal(PixelMap* pixelMap);
 
     private:
         boolean isAngleInRange(float angleToCheck, float startAngle, float endAngle);

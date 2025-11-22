@@ -18,6 +18,7 @@ enum class FirePatternType : byte
 class FireDisplayPattern : public DisplayPattern
 {
     public:
+        FireDisplayPattern();
         FireDisplayPattern(PixelBuffer* pixelBuffer, FirePatternType patternType);
         void setSparkingAmount(byte sparkingAmount);
         void setCoolingAmount(byte coolingAmount);
@@ -26,7 +27,9 @@ class FireDisplayPattern : public DisplayPattern
     
     protected:
         virtual void updateInternal();
+        virtual void updateInternal(PixelMap* pixelMap);
         virtual void resetInternal();
+        virtual void resetInternal(PixelMap* pixelMap);
 
     private:
         FirePatternType m_patternType{FirePatternType::Solid};

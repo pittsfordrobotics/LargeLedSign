@@ -130,6 +130,8 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
         return false;
     }
     config.m_numPixels = display["numberOfPixels"].as<uint16_t>();
+    Serial.print("Number of pixels: ");
+    Serial.println(config.m_numPixels);
 
     if (display["defaultBrightness"].is<JsonVariant>())
     {

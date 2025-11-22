@@ -17,6 +17,18 @@ void SimpleShiftDisplayPattern::resetInternal()
     }
 }
 
+void SimpleShiftDisplayPattern::resetInternal(PixelMap* pixelMap)
+{
+    m_colorPattern->reset();
+    m_colorPattern->incrementOnly(getInitialIncrementAmount());
+
+    int numberOfBlocks = getNumberOfBlocksForPattern();
+    for (int i = 0; i < numberOfBlocks; i++)
+    {
+        updateInternal(pixelMap);
+    }
+}
+
 void SimpleShiftDisplayPattern::updateInternal()
 {
     ulong newColor = m_colorPattern->getNextColor();
@@ -44,6 +56,36 @@ void SimpleShiftDisplayPattern::updateInternal()
         default:
             // Default to Solid (ie, all lights the same color)
             m_pixelBuffer->fill(newColor);
+    }
+}
+
+void SimpleShiftDisplayPattern::updateInternal(PixelMap* pixelMap)
+{
+    ulong newColor = m_colorPattern->getNextColor();
+
+    switch (m_shiftType)
+    {
+        case ShiftType::Right:
+            pixelMap->shiftColumnsRight(newColor);
+            return;
+        case ShiftType::Left:
+            pixelMap->shiftColumnsLeft(newColor);
+            return;
+        case ShiftType::Up:
+            pixelMap->shiftRowsUp(newColor);
+            return;
+        case ShiftType::Down:
+            pixelMap->shiftRowsDown(newColor);
+            return;
+        case ShiftType::Digit:
+            pixelMap->shiftDigitsRight(newColor);
+            return;
+        case ShiftType::Line:
+            pixelMap->shiftPixelsRight(newColor);
+            return;
+        default:
+            // Default to Solid (ie, all lights the same color)
+            pixelMap->fill(newColor);
     }
 }
 
