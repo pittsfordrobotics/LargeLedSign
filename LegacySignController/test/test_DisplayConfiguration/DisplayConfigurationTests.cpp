@@ -18,24 +18,28 @@ void emptyStringGivesNoConfigs() {
     const char* jsonString = "";
     std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
+    delete configs;
 }
 
 void emptyObjectGivesNoConfigs() {
     const char* jsonString = "{}";
     std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
+    delete configs;
 }
 
 void invalidJsonGivesNoConfigs() {
     const char* jsonString = "NotJson";
     std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
+    delete configs;
 }
 
 void emptyDisplayArrayGivesNoConfigs() {
     const char* jsonString = "{\"displays\":[]}";
     std::vector<DisplayConfiguration>* configs = DisplayConfiguration::ParseJson(jsonString, strlen(jsonString));
     TEST_ASSERT_EQUAL_MESSAGE(0, configs->size(), "Expected 0 display configurations");
+    delete configs;
 }
 
 void parseFullTestMatrixJson() {
@@ -72,6 +76,7 @@ void parseFullTestMatrixJson() {
 
     TEST_ASSERT_EQUAL_MESSAGE(1, config.getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(64, config.getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
+    delete configs;
 }
 
 void parseMinimalTestMatrixJson() {
@@ -108,6 +113,7 @@ void parseMinimalTestMatrixJson() {
 
     TEST_ASSERT_EQUAL_MESSAGE(1, config.getDigitPixelMapping().size(), "Digit pixel mapping size is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(64, config.getDigitPixelMapping().at(0)->size(), "Digit pixel mapping size is not correct.");
+    delete configs;
 }
 
 void disabledDisplaysAreSkipped() {
@@ -116,6 +122,7 @@ void disabledDisplaysAreSkipped() {
     TEST_ASSERT_EQUAL_MESSAGE(2, configs->size(), "Expected 2 display configurations");
     TEST_ASSERT_EQUAL_MESSAGE(16, configs->at(0).getGpioPin(), "First display GPIO pin is not correct.");
     TEST_ASSERT_EQUAL_MESSAGE(18, configs->at(1).getGpioPin(), "Second display GPIO pin is not correct.");
+    delete configs;
 }
 
 void defaultBrightnessIsSet() {
@@ -124,6 +131,7 @@ void defaultBrightnessIsSet() {
     TEST_ASSERT_EQUAL_MESSAGE(2, configs->size(), "Expected 2 display configuration");
     TEST_ASSERT_EQUAL_MESSAGE(DISPLAY_CONFIG_DEFAULTBRIGHTNESS, configs->at(0).getDefaultBrightness(), "Default brightness for the first display should be the global default value.");
     TEST_ASSERT_EQUAL_MESSAGE(99, configs->at(1).getDefaultBrightness(), "Default brightness for the second display should have been read from the config.");
+    delete configs;
 }
 
 int main(int argc, char **argv) {

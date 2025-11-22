@@ -58,7 +58,22 @@ DisplayConfiguration::DisplayConfiguration()
 
 DisplayConfiguration::DisplayConfiguration(const DisplayConfiguration& other)
 {
+    // Member variables are default-initialized to empty vectors, so copy() can safely be called
     copy(other);
+}
+
+DisplayConfiguration::~DisplayConfiguration()
+{
+    // Clean up dynamically allocated pixel mapping vectors
+    for (auto* vec : m_columnPixelMapping) {
+        delete vec;
+    }
+    for (auto* vec : m_rowPixelMapping) {
+        delete vec;
+    }
+    for (auto* vec : m_digitPixelMapping) {
+        delete vec;
+    }
 }
 
 DisplayConfiguration& DisplayConfiguration::operator=(const DisplayConfiguration& other)
@@ -84,9 +99,34 @@ void DisplayConfiguration::copy(const DisplayConfiguration& other)
     this->m_rowsBelow = other.m_rowsBelow;
     this->m_digitsToLeft = other.m_digitsToLeft;
     this->m_digitsToRight = other.m_digitsToRight;
-    this->m_digitPixelMapping = other.m_digitPixelMapping;
-    this->m_columnPixelMapping = other.m_columnPixelMapping;
-    this->m_rowPixelMapping = other.m_rowPixelMapping;
+    
+    // Deep copy pixel mappings (Code provided by Claude Sonnet 4.5)
+    for (auto* vec : m_columnPixelMapping) {
+        delete vec;
+    }
+
+    m_columnPixelMapping.clear();
+    for (auto* vec : other.m_columnPixelMapping) {
+        m_columnPixelMapping.push_back(new std::vector<uint16_t>(*vec));
+    }
+    
+    for (auto* vec : m_rowPixelMapping) {
+        delete vec;
+    }
+
+    m_rowPixelMapping.clear();
+    for (auto* vec : other.m_rowPixelMapping) {
+        m_rowPixelMapping.push_back(new std::vector<uint16_t>(*vec));
+    }
+    
+    for (auto* vec : m_digitPixelMapping) {
+        delete vec;
+    }
+    
+    m_digitPixelMapping.clear();
+    for (auto* vec : other.m_digitPixelMapping) {
+        m_digitPixelMapping.push_back(new std::vector<uint16_t>(*vec));
+    }
 }
 
 bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant display, byte defaultBrightness, DisplayConfiguration& config)
@@ -130,8 +170,6 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
         return false;
     }
     config.m_numPixels = display["numberOfPixels"].as<uint16_t>();
-    Serial.print("Number of pixels: ");
-    Serial.println(config.m_numPixels);
 
     if (display["defaultBrightness"].is<JsonVariant>())
     {

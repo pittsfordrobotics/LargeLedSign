@@ -12,6 +12,7 @@ class DisplayConfiguration
     public:
         static std::vector<DisplayConfiguration>* ParseJson(const char* jsonString, size_t length);
         DisplayConfiguration(const DisplayConfiguration& other);
+        ~DisplayConfiguration();
         
         byte getDefaultBrightness() { return m_defaultBrightness; }
         byte getGpioPin() const { return m_gpioPin; }
