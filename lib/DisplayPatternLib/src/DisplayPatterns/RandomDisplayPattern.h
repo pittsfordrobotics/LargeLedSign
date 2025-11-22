@@ -9,6 +9,7 @@
 class RandomDisplayPattern : public DisplayPattern
 {
     public:
+        RandomDisplayPattern();
         RandomDisplayPattern(PixelBuffer* pixelBuffer);
         void setUpdateAmount(byte updateAmount);
 
@@ -16,7 +17,9 @@ class RandomDisplayPattern : public DisplayPattern
     
     protected:
         virtual void updateInternal();
+        virtual void updateInternal(PixelMap* pixelMap);
         virtual void resetInternal();
+        virtual void resetInternal(PixelMap* pixelMap);
 
     private:
         double m_percentToFill{1.0};

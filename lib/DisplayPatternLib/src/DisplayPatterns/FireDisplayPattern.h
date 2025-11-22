@@ -18,6 +18,7 @@ enum class FirePatternType : byte
 class FireDisplayPattern : public DisplayPattern
 {
     public:
+        FireDisplayPattern();
         FireDisplayPattern(PixelBuffer* pixelBuffer, FirePatternType patternType);
         void setSparkingAmount(byte sparkingAmount);
         void setCoolingAmount(byte coolingAmount);
@@ -26,7 +27,9 @@ class FireDisplayPattern : public DisplayPattern
     
     protected:
         virtual void updateInternal();
+        virtual void updateInternal(PixelMap* pixelMap);
         virtual void resetInternal();
+        virtual void resetInternal(PixelMap* pixelMap);
 
     private:
         FirePatternType m_patternType{FirePatternType::Solid};
@@ -41,12 +44,14 @@ class FireDisplayPattern : public DisplayPattern
         // each of which contains the set of pixels in the row.
         std::vector<std::vector<std::vector<int>>> m_combinedRowGroups;
 
-        void setRowHeatColor(int row, byte heat);
         void updateRowHeats(std::vector<int> &rowHeats);
         void generatePallet();
         void populateAllRows();
+        void populateAllRows(PixelMap* pixelMap);
         void populateCombinedGroupsForDigits();
+        void populateCombinedGroupsForDigits(PixelMap* pixelMap);
         void populateCombinedGroupsForIndividualColumns();
+        void populateCombinedGroupsForIndividualColumns(PixelMap* pixelMap);
 };
 
 #endif

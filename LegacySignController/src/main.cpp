@@ -3,7 +3,7 @@
 // Global variables
 CommonPeripheral btService;
 StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
-PixelBuffer* pixelBuffer;
+NeoPixelDisplay* neoPixelDisplay;
 DisplayPattern* currentLightStyle;
 ButtonProcessor buttonProcessor;
 
@@ -32,7 +32,7 @@ volatile bool isInitialized = false;
 void setup()
 {
     Serial.begin(9600);
-    delay(500);
+    delay(2000);
     Serial.println("Starting...");
 
     initializeIO();
@@ -47,8 +47,28 @@ void setup()
 
     display.setDisplay("---1");
     display.setDisplay("---2");
-    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
-    pixelBuffer->setBrightness(currentBrightness);
+
+    //
+    // Read from config!!!
+    //
+    std::vector<DisplayConfiguration>* displayConfigs;
+    if (signType == 0)
+    {
+        displayConfigs = DisplayConfigFactory::createForTestMatrix();
+    }
+    else
+    {
+        displayConfigs = DisplayConfigFactory::createForLegacySign();
+    }
+
+    neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
+    neoPixelDisplay->setBrightness(currentBrightness);
+    newPatternData = defaultStyle.getPatternData();
+    currentPatternData = newPatternData;
+    DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData, nullptr);
+    initialPattern->setSpeed(defaultStyle.getSpeed());
+    neoPixelDisplay->setDisplayPattern(initialPattern);
+
     display.setDisplay("---3");
 
     if (!BLE.begin())
@@ -232,7 +252,8 @@ void checkForLowPowerState()
             Serial.print(", threshold: ");
             Serial.println(NORMALPOWERTHRESHOLD);
             Serial.println("Exiting low power mode.");
-            pixelBuffer->setBrightness(currentBrightness);
+            //pixelBuffer->setBrightness(currentBrightness);
+            neoPixelDisplay->setBrightness(currentBrightness);
             inLowPowerMode = false;
         }
     }
@@ -293,7 +314,8 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        pixelBuffer->setBrightness(newBrightness);
+        //pixelBuffer->setBrightness(newBrightness);
+        neoPixelDisplay->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
 
@@ -309,25 +331,21 @@ void updateLEDs()
 
     if (currentPatternData != newPatternData)
     {
-        if (currentLightStyle)
+        DisplayPattern* oldPattern = neoPixelDisplay->getDisplayPattern();;
+        DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData, nullptr);
+        newPattern->setSpeed(newSpeed);
+        neoPixelDisplay->setDisplayPattern(newPattern);
+        if (oldPattern)
         {
-            delete currentLightStyle;
+            delete oldPattern;
         }
 
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
-        currentLightStyle->setSpeed(newSpeed);
-        currentLightStyle->reset();
+        neoPixelDisplay->resetDisplay();
 
         currentPatternData = newPatternData;
     }
 
-    // The current style shouldn't ever be null here, but check anyways.
-    if (currentLightStyle)
-    {
-        currentLightStyle->update();
-    }
-
-    pixelBuffer->displayPixels();    
+    neoPixelDisplay->updateDisplay();
 }
 
 void ProcessButtonAction(int callerId, String actionName, std::vector<String> arguments)

@@ -9,6 +9,8 @@
 #include <PixelBufferLib.h>
 #include "ArduinoPushButton/ArduinoPushButton.h"
 #include "ButtonProcessor/ButtonProcessor.h"
+#include <Configuration.h>
+#include "NeoPixelDisplay.h"
 
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
 #define VOLTAGEINPUTPIN 29     // GPIO pin # for the analog input to detect battery voltage level.
