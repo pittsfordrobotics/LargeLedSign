@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include "DisplayPattern.h"
-#include "PixelBuffer.h"
 #include <MathUtils.h>
 #include <vector>
 
@@ -18,17 +17,14 @@ enum class FirePatternType : byte
 class FireDisplayPattern : public DisplayPattern
 {
     public:
-        FireDisplayPattern();
-        FireDisplayPattern(PixelBuffer* pixelBuffer, FirePatternType patternType);
+        FireDisplayPattern(FirePatternType patternType);
         void setSparkingAmount(byte sparkingAmount);
         void setCoolingAmount(byte coolingAmount);
 
         static std::vector<String> getParameterNames();
     
     protected:
-        virtual void updateInternal();
         virtual void updateInternal(PixelMap* pixelMap);
-        virtual void resetInternal();
         virtual void resetInternal(PixelMap* pixelMap);
 
     private:
@@ -46,11 +42,8 @@ class FireDisplayPattern : public DisplayPattern
 
         void updateRowHeats(std::vector<int> &rowHeats);
         void generatePallet();
-        void populateAllRows();
         void populateAllRows(PixelMap* pixelMap);
-        void populateCombinedGroupsForDigits();
         void populateCombinedGroupsForDigits(PixelMap* pixelMap);
-        void populateCombinedGroupsForIndividualColumns();
         void populateCombinedGroupsForIndividualColumns(PixelMap* pixelMap);
 };
 

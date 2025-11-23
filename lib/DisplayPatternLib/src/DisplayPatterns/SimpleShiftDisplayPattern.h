@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include "DisplayPattern.h"
-#include "PixelBuffer.h"
 
 enum class ShiftType {
     Right,
@@ -16,21 +15,17 @@ enum class ShiftType {
 
 class SimpleShiftDisplayPattern : public DisplayPattern{
     public:
-        SimpleShiftDisplayPattern();
-        SimpleShiftDisplayPattern(ShiftType shiftType, PixelBuffer* pixelBuffer);
+        SimpleShiftDisplayPattern(ShiftType shiftType);
 
         static std::vector<String> getParameterNames();
 
     protected:
-        virtual void updateInternal();
         virtual void updateInternal(PixelMap* pixelMap);
-        virtual void resetInternal();
         virtual void resetInternal(PixelMap* pixelMap);
 
     private:
-        int getNumberOfBlocksForPattern();
         int getNumberOfBlocksForPattern(PixelMap* pixelMap);
-        int getInitialIncrementAmount();
+        int getInitialIncrementAmount(PixelMap* pixelMap);
         ShiftType m_shiftType{ShiftType::Right};
 };
 

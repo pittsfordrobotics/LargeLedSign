@@ -1,6 +1,6 @@
 #include "PatternFactory.h"
 
-DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternData, PixelBuffer* pixelBuffer)
+DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternData)
 {
     std::vector<byte> params;
     params.push_back(patternData.param1);
@@ -19,56 +19,56 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
     {
         case DisplayPatternType::LowPower:
         {
-            LowPowerDisplayPattern* pattern = new LowPowerDisplayPattern(pixelBuffer);
+            LowPowerDisplayPattern* pattern = new LowPowerDisplayPattern();
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::Up:
         {
-            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Up, pixelBuffer);
+            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Up);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::Down:
         {
-            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Down, pixelBuffer);
+            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Down);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::Right:
         {
-            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Right, pixelBuffer);
+            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Right);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::Left:
         {
-            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Left, pixelBuffer);
+            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Left);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::Digit:
         {
-            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Digit, pixelBuffer);
+            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Digit);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::Line:
         {
-            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Line, pixelBuffer);
+            SimpleShiftDisplayPattern* pattern = new SimpleShiftDisplayPattern(ShiftType::Line);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::Random:
         {
-            RandomDisplayPattern* pattern = new RandomDisplayPattern(pixelBuffer);
+            RandomDisplayPattern* pattern = new RandomDisplayPattern();
             pattern->setColorPattern(colorPattern);
             pattern->setUpdateAmount(params[startOfDisplayParameters]);
             displayPattern = pattern;
@@ -76,21 +76,21 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::CenterOutVertical:
         {
-            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Vertical, pixelBuffer);
+            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Vertical);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::CenterOutHorizontal:
         {
-            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Horizontal, pixelBuffer);
+            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Horizontal);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;
         }
         case DisplayPatternType::Fire3:
         {
-            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, FirePatternType::Solid);
+            FireDisplayPattern* pattern = new FireDisplayPattern(FirePatternType::Solid);
             pattern->setColorPattern(colorPattern);
             pattern->setSparkingAmount(params[startOfDisplayParameters]);
             pattern->setCoolingAmount(params[startOfDisplayParameters + 1]);
@@ -99,7 +99,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::Fire2:
         {
-            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, FirePatternType::Digit);
+            FireDisplayPattern* pattern = new FireDisplayPattern(FirePatternType::Digit);
             pattern->setColorPattern(colorPattern);
             pattern->setSparkingAmount(params[startOfDisplayParameters]);
             pattern->setCoolingAmount(params[startOfDisplayParameters + 1]);
@@ -108,7 +108,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::Fire:
         {
-            FireDisplayPattern* pattern = new FireDisplayPattern(pixelBuffer, FirePatternType::IndividualRows);
+            FireDisplayPattern* pattern = new FireDisplayPattern(FirePatternType::IndividualRows);
             pattern->setColorPattern(colorPattern);
             pattern->setSparkingAmount(params[startOfDisplayParameters]);
             pattern->setCoolingAmount(params[startOfDisplayParameters + 1]);
@@ -117,7 +117,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::Rotation:
         {
-            RotationDisplayPattern* pattern = new RotationDisplayPattern(true, false, pixelBuffer);
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(true, false);
             pattern->setColorPattern(colorPattern);
             pattern->setNumberOfRays(params[startOfDisplayParameters]);
             pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
@@ -126,7 +126,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::RotationCCW:
         {
-            RotationDisplayPattern* pattern = new RotationDisplayPattern(false, false, pixelBuffer);
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(false, false);
             pattern->setColorPattern(colorPattern);
             pattern->setNumberOfRays(params[startOfDisplayParameters]);
             pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
@@ -135,7 +135,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::SpotLight:
         {
-            RotationDisplayPattern* pattern = new RotationDisplayPattern(true, true, pixelBuffer);
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(true, true);
             pattern->setColorPattern(colorPattern);
             pattern->setNumberOfRays(params[startOfDisplayParameters]);
             pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
@@ -144,7 +144,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::SpotLightCCW:
         {
-            RotationDisplayPattern* pattern = new RotationDisplayPattern(false, true, pixelBuffer);
+            RotationDisplayPattern* pattern = new RotationDisplayPattern(false, true);
             pattern->setColorPattern(colorPattern);
             pattern->setNumberOfRays(params[startOfDisplayParameters]);
             pattern->setAngleIncrementDeg(params[startOfDisplayParameters + 1]);
@@ -153,7 +153,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         default:
         {
-            SolidDisplayPattern* pattern = new SolidDisplayPattern(pixelBuffer);
+            SolidDisplayPattern* pattern = new SolidDisplayPattern();
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;

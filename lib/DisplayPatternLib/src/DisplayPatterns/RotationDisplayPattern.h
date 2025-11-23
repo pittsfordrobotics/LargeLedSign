@@ -6,8 +6,7 @@
 class RotationDisplayPattern : public DisplayPattern
 {
     public:
-        RotationDisplayPattern();
-        RotationDisplayPattern(boolean isClockwise, boolean isSpotLight, PixelBuffer *pixels);
+        RotationDisplayPattern(boolean isClockwise, boolean isSpotLight);
 
         static std::vector<String> getParameterNames();
 
@@ -15,9 +14,7 @@ class RotationDisplayPattern : public DisplayPattern
         void setAngleIncrementDeg(byte unscaledValue);
 
     protected:
-        virtual void resetInternal();
         virtual void resetInternal(PixelMap* pixelMap);
-        virtual void updateInternal();
         virtual void updateInternal(PixelMap* pixelMap);
 
     private:

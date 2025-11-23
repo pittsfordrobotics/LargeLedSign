@@ -94,11 +94,11 @@ void setup()
     newPatternData.colorPattern = ColorPatternType::SingleColor;
     newPatternData.displayPattern = DisplayPatternType::Solid;
     newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
-    currentLightStyle = PatternFactory::createForPatternData(newPatternData, nullptr);
+    currentLightStyle = PatternFactory::createForPatternData(newPatternData);
     if (signType == PITSIGN_TYPE_ID) 
     {
         newPatternData.color1 = Adafruit_NeoPixel::Color(255,0,0);
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, nullptr);
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData);
     }
     btService.setPatternData(newPatternData);
     neoPixelDisplay->setDisplayPattern(currentLightStyle);
@@ -291,7 +291,7 @@ void updateLEDs()
     if (shouldResetStyle)
     {
         DisplayPattern* oldPattern = neoPixelDisplay->getDisplayPattern();
-        DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData, nullptr);
+        DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
         newPattern->setSpeed(newSpeed);
         neoPixelDisplay->setDisplayPattern(newPattern);
         if (oldPattern)

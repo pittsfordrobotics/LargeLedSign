@@ -65,7 +65,7 @@ void setup()
     neoPixelDisplay->setBrightness(currentBrightness);
     newPatternData = defaultStyle.getPatternData();
     currentPatternData = newPatternData;
-    DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData, nullptr);
+    DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
     initialPattern->setSpeed(defaultStyle.getSpeed());
     neoPixelDisplay->setDisplayPattern(initialPattern);
 
@@ -252,7 +252,6 @@ void checkForLowPowerState()
             Serial.print(", threshold: ");
             Serial.println(NORMALPOWERTHRESHOLD);
             Serial.println("Exiting low power mode.");
-            //pixelBuffer->setBrightness(currentBrightness);
             neoPixelDisplay->setBrightness(currentBrightness);
             inLowPowerMode = false;
         }
@@ -314,7 +313,6 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        //pixelBuffer->setBrightness(newBrightness);
         neoPixelDisplay->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
@@ -332,7 +330,7 @@ void updateLEDs()
     if (currentPatternData != newPatternData)
     {
         DisplayPattern* oldPattern = neoPixelDisplay->getDisplayPattern();;
-        DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData, nullptr);
+        DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
         newPattern->setSpeed(newSpeed);
         neoPixelDisplay->setDisplayPattern(newPattern);
         if (oldPattern)

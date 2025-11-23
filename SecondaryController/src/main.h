@@ -5,7 +5,6 @@
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoBLE.h>
 #include <vector>
-#include <PixelBufferLib.h>
 #include <BluetoothCommon.h>
 #include "Bluetooth\SecondaryPeripheral.h"
 #include <SignDataLib.h>

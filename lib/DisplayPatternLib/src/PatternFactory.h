@@ -16,7 +16,6 @@
 #include "ColorPatterns\SingleColorPattern.h"
 #include "ColorPatterns\TwoColorPattern.h"
 #include "ColorPatterns\BackgroundPlusThree.h"
-#include <PixelBuffer.h>
 #include "PatternData.h"
 #include <vector>
 
@@ -24,7 +23,7 @@ class PatternFactory
 {
     public:
         // Creates a DisplayPattern based on the given PatternData.
-        static DisplayPattern* createForPatternData(const PatternData& patternData, PixelBuffer* pixelBuffer);
+        static DisplayPattern* createForPatternData(const PatternData& patternData);
 
         // Retrieves a string version of all known color patterns.
         // This is in the format <PatternName>,<PatternNumber>,<#Colors>,<param1>,...,<paramN>;<PatternName>,<PatternNumber>,<#Colors>,<param1>,...,<paramN>;...

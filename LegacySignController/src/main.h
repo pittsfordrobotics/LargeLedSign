@@ -6,7 +6,6 @@
 #include <DisplayPatternLib.h>
 #include <StatusDisplay.h>
 #include <PredefinedStyleLib.h>
-#include <PixelBufferLib.h>
 #include "ArduinoPushButton/ArduinoPushButton.h"
 #include "ButtonProcessor/ButtonProcessor.h"
 #include <Configuration.h>
