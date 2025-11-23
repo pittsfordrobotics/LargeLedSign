@@ -95,166 +95,137 @@ int main(int argc, char **argv) {
     return UNITY_END();
 }
 
+const char* minimalConfigurationJson() {
+    return R"json(
+        {
+            "displayConfigurationFile": "display.json",
+            "bluetoothConfigurationFile": "bt.json",
+            "styleConfigurationFile": "styles.json"
+        }
+    )json";
+}
+
 const char* oneButtonWithActions() {
-    return "{"
-    "    \"buttons\": {"
-    "        \"definitions\": ["
-    "            {"
-    "                \"id\": \"1\","
-    "                \"enabled\": true,"
-    "                \"gpioPin\": 10"
-    "            },"
-    "            {"
-    "                \"id\": \"2\","
-    "                \"enabled\": true,"
-    "                \"gpioPin\": 13"
-    "            },"
-    "            {"
-    "                \"id\": \"power\","
-    "                \"enabled\": true,"
-    "                \"gpioPin\": 11"
-    "            }"
-    "        ],"
-    "        \"actions\": ["
-    "            {"
-    "                \"buttonIds\": [\"1\"],"
-    "                \"tapAction\": \"changeStyle\","
-    "                \"longTapAction\": \"batteryVoltage\","
-    "                \"tapActionArguments\": [\"Pink\", \"RainbowLava\"],"
-    "                \"longTapActionArguments\": []"
-    "            },"
-    "            {"
-    "                \"buttonId\": [\"2\"],"
-    "                \"tapAction\": \"changeStyle\","
-    "                \"tapActionArguments\": [\"Red\", \"Blue\"]"
-    "            },"
-    "            {"
-    "                \"buttonId\": [\"power\"],"
-    "                \"tapAction\": \"powerCycle\""
-    "            },"
-    "            {"
-    "                \"enabled\": true,"
-    "                \"buttonIds\": [\"1\", \"2\"]"
-    "                \"tapAction\": \"\","
-    "                \"longTapAction\": \"\""
-    "            }"
-    "        ]"
-    "    }"
-    "}";
+    return R"json(
+        {
+            "displayConfigurationFile": "display.json",
+            "bluetoothConfigurationFile": "bt.json",
+            "styleConfigurationFile": "styles.json"
+            "buttons": {
+                "definitions": [
+                    {
+                        "id": "1",
+                        "enabled": true,
+                        "gpioPin": 10
+                    },
+                    {
+                        "id": "2",
+                        "enabled": true,
+                        "gpioPin": 13
+                    },
+                    {
+                        "id": "power",
+                        "enabled": true,
+                        "gpioPin": 11
+                    }
+                ],
+                "actions": [
+                    {
+                        "buttonIds": ["1"],
+                        "tapAction": "changeStyle",
+                        "longTapAction": "batteryVoltage",
+                        "tapActionArguments": ["Pink", "RainbowLava"],
+                        "longTapActionArguments": []
+                    },
+                    {
+                        "buttonId": ["2"],
+                        "tapAction": "changeStyle",
+                        "tapActionArguments": ["Red", "Blue"]
+                    },
+                    {
+                        "buttonId": ["power"],
+                        "tapAction": "powerCycle"
+                    },
+                    {
+                        "enabled": true,
+                        "buttonIds": ["1", "2"]
+                        "tapAction": "",
+                        "longTapAction": ""
+                    }
+                ]
+            }
+        }
+    )json";
 }
 
-const char* largeTest() {
-    return "{"
-    "    \"buttons\": {"
-    "        \"definitions\": ["
-    "            {"
-    "                \"id\": \"1\","
-    "                \"enabled\": true,"
-    "                \"gpioPin\": 10"
-    "            },"
-    "            {"
-    "                \"id\": \"2\","
-    "                \"enabled\": true,"
-    "                \"gpioPin\": 13"
-    "            },"
-    "            {"
-    "                \"id\": \"power\","
-    "                \"enabled\": true,"
-    "                \"gpioPin\": 11"
-    "            }"
-    "        ],"
-    "        \"actions\": ["
-    "            {"
-    "                \"buttonIds\": [\"1\"],"
-    "                \"tapAction\": \"changeStyle\","
-    "                \"longTapAction\": \"batteryVoltage\","
-    "                \"tapActionArguments\": [\"Pink\", \"RainbowLava\"],"
-    "                \"longTapActionArguments\": []"
-    "            },"
-    "            {"
-    "                \"buttonId\": [\"2\"],"
-    "                \"tapAction\": \"changeStyle\","
-    "                \"tapActionArguments\": [\"Red\", \"Blue\"]"
-    "            },"
-    "            {"
-    "                \"buttonId\": [\"power\"],"
-    "                \"tapAction\": \"powerCycle\""
-    "            },"
-    "            {"
-    "                \"enabled\": true,"
-    "                \"buttonIds\": [\"1\", \"2\"]"
-    "                \"tapAction\": \"\","
-    "                \"longTapAction\": \"\""
-    "            }"
-    "        ]"
-    "    }"
-    "}";
-}
-
-
-/*
+const char* fullLegacySignConfigurationJson()
 {
-    "buttons": {
-        "definitions": [
-            {
-                "id": "1",
-                "enabled": true,
-                "gpioPin": 10
+    return R"json(
+        {
+            "comment": "Legacy sign",
+            "displayConfigurationFile": "displayconfiguration.json",
+            "bluetoothConfigurationFile": "bluetoothconfiguration.json",
+            "styleConfigurationFile": "styleconfigurations.json"
+            "buttons": {
+                "definitions": [
+                    {
+                        "id": "1",
+                        "enabled": true,
+                        "gpioPin": 27
+                    },
+                    {
+                        "id": "2",
+                        "enabled": true,
+                        "gpioPin": 28
+                    },
+                    {
+                        "id": "3",
+                        "enabled": true,
+                        "gpioPin": 26
+                    }
+                ],
+                "actions": [
+                    {
+                        "buttonIds": ["1"],
+                        "tapAction": "changeStyle",
+                        "tapActionArguments": ["Pink", "RainbowRandom"],
+                        "longTapAction": "changeStyle",
+                        "longTapActionArguments": ["Fire"]
+                    },
+                    {
+                        "buttonId": ["2"],
+                        "tapAction": "changeStyle",
+                        "tapActionArguments": ["BluePinkRandom", "BluePinkDigit"]
+                        "longTapAction": "batteryVoltage",
+                        "longTapActionArguments": []
+                    },
+                    {
+                        "buttonId": ["3"],
+                        "tapAction": "changeStyle",
+                        "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"]
+                        "longTapAction": "disconnectBT",
+                        "longTapActionArguments": []
+                    }
+                ]
             },
-            {
-                "id": "2",
+            "batteryMonitor": {
                 "enabled": true,
-                "gpioPin": 13
+                "analogInputGpioPin": 29,
+                "inputMultiplier": 4.83,
+                "voltageToEnterLowPowerState": 6.7,
+                "voltageToExitLowPowerState": 7.2
             },
-            {
-                "id": "power",
+            "powerLed": {
+                "enabled": false,
+                "gpioPin": 22
+            },
+            "clockMultiplier": 1.0,
+            "tm1637Display": {
                 "enabled": true,
-                "gpioPin": 11
+                "clockGpioPin": 15,
+                "dataGpioPin": 16,
+                "brightness": 5
             }
-        ],
-        "actions": [
-            {
-                "buttonIds": ["1"],
-                "tapAction": "changeStyle",
-                "longTapAction": "batteryVoltage",
-                "tapActionArguments": ["Pink", "RainbowLava"],
-                "longTapActionArguments": []
-            },
-            {
-                "buttonId": ["2"],
-                "tapAction": "changeStyle",
-                "tapActionArguments": ["Red", "Blue"]
-            },
-            {
-                "buttonId": ["power"],
-                "tapAction": "powerCycle"
-            },
-            {
-                "enabled": true,
-                "buttonIds": ["1", "2"]
-                "tapAction": "",
-                "longTapAction": ""
-            }
-        ]
-    },
-    "batteryMonitor": {
-        "enabled": true,
-        "analogInputPin": "1",   // gpio or analog number?
-        "inputMultiplier": "3.14",
-        "voltageToEnterLowPowerState": 6.2,
-        "voltageToExitLowPowerState": 8.1
-    },
-    "powerLed": {
-        "enabled": true,
-        "gpioPin": 22
-    },
-    "clockMultiplier": 1.0,
-    "tm1637Display": {
-        "enabled": true,
-        "clockGpioPin": 15,
-        "dataGpioPin": 16
-    }
+        }
+    )json";
 }
-
-*/
-

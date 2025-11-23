@@ -8,6 +8,8 @@
 #include "..\ButtonProcessor\ButtonProcessor.h"
 #include "..\DebugUtils\DebugUtils.h"
 
+// Typedef for "ButtonFactory".
+// It takes a GPIO pin number and returns a pointer to a GenericButton implementation.
 typedef GenericButton* (*ButtonFactory)(int gpioPin);
 
 class SystemConfiguration {
@@ -19,9 +21,22 @@ class SystemConfiguration {
             ButtonFactory buttonFactory);
 
         ButtonProcessor& getButtonProcessor() { return m_buttonProcessor; }
+        String getDisplayConfigurationFile() { return m_displayConfigurationFile; }
+        String getBluetoothConfigurationFile() { return m_bluetoothConfigurationFile; }
+        String getStyleConfigurationFile() { return m_styleConfigurationFile; }
+        float getClockMultiplier() { return m_clockMultiplier; }
+
+        // Additional configs to add:
+        // BatteryMonitorConfiguration
+        // PowerLedConfiguration
+        // Tm1637Configuration
 
     private:
         ButtonProcessor m_buttonProcessor;
+        String m_displayConfigurationFile{""};
+        String m_bluetoothConfigurationFile{""};
+        String m_styleConfigurationFile{""};
+        float m_clockMultiplier{1.0f};
 
         SystemConfiguration() {};
         void configureButtonProcessor(JsonVariant buttonConfigs, ButtonFactory buttonFactory);
