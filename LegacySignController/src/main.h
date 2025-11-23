@@ -10,7 +10,6 @@
 #include <Configuration.h>
 #include "NeoPixelDisplay.h"
 
-#define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
 #define VOLTAGEINPUTPIN 29     // GPIO pin # for the analog input to detect battery voltage level.
 
 #define TM1637_CLOCK 7    // GPIO pin # for the TM1637 clock line
