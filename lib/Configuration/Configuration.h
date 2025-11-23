@@ -4,5 +4,6 @@
 #include "DisplayConfiguration.h"
 #include "DisplayConfigFactory.h"
 #include "StyleConfiguration.h"
+#include "StyleConfigFactory.h"
 
 #endif // CONFIGURATION_H
