@@ -32,11 +32,13 @@ int loopCounter = 0;              // Records the number of times the main loop r
 ulong lastTelemetryTimestamp = 0; // The last time debug information was emitted.
 ulong lastBtTimestampUpdate = 0;  // The last time the 'timestamp' BT characteristic was updated.
 byte inLowPowerMode = false;      // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
-
+ulong lastLedTelemetryTimestamp = 0; // The last time LED timing information was emitted.
+int ledLoopCounter = 0;              // Records the number of times the LED update loop ran since the last timing calculation.
 bool isOff = false;
 
-// Main entry point for the program --
-// This is run once at startup.
+// Used to signal the second core that the system is initialized.
+volatile bool isInitialized = false;
+
 void setup()
 {
     // Delay for debugging
@@ -52,18 +54,20 @@ void setup()
     signType = getSignType();
     signPosition = getSignPosition();
 
-    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
-
+    
     byte defaultBrightness = DEFAULT_BRIGHTNESS;
     if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
     {
+        // The "local debug" pin is low, so assume we're testing using the test matrix.
         defaultBrightness = DEFAULT_BRIGHTNESS_LOW;
+        signType = 0;
     }
     if (signType == PITSIGN_TYPE_ID) 
     {
         defaultBrightness = 255;
     }
-
+    
+    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
     pixelBuffer->setBrightness(defaultBrightness);
     currentBrightness = defaultBrightness;
     newBrightness = defaultBrightness;
@@ -81,10 +85,10 @@ void setup()
         currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
     }
     btService.setPatternData(newPatternData);
+
+    isInitialized = true;
 }
 
-// Main loop --
-// This method is called continously.
 void loop()
 {
     readInputButton();
@@ -97,7 +101,7 @@ void loop()
     }
 
     BLE.poll();
-    emitTelemetry();
+    updateTelemetry();
     checkForLowPowerState();
 
     if (signType == PITSIGN_TYPE_ID && inLowPowerMode)
@@ -115,9 +119,20 @@ void loop()
         // See if any settings have been changed via BLE and apply them if necessary.
         readBleSettings();
     }
+}
 
-    // Apply any updates that were received via BLE or manually
+// Setup for the second core
+void setup1()
+{
+    while(!isInitialized) {}
+}
+
+// Main loop for the second core
+void loop1()
+{
+    // Check for threading issues!!!
     updateLEDs();
+    updateLedTelemetry();
 }
 
 // Initialize all input/output pins
@@ -370,7 +385,7 @@ int getVoltageInputLevel()
 }
 
 // Calculate loop timing information and emit the current battery voltage level.
-void emitTelemetry()
+void updateTelemetry()
 {
     loopCounter++;
     ulong timestamp = millis();
@@ -407,6 +422,26 @@ void emitTelemetry()
 
         Serial.print("Bluetooth connected: ");
         Serial.println(btService.isConnected());
+    }
+}
+
+void updateLedTelemetry()
+{
+    ledLoopCounter++;
+    unsigned long timestamp = millis();
+
+    if (timestamp > lastLedTelemetryTimestamp + TELEMETRYINTERVAL)
+    {
+        // Calculate loop timing data
+        unsigned long diff = timestamp - lastLedTelemetryTimestamp;
+        double timePerIteration = (double)diff / ledLoopCounter;
+        Serial.print(ledLoopCounter);
+        Serial.print(" LED iterations done in ");
+        Serial.print(diff);
+        Serial.print(" msec; avg msec per iteration: ");
+        Serial.println(timePerIteration);
+        lastLedTelemetryTimestamp = timestamp;
+        ledLoopCounter = 0;
     }
 }
 
