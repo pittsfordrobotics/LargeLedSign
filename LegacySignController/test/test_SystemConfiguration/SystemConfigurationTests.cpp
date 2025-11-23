@@ -71,6 +71,14 @@ void emptyJsonDoesNothing() {
     TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
     std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("displayconfiguration.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected default value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("bluetoothconfiguration.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected default value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("styleconfiguration.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected default value.");
+    TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
+    // Additional checks when other configs are in place:
+    // BatteryMonitorConfiguration is disabled
+    // PowerLedConfiguration is disabled
+    // Tm1637Configuration is disabled
 }
 
 void emptyJsonObjectDoesNothing() {
@@ -84,6 +92,14 @@ void emptyJsonObjectDoesNothing() {
     TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
     std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("displayconfiguration.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected default value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("bluetoothconfiguration.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected default value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("styleconfiguration.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected default value.");
+    TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
+    // Additional checks when other configs are in place:
+    // BatteryMonitorConfiguration is disabled
+    // PowerLedConfiguration is disabled
+    // Tm1637Configuration is disabled
 }
 
 int main(int argc, char **argv) {

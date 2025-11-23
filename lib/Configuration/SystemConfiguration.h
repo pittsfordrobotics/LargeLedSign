@@ -33,9 +33,9 @@ class SystemConfiguration {
 
     private:
         ButtonProcessor m_buttonProcessor;
-        String m_displayConfigurationFile{""};
-        String m_bluetoothConfigurationFile{""};
-        String m_styleConfigurationFile{""};
+        String m_displayConfigurationFile{"displayconfiguration.json"};
+        String m_bluetoothConfigurationFile{"bluetoothconfiguration.json"};
+        String m_styleConfigurationFile{"styleconfiguration.json"};
         float m_clockMultiplier{1.0f};
 
         SystemConfiguration() {};
