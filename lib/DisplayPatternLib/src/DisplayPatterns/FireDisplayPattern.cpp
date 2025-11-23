@@ -210,7 +210,6 @@ void FireDisplayPattern::generatePallet()
             hue = (temperature - 128) / 255.0 * 8200;
         }
     
-        //m_heatColors[temperature] = NeoPixelUtils::ColorHSV(hue, saturation, value);
-        m_heatColors[temperature] = Adafruit_NeoPixel::ColorHSV(hue, saturation, value);
+        m_heatColors[temperature] = NeoPixelUtils::ColorHSV(hue, saturation, value);
     }
 }
