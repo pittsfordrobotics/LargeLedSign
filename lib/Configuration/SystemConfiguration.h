@@ -17,7 +17,6 @@ class SystemConfiguration {
         static SystemConfiguration* ParseJson(
             const char* jsonString, 
             size_t length,
-            ButtonActionProcessor actionProcessor,
             ButtonFactory buttonFactory);
 
         ~SystemConfiguration();

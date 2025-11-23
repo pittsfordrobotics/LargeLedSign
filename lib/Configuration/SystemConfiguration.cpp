@@ -5,7 +5,6 @@
 SystemConfiguration* SystemConfiguration::ParseJson(
     const char* jsonString, 
     size_t length, 
-    ButtonActionProcessor actionProcessor,
     ButtonFactory buttonFactory) 
 {
     SystemConfiguration* config = new SystemConfiguration();
@@ -15,27 +14,44 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     
     if (err == DeserializationError::EmptyInput)
     {
-        DebugUtils::println("Display configuration JSON string was empty.");
+        DebugUtils::println("System configuration JSON string was empty.");
         return config;
     }
 
     if (err != DeserializationError::Ok)
     {
-        DebugUtils::print("Error parsing display configuration JSON: ");
+        DebugUtils::print("Error parsing system configuration JSON: ");
         DebugUtils::println(err.c_str());
         return config;
     }
 
     if (configDoc.isNull())
     {
-        DebugUtils::println("Display configuration JSON was null after parsing.");
+        DebugUtils::println("System configuration JSON was null after parsing.");
         return config;
+    }
+
+    if (configDoc["displayConfigurationFile"].is<JsonVariant>())
+    {
+        std::string displayConfigFile = configDoc["displayConfigurationFile"].as<std::string>();
+        config->m_displayConfigurationFile = String(displayConfigFile.c_str());
+    }
+
+    if (configDoc["bluetoothConfigurationFile"].is<JsonVariant>())
+    {
+        std::string bluetoothConfigFile = configDoc["bluetoothConfigurationFile"].as<std::string>();
+        config->m_bluetoothConfigurationFile = String(bluetoothConfigFile.c_str());
+    }
+
+    if (configDoc["styleConfigurationFile"].is<JsonVariant>())
+    {
+        std::string styleConfigFile = configDoc["styleConfigurationFile"].as<std::string>();
+        config->m_styleConfigurationFile = String(styleConfigFile.c_str());
     }
 
     JsonVariant buttonConfigs = configDoc["buttons"].as<JsonVariant>();
     if (buttonFactory != nullptr && !buttonConfigs.isNull())
     {
-        config->m_buttonProcessor.setActionProcessor(actionProcessor);
         config->configureButtonProcessor(buttonConfigs, buttonFactory);
     }
 

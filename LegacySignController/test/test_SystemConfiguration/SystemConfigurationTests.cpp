@@ -15,13 +15,15 @@ std::vector<String> lastArguments;
 MockButton* button1;
 MockButton* button2;
 
+const char* minimalConfigurationJson();
+const char* oneButtonWithActions();
+const char* fullLegacySignConfigurationJson();
+
 void resetActionParameters() {
     lastCallerId = -1;
     lastActionName = "";
     lastArguments.clear();
 }
-
-
 
 // Run before each test
 void setUp(void) {
@@ -65,7 +67,6 @@ void emptyJsonDoesNothing() {
     SystemConfiguration* sc = SystemConfiguration::ParseJson(
         json.c_str(), 
         json.length(), 
-        processAction, 
         mockButtonFactory);
     
     TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
@@ -87,7 +88,6 @@ void emptyJsonObjectDoesNothing() {
     SystemConfiguration* sc = SystemConfiguration::ParseJson(
         json.c_str(), 
         json.length(), 
-        processAction, 
         mockButtonFactory);
     
     TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
@@ -104,11 +104,32 @@ void emptyJsonObjectDoesNothing() {
     delete sc;
 }
 
+void minimalJsonSetsProperties() {
+    String json = minimalConfigurationJson();
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        json.c_str(), 
+        json.length(), 
+        mockButtonFactory);
+    
+    std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
+    TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("display.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("bt.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("styles.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected value.");
+    TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
+    // Additional checks when other configs are in place:
+    // BatteryMonitorConfiguration is disabled
+    // PowerLedConfiguration is disabled
+    // Tm1637Configuration is disabled
+    delete sc;
+}
+
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
     RUN_TEST(emptyJsonDoesNothing);
     RUN_TEST(emptyJsonObjectDoesNothing);
+    RUN_TEST(minimalJsonSetsProperties);
     
     return UNITY_END();
 }
