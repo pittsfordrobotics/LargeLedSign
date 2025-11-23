@@ -71,7 +71,7 @@ void RotationDisplayPattern::updateInternal(PixelMap* pixelMap)
         {
             float angleToPixelDeg = m_pixelAnglesDeg[row][col];
             float rayAngleIncrement = 360.0f / m_numberOfRays;
-            for (uint rayIndex = 0; rayIndex < m_numberOfRays; rayIndex++)
+            for (uint16_t rayIndex = 0; rayIndex < m_numberOfRays; rayIndex++)
             {
                 float adjustedStartAngle = m_currentAngleDeg + rayIndex * rayAngleIncrement;
                 float adjustedEndAngle = newAngleDeg + rayIndex * rayAngleIncrement;

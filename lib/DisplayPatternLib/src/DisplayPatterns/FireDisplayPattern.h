@@ -2,6 +2,7 @@
 #define FIREDISPLAYPATTERN_H
 
 #include <Arduino.h>
+//#include "NeoPixelUtils.h"
 #include <Adafruit_NeoPixel.h>
 #include "DisplayPattern.h"
 #include <MathUtils.h>
@@ -31,7 +32,7 @@ class FireDisplayPattern : public DisplayPattern
         FirePatternType m_patternType{FirePatternType::Solid};
         byte m_sparking{120};
         byte m_cooling{50};
-        uint m_heatColors[256];
+        uint16_t m_heatColors[256];
         
         // Maintains the current "heat" level for each row grouping.
         std::vector<std::vector<int>> m_combinedRowHeats;

@@ -29,7 +29,7 @@ ColorFadePattern::ColorFadePattern(uint32_t color1, uint32_t color2, uint32_t co
 
 double ColorFadePattern::applyBrightnessGamma(double inputBrightness) {
         byte inputScale = 255 * inputBrightness;
-        byte outputScale = Adafruit_NeoPixel::gamma8(inputScale);
+        byte outputScale = NeoPixelUtils::gamma8(inputScale);
         
         return (double)outputScale / 255.0;
 }
@@ -48,7 +48,7 @@ void ColorFadePattern::reset()
         for (int i = 0; i < m_fadeInDuration; i++)
         {
             double scaling =  applyBrightnessGamma((double)(i + 1)/(m_fadeInDuration + 1));
-            uint32_t color = Adafruit_NeoPixel::Color(colorRed * scaling, colorGreen * scaling, colorBlue * scaling);
+            uint32_t color = NeoPixelUtils::Color(colorRed * scaling, colorGreen * scaling, colorBlue * scaling);
             m_colorSequence.push_back(color);
         }
 
@@ -62,7 +62,7 @@ void ColorFadePattern::reset()
         for (int i = m_fadeOutDuration -1; i >= 0; i--)
         {
             double scaling =  applyBrightnessGamma((double)(i + 1)/(m_fadeOutDuration + 1));
-            uint32_t color = Adafruit_NeoPixel::Color(colorRed * scaling, colorGreen * scaling, colorBlue * scaling);
+            uint32_t color = NeoPixelUtils::Color(colorRed * scaling, colorGreen * scaling, colorBlue * scaling);
             m_colorSequence.push_back(color);
         }
 
@@ -74,7 +74,7 @@ void ColorFadePattern::reset()
     }
 }
 
-ulong ColorFadePattern::getNextColor()
+uint32_t ColorFadePattern::getNextColor()
 {
     // Check the size of the sequence list just in case.
     if (m_colorSequence.size() == 0)

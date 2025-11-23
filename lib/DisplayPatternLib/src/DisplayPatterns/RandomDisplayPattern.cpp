@@ -22,7 +22,7 @@ void RandomDisplayPattern::updateInternal(PixelMap* pixelMap)
 {
     // Grab the next color and fill all needed random pixels with that color.
     // TBD: have the option to grab the next color for each pixel to be filled.
-    ulong newColor = m_colorPattern->getNextColor();
+    uint32_t newColor = m_colorPattern->getNextColor();
     int numPixelsToFill = pixelMap->getPixelCount() * m_percentToFill;
     pixelMap->fillRandomly(newColor, numPixelsToFill);
 }

@@ -12,7 +12,7 @@ void PixelMap::initializeFromConfiguration(const DisplayConfiguration& displayCo
     DisplayConfiguration config(displayConfiguration);
 
     m_numPixels = config.getNumberOfPixels();
-    m_pixelColors = new unsigned long[m_numPixels];
+    m_pixelColors = new uint32_t[m_numPixels];
     m_digitsToLeft = config.getDigitsToLeft();
     m_digitsToRight = config.getDigitsToRight();
     m_colsToLeft = config.getColumnsToLeft();
@@ -54,12 +54,12 @@ void PixelMap::initializeFromConfiguration(const DisplayConfiguration& displayCo
 
 void PixelMap::initializeInternalMaps()
 {
-    for (uint i = 0; i < m_rows.size(); i++)
+    for (uint16_t i = 0; i < m_rows.size(); i++)
     {
         // Initialize pixel map to -1 (no pixel)
         m_pixelMap.push_back(std::vector<int>(m_columns.size(), -1));
         // Initialize color map to 0 (black)
-        m_colorMap.push_back(std::vector<ulong>(m_columns.size(), 0));
+        m_colorMap.push_back(std::vector<uint32_t>(m_columns.size(), 0));
     }
 
     // Populate the pixel map based on the row/column vectors.
@@ -88,7 +88,7 @@ void PixelMap::initializeInternalMaps()
     }
 }
 
-void PixelMap::setRowAndColumnForPixel(uint pixel, uint row, uint column)
+void PixelMap::setRowAndColumnForPixel(uint16_t pixel, uint16_t row, uint16_t column)
 {
     if (row >= m_pixelMap.size())
     {
@@ -105,13 +105,13 @@ void PixelMap::setRowAndColumnForPixel(uint pixel, uint row, uint column)
 
 void PixelMap::clearBuffer()
 {
-    for (unsigned int i = 0; i < m_numPixels; i++)
+    for (uint16_t i = 0; i < m_numPixels; i++)
     {
         m_pixelColors[i] = 0;
     }
 }
 
-unsigned long PixelMap::getPixel(unsigned int pixel)
+uint32_t PixelMap::getPixel(uint16_t pixel)
 {
     if (pixel >= m_numPixels)
     {
@@ -121,27 +121,27 @@ unsigned long PixelMap::getPixel(unsigned int pixel)
     return m_pixelColors[pixel];
 }
 
-unsigned int PixelMap::getColumnCount()
+uint16_t PixelMap::getColumnCount()
 {
     return m_columns.size();
 }
 
-unsigned int PixelMap::getRowCount()
+uint16_t PixelMap::getRowCount()
 {
     return m_rows.size();
 }
 
-unsigned int PixelMap::getDigitCount()
+uint16_t PixelMap::getDigitCount()
 {
     return m_digits.size();
 }
 
-unsigned int PixelMap::getPixelCount()
+uint16_t PixelMap::getPixelCount()
 {
     return m_numPixels;
 }
 
-void PixelMap::setPixel(unsigned int pixel, unsigned long color)
+void PixelMap::setPixel(uint16_t pixel, uint32_t color)
 {
     if (pixel >= m_numPixels)
     {
@@ -151,52 +151,52 @@ void PixelMap::setPixel(unsigned int pixel, unsigned long color)
     m_pixelColors[pixel] = color;
 }
 
-void PixelMap::setRowColor(unsigned int row, unsigned long newColor)
+void PixelMap::setRowColor(uint16_t row, uint32_t newColor)
 {
     if (row >= m_rows.size())
     {
         return;
     }
 
-    for (unsigned int col = 0; col < m_columns.size(); col++)
+    for (uint16_t col = 0; col < m_columns.size(); col++)
     {
         setColorInPixelMap(row, col, newColor);
     }
 }
 
-void PixelMap::setColumnColor(unsigned int column, unsigned long newColor)
+void PixelMap::setColumnColor(uint16_t column, uint32_t newColor)
 {
     if (column >= m_columns.size())
     {
         return;
     }
 
-    for (unsigned int row = 0; row < m_rows.size(); row++)
+    for (uint16_t row = 0; row < m_rows.size(); row++)
     {
         setColorInPixelMap(row, column, newColor);
     }
 }
 
-void PixelMap::fill(unsigned long newColor)
+void PixelMap::fill(uint32_t newColor)
 {
-    for (unsigned int i = 0; i < m_numPixels; i++)
+    for (uint16_t i = 0; i < m_numPixels; i++)
     {
         m_pixelColors[i] = newColor;
     }
 }
 
-void PixelMap::fillRandomly(unsigned long newColor, unsigned int numberOfPixels)
+void PixelMap::fillRandomly(uint32_t newColor, uint16_t numberOfPixels)
 {
-    for (unsigned int i = 0; i < numberOfPixels; i++)
+    for (uint16_t i = 0; i < numberOfPixels; i++)
     {
         int pixel = random(0, m_numPixels);
         m_pixelColors[pixel] = newColor;
     }
 }
 
-void PixelMap::shiftPixelsRight(unsigned long newColor)
+void PixelMap::shiftPixelsRight(uint32_t newColor)
 {
-    for (unsigned int i = m_numPixels - 1; i >= 1; i--)
+    for (uint16_t i = m_numPixels - 1; i >= 1; i--)
     {
         m_pixelColors[i] = m_pixelColors[i - 1];
     }
@@ -204,9 +204,9 @@ void PixelMap::shiftPixelsRight(unsigned long newColor)
     m_pixelColors[0] = newColor;
 }
 
-void PixelMap::shiftPixelsLeft(unsigned long newColor)
+void PixelMap::shiftPixelsLeft(uint32_t newColor)
 {
-    for (unsigned int i = 0; i < m_numPixels - 1; i++)
+    for (uint16_t i = 0; i < m_numPixels - 1; i++)
     {
         m_pixelColors[i] = m_pixelColors[i + 1];
     }
@@ -214,12 +214,12 @@ void PixelMap::shiftPixelsLeft(unsigned long newColor)
     m_pixelColors[m_numPixels - 1] = newColor;
 }
 
-void PixelMap::shiftColumnsRight(unsigned long newColor)
+void PixelMap::shiftColumnsRight(uint32_t newColor)
 {
     // Shift all columns to the right, then fill the first column with the new color.
-    for (unsigned int row = 0; row < m_rows.size(); row++)
+    for (uint16_t row = 0; row < m_rows.size(); row++)
     {
-        for (unsigned int col = m_columns.size() - 1; col > 0; col--)
+        for (uint16_t col = m_columns.size() - 1; col > 0; col--)
         {
             setColorInPixelMap(row, col, m_colorMap[row][col-1]);
         }
@@ -230,17 +230,17 @@ void PixelMap::shiftColumnsRight(unsigned long newColor)
 
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
-void PixelMap::shiftColumnsRight(unsigned long newColor, unsigned int startingColumn)
+void PixelMap::shiftColumnsRight(uint32_t newColor, uint16_t startingColumn)
 {
     shiftPixelBlocksRight(m_columns, newColor, startingColumn);
 }
 
-void PixelMap::shiftColumnsLeft(unsigned long newColor)
+void PixelMap::shiftColumnsLeft(uint32_t newColor)
 {
     // Shift all columns to the left, then fill the last column with the new color.
-    for (unsigned int row = 0; row < m_rows.size(); row++)
+    for (uint16_t row = 0; row < m_rows.size(); row++)
     {
-        for (unsigned int col = 0; col < m_columns.size() - 1; col++)
+        for (uint16_t col = 0; col < m_columns.size() - 1; col++)
         {
             setColorInPixelMap(row, col, m_colorMap[row][col+1]);
         }
@@ -251,17 +251,17 @@ void PixelMap::shiftColumnsLeft(unsigned long newColor)
 
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
-void PixelMap::shiftColumnsLeft(unsigned long newColor, unsigned int startingColumn)
+void PixelMap::shiftColumnsLeft(uint32_t newColor, uint16_t startingColumn)
 {
     shiftPixelBlocksLeft(m_columns, newColor, startingColumn);
 }
 
-void PixelMap::shiftRowsUp(unsigned long newColor)
+void PixelMap::shiftRowsUp(uint32_t newColor)
 {
     // Shift all rows up, then fill the last row with the new color.
-    for (unsigned int col = 0; col < m_columns.size(); col++)
+    for (uint16_t col = 0; col < m_columns.size(); col++)
     {
-        for (unsigned int row = 0; row < m_rows.size() - 1; row++)
+        for (uint16_t row = 0; row < m_rows.size() - 1; row++)
         {
             setColorInPixelMap(row, col, m_colorMap[row+1][col]);
         }
@@ -272,17 +272,17 @@ void PixelMap::shiftRowsUp(unsigned long newColor)
 
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
-void PixelMap::shiftRowsUp(unsigned long newColor, unsigned int startingRow)
+void PixelMap::shiftRowsUp(uint32_t newColor, uint16_t startingRow)
 {
     shiftPixelBlocksLeft(m_rows, newColor, startingRow);
 }
 
-void PixelMap::shiftRowsDown(unsigned long newColor)
+void PixelMap::shiftRowsDown(uint32_t newColor)
 {
     // Shift all rows down, then fill the first row with the new color.
-    for (unsigned int col = 0; col < m_columns.size(); col++)
+    for (uint16_t col = 0; col < m_columns.size(); col++)
     {
-        for (unsigned int row = m_rows.size() - 1; row > 0; row--)
+        for (uint16_t row = m_rows.size() - 1; row > 0; row--)
         {
             setColorInPixelMap(row, col, m_colorMap[row-1][col]);
         }
@@ -293,21 +293,21 @@ void PixelMap::shiftRowsDown(unsigned long newColor)
 
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
-void PixelMap::shiftRowsDown(unsigned long newColor, unsigned int startingRow)
+void PixelMap::shiftRowsDown(uint32_t newColor, uint16_t startingRow)
 {
     shiftPixelBlocksRight(m_rows, newColor, startingRow);
 }
 
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
-void PixelMap::shiftDigitsRight(unsigned long newColor)
+void PixelMap::shiftDigitsRight(uint32_t newColor)
 {
     shiftPixelBlocksRight(m_digits, newColor, 0);
 }
 
-void PixelMap::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, unsigned long newColor, unsigned int startingBlock)
+void PixelMap::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, uint32_t newColor, uint16_t startingBlock)
 {
-    for (unsigned int i = pixelBlocks.size() - 1; i > startingBlock; i--)
+    for (uint16_t i = pixelBlocks.size() - 1; i > startingBlock; i--)
     {
         std::vector<int> *source = pixelBlocks.at(i - 1);
         std::vector<int> *destination = pixelBlocks.at(i);
@@ -319,7 +319,7 @@ void PixelMap::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks
         }
 
         // Find the color of the first pixel in the source column, and set the destination column to that color.
-        unsigned long previousColor = m_pixelColors[source->at(0)];
+        uint32_t previousColor = m_pixelColors[source->at(0)];
         setColorForMappedPixels(destination, previousColor);
     }
 
@@ -329,14 +329,14 @@ void PixelMap::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks
     }
 }
 
-void PixelMap::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks, unsigned long newColor, unsigned int startingBlock)
+void PixelMap::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks, uint32_t newColor, uint16_t startingBlock)
 {
-    for (unsigned int i = 0; i < startingBlock; i++)
+    for (uint16_t i = 0; i < startingBlock; i++)
     {
         std::vector<int> *source = pixelBlocks.at(i + 1);
         std::vector<int> *destination = pixelBlocks.at(i);
         // Find the color of the first pixel in the source column, and set the destination column to that color.
-        unsigned long previousColor = m_pixelColors[source->at(0)];
+        uint32_t previousColor = m_pixelColors[source->at(0)];
         setColorForMappedPixels(destination, previousColor);
     }
 
@@ -346,16 +346,16 @@ void PixelMap::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks,
     }
 }
 
-void PixelMap::setColorForMappedPixels(std::vector<int> *destination, unsigned long newColor)
+void PixelMap::setColorForMappedPixels(std::vector<int> *destination, uint32_t newColor)
 {
-    for (unsigned int i = 0; i < destination->size(); i++)
+    for (uint16_t i = 0; i < destination->size(); i++)
     {
         int pixelIndex = destination->at(i);
         m_pixelColors[pixelIndex] = newColor;
     }
 }
 
-void PixelMap::setColorInPixelMap(unsigned int row, unsigned int column, unsigned long color)
+void PixelMap::setColorInPixelMap(uint16_t row, uint16_t column, uint32_t color)
 {
     if (row >= m_colorMap.size())
     {
@@ -384,7 +384,7 @@ const std::vector<std::vector<int>*>& PixelMap::getAllColumns()
     return m_columns;
 }
 
-const std::vector<std::vector<int>*> PixelMap::getRowsForDigit(unsigned int digit)
+const std::vector<std::vector<int>*> PixelMap::getRowsForDigit(uint16_t digit)
 {
     std::vector<std::vector<int>*> rowsForDigit;
     if (digit >= m_digits.size())

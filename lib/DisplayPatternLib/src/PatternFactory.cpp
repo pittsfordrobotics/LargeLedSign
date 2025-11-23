@@ -13,7 +13,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
     ColorPattern* colorPattern = createColorPatternForPatternData(patternData);
     DisplayPattern* displayPattern;
 
-    uint startOfDisplayParameters = colorPattern->getNumberOfParameters();
+    uint16_t startOfDisplayParameters = colorPattern->getNumberOfParameters();
 
     switch (patternData.displayPattern)
     {
@@ -267,7 +267,7 @@ String PatternFactory::getColorPatternString(String patternName, ColorPatternTyp
     patternString += "," + String(static_cast<byte>(patternType));
     patternString += "," + String(numberOfColors);
     
-    for (uint i = 0; i < parameterNames.size(); i++)
+    for (uint16_t i = 0; i < parameterNames.size(); i++)
     {
         patternString += "," + parameterNames[i];
     }
@@ -282,7 +282,7 @@ String PatternFactory::getDisplayPatternString(String patternName, DisplayPatter
     String patternString = patternName;
     patternString += "," + String(static_cast<byte>(patternType));
     
-    for (uint i = 0; i < parameterNames.size(); i++)
+    for (uint16_t i = 0; i < parameterNames.size(); i++)
     {
         patternString += "," + parameterNames[i];
     }

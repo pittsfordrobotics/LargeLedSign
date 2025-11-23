@@ -67,7 +67,7 @@ void CenterOutDisplayPattern::resetInternal(PixelMap* pixelMap)
 
 void CenterOutDisplayPattern::updateInternal(PixelMap* pixelMap)
 {
-    ulong newColor = m_colorPattern->getNextColor();
+    uint32_t newColor = m_colorPattern->getNextColor();
 
     if (m_orientation == CenterOutOrientation::Vertical)
     {

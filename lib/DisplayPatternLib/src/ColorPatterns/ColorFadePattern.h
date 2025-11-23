@@ -2,7 +2,7 @@
 #define COLORFADEPATTERN_H
 
 #include <Arduino.h>
-#include "Adafruit_NeoPixel.h"
+#include "NeoPixelUtils.h"
 #include "ColorPattern.h"
 #include <MathUtils.h>
 #include <vector>

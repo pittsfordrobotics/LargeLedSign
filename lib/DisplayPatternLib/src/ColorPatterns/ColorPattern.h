@@ -16,7 +16,7 @@ class ColorPattern
         virtual void reset() = 0;
 
         // Gets the next color in the sequence.
-        virtual ulong getNextColor() = 0;
+        virtual uint32_t getNextColor() = 0;
 
         // Increments the internal state of the color pattern by the specified number of iterations.
         virtual void incrementOnly(uint16_t incrementAmount) = 0;

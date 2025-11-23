@@ -60,7 +60,7 @@ void FireDisplayPattern::updateInternal(PixelMap* pixelMap)
         for (int row = 0; row < numRows; row++)
         {
             byte temperature = m_combinedRowHeats[group][row];
-            ulong color = m_heatColors[temperature];
+            uint32_t color = m_heatColors[temperature];
             for (int pixel : m_combinedRowGroups[group][numRows - row - 1])
             {
                 pixelMap->setPixel(pixel, color);
@@ -116,7 +116,7 @@ void FireDisplayPattern::populateCombinedGroupsForIndividualColumns(PixelMap* pi
 
 void FireDisplayPattern::populateCombinedGroupsForDigits(PixelMap* pixelMap)
 {
-    for (uint digitNumber = 0; digitNumber < pixelMap->getDigitCount(); digitNumber++)
+    for (uint16_t digitNumber = 0; digitNumber < pixelMap->getDigitCount(); digitNumber++)
     {
         std::vector<std::vector<int>> digitRows;
         for (std::vector<int>* row : pixelMap->getRowsForDigit(digitNumber))
@@ -210,6 +210,7 @@ void FireDisplayPattern::generatePallet()
             hue = (temperature - 128) / 255.0 * 8200;
         }
     
+        //m_heatColors[temperature] = NeoPixelUtils::ColorHSV(hue, saturation, value);
         m_heatColors[temperature] = Adafruit_NeoPixel::ColorHSV(hue, saturation, value);
     }
 }
