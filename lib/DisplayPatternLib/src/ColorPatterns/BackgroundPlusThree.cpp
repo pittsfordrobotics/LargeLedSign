@@ -40,7 +40,7 @@ void BackgroundPlusThree::reset()
     }
 }
 
-ulong BackgroundPlusThree::getNextColor()
+uint32_t BackgroundPlusThree::getNextColor()
 {
     // Check the size of the sequence list just in case.
     if (m_colorSequence.size() == 0)
@@ -49,7 +49,7 @@ ulong BackgroundPlusThree::getNextColor()
     }
 
     m_iterationCount = m_iterationCount % m_colorSequence.size();
-    ulong color = m_colorSequence[m_iterationCount];
+    uint32_t color = m_colorSequence[m_iterationCount];
     m_iterationCount++;
     return color;
 }

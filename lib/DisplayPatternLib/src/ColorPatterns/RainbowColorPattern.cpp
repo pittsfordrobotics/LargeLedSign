@@ -9,9 +9,9 @@ void RainbowColorPattern::reset()
     m_currentHue = 0;
 }
 
-ulong RainbowColorPattern::getNextColor()
+uint32_t RainbowColorPattern::getNextColor()
 {
-    ulong color = Adafruit_NeoPixel::ColorHSV(m_currentHue);
+    uint32_t color = NeoPixelUtils::ColorHSV(m_currentHue);
     m_currentHue += m_hueIncrement;
     return color;
 }

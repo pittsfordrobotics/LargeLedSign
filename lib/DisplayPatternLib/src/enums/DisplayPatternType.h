@@ -25,4 +25,85 @@ enum class DisplayPatternType : byte
     SpotLightCCW = 17
 };
 
+class DisplayPatternTypeHelper
+{
+    public:
+        static DisplayPatternType fromString(String type)
+        {
+            if (type.equalsIgnoreCase("solid"))
+            {
+                return DisplayPatternType::Solid;
+            }
+            if (type.equalsIgnoreCase("right"))
+            {
+                return DisplayPatternType::Right;
+            }
+            if (type.equalsIgnoreCase("left"))
+            {
+                return DisplayPatternType::Left;
+            }
+            if (type.equalsIgnoreCase("up"))
+            {
+                return DisplayPatternType::Up;
+            }
+            if (type.equalsIgnoreCase("down"))
+            {
+                return DisplayPatternType::Down;
+            }
+            if (type.equalsIgnoreCase("digit"))
+            {
+                return DisplayPatternType::Digit;
+            }
+            if (type.equalsIgnoreCase("random"))
+            {
+                return DisplayPatternType::Random;
+            }
+            if (type.equalsIgnoreCase("centeroutvertical"))
+            {
+                return DisplayPatternType::CenterOutVertical;
+            }
+            if (type.equalsIgnoreCase("centerouthorizontal"))
+            {
+                return DisplayPatternType::CenterOutHorizontal;
+            }
+            if (type.equalsIgnoreCase("line"))
+            {
+                return DisplayPatternType::Line;
+            }
+            if (type.equalsIgnoreCase("lowpower"))
+            {
+                return DisplayPatternType::LowPower;
+            }
+            if (type.equalsIgnoreCase("fire"))
+            {
+                return DisplayPatternType::Fire;
+            }
+            if (type.equalsIgnoreCase("fire2"))
+            {
+                return DisplayPatternType::Fire2;
+            }
+            if (type.equalsIgnoreCase("fire3"))
+            {
+                return DisplayPatternType::Fire3;
+            }
+            if (type.equalsIgnoreCase("rotation"))
+            {
+                return DisplayPatternType::Rotation;
+            }
+            if (type.equalsIgnoreCase("rotationccw"))
+            {
+                return DisplayPatternType::RotationCCW;
+            }
+            if (type.equalsIgnoreCase("spotlight"))
+            {
+                return DisplayPatternType::SpotLight;
+            }
+            if (type.equalsIgnoreCase("spotlightccw"))
+            {
+                return DisplayPatternType::SpotLightCCW;
+            }
+            return DisplayPatternType::Solid;
+        }
+};
+
 #endif

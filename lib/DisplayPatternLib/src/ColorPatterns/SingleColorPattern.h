@@ -7,7 +7,7 @@
 class SingleColorPattern : public ColorPattern
 {
     public:
-        SingleColorPattern(ulong color);
+        SingleColorPattern(uint32_t color);
 
         virtual void reset();
         virtual uint32_t getNextColor();

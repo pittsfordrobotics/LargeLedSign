@@ -3,5 +3,6 @@
 
 #include "DisplayConfiguration.h"
 #include "DisplayConfigFactory.h"
+#include "StyleConfiguration.h"
 
 #endif // CONFIGURATION_H
