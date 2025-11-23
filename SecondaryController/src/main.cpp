@@ -1,13 +1,12 @@
 #include "main.h"
 
-std::vector<int> orderSelectorPins{ORDER_SELECTOR_PINS};     // Tells the controller which digit it's controlling (only the first pin is used so far)
-std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS}; // Tells the controller which digit it's controlling (only the first pin is used so far)
+std::vector<int> orderSelectorPins{ORDER_SELECTOR_PINS};
+std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS};
 
 // Main BLE service wrapper
 SecondaryPeripheral btService;
 
 // Pixel and color data
-//PixelBuffer *pixelBuffer;
 std::vector<DisplayConfiguration>* displayConfigs;
 NeoPixelDisplay* neoPixelDisplay;
 DisplayPattern *currentLightStyle;
@@ -69,7 +68,7 @@ void setup()
         defaultBrightness = 255;
     }
 
-    // Read the actual config from files!
+    // TODO: Read the actual config from files!
     switch (signType)
     {
         case 1:
@@ -85,9 +84,6 @@ void setup()
             displayConfigs = DisplayConfigFactory::createForTestMatrix();
             break;
     }
-    
-    //pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
-    //pixelBuffer->setBrightness(defaultBrightness);
     
     currentBrightness = defaultBrightness;
     newBrightness = defaultBrightness;
@@ -153,7 +149,6 @@ void setup1()
 // Main loop for the second core
 void loop1()
 {
-    // Check for threading issues!!!
     updateLEDs();
     updateLedTelemetry();
 }
@@ -231,8 +226,6 @@ void startBLE()
     SignConfigurationData configData;
     configData.signType = signType;
     configData.signOrder = signPosition;
-    //configData.columnCount = pixelBuffer->getColumnCount();
-    //configData.pixelCount = pixelBuffer->getPixelCount();
     configData.columnCount = displayConfigs->at(0).getNumberOfColumns();
     configData.pixelCount = displayConfigs->at(0).getNumberOfPixels();
 
@@ -271,7 +264,6 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        //pixelBuffer->setBrightness(newBrightness);
         neoPixelDisplay->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
@@ -298,17 +290,6 @@ void updateLEDs()
 
     if (shouldResetStyle)
     {
-        // if (currentLightStyle)
-        // {
-        //     delete currentLightStyle;
-        // }
-
-        // currentLightStyle = PatternFactory::createForPatternData(newPatternData, nullptr);
-        // currentLightStyle->setSpeed(newSpeed);
-        // currentLightStyle->reset();
-
-        // currentPatternData = newPatternData;
-
         DisplayPattern* oldPattern = neoPixelDisplay->getDisplayPattern();
         DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData, nullptr);
         newPattern->setSpeed(newSpeed);
@@ -323,13 +304,6 @@ void updateLEDs()
         currentPatternData = newPatternData;
     }
 
-    // The current style shouldn't ever be null here, but check anyways.
-    // if (currentLightStyle)
-    // {
-    //     currentLightStyle->update();
-    // }
-
-    //pixelBuffer->displayPixels();
     neoPixelDisplay->updateDisplay();
 }
 
@@ -386,11 +360,6 @@ void enterLowPowerMode()
     {
         neoPixelDisplay->setBrightness(0);
         neoPixelDisplay->updateDisplay();
-
-
-        // pixelBuffer->setBrightness(0);
-        // pixelBuffer->displayPixels();
-        // pixelBuffer->stop();
     }
     else
     {
@@ -407,8 +376,6 @@ void exitLowPowerMode()
 {
     inLowPowerMode = false;
 
-    //pixelBuffer->resume();
-    //pixelBuffer->setBrightness(currentBrightness);
     neoPixelDisplay->setBrightness(currentBrightness);
     newSyncData++;
 }
@@ -501,6 +468,7 @@ void indicateBleFailure()
         // pixelBuffer->clearBuffer();
         // pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(0, 0, 255));
         // pixelBuffer->displayPixels();
+        // TODO: extend NeoPixelDisplay to support this.
         delay(500);
 
         // pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
@@ -558,9 +526,6 @@ void readInputButton()
                 btService.disconnect();
                 btService.stop();
 
-                // pixelBuffer->setBrightness(0);
-                // pixelBuffer->displayPixels();
-                // pixelBuffer->stop();
                 neoPixelDisplay->setBrightness(0);
                 neoPixelDisplay->updateDisplay();
             }
