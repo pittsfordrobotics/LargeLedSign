@@ -79,6 +79,7 @@ void emptyJsonDoesNothing() {
     // BatteryMonitorConfiguration is disabled
     // PowerLedConfiguration is disabled
     // Tm1637Configuration is disabled
+    delete sc;
 }
 
 void emptyJsonObjectDoesNothing() {
@@ -100,6 +101,7 @@ void emptyJsonObjectDoesNothing() {
     // BatteryMonitorConfiguration is disabled
     // PowerLedConfiguration is disabled
     // Tm1637Configuration is disabled
+    delete sc;
 }
 
 int main(int argc, char **argv) {

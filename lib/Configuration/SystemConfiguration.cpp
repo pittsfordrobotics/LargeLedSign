@@ -42,6 +42,14 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     return config;
 }
 
+SystemConfiguration::~SystemConfiguration()
+{
+    // Clean up dynamically allocated buttons
+    for (auto* button : m_buttons) {
+        delete button;
+    }
+}
+
 void SystemConfiguration::configureButtonProcessor(JsonVariant buttonConfigs, ButtonFactory buttonFactory) {
     if (!buttonConfigs["definitions"].is<JsonVariant>())
     {
@@ -95,6 +103,7 @@ void SystemConfiguration::addButtonDefinitions(JsonArray definitions, ButtonFact
         GenericButton* button = buttonFactory(gpioPin);
         if (button != nullptr)
         {
+            m_buttons.push_back(button);  // Track for cleanup
             m_buttonProcessor.addButtonDefinition(id, button);
         }
     }

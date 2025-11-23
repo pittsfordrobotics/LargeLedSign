@@ -20,6 +20,8 @@ class SystemConfiguration {
             ButtonActionProcessor actionProcessor,
             ButtonFactory buttonFactory);
 
+        ~SystemConfiguration();
+
         ButtonProcessor& getButtonProcessor() { return m_buttonProcessor; }
         String getDisplayConfigurationFile() { return m_displayConfigurationFile; }
         String getBluetoothConfigurationFile() { return m_bluetoothConfigurationFile; }
@@ -37,6 +39,7 @@ class SystemConfiguration {
         String m_bluetoothConfigurationFile{"bluetoothconfiguration.json"};
         String m_styleConfigurationFile{"styleconfiguration.json"};
         float m_clockMultiplier{1.0f};
+        std::vector<GenericButton*> m_buttons;  // Track buttons for cleanup
 
         SystemConfiguration() {};
         void configureButtonProcessor(JsonVariant buttonConfigs, ButtonFactory buttonFactory);
