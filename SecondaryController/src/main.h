@@ -12,6 +12,8 @@
 #include <DisplayPatternLib.h>
 #include <PredefinedStyleLib.h>
 #include <PushButton.h>
+#include <Configuration.h>
+#include "NeoPixelDisplay.h"
 
 // Input-Output pin assignments
 #define DATA_OUT 25            // GPIO pin # (NOT Digital pin #) controlling the NeoPixels
