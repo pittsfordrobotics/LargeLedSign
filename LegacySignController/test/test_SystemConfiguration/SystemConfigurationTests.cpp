@@ -17,6 +17,8 @@ MockButton* button2;
 
 const char* minimalConfigurationJson();
 const char* oneButtonWithActions();
+const char* buttonsWithActions();
+const char* disabledButton();
 const char* fullLegacySignConfigurationJson();
 
 void resetActionParameters() {
@@ -34,14 +36,10 @@ void setUp(void) {
 
 // Run after each test
 void tearDown(void) {
-    if (button1 != nullptr) {
-        delete button1;
-        button1 = nullptr;
-    }
-    if (button2 != nullptr) {
-        delete button2;
-        button2 = nullptr;
-    }
+    // Note: buttons are now owned by SystemConfiguration and will be deleted by it
+    // So we just reset the pointers here to avoid dangling references
+    button1 = nullptr;
+    button2 = nullptr;
 }
 
 GenericButton* mockButtonFactory(int gpioPin) {
@@ -124,13 +122,55 @@ void minimalJsonSetsProperties() {
     delete sc;
 }
 
+void buttonsAndActionsAreParsed() {
+    String json = buttonsWithActions();
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        json.c_str(), 
+        json.length(), 
+        mockButtonFactory);
+    
+    ButtonProcessor& bp = sc->getButtonProcessor();
+    std::vector<GenericButton*> buttons = bp.getButtons();
+    TEST_ASSERT_EQUAL_MESSAGE(2, buttons.size(), "There should be 2 buttons.");
+    bp.setActionProcessor(processAction);
+
+    // Simulate button 1 tap
+    button1->setPressType(ButtonPressType::Normal);
+    sc->getButtonProcessor().update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("changeStyle", lastActionName.c_str(), "Last action name is not correct for button 1 tap.");
+    TEST_ASSERT_EQUAL_MESSAGE(2, lastArguments.size(), "Number of arguments is not correct for button 1 tap.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", lastArguments[0].c_str(), "First argument is not correct for button 1 tap.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("RainbowLava", lastArguments[1].c_str(), "Second argument is not correct for button 1 tap.");
+    resetActionParameters();
+
+    // Simulate button 1 long tap
+    button1->setPressType(ButtonPressType::Long);
+    sc->getButtonProcessor().update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("batteryVoltage", lastActionName.c_str(), "Last action name is not correct for button 1 long tap.");
+    TEST_ASSERT_EQUAL_MESSAGE(0, lastArguments.size(), "Number of arguments is not correct for button 1 long tap.");
+    resetActionParameters();
+
+    // Simulate button 2 tap
+    button2->setPressType(ButtonPressType::Normal);
+    sc->getButtonProcessor().update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("changeStyle", lastActionName.c_str(), "Last action name is not correct for button 2 tap.");
+    TEST_ASSERT_EQUAL_MESSAGE(3, lastArguments.size(), "Number of arguments is not correct for button 2 tap.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Red", lastArguments[0].c_str(), "First argument is not correct for button 2 tap.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Blue", lastArguments[1].c_str(), "Second argument is not correct for button 2 tap.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", lastArguments[2].c_str(), "Third argument is not correct for button 2 tap.");
+    resetActionParameters();
+
+    delete sc;
+}
+
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
     RUN_TEST(emptyJsonDoesNothing);
     RUN_TEST(emptyJsonObjectDoesNothing);
     RUN_TEST(minimalJsonSetsProperties);
-    
+    RUN_TEST(buttonsAndActionsAreParsed);
+
     return UNITY_END();
 }
 
@@ -144,28 +184,20 @@ const char* minimalConfigurationJson() {
     )json";
 }
 
-const char* oneButtonWithActions() {
+const char* buttonsWithActions() {
     return R"json(
         {
-            "displayConfigurationFile": "display.json",
-            "bluetoothConfigurationFile": "bt.json",
-            "styleConfigurationFile": "styles.json"
             "buttons": {
                 "definitions": [
                     {
                         "id": "1",
                         "enabled": true,
-                        "gpioPin": 10
+                        "gpioPin": 1
                     },
                     {
                         "id": "2",
                         "enabled": true,
-                        "gpioPin": 13
-                    },
-                    {
-                        "id": "power",
-                        "enabled": true,
-                        "gpioPin": 11
+                        "gpioPin": 2
                     }
                 ],
                 "actions": [
@@ -177,19 +209,47 @@ const char* oneButtonWithActions() {
                         "longTapActionArguments": []
                     },
                     {
+                        "buttonIds": ["2"],
+                        "tapAction": "changeStyle",
+                        "tapActionArguments": ["Red", "Blue", "Pink"]
+                    },
+                    {
+                        "buttonIds": ["1", "2"],
+                        "tapAction": "changeStyle",
+                        "tapActionArguments": ["Fire"]
+                    }
+                ]
+            }
+        }
+    )json";
+}
+
+const char* disabledButton() {
+    return R"json(
+        {
+            "buttons": {
+                "definitions": [
+                    {
+                        "id": "1",
+                        "enabled": true,
+                        "gpioPin": 1
+                    },
+                    {
+                        "id": "2",
+                        "enabled": false,
+                        "gpioPin": 2
+                    }
+                ],
+                "actions": [
+                    {
+                        "buttonIds": ["1"],
+                        "tapAction": "changeStyle",
+                        "tapActionArguments": ["Pink", "RainbowLava"]
+                    },
+                    {
                         "buttonId": ["2"],
                         "tapAction": "changeStyle",
-                        "tapActionArguments": ["Red", "Blue"]
-                    },
-                    {
-                        "buttonId": ["power"],
-                        "tapAction": "powerCycle"
-                    },
-                    {
-                        "enabled": true,
-                        "buttonIds": ["1", "2"]
-                        "tapAction": "",
-                        "longTapAction": ""
+                        "tapActionArguments": ["Fire"]
                     }
                 ]
             }
