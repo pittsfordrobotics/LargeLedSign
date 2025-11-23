@@ -1,13 +1,14 @@
 #include "main.h"
 
-std::vector<int> orderSelectorPins{ORDER_SELECTOR_PINS};     // Tells the controller which digit it's controlling (only the first pin is used so far)
-std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS}; // Tells the controller which digit it's controlling (only the first pin is used so far)
+std::vector<int> orderSelectorPins{ORDER_SELECTOR_PINS};
+std::vector<int> typeSelectorPins{STYLE_TYPE_SELECTOR_PINS};
 
 // Main BLE service wrapper
 SecondaryPeripheral btService;
 
 // Pixel and color data
-PixelBuffer *pixelBuffer;
+std::vector<DisplayConfiguration>* displayConfigs;
+NeoPixelDisplay* neoPixelDisplay;
 DisplayPattern *currentLightStyle;
 
 // Settings that are updated via bluetooth
@@ -66,25 +67,43 @@ void setup()
     {
         defaultBrightness = 255;
     }
+
+    // TODO: Read the actual config from files!
+    switch (signType)
+    {
+        case 1:
+            displayConfigs = DisplayConfigFactory::createForDigit1();
+            break;
+        case 3:
+            displayConfigs = DisplayConfigFactory::createForDigit3();
+            break;
+        case 8:
+            displayConfigs = DisplayConfigFactory::createForDigit8();
+            break;
+        default:
+            displayConfigs = DisplayConfigFactory::createForTestMatrix();
+            break;
+    }
     
-    pixelBuffer = PixelBufferFactory::CreatePixelBufferForSignType(signType, DATA_OUT);
-    pixelBuffer->setBrightness(defaultBrightness);
     currentBrightness = defaultBrightness;
     newBrightness = defaultBrightness;
-
-    startBLE();
+    neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
+    neoPixelDisplay->setBrightness(currentBrightness);
 
     // Setup the default pattern to show prior to any BT connections
     newPatternData.colorPattern = ColorPatternType::SingleColor;
     newPatternData.displayPattern = DisplayPatternType::Solid;
     newPatternData.color1 = Adafruit_NeoPixel::Color(230, 22, 161); // Pink
-    currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
+    currentLightStyle = PatternFactory::createForPatternData(newPatternData, nullptr);
     if (signType == PITSIGN_TYPE_ID) 
     {
         newPatternData.color1 = Adafruit_NeoPixel::Color(255,0,0);
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
+        currentLightStyle = PatternFactory::createForPatternData(newPatternData, nullptr);
     }
     btService.setPatternData(newPatternData);
+    neoPixelDisplay->setDisplayPattern(currentLightStyle);
+
+    startBLE();
 
     isInitialized = true;
 }
@@ -130,7 +149,6 @@ void setup1()
 // Main loop for the second core
 void loop1()
 {
-    // Check for threading issues!!!
     updateLEDs();
     updateLedTelemetry();
 }
@@ -208,8 +226,8 @@ void startBLE()
     SignConfigurationData configData;
     configData.signType = signType;
     configData.signOrder = signPosition;
-    configData.columnCount = pixelBuffer->getColumnCount();
-    configData.pixelCount = pixelBuffer->getPixelCount();
+    configData.columnCount = displayConfigs->at(0).getNumberOfColumns();
+    configData.pixelCount = displayConfigs->at(0).getNumberOfPixels();
 
     // If the sign "position" is 0, then we'll assume we're standalone.
     String uuid = signPosition == 0
@@ -246,7 +264,7 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        pixelBuffer->setBrightness(newBrightness);
+        neoPixelDisplay->setBrightness(newBrightness);
         currentBrightness = newBrightness;
     }
 
@@ -272,25 +290,21 @@ void updateLEDs()
 
     if (shouldResetStyle)
     {
-        if (currentLightStyle)
+        DisplayPattern* oldPattern = neoPixelDisplay->getDisplayPattern();
+        DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData, nullptr);
+        newPattern->setSpeed(newSpeed);
+        neoPixelDisplay->setDisplayPattern(newPattern);
+        if (oldPattern)
         {
-            delete currentLightStyle;
+            delete oldPattern;
         }
 
-        currentLightStyle = PatternFactory::createForPatternData(newPatternData, pixelBuffer);
-        currentLightStyle->setSpeed(newSpeed);
-        currentLightStyle->reset();
+        neoPixelDisplay->resetDisplay();
 
         currentPatternData = newPatternData;
     }
 
-    // The current style shouldn't ever be null here, but check anyways.
-    if (currentLightStyle)
-    {
-        currentLightStyle->update();
-    }
-
-    pixelBuffer->displayPixels();
+    neoPixelDisplay->updateDisplay();
 }
 
 // Check if the current battery voltage is too low to run the sign,
@@ -344,9 +358,8 @@ void enterLowPowerMode()
     // instead of blinking the display pixels.
     if (signType == PITSIGN_TYPE_ID)
     {
-        pixelBuffer->setBrightness(0);
-        pixelBuffer->displayPixels();
-        pixelBuffer->stop();
+        neoPixelDisplay->setBrightness(0);
+        neoPixelDisplay->updateDisplay();
     }
     else
     {
@@ -363,8 +376,7 @@ void exitLowPowerMode()
 {
     inLowPowerMode = false;
 
-    pixelBuffer->resume();
-    pixelBuffer->setBrightness(currentBrightness);
+    neoPixelDisplay->setBrightness(currentBrightness);
     newSyncData++;
 }
 
@@ -448,28 +460,33 @@ void updateLedTelemetry()
 void indicateBleFailure()
 {
     // Infinite loop here -- we can't continue with the rest of the service, so never return.
-    Serial.println("Could not start BLE service!");
     while (true)
     {
+        Serial.println("Could not start BLE service!");
         // Turn all LEDs off except for the first one, which will blink red/blue.
-        pixelBuffer->setBrightness(255);
-        pixelBuffer->clearBuffer();
-        pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(0, 0, 255));
-        pixelBuffer->displayPixels();
+        // pixelBuffer->setBrightness(255);
+        // pixelBuffer->clearBuffer();
+        // pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(0, 0, 255));
+        // pixelBuffer->displayPixels();
+        // TODO: extend NeoPixelDisplay to support this.
         delay(500);
 
-        pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
-        pixelBuffer->displayPixels();
-        delay(500);
+        // pixelBuffer->setPixel(0, Adafruit_NeoPixel::Color(255, 0, 0));
+        // pixelBuffer->displayPixels();
+        //delay(500);
     }
 }
 
 void resetPixelBufferOffsets(SignOffsetData offsetData)
 {
-    pixelBuffer->setDigitsToLeft(offsetData.digitsToLeft);
-    pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
-    pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
-    pixelBuffer->setColsToRight(offsetData.columnsToRight);
+    // TODO:
+    // This shouldn't be needed once the display configs
+    // can be read via the SD Card.
+    // In the mean time, the offsests won't do anything.
+    // pixelBuffer->setDigitsToLeft(offsetData.digitsToLeft);
+    // pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
+    // pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
+    // pixelBuffer->setColsToRight(offsetData.columnsToRight);
 }
 
 void turnOnPowerLed()
@@ -498,9 +515,7 @@ void readInputButton()
                 // nulls out the device's advertised name for some reason, even if
                 // we set it explicitly before restarting advertising.
                 // To get around this, just restart the entire system.
-                //
-                // **** 
-                //NVIC_SystemReset();
+                rp2040.restart();
             }
             else
             {
@@ -511,9 +526,8 @@ void readInputButton()
                 btService.disconnect();
                 btService.stop();
 
-                pixelBuffer->setBrightness(0);
-                pixelBuffer->displayPixels();
-                pixelBuffer->stop();
+                neoPixelDisplay->setBrightness(0);
+                neoPixelDisplay->updateDisplay();
             }
         }
         else

@@ -11,6 +11,9 @@ class DisplayConfigFactory
     public:
         static std::vector<DisplayConfiguration>* createForTestMatrix();
         static std::vector<DisplayConfiguration>* createForLegacySign();
+        static std::vector<DisplayConfiguration>* createForDigit1();
+        static std::vector<DisplayConfiguration>* createForDigit3();
+        static std::vector<DisplayConfiguration>* createForDigit8();
 };
 
 #endif // DISPLAYCONFIGFACTORY_H
