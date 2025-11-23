@@ -5,7 +5,6 @@
 #include <BluetoothCommon.h>
 #include <DisplayPatternLib.h>
 #include <StatusDisplay.h>
-#include <PredefinedStyleLib.h>
 #include "ArduinoPushButton/ArduinoPushButton.h"
 #include "ButtonProcessor/ButtonProcessor.h"
 #include <Configuration.h>
@@ -37,7 +36,7 @@ void initializeIO();
 void initializeButtonProcessor();
 void startBLEService();
 void readSettingsFromBLE();
-void setManualStyle(PredefinedStyle style);
+void setManualStyle(StyleDefinition styleDefinition);
 void updateTelemetry();
 void updateLedTelemetry();
 float getCalculatedBatteryVoltage();

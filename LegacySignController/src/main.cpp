@@ -6,6 +6,7 @@ StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 NeoPixelDisplay* neoPixelDisplay;
 DisplayPattern* currentLightStyle;
 ButtonProcessor buttonProcessor;
+StyleConfiguration* styleConfiguration;
 
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
@@ -15,9 +16,6 @@ ulong lastLedTelemetryTimestamp = 0;
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
 byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
-
-PredefinedStyle defaultStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid);
-PredefinedStyle lowPowerStyle = PredefinedStyle::getPredefinedStyle(PredefinedStyles::LowPower);
 
 // Settings that are updated via bluetooth
 byte currentBrightness = DEFAULT_BRIGHTNESS;
@@ -61,12 +59,16 @@ void setup()
         displayConfigs = DisplayConfigFactory::createForLegacySign();
     }
 
+    styleConfiguration = StyleConfigFactory::createDefaultStyleConfiguration();
+
     neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
     neoPixelDisplay->setBrightness(currentBrightness);
-    newPatternData = defaultStyle.getPatternData();
+    newPatternData = styleConfiguration->getDefaultStyle().getPatternData();
     currentPatternData = newPatternData;
     DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
-    initialPattern->setSpeed(defaultStyle.getSpeed());
+    currentSpeed = styleConfiguration->getDefaultStyle().getSpeed();
+    newSpeed = currentSpeed;
+    initialPattern->setSpeed(newSpeed);
     neoPixelDisplay->setDisplayPattern(initialPattern);
 
     display.setDisplay("---3");
@@ -135,7 +137,7 @@ void initializeButtonProcessor()
     }
 
     // Add the button actions
-    buttonProcessor.addTapAction({"0"}, "changeStyle", {"Rainbow", "Pink"});
+    buttonProcessor.addTapAction({"0"}, "changeStyle", {"RainbowRandom", "Pink"});
     buttonProcessor.addTapAction({"1"}, "changeStyle", {"BluePinkRandom", "BluePinkDigit"});
     buttonProcessor.addTapAction({"2"}, "changeStyle", {"RedPinkRandom", "RedPinkDigit"});
     buttonProcessor.addLongTapAction({"0"}, "changeStyle", {"Fire"});
@@ -143,10 +145,10 @@ void initializeButtonProcessor()
     buttonProcessor.addLongTapAction({"2"}, "disconnectBT");
 }
 
-void setManualStyle(PredefinedStyle style)
+void setManualStyle(StyleDefinition styleDefinition)
 {
-    newSpeed = style.getSpeed();
-    newPatternData = style.getPatternData();
+    newSpeed = styleDefinition.getSpeed();
+    newPatternData = styleDefinition.getPatternData();
 
     // Update the local BLE settings to reflect the new manual settings.
     btService.setSpeed(newSpeed);
@@ -164,8 +166,8 @@ void startBLEService()
     display.setDisplay("C ==");
 
     btService.setBrightness(currentBrightness);
-    btService.setSpeed(defaultStyle.getSpeed());
-    btService.setPatternData(defaultStyle.getPatternData());
+    btService.setSpeed(styleConfiguration->getDefaultStyle().getSpeed());
+    btService.setPatternData(styleConfiguration->getDefaultStyle().getPatternData());
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
 
@@ -232,9 +234,14 @@ void checkForLowPowerState()
 
             // Set up the "low power" display pattern.
             // The next call to updateLEDs will set this pattern for us.
+            PatternData lowPowerPattern;
+            lowPowerPattern.colorPattern = ColorPatternType::SingleColor;
+            lowPowerPattern.displayPattern = DisplayPatternType::LowPower;
+            lowPowerPattern.color1 = 0xFF0000; // Red
+
             newBrightness = 255;
-            newPatternData = lowPowerStyle.getPatternData();
-            newSpeed = lowPowerStyle.getSpeed();
+            newPatternData = lowPowerPattern;
+            newSpeed = 1;
         }
     }
 
@@ -364,8 +371,8 @@ void ProcessButtonAction(int callerId, String actionName, std::vector<String> ar
     {
         if (arguments.size() < 1)
         {
-            // Invalid number of arguments. Set to Pink_Solid as a default.
-            setManualStyle(PredefinedStyle::getPredefinedStyle(PredefinedStyles::Pink_Solid));
+            // Invalid number of arguments. Set to the default.
+            setManualStyle(styleConfiguration->getDefaultStyle());
             return;
         }
 
@@ -382,45 +389,17 @@ void ProcessButtonAction(int callerId, String actionName, std::vector<String> ar
 
         // Get styleName from argument list, based on the number of times the callerId was pressed.
         String styleName = arguments[manualButtonSequenceNumber];
-        PredefinedStyles styleEnum;
 
-        // Map the string to the enum
-        // Eventualy move this to the display configuration when implemented.
-        if (styleName == "Fire")
+        StyleDefinition styleDef = styleConfiguration->getDefaultStyle();
+        for (StyleDefinition& def : styleConfiguration->getStyles())
         {
-            styleEnum = PredefinedStyles::Fire;
-        }
-        else if (styleName == "Rainbow")
-        {
-            styleEnum = PredefinedStyles::Rainbow_Random_v1;
-        }
-        else if (styleName == "Pink")
-        {
-            styleEnum = PredefinedStyles::Pink_Solid;
-        }
-        else if (styleName == "BluePinkDigit")
-        {
-            styleEnum = PredefinedStyles::BluePink_Digit;
-        }
-        else if (styleName == "BluePinkRandom")
-        {
-            styleEnum = PredefinedStyles::BluePink_Random_v1;
-        }
-        else if (styleName == "RedPinkDigit")
-        {
-            styleEnum = PredefinedStyles::RedPink_Digit;
-        }
-        else if (styleName == "RedPinkRandom")
-        {
-            styleEnum = PredefinedStyles::RedPink_Random_v1;
-        }
-        else
-        {
-            // Unrecognized style name -- default to Pink_Solid
-            styleEnum = PredefinedStyles::Pink_Solid;
+            if (def.getName().equalsIgnoreCase(styleName))
+            {
+                styleDef = def;
+                break;
+            }
         }
 
-        PredefinedStyle style = PredefinedStyle::getPredefinedStyle(styleEnum);
-        setManualStyle(style);
+        setManualStyle(styleDef);
     }
 }
