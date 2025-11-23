@@ -41,7 +41,7 @@ class PatternFactory
         // Helper method to construct the appropriate ColorPattern based on the given PatternData.
         static ColorPattern* createColorPatternForPatternData(const PatternData& patternData);
 
-        static String getColorPatternString(String patternName, ColorPatternType patternType, uint numberOfColors, std::vector<String> parameterNames);
+        static String getColorPatternString(String patternName, ColorPatternType patternType, uint16_t numberOfColors, std::vector<String> parameterNames);
         static String getDisplayPatternString(String patternName, DisplayPatternType patternType, std::vector<String> parameterNames);
 };
 

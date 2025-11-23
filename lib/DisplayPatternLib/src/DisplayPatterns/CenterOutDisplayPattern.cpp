@@ -88,7 +88,7 @@ void CenterOutDisplayPattern::updateInternal(PixelMap* pixelMap)
         }
         else
         {
-            uint localCenter = m_centerLine - pixelMap->getColsToLeft();
+            uint16_t localCenter = m_centerLine - pixelMap->getColsToLeft();
             pixelMap->shiftColumnsLeft(newColor, localCenter);
             if (localCenter < pixelMap->getColumnCount() - 1) {
                 pixelMap->shiftColumnsRight(newColor, localCenter + 1);

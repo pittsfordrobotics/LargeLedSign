@@ -259,7 +259,7 @@ String PatternFactory::getKnownDisplayPatterns()
     return knownPatterns;
 }
 
-String PatternFactory::getColorPatternString(String patternName, ColorPatternType patternType, uint numberOfColors, std::vector<String> parameterNames)
+String PatternFactory::getColorPatternString(String patternName, ColorPatternType patternType, uint16_t numberOfColors, std::vector<String> parameterNames)
 {
     // Format:
     // <name>,<number>,<#colors>,<param1>,...

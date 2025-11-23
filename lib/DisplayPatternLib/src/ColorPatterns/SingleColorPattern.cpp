@@ -1,6 +1,6 @@
 #include "SingleColorPattern.h"
 
-SingleColorPattern::SingleColorPattern(ulong color)
+SingleColorPattern::SingleColorPattern(uint32_t color)
 {
     m_color = color;
     m_colorCount = 1;
@@ -10,17 +10,17 @@ void SingleColorPattern::reset()
 {
 }
 
-ulong SingleColorPattern::getNextColor()
+uint32_t SingleColorPattern::getNextColor()
 {
     return m_color;
 }
 
-uint SingleColorPattern::getNumberOfParameters()
+uint16_t SingleColorPattern::getNumberOfParameters()
 {
     return getParameterNames().size();
 }
 
-void SingleColorPattern::incrementOnly(uint incrementAmount)
+void SingleColorPattern::incrementOnly(uint16_t incrementAmount)
 {
 }
 

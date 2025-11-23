@@ -11,17 +11,17 @@ class RainbowColorPattern : public ColorPattern
     public:
         RainbowColorPattern();
         virtual void reset();
-        virtual ulong getNextColor();
-        virtual void incrementOnly(uint incrementAmount);
-        virtual uint getNumberOfParameters();
+        virtual uint32_t getNextColor();
+        virtual void incrementOnly(uint16_t incrementAmount);
+        virtual uint16_t getNumberOfParameters();
 
         void setHueIncrement(byte increment);
 
         static std::vector<String> getParameterNames();
 
     private:
-        uint m_currentHue{0};
-        uint m_hueIncrement{1};
+        uint16_t m_currentHue{0};
+        uint16_t m_hueIncrement{1};
 };
 
 #endif

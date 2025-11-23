@@ -10,14 +10,14 @@ class SingleColorPattern : public ColorPattern
         SingleColorPattern(ulong color);
 
         virtual void reset();
-        virtual ulong getNextColor();
-        virtual void incrementOnly(uint incrementAmount);
-        virtual uint getNumberOfParameters();
+        virtual uint32_t getNextColor();
+        virtual void incrementOnly(uint16_t incrementAmount);
+        virtual uint16_t getNumberOfParameters();
 
         static std::vector<String> getParameterNames();
 
     private:
-        ulong m_color{0};
+        uint32_t m_color{0};
 };
 
 #endif

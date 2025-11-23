@@ -1,6 +1,6 @@
 #include "RotationDisplayPattern.h"
 
-RotationDisplayPattern::RotationDisplayPattern(boolean isClockwise, boolean isSpotLight) : DisplayPattern()
+RotationDisplayPattern::RotationDisplayPattern(bool isClockwise, bool isSpotLight) : DisplayPattern()
 {
     m_isClockwise = isClockwise;
     m_isSpotLight = isSpotLight;
@@ -63,7 +63,7 @@ void RotationDisplayPattern::updateInternal(PixelMap* pixelMap)
     // Due to the fact that the pixel buffer's row and column numbers start
     // at 0 in the top-left, an increasing angle is clockwise.
     float newAngleDeg = m_isClockwise ? m_currentAngleDeg + m_angleIncrementDeg : m_currentAngleDeg - m_angleIncrementDeg;
-    ulong currentColor = m_colorPattern->getNextColor();
+    uint32_t currentColor = m_colorPattern->getNextColor();
 
     for (int row = 0; row < pixelMap->getRowCount(); row++)
     {

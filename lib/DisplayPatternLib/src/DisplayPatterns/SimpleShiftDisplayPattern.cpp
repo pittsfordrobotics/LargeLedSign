@@ -19,7 +19,7 @@ void SimpleShiftDisplayPattern::resetInternal(PixelMap* pixelMap)
 
 void SimpleShiftDisplayPattern::updateInternal(PixelMap* pixelMap)
 {
-    ulong newColor = m_colorPattern->getNextColor();
+    uint32_t newColor = m_colorPattern->getNextColor();
 
     switch (m_shiftType)
     {

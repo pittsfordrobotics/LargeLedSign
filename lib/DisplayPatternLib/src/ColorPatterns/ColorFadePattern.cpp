@@ -1,6 +1,6 @@
 #include "ColorFadePattern.h"
 
-ColorFadePattern::ColorFadePattern(ulong color1, ulong color2)
+ColorFadePattern::ColorFadePattern(uint32_t color1, uint32_t color2)
 {
     m_colors.push_back(color1);
     m_colors.push_back(color2);
@@ -8,7 +8,7 @@ ColorFadePattern::ColorFadePattern(ulong color1, ulong color2)
     m_colorCount = 2;
 }
 
-ColorFadePattern::ColorFadePattern(ulong color1, ulong color2, ulong color3)
+ColorFadePattern::ColorFadePattern(uint32_t color1, uint32_t color2, uint32_t color3)
 {
     m_colors.push_back(color1);
     m_colors.push_back(color2);
@@ -17,7 +17,7 @@ ColorFadePattern::ColorFadePattern(ulong color1, ulong color2, ulong color3)
     m_colorCount = 3;
 }
 
-ColorFadePattern::ColorFadePattern(ulong color1, ulong color2, ulong color3, ulong color4)
+ColorFadePattern::ColorFadePattern(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4)
 {
     m_colors.push_back(color1);
     m_colors.push_back(color2);
@@ -38,17 +38,17 @@ void ColorFadePattern::reset()
 {
     m_iterationCount = 0;
     
-    for (uint i = 0; i < m_colors.size(); i++)
+    for (uint16_t i = 0; i < m_colors.size(); i++)
     {
         // Fade in
-        ulong targetColor = m_colors[i];
+        uint32_t targetColor = m_colors[i];
         byte colorRed = (targetColor & 0xFF0000) >> 16;
         byte colorGreen = (targetColor & 0xFF00) >> 8;
         byte colorBlue = (targetColor & 0xFF);
         for (int i = 0; i < m_fadeInDuration; i++)
         {
             double scaling =  applyBrightnessGamma((double)(i + 1)/(m_fadeInDuration + 1));
-            ulong color = Adafruit_NeoPixel::Color(colorRed * scaling, colorGreen * scaling, colorBlue * scaling);
+            uint32_t color = Adafruit_NeoPixel::Color(colorRed * scaling, colorGreen * scaling, colorBlue * scaling);
             m_colorSequence.push_back(color);
         }
 
@@ -62,7 +62,7 @@ void ColorFadePattern::reset()
         for (int i = m_fadeOutDuration -1; i >= 0; i--)
         {
             double scaling =  applyBrightnessGamma((double)(i + 1)/(m_fadeOutDuration + 1));
-            ulong color = Adafruit_NeoPixel::Color(colorRed * scaling, colorGreen * scaling, colorBlue * scaling);
+            uint32_t color = Adafruit_NeoPixel::Color(colorRed * scaling, colorGreen * scaling, colorBlue * scaling);
             m_colorSequence.push_back(color);
         }
 
@@ -83,7 +83,7 @@ ulong ColorFadePattern::getNextColor()
     }
 
     m_iterationCount = m_iterationCount % m_colorSequence.size();
-    ulong color = m_colorSequence[m_iterationCount];
+    uint32_t color = m_colorSequence[m_iterationCount];
     m_iterationCount++;
     return color;
 }
@@ -136,12 +136,12 @@ byte ColorFadePattern::convertFadeInOutDuration(byte duration)
     return convertedDuration;
 }
 
-void ColorFadePattern::incrementOnly(uint incrementAmount)
+void ColorFadePattern::incrementOnly(uint16_t incrementAmount)
 {
     m_iterationCount = incrementAmount;
 }
 
-uint ColorFadePattern::getNumberOfParameters()
+uint16_t ColorFadePattern::getNumberOfParameters()
 {
     return getParameterNames().size();
 }

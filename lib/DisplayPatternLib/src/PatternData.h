@@ -29,7 +29,7 @@ struct PatternData {
 
 		// The first color in the color pattern, if needed for the pattern.
 		union {
-			ulong color1{0};
+			uint32_t color1{0};
 			struct {
 				byte blue1;
 				byte green1;
@@ -40,7 +40,7 @@ struct PatternData {
 
 		// The second color in the color pattern, if needed for the pattern.
 		union {
-			ulong color2{0};
+			uint32_t color2{0};
 			struct {
 				byte blue2;
 				byte green2;
@@ -51,7 +51,7 @@ struct PatternData {
 
 		// The third color in the color pattern, if needed for the pattern.
 		union {
-			ulong color3{0};
+			uint32_t color3{0};
 			struct {
 				byte blue3;
 				byte green3;
@@ -62,7 +62,7 @@ struct PatternData {
 
 		// The fourth color in the color pattern, if needed for the pattern.
 		union {
-			ulong color4{0};
+			uint32_t color4{0};
 			struct {
 				byte blue4;
 				byte green4;

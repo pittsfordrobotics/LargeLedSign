@@ -10,14 +10,14 @@
 class ColorFadePattern : public ColorPattern
 {
     public:
-        ColorFadePattern(ulong color1, ulong color2);
-        ColorFadePattern(ulong color1, ulong color2, ulong color3);
-        ColorFadePattern(ulong color1, ulong color2, ulong color3, ulong color4);
+        ColorFadePattern(uint32_t color1, uint32_t color2);
+        ColorFadePattern(uint32_t color1, uint32_t color2, uint32_t color3);
+        ColorFadePattern(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4);
 
         virtual void reset();
-        virtual ulong getNextColor();
-        virtual void incrementOnly(uint incrementAmount);
-        virtual uint getNumberOfParameters();
+        virtual uint32_t getNextColor();
+        virtual void incrementOnly(uint16_t incrementAmount);
+        virtual uint16_t getNumberOfParameters();
 
         void setColorDuration(byte duration);
         void setFadeInDuration(byte duration);
@@ -31,10 +31,10 @@ class ColorFadePattern : public ColorPattern
         byte m_fadeInDuration{0};
         byte m_fadeOutDuration{0};
         byte m_fadedDuration{1};
-        ulong m_iterationCount{0};
+        uint32_t m_iterationCount{0};
 
-        std::vector<ulong> m_colors;
-        std::vector<ulong> m_colorSequence;
+        std::vector<uint32_t> m_colors;
+        std::vector<uint32_t> m_colorSequence;
         byte convertColorDuration(byte duration);
         byte convertFadeInOutDuration(byte duration);
 

@@ -1,6 +1,6 @@
 #include "BackgroundPlusThree.h"
 
-BackgroundPlusThree::BackgroundPlusThree(ulong background, ulong color1, ulong color2, ulong color3)
+BackgroundPlusThree::BackgroundPlusThree(uint32_t background, uint32_t color1, uint32_t color2, uint32_t color3)
 {
     m_backgroundColor = background;
     m_color1 = color1;
@@ -54,7 +54,7 @@ ulong BackgroundPlusThree::getNextColor()
     return color;
 }
 
-uint BackgroundPlusThree::getNumberOfParameters()
+uint16_t BackgroundPlusThree::getNumberOfParameters()
 {
     return getParameterNames().size();
 }
@@ -91,7 +91,7 @@ byte BackgroundPlusThree::convertDuration(byte duration)
     return convertedDuration;
 }
 
-void BackgroundPlusThree::incrementOnly(uint incrementAmount)
+void BackgroundPlusThree::incrementOnly(uint16_t incrementAmount)
 {
     m_iterationCount = incrementAmount;
 }

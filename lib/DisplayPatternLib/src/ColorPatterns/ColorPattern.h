@@ -19,23 +19,23 @@ class ColorPattern
         virtual ulong getNextColor() = 0;
 
         // Increments the internal state of the color pattern by the specified number of iterations.
-        virtual void incrementOnly(uint incrementAmount) = 0;
+        virtual void incrementOnly(uint16_t incrementAmount) = 0;
 
         // Gets the number of colors expected by this color pattern.
-        uint getNumberOfColors() { return m_colorCount; }
+        uint16_t getNumberOfColors() { return m_colorCount; }
 
         // Gets the number of parameters required by the color pattern.
-        virtual uint getNumberOfParameters() = 0;
+        virtual uint16_t getNumberOfParameters() = 0;
 
     protected:
-        uint m_colorCount{0};
+        uint16_t m_colorCount{0};
 
         // Just in-line the 'color' method here.
-        ulong color(byte red, byte green, byte blue)
+        uint32_t color(byte red, byte green, byte blue)
         {
             // Taken from the Adafruit_Neopixel::Color method.
             // I didn't want to add a dependency on that library for a single method, so copying it here.
-            return ((ulong)red << 16) | ((ulong)green << 8) | blue;
+            return ((uint32_t)red << 16) | ((uint32_t)green << 8) | blue;
         }
 };
 

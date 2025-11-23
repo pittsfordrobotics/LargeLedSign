@@ -16,7 +16,7 @@ ulong RainbowColorPattern::getNextColor()
     return color;
 }
 
-uint RainbowColorPattern::getNumberOfParameters()
+uint16_t RainbowColorPattern::getNumberOfParameters()
 {
     return getParameterNames().size();
 }
@@ -26,7 +26,7 @@ void RainbowColorPattern::setHueIncrement(byte hueIncrement)
     m_hueIncrement = MathUtils::rescaleInput(5, 1000, hueIncrement);
 }
 
-void RainbowColorPattern::incrementOnly(uint incrementAmount)
+void RainbowColorPattern::incrementOnly(uint16_t incrementAmount)
 {
     m_currentHue += incrementAmount * m_hueIncrement;
 }

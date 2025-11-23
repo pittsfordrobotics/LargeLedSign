@@ -6,7 +6,7 @@
 class RotationDisplayPattern : public DisplayPattern
 {
     public:
-        RotationDisplayPattern(boolean isClockwise, boolean isSpotLight);
+        RotationDisplayPattern(bool isClockwise, bool isSpotLight);
 
         static std::vector<String> getParameterNames();
 
@@ -18,18 +18,18 @@ class RotationDisplayPattern : public DisplayPattern
         virtual void updateInternal(PixelMap* pixelMap);
 
     private:
-        boolean isAngleInRange(float angleToCheck, float startAngle, float endAngle);
+        bool isAngleInRange(float angleToCheck, float startAngle, float endAngle);
         float normalizeAngle(float angle);
 
-        boolean m_isClockwise{true};
-        boolean m_isSpotLight{false};
-        uint m_numberOfRays{1};
-        int m_angleIncrementDeg{5};
+        bool m_isClockwise{true};
+        bool m_isSpotLight{false};
+        uint16_t m_numberOfRays{1};
+        int16_t m_angleIncrementDeg{5};
         float m_centerRow{0.0f};
         float m_centerColumn{0.0f};
         float m_currentAngleDeg{0.0f};
         std::vector<std::vector<float>> m_pixelAnglesDeg;
-        std::vector<ulong> m_spotLightColors;
+        std::vector<uint32_t> m_spotLightColors;
 };
 
 #endif
