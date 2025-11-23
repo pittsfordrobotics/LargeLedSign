@@ -14,20 +14,20 @@ StyleConfiguration* StyleConfiguration::ParseJson(const char* jsonString, size_t
     
     if (err == DeserializationError::EmptyInput)
     {
-        debugPrintln("Style configuration JSON string was empty.");
+        DebugUtils::println("Style configuration JSON string was empty.");
         return styleConfiguration;
     }
 
     if (err != DeserializationError::Ok)
     {
-        debugPrint("Error parsing style configuration JSON: ");
-        debugPrintln(err.c_str());
+        DebugUtils::print("Error parsing style configuration JSON: ");
+        DebugUtils::println(err.c_str());
         return styleConfiguration;
     }
 
     if (configDoc.isNull())
     {
-        debugPrintln("Style configuration JSON was null after parsing.");
+        DebugUtils::println("Style configuration JSON was null after parsing.");
         return styleConfiguration;
     }
 
@@ -70,30 +70,30 @@ bool StyleConfiguration::tryParseStyleEntry(JsonVariant style, StyleDefinition& 
 {
     if (!style["name"].is<JsonVariant>())
     {
-        debugPrintln("Style entry is missing a name.");
+        DebugUtils::println("Style entry is missing a name.");
         return false;
     }
 
     String styleName = style["name"].as<std::string>().c_str();
-    debugPrint("Parsing style with name ");
-    debugPrintln(styleName.c_str());
+    DebugUtils::print("Parsing style with name ");
+    DebugUtils::println(styleName.c_str());
     styleDefinition.setName(styleName);
 
     if (!style["colorPattern"].is<JsonVariant>())
     {
-        debugPrintln("Style entry is missing a color pattern.");
+        DebugUtils::println("Style entry is missing a color pattern.");
         return false;
     }
 
     if (!style["displayPattern"].is<JsonVariant>())
     {
-        debugPrintln("Style entry is missing a display pattern.");
+        DebugUtils::println("Style entry is missing a display pattern.");
         return false;
     }
 
     if (!style["speed"].is<JsonVariant>())
     {
-        debugPrintln("Style entry is missing a speed.");
+        DebugUtils::println("Style entry is missing a speed.");
         return false;
     }
 
@@ -136,22 +136,4 @@ StyleDefinition StyleConfiguration::getUnknownDefaultStyle()
     styleDefinition.setName("UnknownDefault");
 
     return styleDefinition;
-}
-
-void StyleConfiguration::debugPrint(const char* message)
-{
-#ifdef PIO_UNIT_TESTING
-    printf("%s", message);
-#else
-    Serial.print(message);
-#endif      
-}
-
-void StyleConfiguration::debugPrintln(const char* message)
-{
-#ifdef PIO_UNIT_TESTING
-    printf("%s\n", message);
-#else
-    Serial.println(message);
-#endif      
 }

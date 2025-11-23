@@ -4,9 +4,8 @@
 
 // Reference any needed cpp files directly to avoid pulling in
 // references that can't be resolved with the "fake" Arduino environment.
-#include "../src/ButtonProcessor/ButtonProcessor.cpp"
-#include "../src/ButtonProcessor/ButtonAction.cpp"
-#include "../src/Utils/DebugUtils.cpp"
+#include <DebugUtils.h>
+#include <ButtonProcessor.h>
 #include "../TestHelpers/MockButton.cpp"
 
 int lastCallerId(-1);

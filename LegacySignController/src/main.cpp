@@ -32,6 +32,8 @@ void setup()
     Serial.begin(9600);
     delay(2000);
     Serial.println("Starting...");
+    
+    display.setDisplay("---1");
 
     initializeIO();
     initializeButtonProcessor();
@@ -43,7 +45,6 @@ void setup()
         signType = 0; // Test matrix
     }
 
-    display.setDisplay("---1");
     display.setDisplay("---2");
 
     //
@@ -61,6 +62,8 @@ void setup()
 
     styleConfiguration = StyleConfigFactory::createDefaultStyleConfiguration();
 
+    display.setDisplay("---3");
+
     neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
     neoPixelDisplay->setBrightness(currentBrightness);
     newPatternData = styleConfiguration->getDefaultStyle().getPatternData();
@@ -71,7 +74,7 @@ void setup()
     initialPattern->setSpeed(newSpeed);
     neoPixelDisplay->setDisplayPattern(initialPattern);
 
-    display.setDisplay("---3");
+    display.setDisplay("---4");
 
     if (!BLE.begin())
     {

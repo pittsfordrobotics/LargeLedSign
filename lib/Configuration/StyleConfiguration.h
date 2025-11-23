@@ -6,6 +6,7 @@
 #include <vector>
 #include "Colors.h"
 #include "StyleDefinition.h"
+#include "..\DebugUtils\DebugUtils.h"
 
 class StyleConfiguration
 {
@@ -21,8 +22,6 @@ class StyleConfiguration
         static bool tryParseStyleEntry(JsonVariant style, StyleDefinition& styleDefinition);
         // returns the style to use as the default if the named default style is not present in the list.
         static StyleDefinition getUnknownDefaultStyle();
-        static void debugPrint(const char* message);
-        static void debugPrintln(const char* message);
 
         StyleDefinition m_defaultStyle;
         std::vector<StyleDefinition> m_styles;

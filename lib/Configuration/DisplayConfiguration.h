@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <vector>
 #include <ArduinoJson.h>
+#include "..\DebugUtils\DebugUtils.h"
 
 #define DISPLAY_CONFIG_DEFAULTBRIGHTNESS 170
 
@@ -32,8 +33,6 @@ class DisplayConfiguration
         DisplayConfiguration& operator=(const DisplayConfiguration& other);
 
     private:
-        static void debugPrint(const char* message);
-        static void debugPrintln(const char* message);
         static bool tryParseDisplayEntryFromJsonVariant(JsonVariant display, byte defaultBrightness, DisplayConfiguration& config);
 
         DisplayConfiguration();

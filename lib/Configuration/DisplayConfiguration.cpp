@@ -9,20 +9,20 @@ std::vector<DisplayConfiguration>* DisplayConfiguration::ParseJson(const char* j
     
     if (err == DeserializationError::EmptyInput)
     {
-        debugPrintln("Display configuration JSON string was empty.");
+        DebugUtils::println("Display configuration JSON string was empty.");
         return configs;
     }
 
     if (err != DeserializationError::Ok)
     {
-        debugPrint("Error parsing display configuration JSON: ");
-        debugPrintln(err.c_str());
+        DebugUtils::print("Error parsing display configuration JSON: ");
+        DebugUtils::println(err.c_str());
         return configs;
     }
 
     if (configDoc.isNull())
     {
-        debugPrintln("Display configuration JSON was null after parsing.");
+        DebugUtils::println("Display configuration JSON was null after parsing.");
         return configs;
     }
 
@@ -36,7 +36,7 @@ std::vector<DisplayConfiguration>* DisplayConfiguration::ParseJson(const char* j
     JsonArray displays = configDoc["displays"].as<JsonArray>();
     if (displays.isNull())
     {
-        debugPrintln("No displays found in the configuration.");
+        DebugUtils::println("No displays found in the configuration.");
         return configs;
     }
 
@@ -133,40 +133,40 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
 {
     if (display.isNull())
     {
-        debugPrintln("Display entry was null.");
+        DebugUtils::println("Display entry was null.");
         return false;
     }
 
-    debugPrint("Parsing display entry: ");
+    DebugUtils::print("Parsing display entry: ");
     if (display["name"].is<JsonVariant>())
     {
         const char* name = display["name"].as<const char*>();
-        debugPrintln(name);
+        DebugUtils::println(name);
     }
     else
     {
-        debugPrintln("<<no name>>");
+        DebugUtils::println("<<no name>>");
     }
 
     if (display["disabled"].is<JsonVariant>())
     {
         if (display["disabled"].as<bool>())
         {
-            debugPrintln("Display entry is disabled.");
+            DebugUtils::println("Display entry is disabled.");
             return false;
         }
     }
 
     if (!display["gpioPin"].is<JsonVariant>())
     {
-        debugPrintln("Display entry did not contain a GPIO pin.");
+        DebugUtils::println("Display entry did not contain a GPIO pin.");
         return false;
     }
     config.m_gpioPin = display["gpioPin"].as<byte>();
 
     if (!display["numberOfPixels"].is<JsonVariant>())
     {
-        debugPrintln("Display entry did not contain the number of pixels.");
+        DebugUtils::println("Display entry did not contain the number of pixels.");
         return false;
     }
     config.m_numPixels = display["numberOfPixels"].as<uint16_t>();
@@ -191,7 +191,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
     // Parse the pixel mappings
     if (!display["columnPixelMapping"].is<JsonArray>())
     {
-        debugPrintln("Display entry did not contain a valid column pixel mapping.");
+        DebugUtils::println("Display entry did not contain a valid column pixel mapping.");
         return false;
     }
 
@@ -201,7 +201,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
         std::vector<uint16_t>* columnPixels = new std::vector<uint16_t>();
         if (!columnMapping[i].is<JsonArray>())
         {
-            debugPrintln("Column pixel mapping entry was not an array.");
+            DebugUtils::println("Column pixel mapping entry was not an array.");
             return false;
         }
 
@@ -215,7 +215,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
 
     if (!display["rowPixelMapping"].is<JsonArray>())
     {
-        debugPrintln("Display entry did not contain a valid row pixel mapping.");
+        DebugUtils::println("Display entry did not contain a valid row pixel mapping.");
         return false;
     }
 
@@ -225,7 +225,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
         std::vector<uint16_t>* rowPixels = new std::vector<uint16_t>();
         if (!rowMapping[i].is<JsonArray>())
         {
-            debugPrintln("Row pixel mapping entry was not an array.");
+            DebugUtils::println("Row pixel mapping entry was not an array.");
             return false;
         }
 
@@ -240,7 +240,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
     if (!display["digitPixelMapping"].is<JsonArray>())
     {
         // If not defined, put all pixels in a single digit.
-        debugPrintln("Display entry did not contain a valid digit pixel mapping. Assuming all pixels are in a single digit.");
+        DebugUtils::println("Display entry did not contain a valid digit pixel mapping. Assuming all pixels are in a single digit.");
         std::vector<uint16_t>* digitPixels = new std::vector<uint16_t>();
         for (int i = 0; i < config.m_numPixels; i++)
         {
@@ -257,7 +257,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
             std::vector<uint16_t>* digitPixels = new std::vector<uint16_t>();
             if (!digitMapping[i].is<JsonArray>())
             {
-                debugPrintln("Digit pixel mapping entry was not an array.");
+                DebugUtils::println("Digit pixel mapping entry was not an array.");
                 return false;
             }
 
@@ -270,25 +270,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
         }
     }
 
-    debugPrintln("Display entry parsed successfully.");
+    DebugUtils::println("Display entry parsed successfully.");
     
     return true;
-}
-
-void DisplayConfiguration::debugPrint(const char* message)
-{
-#ifdef PIO_UNIT_TESTING
-    printf("%s", message);
-#else
-    Serial.print(message);
-#endif      
-}
-
-void DisplayConfiguration::debugPrintln(const char* message)
-{
-#ifdef PIO_UNIT_TESTING
-    printf("%s\n", message);
-#else
-    Serial.println(message);
-#endif      
 }

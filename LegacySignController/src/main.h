@@ -6,7 +6,7 @@
 #include <DisplayPatternLib.h>
 #include <StatusDisplay.h>
 #include "ArduinoPushButton/ArduinoPushButton.h"
-#include "ButtonProcessor/ButtonProcessor.h"
+#include <ButtonProcessor.h>
 #include <Configuration.h>
 #include "NeoPixelDisplay.h"
 
