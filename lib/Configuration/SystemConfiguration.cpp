@@ -55,6 +55,11 @@ SystemConfiguration* SystemConfiguration::ParseJson(
         config->configureButtonProcessor(buttonConfigs, buttonFactory);
     }
 
+    if (configDoc["clockMultiplier"].is<JsonVariant>())
+    {
+        config->m_clockMultiplier = configDoc["clockMultiplier"].as<float>();
+    }
+
     return config;
 }
 

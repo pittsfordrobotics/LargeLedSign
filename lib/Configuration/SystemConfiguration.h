@@ -5,6 +5,9 @@
 #include <functional>
 #include <vector>
 #include <ArduinoJson.h>
+#include "BatteryMonitorConfiguration.h"
+#include "PowerLedConfiguration.h"
+#include "Tm1637DisplayConfiguration.h"
 #include "..\ButtonProcessor\ButtonProcessor.h"
 #include "..\DebugUtils\DebugUtils.h"
 
@@ -27,10 +30,9 @@ class SystemConfiguration {
         String getStyleConfigurationFile() { return m_styleConfigurationFile; }
         float getClockMultiplier() { return m_clockMultiplier; }
 
-        // Additional configs to add:
-        // BatteryMonitorConfiguration
-        // PowerLedConfiguration
-        // Tm1637Configuration
+        PowerLedConfiguration& getPowerLedConfiguration() { return m_powerLedConfiguration; }
+        BatteryMonitorConfiguration& getBatteryMonitorConfiguration() { return m_batteryMonitorConfiguration; }
+        Tm1637DisplayConfiguration& getTm1637DisplayConfiguration() { return m_tm1637DisplayConfiguration; }
 
     private:
         ButtonProcessor m_buttonProcessor;
@@ -39,6 +41,9 @@ class SystemConfiguration {
         String m_styleConfigurationFile{"styleconfiguration.json"};
         float m_clockMultiplier{1.0f};
         std::vector<GenericButton*> m_buttons;  // Track buttons for cleanup
+        PowerLedConfiguration m_powerLedConfiguration;
+        BatteryMonitorConfiguration m_batteryMonitorConfiguration;
+        Tm1637DisplayConfiguration m_tm1637DisplayConfiguration;
 
         SystemConfiguration() {};
         void configureButtonProcessor(JsonVariant buttonConfigs, ButtonFactory buttonFactory);

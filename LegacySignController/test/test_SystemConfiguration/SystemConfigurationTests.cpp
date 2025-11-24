@@ -19,7 +19,7 @@ const char* minimalConfigurationJson();
 const char* oneButtonWithActions();
 const char* buttonsWithActions();
 const char* disabledButton();
-const char* fullLegacySignConfigurationJson();
+const char* additionalConfigurations();
 
 void resetActionParameters() {
     lastCallerId = -1;
@@ -74,10 +74,12 @@ void emptyJsonDoesNothing() {
     TEST_ASSERT_EQUAL_STRING_MESSAGE("bluetoothconfiguration.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styleconfiguration.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
-    // Additional checks when other configs are in place:
-    // BatteryMonitorConfiguration is disabled
-    // PowerLedConfiguration is disabled
-    // Tm1637Configuration is disabled
+    BatteryMonitorConfiguration& bmc = sc->getBatteryMonitorConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(bmc.isEnabled(), "BatteryMonitorConfiguration should be disabled by default.");
+    PowerLedConfiguration& plc = sc->getPowerLedConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(plc.isEnabled(), "PowerLedConfiguration should be disabled by default.");
+    Tm1637DisplayConfiguration& tdc = sc->getTm1637DisplayConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(tdc.isEnabled(), "Tm1637DisplayConfiguration should be disabled by default.");
     delete sc;
 }
 
@@ -95,10 +97,12 @@ void emptyJsonObjectDoesNothing() {
     TEST_ASSERT_EQUAL_STRING_MESSAGE("bluetoothconfiguration.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styleconfiguration.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
-    // Additional checks when other configs are in place:
-    // BatteryMonitorConfiguration is disabled
-    // PowerLedConfiguration is disabled
-    // Tm1637Configuration is disabled
+    BatteryMonitorConfiguration& bmc = sc->getBatteryMonitorConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(bmc.isEnabled(), "BatteryMonitorConfiguration should be disabled by default.");
+    PowerLedConfiguration& plc = sc->getPowerLedConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(plc.isEnabled(), "PowerLedConfiguration should be disabled by default.");
+    Tm1637DisplayConfiguration& tdc = sc->getTm1637DisplayConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(tdc.isEnabled(), "Tm1637DisplayConfiguration should be disabled by default.");
     delete sc;
 }
 
@@ -134,6 +138,9 @@ void buttonsAndActionsAreParsed() {
     TEST_ASSERT_EQUAL_MESSAGE(2, buttons.size(), "There should be 2 buttons.");
     bp.setActionProcessor(processAction);
 
+    // We don't need to test all functionality of the ButtonProcessor here,
+    // just that the buttons and actions were parsed correctly.
+
     // Simulate button 1 tap
     button1->setPressType(ButtonPressType::Normal);
     sc->getButtonProcessor().update();
@@ -160,6 +167,53 @@ void buttonsAndActionsAreParsed() {
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", lastArguments[2].c_str(), "Third argument is not correct for button 2 tap.");
     resetActionParameters();
 
+    // Simulate buttons 1 and 2 tap
+    button1->setPressType(ButtonPressType::Normal);
+    button2->setPressType(ButtonPressType::Normal);
+    sc->getButtonProcessor().update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("changeStyle", lastActionName.c_str(), "Last action name is not correct for buttons 1 and 2 tap.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, lastArguments.size(), "Number of arguments is not correct for buttons 1 and 2 tap.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Fire", lastArguments[0].c_str(), "First argument is not correct for buttons 1 and 2 tap.");
+    resetActionParameters();
+
+    delete sc;
+}
+
+void disabledButtonDefinitionIsIgnored() {
+    String json = disabledButton();
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        json.c_str(), 
+        json.length(), 
+        mockButtonFactory);
+    
+    ButtonProcessor& bp = sc->getButtonProcessor();
+    std::vector<GenericButton*> buttons = bp.getButtons();
+    TEST_ASSERT_EQUAL_MESSAGE(1, buttons.size(), "There should be 1 button (the disabled one should be ignored).");
+    bp.setActionProcessor(processAction);
+
+    // Simulate button 1 tap (make sure the correct button was mapped)
+    button1->setPressType(ButtonPressType::Normal);
+    sc->getButtonProcessor().update();
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("changeStyle", lastActionName.c_str(), "Last action name is not correct for button 1 tap.");
+    TEST_ASSERT_EQUAL_MESSAGE(2, lastArguments.size(), "Number of arguments is not correct for button 1 tap.");
+    resetActionParameters();
+
+    delete sc;
+}
+
+void additionalConfigurationsAreParsed() {
+    String json = additionalConfigurations();
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        json.c_str(), 
+        json.length(), 
+        mockButtonFactory);
+    
+    TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.15f, sc->getClockMultiplier(), "Clock multiplier is not the expected value.");
+    // Additional checks when other configs are in place:
+    // BatteryMonitorConfiguration is enabled with correct properties
+    // PowerLedConfiguration is disabled
+    // Tm1637Configuration is enabled with correct properties
+
     delete sc;
 }
 
@@ -170,6 +224,8 @@ int main(int argc, char **argv) {
     RUN_TEST(emptyJsonObjectDoesNothing);
     RUN_TEST(minimalJsonSetsProperties);
     RUN_TEST(buttonsAndActionsAreParsed);
+    RUN_TEST(disabledButtonDefinitionIsIgnored);
+    RUN_TEST(additionalConfigurationsAreParsed);
 
     return UNITY_END();
 }
@@ -257,56 +313,10 @@ const char* disabledButton() {
     )json";
 }
 
-const char* fullLegacySignConfigurationJson()
+const char* additionalConfigurations()
 {
     return R"json(
         {
-            "comment": "Legacy sign",
-            "displayConfigurationFile": "displayconfiguration.json",
-            "bluetoothConfigurationFile": "bluetoothconfiguration.json",
-            "styleConfigurationFile": "styleconfigurations.json"
-            "buttons": {
-                "definitions": [
-                    {
-                        "id": "1",
-                        "enabled": true,
-                        "gpioPin": 27
-                    },
-                    {
-                        "id": "2",
-                        "enabled": true,
-                        "gpioPin": 28
-                    },
-                    {
-                        "id": "3",
-                        "enabled": true,
-                        "gpioPin": 26
-                    }
-                ],
-                "actions": [
-                    {
-                        "buttonIds": ["1"],
-                        "tapAction": "changeStyle",
-                        "tapActionArguments": ["Pink", "RainbowRandom"],
-                        "longTapAction": "changeStyle",
-                        "longTapActionArguments": ["Fire"]
-                    },
-                    {
-                        "buttonId": ["2"],
-                        "tapAction": "changeStyle",
-                        "tapActionArguments": ["BluePinkRandom", "BluePinkDigit"]
-                        "longTapAction": "batteryVoltage",
-                        "longTapActionArguments": []
-                    },
-                    {
-                        "buttonId": ["3"],
-                        "tapAction": "changeStyle",
-                        "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"]
-                        "longTapAction": "disconnectBT",
-                        "longTapActionArguments": []
-                    }
-                ]
-            },
             "batteryMonitor": {
                 "enabled": true,
                 "analogInputGpioPin": 29,
@@ -318,7 +328,7 @@ const char* fullLegacySignConfigurationJson()
                 "enabled": false,
                 "gpioPin": 22
             },
-            "clockMultiplier": 1.0,
+            "clockMultiplier": 1.15,
             "tm1637Display": {
                 "enabled": true,
                 "clockGpioPin": 15,
