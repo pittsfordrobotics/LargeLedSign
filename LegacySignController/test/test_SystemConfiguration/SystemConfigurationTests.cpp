@@ -80,6 +80,10 @@ void emptyJsonDoesNothing() {
     TEST_ASSERT_FALSE_MESSAGE(plc.isEnabled(), "PowerLedConfiguration should be disabled by default.");
     Tm1637DisplayConfiguration& tdc = sc->getTm1637DisplayConfiguration();
     TEST_ASSERT_FALSE_MESSAGE(tdc.isEnabled(), "Tm1637DisplayConfiguration should be disabled by default.");
+    BluetoothConfiguration& btc = sc->getBluetoothConfiguration();
+    TEST_ASSERT_TRUE_MESSAGE(btc.isEnabled(), "BluetoothConfiguration should be enabled by default.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("99be4fac-c708-41e5-a149-74047f554cc1", btc.getUuid().c_str(), "Bluetooth UUID is not the expected default value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("LED Sign Controller", btc.getLocalName().c_str(), "Bluetooth local name is not the expected default value.");
     delete sc;
 }
 
@@ -103,6 +107,10 @@ void emptyJsonObjectDoesNothing() {
     TEST_ASSERT_FALSE_MESSAGE(plc.isEnabled(), "PowerLedConfiguration should be disabled by default.");
     Tm1637DisplayConfiguration& tdc = sc->getTm1637DisplayConfiguration();
     TEST_ASSERT_FALSE_MESSAGE(tdc.isEnabled(), "Tm1637DisplayConfiguration should be disabled by default.");
+    BluetoothConfiguration& btc = sc->getBluetoothConfiguration();
+    TEST_ASSERT_TRUE_MESSAGE(btc.isEnabled(), "BluetoothConfiguration should be enabled by default.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("99be4fac-c708-41e5-a149-74047f554cc1", btc.getUuid().c_str(), "Bluetooth UUID is not the expected default value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("LED Sign Controller", btc.getLocalName().c_str(), "Bluetooth local name is not the expected default value.");
     delete sc;
 }
 
@@ -119,10 +127,16 @@ void minimalJsonSetsProperties() {
     TEST_ASSERT_EQUAL_STRING_MESSAGE("bt.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styles.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected value.");
     TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
-    // Additional checks when other configs are in place:
-    // BatteryMonitorConfiguration is disabled
-    // PowerLedConfiguration is disabled
-    // Tm1637Configuration is disabled
+    BatteryMonitorConfiguration& bmc = sc->getBatteryMonitorConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(bmc.isEnabled(), "BatteryMonitorConfiguration should be disabled by default.");
+    PowerLedConfiguration& plc = sc->getPowerLedConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(plc.isEnabled(), "PowerLedConfiguration should be disabled by default.");
+    Tm1637DisplayConfiguration& tdc = sc->getTm1637DisplayConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(tdc.isEnabled(), "Tm1637DisplayConfiguration should be disabled by default.");
+    BluetoothConfiguration& btc = sc->getBluetoothConfiguration();
+    TEST_ASSERT_TRUE_MESSAGE(btc.isEnabled(), "BluetoothConfiguration should be enabled by default.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("99be4fac-c708-41e5-a149-74047f554cc1", btc.getUuid().c_str(), "Bluetooth UUID is not the expected default value.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("LED Sign Controller", btc.getLocalName().c_str(), "Bluetooth local name is not the expected default value.");
     delete sc;
 }
 
@@ -209,11 +223,24 @@ void additionalConfigurationsAreParsed() {
         mockButtonFactory);
     
     TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.15f, sc->getClockMultiplier(), "Clock multiplier is not the expected value.");
-    // Additional checks when other configs are in place:
-    // BatteryMonitorConfiguration is enabled with correct properties
-    // PowerLedConfiguration is disabled
-    // Tm1637Configuration is enabled with correct properties
-
+    BatteryMonitorConfiguration& bmc = sc->getBatteryMonitorConfiguration();
+    TEST_ASSERT_TRUE_MESSAGE(bmc.isEnabled(), "BatteryMonitorConfiguration should be enabled.");
+    TEST_ASSERT_EQUAL_MESSAGE(29, bmc.getAnalogInputPin(), "BatteryMonitorConfiguration analog input pin is not correct.");
+    TEST_ASSERT_FLOAT_WITHIN_MESSAGE(0.01f, 4.83f, bmc.getInputMultiplier(), "BatteryMonitorConfiguration input multiplier is not correct.");
+    TEST_ASSERT_FLOAT_WITHIN_MESSAGE(0.01f, 6.7f, bmc.getVoltageToEnterLowPowerState(), "BatteryMonitorConfiguration voltage to enter low power state is not correct.");
+    TEST_ASSERT_FLOAT_WITHIN_MESSAGE(0.01f, 7.2f, bmc.getVoltageToExitLowPowerState(), "BatteryMonitorConfiguration voltage to exit low power state is not correct.");
+    PowerLedConfiguration& plc = sc->getPowerLedConfiguration();
+    TEST_ASSERT_TRUE_MESSAGE(plc.isEnabled(), "PowerLedConfiguration should be enabled.");
+    TEST_ASSERT_EQUAL_MESSAGE(22, plc.getGpioPin(), "PowerLedConfiguration GPIO pin is not correct.");
+    Tm1637DisplayConfiguration& tdc = sc->getTm1637DisplayConfiguration();
+    TEST_ASSERT_TRUE_MESSAGE(tdc.isEnabled(), "Tm1637DisplayConfiguration should be enabled.");
+    TEST_ASSERT_EQUAL_MESSAGE(15, tdc.getClockGpioPin(), "Tm1637DisplayConfiguration clock GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(16, tdc.getDataGpioPin(), "Tm1637DisplayConfiguration data GPIO pin is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(5, tdc.getBrightness(), "Tm1637DisplayConfiguration brightness is not correct.");
+    BluetoothConfiguration& btc = sc->getBluetoothConfiguration();
+    TEST_ASSERT_FALSE_MESSAGE(btc.isEnabled(), "BluetoothConfiguration should be disabled.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("a32090db-3b1f-44f6-8b37-37a28b1a44dd", btc.getUuid().c_str(), "Bluetooth UUID is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("My LED Sign", btc.getLocalName().c_str(), "Bluetooth local name is not correct.");
     delete sc;
 }
 
@@ -317,6 +344,11 @@ const char* additionalConfigurations()
 {
     return R"json(
         {
+            "bluetooth": {
+                "enabled": false,
+                "uuid": "a32090db-3b1f-44f6-8b37-37a28b1a44dd",
+                "localName": "My LED Sign"
+            },
             "batteryMonitor": {
                 "enabled": true,
                 "analogInputGpioPin": 29,
@@ -325,7 +357,7 @@ const char* additionalConfigurations()
                 "voltageToExitLowPowerState": 7.2
             },
             "powerLed": {
-                "enabled": false,
+                "enabled": true,
                 "gpioPin": 22
             },
             "clockMultiplier": 1.15,

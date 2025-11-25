@@ -60,6 +60,30 @@ SystemConfiguration* SystemConfiguration::ParseJson(
         config->m_clockMultiplier = configDoc["clockMultiplier"].as<float>();
     }
 
+    if (configDoc["powerLed"].is<JsonVariant>())
+    {
+        config->m_powerLedConfiguration = 
+            config->parsePowerLedConfiguration(configDoc["powerLed"].as<JsonVariant>());
+    }
+
+    if (configDoc["batteryMonitor"].is<JsonVariant>())
+    {
+        config->m_batteryMonitorConfiguration = 
+            config->parseBatteryMonitorConfiguration(configDoc["batteryMonitor"].as<JsonVariant>());
+    }
+
+    if (configDoc["tm1637Display"].is<JsonVariant>())
+    {
+        config->m_tm1637DisplayConfiguration = 
+            config->parseTm1637DisplayConfiguration(configDoc["tm1637Display"].as<JsonVariant>());
+    }
+
+    if (configDoc["bluetooth"].is<JsonVariant>())
+    {
+        config->m_bluetoothConfiguration = 
+            config->parseBluetoothConfiguration(configDoc["bluetooth"].as<JsonVariant>());
+    }
+
     return config;
 }
 
@@ -200,91 +224,128 @@ std::vector<String> SystemConfiguration::getStringList(JsonVariant array)
     return result;
 }
 
-/*
-
-systemconfiguration.json
-
+PowerLedConfiguration SystemConfiguration::parsePowerLedConfiguration(JsonVariant plcVariant)
 {
-    "buttons": {
-        "definitions": [
-            {
-                "id": "1",
-                "enabled": true,
-                "gpioPin": 10
-            },
-            {
-                "id": "2",
-                "enabled": true,
-                "gpioPin": 13
-            },
-            {
-                "id": "power",
-                "enabled": true,
-                "gpioPin": 11
-            }
-        ],
-        "actions": [
-            {
-                "buttonIds": ["1"],
-                "tapAction": "changeStyle",
-                "longTapAction": "batteryVoltage",
-                "tapActionArguments": ["Pink", "RainbowLava"],
-                "longTapActionArguments": []
-            },
-            {
-                "buttonId": ["2"],
-                "tapAction": "changeStyle",
-                "tapActionArguments": ["Red", "Blue"]
-            },
-            {
-                "buttonId": ["power"],
-                "tapAction": "powerCycle"
-            },
-            {
-                "enabled": true,
-                "buttonIds": ["1", "2"]
-                "tapAction": "",
-                "longTapAction": ""
-            }
-        ]
-    },
-    "batteryMonitor": {
-        "enabled": true,
-        "analogInputPin": "1",   // gpio or analog number?
-        "inputMultiplier": "3.14",
-        "voltageToEnterLowPowerState": 6.2,
-        "voltageToExitLowPowerState": 8.1
-    },
-    "powerLed": {
-        "enabled": true,
-        "gpioPin": 22
-    },
-    "clockMultiplier": 1.0,
-    "tm1637Display": {
-        "enabled": true,
-        "clockGpioPin": 15,
-        "dataGpioPin": 16
+    PowerLedConfiguration defaultPlc;
+    bool enabled = defaultPlc.isEnabled();
+    int gpioPin = defaultPlc.getGpioPin();
+    
+    if (plcVariant["enabled"].is<JsonVariant>())
+    {
+        enabled = plcVariant["enabled"].as<bool>();
     }
+
+    if (plcVariant["gpioPin"].is<JsonVariant>())
+    {
+        gpioPin = plcVariant["gpioPin"].as<int>();
+    }
+
+    return PowerLedConfiguration(enabled, gpioPin);
 }
 
+BatteryMonitorConfiguration SystemConfiguration::parseBatteryMonitorConfiguration(JsonVariant bmcVariant)
+{
+    BatteryMonitorConfiguration defaultBmc;
+    bool enabled = defaultBmc.isEnabled();
+    int analogInputPin = defaultBmc.getAnalogInputPin();
+    float inputMultiplier = defaultBmc.getInputMultiplier();
+    float voltageToEnterLowPowerState = defaultBmc.getVoltageToEnterLowPowerState();
+    float voltageToExitLowPowerState = defaultBmc.getVoltageToExitLowPowerState();
+    
+    if (bmcVariant["enabled"].is<JsonVariant>())
+    {
+        enabled = bmcVariant["enabled"].as<bool>();
+    }
 
-"tapAction": "setStyle:styleList1" // if not specified, default to "styleList"
-"longTapAction": "setStyle:styleList2"
+    if (bmcVariant["analogInputGpioPin"].is<JsonVariant>())
+    {
+        analogInputPin = bmcVariant["analogInputGpioPin"].as<int>();
+    }
 
-Actions: none, setStyle, powerCycle, batteryVoltage, ...
-button combos?
+    if (bmcVariant["inputMultiplier"].is<JsonVariant>())
+    {
+        inputMultiplier = bmcVariant["inputMultiplier"].as<float>();
+    }
 
+    if (bmcVariant["voltageToEnterLowPowerState"].is<JsonVariant>())
+    {
+        voltageToEnterLowPowerState = bmcVariant["voltageToEnterLowPowerState"].as<float>();
+    }
 
-hardware.json (system.json?)
+    if (bmcVariant["voltageToExitLowPowerState"].is<JsonVariant>())
+    {
+        voltageToExitLowPowerState = bmcVariant["voltageToExitLowPowerState"].as<float>();
+    }
 
-power indicator led pin (if present)
-4-char display setup
-clock multiplier
-battery levels - input pin, high/low levels, multiplier
-
-buttons: {
-    definitions: [],
-    combinations: []
+    return BatteryMonitorConfiguration(
+        enabled,
+        analogInputPin,
+        inputMultiplier,
+        voltageToEnterLowPowerState,
+        voltageToExitLowPowerState);
 }
 
-*/
+Tm1637DisplayConfiguration SystemConfiguration::parseTm1637DisplayConfiguration(JsonVariant tdcVariant)
+{
+    Tm1637DisplayConfiguration defaultTdc;
+    bool enabled = defaultTdc.isEnabled();
+    int clockGpioPin = defaultTdc.getClockGpioPin();
+    int dataGpioPin = defaultTdc.getDataGpioPin();
+    int brightness = defaultTdc.getBrightness();
+    
+    if (tdcVariant["enabled"].is<JsonVariant>())
+    {
+        enabled = tdcVariant["enabled"].as<bool>();
+    }
+
+    if (tdcVariant["clockGpioPin"].is<JsonVariant>())
+    {
+        clockGpioPin = tdcVariant["clockGpioPin"].as<int>();
+    }
+
+    if (tdcVariant["dataGpioPin"].is<JsonVariant>())
+    {
+        dataGpioPin = tdcVariant["dataGpioPin"].as<int>();
+    }
+
+    if (tdcVariant["brightness"].is<JsonVariant>())
+    {
+        brightness = tdcVariant["brightness"].as<byte>();
+    }
+
+    return Tm1637DisplayConfiguration(
+        enabled,
+        clockGpioPin,
+        dataGpioPin,
+        brightness);
+}
+
+BluetoothConfiguration SystemConfiguration::parseBluetoothConfiguration(JsonVariant btcVariant)
+{
+    BluetoothConfiguration defaultBtc;
+    bool enabled = defaultBtc.isEnabled();
+    String uuid = defaultBtc.getUuid();
+    String localName = defaultBtc.getLocalName();
+    
+    if (btcVariant["enabled"].is<JsonVariant>())
+    {
+        enabled = btcVariant["enabled"].as<bool>();
+    }
+
+    if (btcVariant["uuid"].is<JsonVariant>())
+    {
+        std::string uuidStr = btcVariant["uuid"].as<std::string>();
+        uuid = String(uuidStr.c_str());
+    }
+
+    if (btcVariant["localName"].is<JsonVariant>())
+    {
+        std::string localNamestr = btcVariant["localName"].as<std::string>();
+        localName = String(localNamestr.c_str());
+    }
+
+    return BluetoothConfiguration(
+        enabled,
+        uuid,
+        localName);
+}

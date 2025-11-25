@@ -8,6 +8,7 @@
 #include "BatteryMonitorConfiguration.h"
 #include "PowerLedConfiguration.h"
 #include "Tm1637DisplayConfiguration.h"
+#include "BluetoothConfiguration.h"
 #include "..\ButtonProcessor\ButtonProcessor.h"
 #include "..\DebugUtils\DebugUtils.h"
 
@@ -33,6 +34,7 @@ class SystemConfiguration {
         PowerLedConfiguration& getPowerLedConfiguration() { return m_powerLedConfiguration; }
         BatteryMonitorConfiguration& getBatteryMonitorConfiguration() { return m_batteryMonitorConfiguration; }
         Tm1637DisplayConfiguration& getTm1637DisplayConfiguration() { return m_tm1637DisplayConfiguration; }
+        BluetoothConfiguration& getBluetoothConfiguration() { return m_bluetoothConfiguration; }
 
     private:
         ButtonProcessor m_buttonProcessor;
@@ -44,12 +46,17 @@ class SystemConfiguration {
         PowerLedConfiguration m_powerLedConfiguration;
         BatteryMonitorConfiguration m_batteryMonitorConfiguration;
         Tm1637DisplayConfiguration m_tm1637DisplayConfiguration;
+        BluetoothConfiguration m_bluetoothConfiguration;
 
         SystemConfiguration() {};
         void configureButtonProcessor(JsonVariant buttonConfigs, ButtonFactory buttonFactory);
         void addButtonDefinitions(JsonArray definitions, ButtonFactory buttonFactory);
         void addButtonActions(JsonArray actions);
         std::vector<String> getStringList(JsonVariant array);
+        PowerLedConfiguration parsePowerLedConfiguration(JsonVariant plcVariant);
+        BatteryMonitorConfiguration parseBatteryMonitorConfiguration(JsonVariant bmcVariant);
+        Tm1637DisplayConfiguration parseTm1637DisplayConfiguration(JsonVariant tdcVariant);
+        BluetoothConfiguration parseBluetoothConfiguration(JsonVariant btcVariant);
 };
 
 #endif
