@@ -78,6 +78,7 @@ SystemConfiguration* SystemConfiguration::ParseJson(
             config->parseBluetoothConfiguration(configDoc["bluetooth"].as<JsonVariant>());
     }
 
+    config->m_isValid = true;
     return config;
 }
 

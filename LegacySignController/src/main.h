@@ -86,14 +86,14 @@ const char* SystemConfigurationFileContents = R"json(
             {
                 "buttonId": ["2"],
                 "tapAction": "changeStyle",
-                "tapActionArguments": ["BluePinkRandom", "BluePinkDigit"]
+                "tapActionArguments": ["BluePinkRandom", "BluePinkDigit"],
                 "longTapAction": "batteryVoltage",
                 "longTapActionArguments": []
             },
             {
                 "buttonId": ["3"],
                 "tapAction": "changeStyle",
-                "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"]
+                "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"],
                 "longTapAction": "disconnectBT",
                 "longTapActionArguments": []
             }
@@ -113,8 +113,8 @@ const char* SystemConfigurationFileContents = R"json(
     "clockMultiplier": 1.0,
     "tm1637Display": {
         "enabled": true,
-        "clockGpioPin": 15,
-        "dataGpioPin": 16,
+        "clockGpioPin": 7,
+        "dataGpioPin": 5,
         "brightness": 5
     }
 }

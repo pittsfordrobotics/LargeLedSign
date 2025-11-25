@@ -68,6 +68,7 @@ void emptyJsonDoesNothing() {
         mockButtonFactory);
     
     TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
+    TEST_ASSERT_FALSE_MESSAGE(sc->isValid(), "SystemConfiguration should be invalid.");
     std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("displayconfiguration.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected default value.");
@@ -86,6 +87,18 @@ void emptyJsonDoesNothing() {
     delete sc;
 }
 
+void inValidJsonIsInvalid() {
+    String json = "{\"foo\":}";
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        json.c_str(), 
+        json.length(), 
+        mockButtonFactory);
+    
+    TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
+    TEST_ASSERT_FALSE_MESSAGE(sc->isValid(), "SystemConfiguration should be invalid.");
+    delete sc;
+}
+
 void emptyJsonObjectDoesNothing() {
     String json = "{}";
     SystemConfiguration* sc = SystemConfiguration::ParseJson(
@@ -94,6 +107,7 @@ void emptyJsonObjectDoesNothing() {
         mockButtonFactory);
     
     TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
+    TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
     std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("displayconfiguration.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected default value.");
@@ -119,6 +133,7 @@ void minimalJsonSetsProperties() {
         json.length(), 
         mockButtonFactory);
     
+    TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
     std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("display.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected value.");
@@ -144,6 +159,7 @@ void buttonsAndActionsAreParsed() {
         json.length(), 
         mockButtonFactory);
     
+    TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
     ButtonProcessor& bp = sc->getButtonProcessor();
     std::vector<GenericButton*> buttons = bp.getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(2, buttons.size(), "There should be 2 buttons.");
@@ -197,6 +213,7 @@ void disabledButtonDefinitionIsIgnored() {
         json.length(), 
         mockButtonFactory);
     
+    TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
     ButtonProcessor& bp = sc->getButtonProcessor();
     std::vector<GenericButton*> buttons = bp.getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(1, buttons.size(), "There should be 1 button (the disabled one should be ignored).");
@@ -219,6 +236,7 @@ void additionalConfigurationsAreParsed() {
         json.length(), 
         mockButtonFactory);
     
+    TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
     TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.15f, sc->getClockMultiplier(), "Clock multiplier is not the expected value.");
     BatteryMonitorConfiguration& bmc = sc->getBatteryMonitorConfiguration();
     TEST_ASSERT_TRUE_MESSAGE(bmc.isEnabled(), "BatteryMonitorConfiguration should be enabled.");
@@ -244,6 +262,7 @@ void additionalConfigurationsAreParsed() {
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
+    RUN_TEST(inValidJsonIsInvalid);
     RUN_TEST(emptyJsonDoesNothing);
     RUN_TEST(emptyJsonObjectDoesNothing);
     RUN_TEST(minimalJsonSetsProperties);

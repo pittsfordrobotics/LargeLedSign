@@ -2,7 +2,8 @@
 
 // Global variables
 CommonPeripheral btService;
-StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
+StatusDisplay* display;
+//StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 NeoPixelDisplay* neoPixelDisplay;
 DisplayPattern* currentLightStyle;
 ButtonProcessor buttonProcessor;
@@ -26,14 +27,36 @@ PatternData currentPatternData;
 PatternData newPatternData;
 
 volatile bool isInitialized = false;
+SystemConfiguration* systemConfiguration;
 
 void setup()
 {
     Serial.begin(9600);
     delay(2000);
     Serial.println("Starting...");
+
+    // read in JSON from a file...
+    String configJson = String(SystemConfigurationFileContents);
+    systemConfiguration = SystemConfiguration::ParseJson(
+        configJson.c_str(), 
+        configJson.length(), 
+        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
     
-    display.setDisplay("---1");
+    if (!systemConfiguration->isValid())
+    {
+        while (true)
+        {
+            Serial.println("System configuration is invalid!");
+            delay(1000);
+        }
+    }
+
+    Tm1637DisplayConfiguration& tdc = systemConfiguration->getTm1637DisplayConfiguration();
+    Serial.print("Initializing TM1637 display...");
+    Serial.println("Clock: " + String(tdc.getClockGpioPin()) + ", Data: " + String(tdc.getDataGpioPin()) + ", Brightness: " + String(tdc.getBrightness()));
+    display = new StatusDisplay(tdc.getClockGpioPin(), tdc.getDataGpioPin(), tdc.getBrightness());
+
+    display->setDisplay("---1");
 
     initializeIO();
     initializeButtonProcessor();
@@ -45,7 +68,7 @@ void setup()
         signType = 0; // Test matrix
     }
 
-    display.setDisplay("---2");
+    display->setDisplay("---2");
 
     //
     // Read from config!!!
@@ -62,7 +85,7 @@ void setup()
 
     styleConfiguration = StyleConfigFactory::createDefaultStyleConfiguration();
 
-    display.setDisplay("---3");
+    display->setDisplay("---3");
 
     neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
     neoPixelDisplay->setBrightness(currentBrightness);
@@ -74,12 +97,12 @@ void setup()
     initialPattern->setSpeed(newSpeed);
     neoPixelDisplay->setDisplayPattern(initialPattern);
 
-    display.setDisplay("---4");
+    display->setDisplay("---4");
 
     if (!BLE.begin())
     {
         Serial.println("BLE initialization failed!");
-        display.setDisplay("E-1");
+        display->setDisplay("E-1");
         while (true)
         {
             Serial.println("BLE initialization failed!");
@@ -94,7 +117,7 @@ void setup()
 void loop()
 {
     BLE.poll();
-    display.update();
+    display->update();
     updateTelemetry();
     checkForLowPowerState();
 
@@ -103,7 +126,7 @@ void loop()
         // Something is connected via BT.
         // Set the display to "--" to show something connected to us.
         // Display it as "temporary" since it's a low-priority message.
-        display.displayTemporary(" --", 200);
+        display->displayTemporary(" --", 200);
     }
 
     if (!inLowPowerMode)
@@ -160,13 +183,13 @@ void setManualStyle(StyleDefinition styleDefinition)
 
 void startBLEService()
 {
-    display.setDisplay("C  =");
+    display->setDisplay("C  =");
     Serial.println("Setting up Peripheral service using common logic.");
     String localName = "Small 3181 Sign";
     btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, localName);
 
     // Set the various characteristics based on the defaults
-    display.setDisplay("C ==");
+    display->setDisplay("C ==");
 
     btService.setBrightness(currentBrightness);
     btService.setSpeed(styleConfiguration->getDefaultStyle().getSpeed());
@@ -175,7 +198,7 @@ void startBLEService()
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
 
     Serial.println("Peripheral service started.");
-    display.clear();
+    display->clear();
 }
 
 void readSettingsFromBLE()
@@ -210,7 +233,7 @@ int getVoltageInputLevel()
 void displayBatteryVoltage()
 {
     double voltage = getCalculatedBatteryVoltage();
-    display.displayTemporary(String(voltage, 2), 1500);
+    display->displayTemporary(String(voltage, 2), 1500);
 }
 
 // Check if the current battery voltage is too low to run the sign,

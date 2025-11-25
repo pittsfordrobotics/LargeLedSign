@@ -25,6 +25,7 @@ class SystemConfiguration {
 
         ~SystemConfiguration();
 
+        bool isValid() { return m_isValid; }
         ButtonProcessor& getButtonProcessor() { return m_buttonProcessor; }
         String getDisplayConfigurationFile() { return m_displayConfigurationFile; }
         String getStyleConfigurationFile() { return m_styleConfigurationFile; }
@@ -36,6 +37,7 @@ class SystemConfiguration {
         BluetoothConfiguration& getBluetoothConfiguration() { return m_bluetoothConfiguration; }
 
     private:
+        bool m_isValid{false};
         ButtonProcessor m_buttonProcessor;
         String m_displayConfigurationFile{"displayconfiguration.json"};
         String m_styleConfigurationFile{"styleconfiguration.json"};
