@@ -71,7 +71,6 @@ void emptyJsonDoesNothing() {
     std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("displayconfiguration.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected default value.");
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("bluetoothconfiguration.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styleconfiguration.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
     BatteryMonitorConfiguration& bmc = sc->getBatteryMonitorConfiguration();
@@ -98,7 +97,6 @@ void emptyJsonObjectDoesNothing() {
     std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("displayconfiguration.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected default value.");
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("bluetoothconfiguration.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styleconfiguration.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
     BatteryMonitorConfiguration& bmc = sc->getBatteryMonitorConfiguration();
@@ -124,7 +122,6 @@ void minimalJsonSetsProperties() {
     std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("display.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected value.");
-    TEST_ASSERT_EQUAL_STRING_MESSAGE("bt.json", sc->getBluetoothConfigurationFile().c_str(), "Bluetooth configuration file is not the expected value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styles.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected value.");
     TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1.0f, sc->getClockMultiplier(), "Clock multiplier is not the expected default value.");
     BatteryMonitorConfiguration& bmc = sc->getBatteryMonitorConfiguration();
@@ -261,7 +258,6 @@ const char* minimalConfigurationJson() {
     return R"json(
         {
             "displayConfigurationFile": "display.json",
-            "bluetoothConfigurationFile": "bt.json",
             "styleConfigurationFile": "styles.json"
         }
     )json";

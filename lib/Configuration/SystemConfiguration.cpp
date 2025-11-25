@@ -37,12 +37,6 @@ SystemConfiguration* SystemConfiguration::ParseJson(
         config->m_displayConfigurationFile = String(displayConfigFile.c_str());
     }
 
-    if (configDoc["bluetoothConfigurationFile"].is<JsonVariant>())
-    {
-        std::string bluetoothConfigFile = configDoc["bluetoothConfigurationFile"].as<std::string>();
-        config->m_bluetoothConfigurationFile = String(bluetoothConfigFile.c_str());
-    }
-
     if (configDoc["styleConfigurationFile"].is<JsonVariant>())
     {
         std::string styleConfigFile = configDoc["styleConfigurationFile"].as<std::string>();

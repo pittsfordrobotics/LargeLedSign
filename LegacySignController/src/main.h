@@ -44,3 +44,78 @@ void displayBatteryVoltage();
 void checkForLowPowerState();
 void updateLEDs();
 void ProcessButtonAction(int callerId, String actionName, std::vector<String> arguments);
+
+// Default system configuration for the legacy sign.
+// Should eventually read from a configuration file.
+const char* SystemConfigurationFileContents = R"json(
+{
+    "comment": "Legacy sign",
+    "displayConfigurationFile": "displayconfiguration.json",
+    "styleConfigurationFile": "styleconfigurations.json",
+    "bluetoothConfiguration": {
+        "enabled": true,
+        "uuid": "99be4fac-c708-41e5-a149-74047f554cc1",
+        "localName": "Small 3181 Sign"
+    },
+    "buttons": {
+        "definitions": [
+            {
+                "id": "1",
+                "enabled": true,
+                "gpioPin": 27
+            },
+            {
+                "id": "2",
+                "enabled": true,
+                "gpioPin": 28
+            },
+            {
+                "id": "3",
+                "enabled": true,
+                "gpioPin": 26
+            }
+        ],
+        "actions": [
+            {
+                "buttonIds": ["1"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["Pink", "RainbowRandom"],
+                "longTapAction": "changeStyle",
+                "longTapActionArguments": ["Fire"]
+            },
+            {
+                "buttonId": ["2"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["BluePinkRandom", "BluePinkDigit"]
+                "longTapAction": "batteryVoltage",
+                "longTapActionArguments": []
+            },
+            {
+                "buttonId": ["3"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"]
+                "longTapAction": "disconnectBT",
+                "longTapActionArguments": []
+            }
+        ]
+    },
+    "batteryMonitor": {
+        "enabled": true,
+        "analogInputGpioPin": 29,
+        "inputMultiplier": 4.83,
+        "voltageToEnterLowPowerState": 6.7,
+        "voltageToExitLowPowerState": 7.2
+    },
+    "powerLed": {
+        "enabled": false,
+        "gpioPin": 22
+    },
+    "clockMultiplier": 1.0,
+    "tm1637Display": {
+        "enabled": true,
+        "clockGpioPin": 15,
+        "dataGpioPin": 16,
+        "brightness": 5
+    }
+}
+)json";
