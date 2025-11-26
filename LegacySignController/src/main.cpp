@@ -4,7 +4,6 @@
 CommonPeripheral btService;
 StatusDisplay* display;
 NeoPixelDisplay* neoPixelDisplay;
-DisplayPattern* currentLightStyle;
 ButtonProcessor* buttonProcessor;
 StyleConfiguration* styleConfiguration;
 BatteryMonitorConfiguration batteryMonitorConfig;
@@ -257,6 +256,17 @@ void initializeBatteryMonitor(BatteryMonitorConfiguration& config)
     }
 }
 
+void configurePowerLed(PowerLedConfiguration& config)
+{
+    if (!config.isEnabled())
+    {
+        return;
+    }
+     
+    pinMode(config.getGpioPin(), OUTPUT);
+    digitalWrite(config.getGpioPin(), HIGH); // Turn on the power LED
+}
+
 // Read the analog input from the "voltage input" pin and calculate the battery voltage.
 float getCalculatedBatteryVoltage()
 {
@@ -412,11 +422,7 @@ void updateLEDs()
 
     if (newSpeed != currentSpeed)
     {
-        if (currentLightStyle)
-        {
-            currentLightStyle->setSpeed(newSpeed);
-        }
-        
+        neoPixelDisplay->getDisplayPattern()->setSpeed(newSpeed);
         currentSpeed = newSpeed;
     }
 
