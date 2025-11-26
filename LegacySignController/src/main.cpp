@@ -3,11 +3,11 @@
 // Global variables
 CommonPeripheral btService;
 StatusDisplay* display;
-//StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 NeoPixelDisplay* neoPixelDisplay;
 DisplayPattern* currentLightStyle;
 ButtonProcessor* buttonProcessor;
 StyleConfiguration* styleConfiguration;
+BatteryMonitorConfiguration batteryMonitorConfig;
 
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
@@ -19,8 +19,8 @@ int manualButtonSequenceNumber = 0;
 byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 // Settings that are updated via bluetooth
-byte currentBrightness = DEFAULT_BRIGHTNESS;
-byte newBrightness = DEFAULT_BRIGHTNESS;
+byte currentBrightness;
+byte newBrightness;
 byte currentSpeed;
 byte newSpeed;
 PatternData currentPatternData;
@@ -51,16 +51,6 @@ void setup()
     buttonProcessor = systemConfiguration->getButtonProcessor();
     buttonProcessor->setActionProcessor(processButtonAction);
 
-    initializeIO();
-    //initializeButtonProcessor();
-    // int signType = LEGACY_SIGN_TYPE;
-    // if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
-    // {
-    //     currentBrightness = DEFAULT_BRIGHTNESS_LOW;
-    //     newBrightness = DEFAULT_BRIGHTNESS_LOW;
-    //     signType = 0; // Test matrix
-    // }
-
     display->setDisplay("---2");
 
     neoPixelDisplay = createNeoPixelDisplay(systemConfiguration->getDisplayConfigurationFile());
@@ -79,6 +69,11 @@ void setup()
     neoPixelDisplay->setDisplayPattern(initialPattern);
 
     display->setDisplay("---4");
+
+    initializeBatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
+
+    display->setDisplay("---5");
+    display->setDisplay("---5");
 
     // TODO: Set up battery monitor and power LED based on configuration.
     // Remove initializeIO method.
@@ -132,6 +127,8 @@ void setup1()
 void loop1()
 {
     // Check for threading issues!!!
+    // TODO: Found occasional issues when spamming the input buttons where the LED update crashes.
+    // Need to ensure that the LED update and style updates don't interfere.
     updateLEDs();
     updateLedTelemetry();
 }
@@ -163,6 +160,8 @@ StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
 
 NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile)
 {
+    pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
+
     // Actually read from the file!
     std::vector<DisplayConfiguration>* displayConfigs;
     if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
@@ -187,26 +186,6 @@ StyleConfiguration* createStyleConfiguration(String styleConfigFile)
     // For now, just return the default style configuration.
     return StyleConfigFactory::createDefaultStyleConfiguration();
 }
-
-// void initializeButtonProcessor()
-// {
-//     buttonProcessor.setActionProcessor(ProcessButtonAction);
-
-//     // Add the buttons
-//     std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
-//     for (uint i = 0; i < manualInputPins.size(); i++)
-//     {
-//         buttonProcessor.addButtonDefinition(String(i), new ArduinoPushButton(manualInputPins[i], INPUT_PULLUP));
-//     }
-
-//     // Add the button actions
-//     buttonProcessor.addTapAction({"0"}, "changeStyle", {"RainbowRandom", "Pink"});
-//     buttonProcessor.addTapAction({"1"}, "changeStyle", {"BluePinkRandom", "BluePinkDigit"});
-//     buttonProcessor.addTapAction({"2"}, "changeStyle", {"RedPinkRandom", "RedPinkDigit"});
-//     buttonProcessor.addLongTapAction({"0"}, "changeStyle", {"Fire"});
-//     buttonProcessor.addLongTapAction({"1"}, "batteryVoltage");
-//     buttonProcessor.addLongTapAction({"2"}, "disconnectBT");
-// }
 
 void setManualStyle(StyleDefinition styleDefinition)
 {
@@ -245,26 +224,40 @@ void readSettingsFromBLE()
     newPatternData = btService.getPatternData();
 }
 
-void initializeIO()
+void initializeBatteryMonitor(BatteryMonitorConfiguration& config)
 {
-    pinMode(VOLTAGEINPUTPIN, INPUT);
-    pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
+    batteryMonitorConfig = systemConfiguration->getBatteryMonitorConfiguration();
+    
+    if (batteryMonitorConfig.isEnabled())
+    {
+        pinMode(config.getAnalogInputPin(), INPUT);
+    }
 }
 
 // Read the analog input from the "voltage input" pin and calculate the battery voltage.
 float getCalculatedBatteryVoltage()
 {
+    if (!batteryMonitorConfig.isEnabled())
+    {
+        return 0.0f;
+    }
+
     // The analog input ranges from 0 (0V) to 1024 (3.3V), resulting in 0.00322 Volts per "tick".
     // The battery voltage passes through a voltage divider so we have to multiply the input by
     // a scale factor to get the actual voltage.
-    float rawLevel = getVoltageInputLevel();
-    return rawLevel * VOLTAGEMULTIPLIER * 3.3 / 1024;
+    float rawLevel = getRawVoltageInputLevel();
+    return rawLevel * batteryMonitorConfig.getInputMultiplier() * 3.3 / 1024;
 }
 
 // Read the raw value from the "voltage input" pin.
-int getVoltageInputLevel()
+int getRawVoltageInputLevel()
 {
-    return analogRead(VOLTAGEINPUTPIN);
+    if (!batteryMonitorConfig.isEnabled())
+    {
+        return 0;
+    }
+
+    return analogRead(batteryMonitorConfig.getAnalogInputPin());
 }
 
 void displayBatteryVoltage()
@@ -277,10 +270,15 @@ void displayBatteryVoltage()
 // or if the battery has been charged enough to restart operation.
 void checkForLowPowerState()
 {
+    if (!batteryMonitorConfig.isEnabled())
+    {
+        return;
+    }
+
     double currentVoltage = getCalculatedBatteryVoltage();
 
     // Check if the voltage is too low.
-    if (currentVoltage < LOWPOWERTHRESHOLD)
+    if (currentVoltage < batteryMonitorConfig.getVoltageToEnterLowPowerState())
     {
         if (inLowPowerMode)
         {
@@ -291,7 +289,7 @@ void checkForLowPowerState()
             Serial.print("Battery voltage is below threshold. Voltage: ");
             Serial.print(currentVoltage);
             Serial.print(", threshold: ");
-            Serial.println(LOWPOWERTHRESHOLD);
+            Serial.println(batteryMonitorConfig.getVoltageToEnterLowPowerState());
             Serial.println("Entering low power mode.");
             inLowPowerMode = true;
 
@@ -309,7 +307,7 @@ void checkForLowPowerState()
     }
 
     // Check if the voltage is high enough for normal operation.
-    if (currentVoltage > NORMALPOWERTHRESHOLD)
+    if (currentVoltage > batteryMonitorConfig.getVoltageToExitLowPowerState())
     {
         if (!inLowPowerMode)
         {
@@ -320,7 +318,7 @@ void checkForLowPowerState()
             Serial.print("Battery voltage is above normal threshold. Voltage: ");
             Serial.print(currentVoltage);
             Serial.print(", threshold: ");
-            Serial.println(NORMALPOWERTHRESHOLD);
+            Serial.println(batteryMonitorConfig.getVoltageToExitLowPowerState());
             Serial.println("Exiting low power mode.");
             neoPixelDisplay->setBrightness(currentBrightness);
             inLowPowerMode = false;
@@ -347,14 +345,16 @@ void updateTelemetry()
         loopCounter = 0;
 
         // Output voltage info periodically
-        int rawLevel = getVoltageInputLevel();
+        int rawLevel = getRawVoltageInputLevel();
         float voltage = getCalculatedBatteryVoltage();
 
         // Emit battery voltage information on Bluetooth as well as Serial.
         btService.emitBatteryVoltage(voltage);
-        Serial.print("Analog input: ");
+        Serial.print("Battery monitor: ");
+        Serial.print(batteryMonitorConfig.isEnabled() ? "Enabled" : "Disabled");
+        Serial.print("; Raw input: ");
         Serial.print(rawLevel);
-        Serial.print("; calculated voltage: ");
+        Serial.print("; Calculated voltage: ");
         Serial.println(voltage);
     }
 }
