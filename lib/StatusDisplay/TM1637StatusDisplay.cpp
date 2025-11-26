@@ -191,7 +191,25 @@ byte TM1637StatusDisplay::convertCharacter(char c)
         return 0;
     case '=':
         return 0b01001000;
+    case 'O':
+    case 'o':
+        return 0b01011100;
     default:
         return 0;
     }
 }
+
+// Binary value for the segments on the TM1637:
+// LSB - segment A; bit 6 - segment G; bit 7 - always zero
+/*
+    Segment mapping:
+     --A--           --0--
+    |     |         |     |
+    F     B         5     1
+    |     |         |     |
+     --G--    =>     --6--
+    |     |         |     |
+    E     C         4     2
+    |     |         |     |
+     --D--           --3--
+*/

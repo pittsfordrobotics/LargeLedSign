@@ -9,6 +9,7 @@ ButtonProcessor* buttonProcessor;
 StyleConfiguration* styleConfiguration;
 BatteryMonitorConfiguration batteryMonitorConfig;
 
+bool isBluetoothEnabled = false;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
@@ -69,32 +70,20 @@ void setup()
     display->setDisplay("---6");
 
     // TODO: Set up battery monitor and power LED based on configuration.
-    // Remove initializeIO method.
     // Configure BLE based on config.
 
-    if (!BLE.begin())
-    {
-        Serial.println("BLE initialization failed!");
-        display->setDisplay("E-1");
-        while (true)
-        {
-            Serial.println("BLE initialization failed!");
-            delay(1000);
-        }
-    }
-
-    startBLEService();
+    initializeBLEService();
+    display->clear();
     isInitialized = true;
 }
 
 void loop()
 {
-    BLE.poll();
     display->update();
     updateTelemetry();
     checkForLowPowerState();
 
-    if (btService.isConnected())
+    if (isBluetoothEnabled && btService.isConnected())
     {
         // Something is connected via BT.
         // Set the display to "--" to show something connected to us.
@@ -204,16 +193,38 @@ void setManualStyle(StyleDefinition styleDefinition)
     newPatternData = styleDefinition.getPatternData();
 
     // Update the local BLE settings to reflect the new manual settings.
-    btService.setSpeed(newSpeed);
-    btService.setPatternData(newPatternData);
+    if (isBluetoothEnabled)
+    {
+        btService.setSpeed(newSpeed);
+        btService.setPatternData(newPatternData);
+    }
 }
 
-void startBLEService()
+void initializeBLEService()
 {
+    BluetoothConfiguration& btConfig = systemConfiguration->getBluetoothConfiguration();
+    if (!btConfig.isEnabled())
+    {
+        Serial.println("Bluetooth is disabled in configuration.");
+        display->setDisplay("boff");
+        delay(1500);
+        return;
+    }
+
+    if (!BLE.begin())
+    {
+        Serial.println("BLE initialization failed!");
+        display->setDisplay("E-1");
+        while (true)
+        {
+            Serial.println("BLE initialization failed!");
+            delay(1000);
+        }
+    }
+
     display->setDisplay("C  =");
     Serial.println("Setting up Peripheral service using common logic.");
-    String localName = "Small 3181 Sign";
-    btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, localName);
+    btService.initialize(btConfig.getUuid(), btConfig.getLocalName());
 
     // Set the various characteristics based on the defaults
     display->setDisplay("C ==");
@@ -223,13 +234,18 @@ void startBLEService()
     btService.setPatternData(styleConfiguration->getDefaultStyle().getPatternData());
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
-
+    isBluetoothEnabled = true;
     Serial.println("Peripheral service started.");
-    display->clear();
 }
 
 void readSettingsFromBLE()
 {
+    if (!isBluetoothEnabled)
+    {
+        return;
+    }
+
+    BLE.poll();
     newBrightness = btService.getBrightness();
     newSpeed = btService.getSpeed();
     newPatternData = btService.getPatternData();

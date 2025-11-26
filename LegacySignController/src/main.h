@@ -21,7 +21,7 @@ NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile);
 StyleConfiguration* readStyleConfiguration(String styleConfigFile);
 void initializeBatteryMonitor(BatteryMonitorConfiguration& config);
 void initializeDefaultStyleProperties();
-void startBLEService();
+void initializeBLEService();
 void readSettingsFromBLE();
 void setManualStyle(StyleDefinition styleDefinition);
 void updateTelemetry();
@@ -40,10 +40,10 @@ const char* SystemConfigurationFileContents = R"json(
     "comment": "Legacy sign",
     "displayConfigurationFile": "displayconfiguration.json",
     "styleConfigurationFile": "styleconfigurations.json",
-    "bluetoothConfiguration": {
+    "bluetooth": {
         "enabled": true,
         "uuid": "99be4fac-c708-41e5-a149-74047f554cc1",
-        "localName": "Small 3181 Sign"
+        "localName": "Lucia's Sign"
     },
     "buttons": {
         "definitions": [
