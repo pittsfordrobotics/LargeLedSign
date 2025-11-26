@@ -35,9 +35,15 @@ void setup()
     delay(2000);
     Serial.println("Starting...");
 
+    // Initialize the SD Card reader
+    SPI.setSCK(SDCARD_SPI_CLOCK);
+    SPI.setMOSI(SDCARD_SPI_COPI);
+    SPI.setMISO(SDCARD_SPI_CIPO);
+
     systemConfiguration = readSystemConfiguration();
     if (!systemConfiguration->isValid())
     {
+        // Invalid config.  Not much we can do.
         while (true)
         {
             Serial.println("System configuration is invalid!");
@@ -113,13 +119,21 @@ void loop1()
 
 SystemConfiguration* readSystemConfiguration()
 {
-    // For now, just return the default configuration.
-    String configJson = String(SystemConfigurationFileContents);
-    SystemConfiguration* sc = SystemConfiguration::ParseJson(
-        configJson.c_str(), 
-        configJson.length(), 
-        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
+    const char* fileJson = getSdFileContents("systemconfiguration.json");
     
+    // Not much we can do if we can't read the file.
+    if (!fileJson) {
+        Serial.println("Failed to read system configuration file.");
+        delay(1000);
+    }
+
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        fileJson, 
+        strlen(fileJson), 
+        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});    
+        
+    delete[] fileJson;  // Use delete[] for arrays allocated with new[]
+
     return sc;
 }
 
@@ -501,4 +515,44 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
 
         setManualStyle(styleDef);
     }
+}
+
+const char* getSdFileContents(String filename)
+{
+    Serial.println("Initializing SD card...");
+    if (!SD.begin(SDCARD_CHIPSELECT))
+    {
+        Serial.println("SD card initialization failed!");
+        return nullptr;
+    }
+
+    if (!SD.exists(filename))
+    {
+        Serial.println("File does not exist on SD card: " + filename);
+        SD.end();
+        return nullptr;
+    }
+    Serial.println("Reading file '" + filename + "' from SD card.");
+    File file = SD.open(filename);
+
+    if (!file)
+    {
+        Serial.println("Could not open file!");
+        SD.end();
+        return nullptr;
+    }
+
+    size_t fileSize = file.size();
+
+    Serial.println("Reading file.");
+    char* fileContents = new char[fileSize + 1];
+    file.readBytes(fileContents, fileSize);
+    fileContents[fileSize] = '\0';  // Add null terminator
+
+    Serial.println("File read successfully.");
+
+    file.close();
+    SD.end();
+
+    return fileContents;
 }

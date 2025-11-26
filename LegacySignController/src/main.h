@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ArduinoBLE.h>
+#include <SD.h>
 #include <vector>
 #include <algorithm>
 #include <BluetoothCommon.h>
@@ -13,6 +14,11 @@
 #define TELEMETRYINTERVAL 2000     // Interval (msec) for updating the telemetry.
 
 #define LOW_BRIGHTNESS_PIN  12  // When this GPIO pin # is pulled low, the default brightness will be much lower than normal.
+
+#define SDCARD_CHIPSELECT  20  // GPIO pin # for the SD card chip select line.
+#define SDCARD_SPI_CLOCK  18  // GPIO pin # for the SD card SPI clock line.
+#define SDCARD_SPI_COPI   19  // GPIO pin # for the SD card SPI COPI line.
+#define SDCARD_SPI_CIPO    4  // GPIO pin # for the SD card SPI CIPO line.
 
 // Function prototypes
 SystemConfiguration* readSystemConfiguration();
@@ -33,6 +39,7 @@ void displayBatteryVoltage();
 void checkForLowPowerState();
 void updateLEDs();
 void processButtonAction(int callerId, String actionName, std::vector<String> arguments);
+const char* getSdFileContents(String filename);
 
 // Default system configuration for the legacy sign.
 // Should eventually read from a configuration file.
