@@ -20,7 +20,7 @@ void FireDisplayPattern::resetInternal(PixelMap* pixelMap)
 {
     pixelMap->fill(0);
     m_combinedRowGroups.clear();
-    
+
     switch (m_patternType)
     {
         case FirePatternType::IndividualRows:
@@ -38,7 +38,6 @@ void FireDisplayPattern::resetInternal(PixelMap* pixelMap)
     // Initialize the row heat groups based on the row groupings
     // and set all the initial heats to 0
     m_combinedRowHeats.clear();
-    
     for (std::vector<std::vector<int>> rowGroup : m_combinedRowGroups)
     {
         std::vector<int> rowHeatsForGroup;
@@ -93,6 +92,7 @@ void FireDisplayPattern::populateCombinedGroupsForIndividualColumns(PixelMap* pi
     // If a column doesn't have a pixel in a specific row, add and empty pixel list for that row.
     std::vector<std::vector<int>*> columns = pixelMap->getAllColumns();
     std::vector<std::vector<int>*> rows = pixelMap->getAllRows();
+    
     for(std::vector<int>* column : columns)
     {
         std::vector<std::vector<int>> rowGroup;

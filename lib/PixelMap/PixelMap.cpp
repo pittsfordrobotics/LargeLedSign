@@ -7,6 +7,37 @@ PixelMap::PixelMap(const DisplayConfiguration& displayConfiguration)
     clearBuffer();
 }
 
+PixelMap::~PixelMap()
+{
+    // Free the pixel color buffer
+    if (m_pixelColors)
+    {
+        delete[] m_pixelColors;
+        m_pixelColors = nullptr;
+    }
+    
+    // Free all dynamically allocated vectors in m_rows
+    for (std::vector<int>* row : m_rows)
+    {
+        delete row;
+    }
+    m_rows.clear();
+    
+    // Free all dynamically allocated vectors in m_columns
+    for (std::vector<int>* col : m_columns)
+    {
+        delete col;
+    }
+    m_columns.clear();
+    
+    // Free all dynamically allocated vectors in m_digits
+    for (std::vector<int>* digit : m_digits)
+    {
+        delete digit;
+    }
+    m_digits.clear();
+}
+
 void PixelMap::initializeFromConfiguration(const DisplayConfiguration& displayConfiguration)
 {
     DisplayConfiguration config(displayConfiguration);
@@ -196,7 +227,8 @@ void PixelMap::fillRandomly(uint32_t newColor, uint16_t numberOfPixels)
 
 void PixelMap::shiftPixelsRight(uint32_t newColor)
 {
-    for (uint16_t i = m_numPixels - 1; i >= 1; i--)
+    // Use signed int to avoid underflow when decrementing from 0
+    for (int i = m_numPixels - 1; i >= 1; i--)
     {
         m_pixelColors[i] = m_pixelColors[i - 1];
     }
@@ -216,10 +248,13 @@ void PixelMap::shiftPixelsLeft(uint32_t newColor)
 
 void PixelMap::shiftColumnsRight(uint32_t newColor)
 {
+    if (m_columns.size() == 0) return;  // Safety check
+    
     // Shift all columns to the right, then fill the first column with the new color.
     for (uint16_t row = 0; row < m_rows.size(); row++)
     {
-        for (uint16_t col = m_columns.size() - 1; col > 0; col--)
+        // Use signed int to prevent underflow
+        for (int col = m_columns.size() - 1; col > 0; col--)
         {
             setColorInPixelMap(row, col, m_colorMap[row][col-1]);
         }
@@ -279,10 +314,13 @@ void PixelMap::shiftRowsUp(uint32_t newColor, uint16_t startingRow)
 
 void PixelMap::shiftRowsDown(uint32_t newColor)
 {
+    if (m_rows.size() == 0) return;  // Safety check
+    
     // Shift all rows down, then fill the first row with the new color.
     for (uint16_t col = 0; col < m_columns.size(); col++)
     {
-        for (uint16_t row = m_rows.size() - 1; row > 0; row--)
+        // Use signed int to prevent underflow
+        for (int row = m_rows.size() - 1; row > 0; row--)
         {
             setColorInPixelMap(row, col, m_colorMap[row-1][col]);
         }
@@ -307,7 +345,9 @@ void PixelMap::shiftDigitsRight(uint32_t newColor)
 
 void PixelMap::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, uint32_t newColor, uint16_t startingBlock)
 {
-    for (uint16_t i = pixelBlocks.size() - 1; i > startingBlock; i--)
+    if (pixelBlocks.size() == 0) return;  // Safety check
+    
+    for (int i = pixelBlocks.size() - 1; i > (int)startingBlock; i--)
     {
         std::vector<int> *source = pixelBlocks.at(i - 1);
         std::vector<int> *destination = pixelBlocks.at(i);
@@ -331,10 +371,18 @@ void PixelMap::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks
 
 void PixelMap::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks, uint32_t newColor, uint16_t startingBlock)
 {
-    for (uint16_t i = 0; i < startingBlock; i++)
+    // Ensure we don't go beyond the array bounds
+    uint16_t endBlock = (startingBlock < pixelBlocks.size()) ? startingBlock : pixelBlocks.size() - 1;
+    
+    for (uint16_t i = 0; i < endBlock; i++)
     {
+        if (i + 1 >= pixelBlocks.size()) break;  // Safety check
+        
         std::vector<int> *source = pixelBlocks.at(i + 1);
         std::vector<int> *destination = pixelBlocks.at(i);
+        
+        if (source->size() == 0 || destination->size() == 0) continue;  // Skip empty blocks
+        
         // Find the color of the first pixel in the source column, and set the destination column to that color.
         uint32_t previousColor = m_pixelColors[source->at(0)];
         setColorForMappedPixels(destination, previousColor);
@@ -348,10 +396,16 @@ void PixelMap::shiftPixelBlocksLeft(std::vector<std::vector<int> *> pixelBlocks,
 
 void PixelMap::setColorForMappedPixels(std::vector<int> *destination, uint32_t newColor)
 {
+    if (!destination) return;  // Null pointer check
+    
     for (uint16_t i = 0; i < destination->size(); i++)
     {
         int pixelIndex = destination->at(i);
-        m_pixelColors[pixelIndex] = newColor;
+        // Critical: validate pixelIndex is within bounds
+        if (pixelIndex >= 0 && pixelIndex < m_numPixels)
+        {
+            m_pixelColors[pixelIndex] = newColor;
+        }
     }
 }
 
@@ -368,9 +422,11 @@ void PixelMap::setColorInPixelMap(uint16_t row, uint16_t column, uint32_t color)
     }
 
     m_colorMap[row][column] = color;
-    if (m_pixelMap[row][column] != -1)
+    int pixelIndex = m_pixelMap[row][column];
+    // Critical: validate pixelIndex is within bounds before array access
+    if (pixelIndex >= 0 && pixelIndex < m_numPixels)
     {
-        m_pixelColors[m_pixelMap[row][column]] = color;
+        m_pixelColors[pixelIndex] = color;
     }
 }
 
