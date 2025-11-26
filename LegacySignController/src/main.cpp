@@ -29,31 +29,6 @@ PatternData newPatternData;
 volatile bool isInitialized = false;
 SystemConfiguration* systemConfiguration;
 
-SystemConfiguration* readSystemConfiguration()
-{
-    // For now, just return the default configuration.
-    String configJson = String(SystemConfigurationFileContents);
-    SystemConfiguration* sc = SystemConfiguration::ParseJson(
-        configJson.c_str(), 
-        configJson.length(), 
-        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
-    
-    return sc;
-}
-
-StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
-{
-    if (config.isEnabled())
-    {
-        return (StatusDisplay*)(new TM1637StatusDisplay(
-            config.getClockGpioPin(),
-            config.getDataGpioPin(),
-            config.getBrightness()));
-    }
-
-    return (StatusDisplay*)(new NullStatusDisplay());
-}
-
 void setup()
 {
     Serial.begin(9600);
@@ -78,35 +53,23 @@ void setup()
 
     initializeIO();
     //initializeButtonProcessor();
-    int signType = LEGACY_SIGN_TYPE;
-    if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
-    {
-        currentBrightness = DEFAULT_BRIGHTNESS_LOW;
-        newBrightness = DEFAULT_BRIGHTNESS_LOW;
-        signType = 0; // Test matrix
-    }
+    // int signType = LEGACY_SIGN_TYPE;
+    // if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
+    // {
+    //     currentBrightness = DEFAULT_BRIGHTNESS_LOW;
+    //     newBrightness = DEFAULT_BRIGHTNESS_LOW;
+    //     signType = 0; // Test matrix
+    // }
 
     display->setDisplay("---2");
 
-    //
-    // Read from config!!!
-    //
-    std::vector<DisplayConfiguration>* displayConfigs;
-    if (signType == 0)
-    {
-        displayConfigs = DisplayConfigFactory::createForTestMatrix();
-    }
-    else
-    {
-        displayConfigs = DisplayConfigFactory::createForLegacySign();
-    }
-
-    styleConfiguration = StyleConfigFactory::createDefaultStyleConfiguration();
+    neoPixelDisplay = createNeoPixelDisplay(systemConfiguration->getDisplayConfigurationFile());
 
     display->setDisplay("---3");
 
-    neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
-    neoPixelDisplay->setBrightness(currentBrightness);
+    styleConfiguration = createStyleConfiguration(systemConfiguration->getStyleConfigurationFile());
+
+    // Set default style
     newPatternData = styleConfiguration->getDefaultStyle().getPatternData();
     currentPatternData = newPatternData;
     DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
@@ -116,6 +79,10 @@ void setup()
     neoPixelDisplay->setDisplayPattern(initialPattern);
 
     display->setDisplay("---4");
+
+    // TODO: Set up battery monitor and power LED based on configuration.
+    // Remove initializeIO method.
+    // Configure BLE based on config.
 
     if (!BLE.begin())
     {
@@ -167,6 +134,58 @@ void loop1()
     // Check for threading issues!!!
     updateLEDs();
     updateLedTelemetry();
+}
+
+SystemConfiguration* readSystemConfiguration()
+{
+    // For now, just return the default configuration.
+    String configJson = String(SystemConfigurationFileContents);
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        configJson.c_str(), 
+        configJson.length(), 
+        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
+    
+    return sc;
+}
+
+StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
+{
+    if (config.isEnabled())
+    {
+        return (StatusDisplay*)(new TM1637StatusDisplay(
+            config.getClockGpioPin(),
+            config.getDataGpioPin(),
+            config.getBrightness()));
+    }
+
+    return (StatusDisplay*)(new NullStatusDisplay());
+}
+
+NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile)
+{
+    // Actually read from the file!
+    std::vector<DisplayConfiguration>* displayConfigs;
+    if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
+    {
+        displayConfigs = DisplayConfigFactory::createForTestMatrix();
+    }
+    else
+    {
+        displayConfigs = DisplayConfigFactory::createForLegacySign();
+    }
+
+    NeoPixelDisplay* display = new NeoPixelDisplay(displayConfigs->at(0));
+    currentBrightness = displayConfigs->at(0).getDefaultBrightness();
+    newBrightness = currentBrightness;
+    display->setBrightness(currentBrightness);
+
+    return display;
+}
+
+StyleConfiguration* createStyleConfiguration(String styleConfigFile)
+{
+    // For now, just return the default style configuration.
+    return StyleConfigFactory::createDefaultStyleConfiguration();
 }
 
 // void initializeButtonProcessor()
@@ -405,7 +424,7 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
     Serial.print(actionName);
     Serial.print("', argument count: ");
     Serial.println(arguments.size());
-    
+
     if (actionName == "batteryVoltage")
     {
         displayBatteryVoltage();

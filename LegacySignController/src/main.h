@@ -33,6 +33,8 @@
 // Function prototypes
 SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
+NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile);
+StyleConfiguration* createStyleConfiguration(String styleConfigFile);
 
 void initializeIO();
 //void initializeButtonProcessor();
