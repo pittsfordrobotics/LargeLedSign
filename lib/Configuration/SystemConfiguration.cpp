@@ -8,6 +8,7 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     ButtonFactory buttonFactory) 
 {
     SystemConfiguration* config = new SystemConfiguration();
+    config->m_buttonProcessor = new ButtonProcessor();
 
     JsonDocument configDoc;
     DeserializationError err = deserializeJson(configDoc, jsonString, length);
@@ -88,6 +89,11 @@ SystemConfiguration::~SystemConfiguration()
     for (auto* button : m_buttons) {
         delete button;
     }
+    
+    // Clean up the ButtonProcessor
+    if (m_buttonProcessor) {
+        delete m_buttonProcessor;
+    }
 }
 
 void SystemConfiguration::configureButtonProcessor(JsonVariant buttonConfigs, ButtonFactory buttonFactory) {
@@ -144,7 +150,7 @@ void SystemConfiguration::addButtonDefinitions(JsonArray definitions, ButtonFact
         if (button != nullptr)
         {
             m_buttons.push_back(button);  // Track for cleanup
-            m_buttonProcessor.addButtonDefinition(id, button);
+            m_buttonProcessor->addButtonDefinition(id, button);
         }
     }
 }
@@ -190,12 +196,12 @@ void SystemConfiguration::addButtonActions(JsonArray actions)
 
         if (!tapAction.equals(""))
         {
-            m_buttonProcessor.addTapAction(buttonIds, tapAction, tapActionArgs);
+            m_buttonProcessor->addTapAction(buttonIds, tapAction, tapActionArgs);
         }
 
         if (!longTapAction.equals(""))
         {
-            m_buttonProcessor.addLongTapAction(buttonIds, longTapAction, longTapActionArgs);
+            m_buttonProcessor->addLongTapAction(buttonIds, longTapAction, longTapActionArgs);
         }
     }
 }

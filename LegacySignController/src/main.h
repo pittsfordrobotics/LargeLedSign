@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <BluetoothCommon.h>
 #include <DisplayPatternLib.h>
-#include <StatusDisplay.h>
+#include <StatusDisplayLib.h>
 #include "ArduinoPushButton/ArduinoPushButton.h"
 #include <ButtonProcessor.h>
 #include <Configuration.h>
@@ -31,8 +31,11 @@
 #define LEGACY_SIGN_TYPE 16     // The "sign type" corresponding to the Legacy sign, used to initialize the pixel buffer.
 
 // Function prototypes
+SystemConfiguration* readSystemConfiguration();
+StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
+
 void initializeIO();
-void initializeButtonProcessor();
+//void initializeButtonProcessor();
 void startBLEService();
 void readSettingsFromBLE();
 void setManualStyle(StyleDefinition styleDefinition);
@@ -43,7 +46,7 @@ int getVoltageInputLevel();
 void displayBatteryVoltage();
 void checkForLowPowerState();
 void updateLEDs();
-void ProcessButtonAction(int callerId, String actionName, std::vector<String> arguments);
+void processButtonAction(int callerId, String actionName, std::vector<String> arguments);
 
 // Default system configuration for the legacy sign.
 // Should eventually read from a configuration file.
@@ -84,14 +87,14 @@ const char* SystemConfigurationFileContents = R"json(
                 "longTapActionArguments": ["Fire"]
             },
             {
-                "buttonId": ["2"],
+                "buttonIds": ["2"],
                 "tapAction": "changeStyle",
                 "tapActionArguments": ["BluePinkRandom", "BluePinkDigit"],
                 "longTapAction": "batteryVoltage",
                 "longTapActionArguments": []
             },
             {
-                "buttonId": ["3"],
+                "buttonIds": ["3"],
                 "tapAction": "changeStyle",
                 "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"],
                 "longTapAction": "disconnectBT",

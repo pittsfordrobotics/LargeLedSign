@@ -6,7 +6,7 @@ StatusDisplay* display;
 //StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 NeoPixelDisplay* neoPixelDisplay;
 DisplayPattern* currentLightStyle;
-ButtonProcessor buttonProcessor;
+ButtonProcessor* buttonProcessor;
 StyleConfiguration* styleConfiguration;
 
 ulong loopCounter = 0;
@@ -29,19 +29,38 @@ PatternData newPatternData;
 volatile bool isInitialized = false;
 SystemConfiguration* systemConfiguration;
 
+SystemConfiguration* readSystemConfiguration()
+{
+    // For now, just return the default configuration.
+    String configJson = String(SystemConfigurationFileContents);
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        configJson.c_str(), 
+        configJson.length(), 
+        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
+    
+    return sc;
+}
+
+StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
+{
+    if (config.isEnabled())
+    {
+        return (StatusDisplay*)(new TM1637StatusDisplay(
+            config.getClockGpioPin(),
+            config.getDataGpioPin(),
+            config.getBrightness()));
+    }
+
+    return (StatusDisplay*)(new NullStatusDisplay());
+}
+
 void setup()
 {
     Serial.begin(9600);
     delay(2000);
     Serial.println("Starting...");
 
-    // read in JSON from a file...
-    String configJson = String(SystemConfigurationFileContents);
-    systemConfiguration = SystemConfiguration::ParseJson(
-        configJson.c_str(), 
-        configJson.length(), 
-        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
-    
+    systemConfiguration = readSystemConfiguration();
     if (!systemConfiguration->isValid())
     {
         while (true)
@@ -51,15 +70,14 @@ void setup()
         }
     }
 
-    Tm1637DisplayConfiguration& tdc = systemConfiguration->getTm1637DisplayConfiguration();
-    Serial.print("Initializing TM1637 display...");
-    Serial.println("Clock: " + String(tdc.getClockGpioPin()) + ", Data: " + String(tdc.getDataGpioPin()) + ", Brightness: " + String(tdc.getBrightness()));
-    display = new StatusDisplay(tdc.getClockGpioPin(), tdc.getDataGpioPin(), tdc.getBrightness());
-
+    display = createStatusDisplay(systemConfiguration->getTm1637DisplayConfiguration());
     display->setDisplay("---1");
 
+    buttonProcessor = systemConfiguration->getButtonProcessor();
+    buttonProcessor->setActionProcessor(processButtonAction);
+
     initializeIO();
-    initializeButtonProcessor();
+    //initializeButtonProcessor();
     int signType = LEGACY_SIGN_TYPE;
     if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
     {
@@ -133,7 +151,7 @@ void loop()
     {
         // Only process inputs if we're not in low power mode.
         readSettingsFromBLE();
-        buttonProcessor.update();
+        buttonProcessor->update();
     }
 }
 
@@ -151,25 +169,25 @@ void loop1()
     updateLedTelemetry();
 }
 
-void initializeButtonProcessor()
-{
-    buttonProcessor.setActionProcessor(ProcessButtonAction);
+// void initializeButtonProcessor()
+// {
+//     buttonProcessor.setActionProcessor(ProcessButtonAction);
 
-    // Add the buttons
-    std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
-    for (uint i = 0; i < manualInputPins.size(); i++)
-    {
-        buttonProcessor.addButtonDefinition(String(i), new ArduinoPushButton(manualInputPins[i], INPUT_PULLUP));
-    }
+//     // Add the buttons
+//     std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
+//     for (uint i = 0; i < manualInputPins.size(); i++)
+//     {
+//         buttonProcessor.addButtonDefinition(String(i), new ArduinoPushButton(manualInputPins[i], INPUT_PULLUP));
+//     }
 
-    // Add the button actions
-    buttonProcessor.addTapAction({"0"}, "changeStyle", {"RainbowRandom", "Pink"});
-    buttonProcessor.addTapAction({"1"}, "changeStyle", {"BluePinkRandom", "BluePinkDigit"});
-    buttonProcessor.addTapAction({"2"}, "changeStyle", {"RedPinkRandom", "RedPinkDigit"});
-    buttonProcessor.addLongTapAction({"0"}, "changeStyle", {"Fire"});
-    buttonProcessor.addLongTapAction({"1"}, "batteryVoltage");
-    buttonProcessor.addLongTapAction({"2"}, "disconnectBT");
-}
+//     // Add the button actions
+//     buttonProcessor.addTapAction({"0"}, "changeStyle", {"RainbowRandom", "Pink"});
+//     buttonProcessor.addTapAction({"1"}, "changeStyle", {"BluePinkRandom", "BluePinkDigit"});
+//     buttonProcessor.addTapAction({"2"}, "changeStyle", {"RedPinkRandom", "RedPinkDigit"});
+//     buttonProcessor.addLongTapAction({"0"}, "changeStyle", {"Fire"});
+//     buttonProcessor.addLongTapAction({"1"}, "batteryVoltage");
+//     buttonProcessor.addLongTapAction({"2"}, "disconnectBT");
+// }
 
 void setManualStyle(StyleDefinition styleDefinition)
 {
@@ -379,8 +397,15 @@ void updateLEDs()
     neoPixelDisplay->updateDisplay();
 }
 
-void ProcessButtonAction(int callerId, String actionName, std::vector<String> arguments)
+void processButtonAction(int callerId, String actionName, std::vector<String> arguments)
 {
+    Serial.print("Processing button action for'");
+    Serial.print(callerId);
+    Serial.print("', action '");
+    Serial.print(actionName);
+    Serial.print("', argument count: ");
+    Serial.println(arguments.size());
+    
     if (actionName == "batteryVoltage")
     {
         displayBatteryVoltage();

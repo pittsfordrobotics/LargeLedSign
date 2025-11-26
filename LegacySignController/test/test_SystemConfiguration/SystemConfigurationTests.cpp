@@ -69,7 +69,7 @@ void emptyJsonDoesNothing() {
     
     TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
     TEST_ASSERT_FALSE_MESSAGE(sc->isValid(), "SystemConfiguration should be invalid.");
-    std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
+    std::vector<GenericButton*> buttons = sc->getButtonProcessor()->getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("displayconfiguration.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styleconfiguration.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected default value.");
@@ -108,7 +108,7 @@ void emptyJsonObjectDoesNothing() {
     
     TEST_ASSERT_NOT_NULL_MESSAGE(sc, "SystemConfiguration was null.");
     TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
-    std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
+    std::vector<GenericButton*> buttons = sc->getButtonProcessor()->getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("displayconfiguration.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected default value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styleconfiguration.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected default value.");
@@ -134,7 +134,7 @@ void minimalJsonSetsProperties() {
         mockButtonFactory);
     
     TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
-    std::vector<GenericButton*> buttons = sc->getButtonProcessor().getButtons();
+    std::vector<GenericButton*> buttons = sc->getButtonProcessor()->getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(0, buttons.size(), "There should be no buttons.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("display.json", sc->getDisplayConfigurationFile().c_str(), "Display configuration file is not the expected value.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("styles.json", sc->getStyleConfigurationFile().c_str(), "Style configuration file is not the expected value.");
@@ -160,17 +160,17 @@ void buttonsAndActionsAreParsed() {
         mockButtonFactory);
     
     TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
-    ButtonProcessor& bp = sc->getButtonProcessor();
-    std::vector<GenericButton*> buttons = bp.getButtons();
+    ButtonProcessor* bp = sc->getButtonProcessor();
+    std::vector<GenericButton*> buttons = bp->getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(2, buttons.size(), "There should be 2 buttons.");
-    bp.setActionProcessor(processAction);
+    bp->setActionProcessor(processAction);
 
     // We don't need to test all functionality of the ButtonProcessor here,
     // just that the buttons and actions were parsed correctly.
 
     // Simulate button 1 tap
     button1->setPressType(ButtonPressType::Normal);
-    sc->getButtonProcessor().update();
+    sc->getButtonProcessor()->update();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("changeStyle", lastActionName.c_str(), "Last action name is not correct for button 1 tap.");
     TEST_ASSERT_EQUAL_MESSAGE(2, lastArguments.size(), "Number of arguments is not correct for button 1 tap.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Pink", lastArguments[0].c_str(), "First argument is not correct for button 1 tap.");
@@ -179,14 +179,14 @@ void buttonsAndActionsAreParsed() {
 
     // Simulate button 1 long tap
     button1->setPressType(ButtonPressType::Long);
-    sc->getButtonProcessor().update();
+    sc->getButtonProcessor()->update();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("batteryVoltage", lastActionName.c_str(), "Last action name is not correct for button 1 long tap.");
     TEST_ASSERT_EQUAL_MESSAGE(0, lastArguments.size(), "Number of arguments is not correct for button 1 long tap.");
     resetActionParameters();
 
     // Simulate button 2 tap
     button2->setPressType(ButtonPressType::Normal);
-    sc->getButtonProcessor().update();
+    sc->getButtonProcessor()->update();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("changeStyle", lastActionName.c_str(), "Last action name is not correct for button 2 tap.");
     TEST_ASSERT_EQUAL_MESSAGE(3, lastArguments.size(), "Number of arguments is not correct for button 2 tap.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Red", lastArguments[0].c_str(), "First argument is not correct for button 2 tap.");
@@ -197,7 +197,7 @@ void buttonsAndActionsAreParsed() {
     // Simulate buttons 1 and 2 tap
     button1->setPressType(ButtonPressType::Normal);
     button2->setPressType(ButtonPressType::Normal);
-    sc->getButtonProcessor().update();
+    sc->getButtonProcessor()->update();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("changeStyle", lastActionName.c_str(), "Last action name is not correct for buttons 1 and 2 tap.");
     TEST_ASSERT_EQUAL_MESSAGE(1, lastArguments.size(), "Number of arguments is not correct for buttons 1 and 2 tap.");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Fire", lastArguments[0].c_str(), "First argument is not correct for buttons 1 and 2 tap.");
@@ -214,14 +214,14 @@ void disabledButtonDefinitionIsIgnored() {
         mockButtonFactory);
     
     TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
-    ButtonProcessor& bp = sc->getButtonProcessor();
-    std::vector<GenericButton*> buttons = bp.getButtons();
+    ButtonProcessor* bp = sc->getButtonProcessor();
+    std::vector<GenericButton*> buttons = bp->getButtons();
     TEST_ASSERT_EQUAL_MESSAGE(1, buttons.size(), "There should be 1 button (the disabled one should be ignored).");
-    bp.setActionProcessor(processAction);
+    bp->setActionProcessor(processAction);
 
     // Simulate button 1 tap (make sure the correct button was mapped)
     button1->setPressType(ButtonPressType::Normal);
-    sc->getButtonProcessor().update();
+    sc->getButtonProcessor()->update();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("changeStyle", lastActionName.c_str(), "Last action name is not correct for button 1 tap.");
     TEST_ASSERT_EQUAL_MESSAGE(2, lastArguments.size(), "Number of arguments is not correct for button 1 tap.");
     resetActionParameters();
