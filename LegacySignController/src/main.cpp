@@ -477,7 +477,6 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
         {
             manualButtonSequenceNumber = 0;
         }
-        Serial.println("Manual button sequence number: " + String(manualButtonSequenceNumber));
 
         lastManualButtonPressed = callerId;
 
@@ -496,9 +495,6 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
 
         // Get styleName from argument list, based on the number of times the callerId was pressed.
         String styleName = arguments[manualButtonSequenceNumber];
-        Serial.print("Setting manual style to '");
-        Serial.print(styleName);
-        Serial.println("'.");
 
         StyleDefinition styleDef = styleConfiguration->getDefaultStyle();
         for (StyleDefinition& def : styleConfiguration->getStyles())
@@ -506,9 +502,6 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
             if (def.getName().equalsIgnoreCase(styleName))
             {
                 styleDef = def;
-                Serial.print("Found style definition for '");
-                Serial.print(styleName);
-                Serial.println("'.");
                 break;
             }
         }

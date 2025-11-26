@@ -23,21 +23,16 @@ byte NeoPixelDisplay::getBrightness()
 
 void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)
 {
-    Serial.println("Setting new display pattern.");
     //mutex_enter_blocking(&m_lockObject);
     DisplayPattern* oldPattern = m_displayPattern;
     m_displayPattern = displayPattern;
-    Serial.println("Resetting display pattern.");
     m_displayPattern->reset(m_pixelMap);
-    Serial.println("Display pattern reset.");
     //mutex_exit(&m_lockObject);
     
     // Delete old pattern AFTER releasing lock to avoid holding lock during delete
     if (oldPattern) {
-        Serial.println("Deleting old display pattern.");
         delete oldPattern;
     }
-    Serial.println("New display pattern set.");
 }
 
 void NeoPixelDisplay::updateDisplay()

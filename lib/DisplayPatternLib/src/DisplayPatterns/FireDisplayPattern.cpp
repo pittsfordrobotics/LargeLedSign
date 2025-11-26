@@ -18,11 +18,8 @@ void FireDisplayPattern::setCoolingAmount(byte coolingAmount)
 
 void FireDisplayPattern::resetInternal(PixelMap* pixelMap)
 {
-    Serial.println("Resetting FireDisplayPattern internal state.");
     pixelMap->fill(0);
-    Serial.println("Pixel map cleared.");
     m_combinedRowGroups.clear();
-    Serial.println("Populating row groups.");
 
     switch (m_patternType)
     {
@@ -38,11 +35,9 @@ void FireDisplayPattern::resetInternal(PixelMap* pixelMap)
             break;
     }
 
-    Serial.println("Row groups populated.");
     // Initialize the row heat groups based on the row groupings
     // and set all the initial heats to 0
     m_combinedRowHeats.clear();
-    Serial.println("Initializing row heats.");
     for (std::vector<std::vector<int>> rowGroup : m_combinedRowGroups)
     {
         std::vector<int> rowHeatsForGroup;
@@ -53,7 +48,6 @@ void FireDisplayPattern::resetInternal(PixelMap* pixelMap)
 
         m_combinedRowHeats.push_back(rowHeatsForGroup);
     }
-    Serial.println("Row heats initialized.");
 }
 
 void FireDisplayPattern::updateInternal(PixelMap* pixelMap)
@@ -92,19 +86,12 @@ void FireDisplayPattern::populateAllRows(PixelMap* pixelMap)
 
 void FireDisplayPattern::populateCombinedGroupsForIndividualColumns(PixelMap* pixelMap)
 {
-    // something is broken here when swapping from digit pattern type.
-    Serial.println("Populating combined groups for individual columns.");
-
     // Get the full list of columns and rows.
     // Each column will be a grouping.
     // Find what row each column's pixels are in to get the row mappings.
     // If a column doesn't have a pixel in a specific row, add and empty pixel list for that row.
     std::vector<std::vector<int>*> columns = pixelMap->getAllColumns();
-    Serial.print("Total columns: ");
-    Serial.println(columns.size());
     std::vector<std::vector<int>*> rows = pixelMap->getAllRows();
-    Serial.print("Total rows: ");
-    Serial.println(rows.size());
     
     for(std::vector<int>* column : columns)
     {

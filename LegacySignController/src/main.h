@@ -83,8 +83,8 @@ const char* SystemConfigurationFileContents = R"json(
                 "buttonIds": ["3"],
                 "tapAction": "changeStyle",
                 "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"],
-                "longTapAction": "changeStyle",
-                "longTapActionArguments": ["Pink"]
+                "longTapAction": "disconnectBT",
+                "longTapActionArguments": []
             }
         ]
     },
