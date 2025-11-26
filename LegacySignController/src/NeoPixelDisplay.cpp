@@ -23,11 +23,11 @@ byte NeoPixelDisplay::getBrightness()
 
 void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)
 {
-    //mutex_enter_blocking(&m_lockObject);
+    mutex_enter_blocking(&m_lockObject);
     DisplayPattern* oldPattern = m_displayPattern;
     m_displayPattern = displayPattern;
     m_displayPattern->reset(m_pixelMap);
-    //mutex_exit(&m_lockObject);
+    mutex_exit(&m_lockObject);
     
     // Delete old pattern AFTER releasing lock to avoid holding lock during delete
     if (oldPattern) {
@@ -37,7 +37,7 @@ void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)
 
 void NeoPixelDisplay::updateDisplay()
 {
-    //mutex_enter_blocking(&m_lockObject);
+    mutex_enter_blocking(&m_lockObject);
     bool wasUpdated = false;
 
     if (m_displayPattern)
@@ -49,29 +49,29 @@ void NeoPixelDisplay::updateDisplay()
     {
         outputPixels();
     }
-    //mutex_exit(&m_lockObject);
+    mutex_exit(&m_lockObject);
 }
 
 void NeoPixelDisplay::resetDisplay()
 {
-    //mutex_enter_blocking(&m_lockObject);
+    mutex_enter_blocking(&m_lockObject);
     if (m_displayPattern)
     {
         m_displayPattern->reset(m_pixelMap);
     }
     
     outputPixels();
-    //mutex_exit(&m_lockObject);
+    mutex_exit(&m_lockObject);
 }
 
 void NeoPixelDisplay::setSpeed(byte speed)
 {
-    //mutex_enter_blocking(&m_lockObject);
+    mutex_enter_blocking(&m_lockObject);
     if (m_displayPattern)
     {
         m_displayPattern->setSpeed(speed);
     }
-    //mutex_exit(&m_lockObject);
+    mutex_exit(&m_lockObject);
 }
 
 void NeoPixelDisplay::outputPixels()
