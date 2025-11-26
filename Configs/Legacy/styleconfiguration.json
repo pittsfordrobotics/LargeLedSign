@@ -1,0 +1,71 @@
+{
+    "defaultStyleName": "Pink",
+    "predefinedStyles": [
+        {
+            "name": "Pink",
+            "colorPattern": "SingleColor",
+            "displayPattern": "Solid",
+            "speed": 1,
+            "color1": "0xE616A1"
+        },
+        {
+            "name": "RainbowRandom",
+            "colorPattern": "Rainbow",
+            "displayPattern": "Random",
+            "speed": 245,
+            "param1": 255,
+            "param2": 30
+        },
+        {
+            "name": "Fire",
+            "colorPattern": "SingleColor",
+            "displayPattern": "Fire",
+            "speed": 200,
+            "color1": "0x000000",
+            "param1": 75,
+            "param2": 100
+        },
+        {
+            "name": "BluePinkDigit",
+            "colorPattern": "TwoColor",
+            "displayPattern": "Digit",
+            "speed": 150,
+            "color1": "0x0000FF",
+            "color2": "0xE616A1",
+            "param1": 20,
+            "param2": 20
+        },
+        {
+            "name": "BluePinkRandom",
+            "colorPattern": "TwoColor",
+            "displayPattern": "Random",
+            "speed": 255,
+            "color1": "0x0000FF",
+            "color2": "0xE616A1",
+            "param1": 255,
+            "param2": 255,
+            "param3": 75
+        },
+        {
+            "name": "RedPinkDigit",
+            "colorPattern": "TwoColor",
+            "displayPattern": "Digit",
+            "speed": 150,
+            "color1": "0xFF0000",
+            "color2": "0xE616A1",
+            "param1": 20,
+            "param2": 20
+        },
+        {
+            "name": "RedPinkRandom",
+            "colorPattern": "TwoColor",
+            "displayPattern": "Random",
+            "speed": 255,
+            "color1": "0xFF0000",
+            "color2": "0xE616A1",
+            "param1": 255,
+            "param2": 255,
+            "param3": 75
+        }
+    ]
+}
