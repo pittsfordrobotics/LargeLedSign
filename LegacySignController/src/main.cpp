@@ -60,6 +60,18 @@ void setup()
     display->setDisplay("---2");
 
     neoPixelDisplay = createNeoPixelDisplay(systemConfiguration->getDisplayConfigurationFile());
+    if (!neoPixelDisplay)
+    {
+        // Can't create the NeoPixelDisplay.
+        // For now, this is fatal.  When consolidating the controller types to include
+        // the Primary, which has no LED display, this will be changed to handle it better.
+        display->setDisplay("E-2");
+        while (true)
+        {
+            Serial.println("Failed to create NeoPixelDisplay!");
+            delay(1000);
+        }
+    }
 
     display->setDisplay("---3");
 
@@ -152,26 +164,53 @@ StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
 
 NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile)
 {
-    pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
+    const char* fileJson = getSdFileContents(displayConfigFile);
+    
+    // Not much we can do if we can't read the file.
+    // Extend later to allow no displays.
+    if (!fileJson) {
+        while(true)
+        {
+            Serial.println("Failed to read system configuration file.");
+            delay(1000);
+        }
+    }
 
-    // Actually read from the file!
-    std::vector<DisplayConfiguration>* displayConfigs;
-    if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
+    std::vector<DisplayConfiguration>* displayConfigs = DisplayConfiguration::ParseJson(
+        fileJson,
+        strlen(fileJson));
+
+    if (!displayConfigs || displayConfigs->size() == 0)
     {
-        displayConfigs = DisplayConfigFactory::createForTestMatrix();
+        while (true)
+        {
+            Serial.println("No display configurations found in file.");
+            delay(1000);
+        }
     }
-    else
-    {
-        displayConfigs = DisplayConfigFactory::createForLegacySign();
-    }
+
+    delete[] fileJson;  // Use delete[] for arrays allocated with new[]
 
     return new NeoPixelDisplay(displayConfigs->at(0));
 }
 
 StyleConfiguration* readStyleConfiguration(String styleConfigFile)
 {
-    // For now, just return the default style configuration.
-    return StyleConfigFactory::createDefaultStyleConfiguration();
+    const char* fileJson = getSdFileContents(styleConfigFile);
+    
+    // Not much we can do if we can't read the file.
+    // Extend later to allow no displays.
+    if (!fileJson) {
+        Serial.println("Failed to read style configuration file.");
+        return StyleConfiguration::ParseJson("", 0);
+    }
+
+    StyleConfiguration* styleConfiguration = StyleConfiguration::ParseJson(
+        fileJson,
+        strlen(fileJson));
+
+    delete[] fileJson;
+    return styleConfiguration;
 }
 
 void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition)
