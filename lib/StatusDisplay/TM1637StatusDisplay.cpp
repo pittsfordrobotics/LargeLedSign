@@ -1,20 +1,20 @@
-#include "StatusDisplay.h"
+#include "TM1637StatusDisplay.h"
 
 byte Dot{0b10000000};
 
-StatusDisplay::StatusDisplay(byte clockPin, byte dioPin, byte brightness)
+TM1637StatusDisplay::TM1637StatusDisplay(byte clockPin, byte dioPin, byte brightness) : StatusDisplay()
 {
     m_display = new TM1637Display(clockPin, dioPin);
     m_display->clear();
     m_display->setBrightness(brightness);
 }
 
-StatusDisplay::~StatusDisplay()
+TM1637StatusDisplay::~TM1637StatusDisplay()
 {
     delete m_display;
 }
 
-void StatusDisplay::update()
+void TM1637StatusDisplay::update()
 {
     if (m_currentPriority == DisplayPriority::None || m_currentPriority == DisplayPriority::AdHoc)
     {
@@ -44,21 +44,21 @@ void StatusDisplay::update()
     }
 }
 
-void StatusDisplay::clear()
+void TM1637StatusDisplay::clear()
 {
     m_display->clear();
     m_lastDisplayString = "";
     m_currentPriority = DisplayPriority::None;
 }
 
-void StatusDisplay::setDisplay(String stringToDisplay)
+void TM1637StatusDisplay::setDisplay(String stringToDisplay)
 {
     // Adhoc is the highest priority, so don't bother checking the current priority.
     displayString(stringToDisplay);
     m_currentPriority = DisplayPriority::AdHoc;
 }
 
-void StatusDisplay::displayTemporary(String stringToDisplay, uint durationMsec)
+void TM1637StatusDisplay::displayTemporary(String stringToDisplay, uint durationMsec)
 {
     if (m_currentPriority > DisplayPriority::Ephemeral)
     {
@@ -70,7 +70,7 @@ void StatusDisplay::displayTemporary(String stringToDisplay, uint durationMsec)
     m_currentPriority = DisplayPriority::Ephemeral;
 }
 
-void StatusDisplay::displaySequence(std::vector<String> stringsToDisplay, uint durationMsec)
+void TM1637StatusDisplay::displaySequence(std::vector<String> stringsToDisplay, uint durationMsec)
 {
     if (m_currentPriority > DisplayPriority::Sequence)
     {
@@ -103,7 +103,7 @@ void StatusDisplay::displaySequence(std::vector<String> stringsToDisplay, uint d
     m_currentPriority = DisplayPriority::Sequence;
 }
 
-void StatusDisplay::displayString(String s)
+void TM1637StatusDisplay::displayString(String s)
 {
     if (m_lastDisplayString.equals(s))
     {
@@ -143,7 +143,7 @@ void StatusDisplay::displayString(String s)
     m_lastDisplayString = s;
 }
 
-byte StatusDisplay::convertCharacter(char c)
+byte TM1637StatusDisplay::convertCharacter(char c)
 {
     switch (c)
     {
@@ -191,7 +191,25 @@ byte StatusDisplay::convertCharacter(char c)
         return 0;
     case '=':
         return 0b01001000;
+    case 'O':
+    case 'o':
+        return 0b01011100;
     default:
         return 0;
     }
 }
+
+// Binary value for the segments on the TM1637:
+// LSB - segment A; bit 6 - segment G; bit 7 - always zero
+/*
+    Segment mapping:
+     --A--           --0--
+    |     |         |     |
+    F     B         5     1
+    |     |         |     |
+     --G--    =>     --6--
+    |     |         |     |
+    E     C         4     2
+    |     |         |     |
+     --D--           --3--
+*/

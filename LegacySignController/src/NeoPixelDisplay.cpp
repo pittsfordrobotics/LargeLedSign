@@ -6,13 +6,17 @@ NeoPixelDisplay::NeoPixelDisplay(const DisplayConfiguration& displayConfiguratio
     m_neoPixels = new Adafruit_NeoPixel(m_pixelMap->getPixelCount(), displayConfiguration.getGpioPin(), NEO_GRB + NEO_KHZ800);
     m_neoPixels->begin();
     m_neoPixels->clear();
-
-    // TODO: read default brightness from config and set neoPixels brightness.
+    m_neoPixels->setBrightness(displayConfiguration.getDefaultBrightness());
 }
 
 void NeoPixelDisplay::setBrightness(byte brightness)
 {
     m_neoPixels->setBrightness(brightness);
+}
+
+byte NeoPixelDisplay::getBrightness()
+{
+    return m_neoPixels->getBrightness();
 }
 
 void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)

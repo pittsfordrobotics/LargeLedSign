@@ -32,7 +32,7 @@ StyleConfiguration* StyleConfiguration::ParseJson(const char* jsonString, size_t
     }
 
     String defaultStyleName("");
-    bool defaultStyleSet = false;
+    bool isDefaultStyleSet = false;
     
     if (configDoc["defaultStyleName"].is<JsonVariant>())
     {
@@ -53,11 +53,11 @@ StyleConfiguration* StyleConfiguration::ParseJson(const char* jsonString, size_t
                 styleConfiguration->m_styles.push_back(styleDefinition);
                 
                 // See if this style is supposed to be the default style.
-                if (!defaultStyleSet || defaultStyleName.equalsIgnoreCase(styleDefinition.getName()))
+                if (!isDefaultStyleSet || defaultStyleName.equalsIgnoreCase(styleDefinition.getName()))
                 {
                     // Either it's the first valid style in the list, or it's the one named as the default.
                     styleConfiguration->m_defaultStyle = styleDefinition;
-                    defaultStyleSet = true;
+                    isDefaultStyleSet = true;
                 }
             }
         }

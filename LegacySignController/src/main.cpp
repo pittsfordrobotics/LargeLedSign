@@ -2,12 +2,13 @@
 
 // Global variables
 CommonPeripheral btService;
-StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
+StatusDisplay* display;
 NeoPixelDisplay* neoPixelDisplay;
-DisplayPattern* currentLightStyle;
-ButtonProcessor buttonProcessor;
+ButtonProcessor* buttonProcessor;
 StyleConfiguration* styleConfiguration;
+BatteryMonitorConfiguration batteryMonitorConfig;
 
+bool isBluetoothEnabled = false;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
@@ -18,99 +19,79 @@ int manualButtonSequenceNumber = 0;
 byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
 
 // Settings that are updated via bluetooth
-byte currentBrightness = DEFAULT_BRIGHTNESS;
-byte newBrightness = DEFAULT_BRIGHTNESS;
+byte currentBrightness;
+byte newBrightness;
 byte currentSpeed;
 byte newSpeed;
 PatternData currentPatternData;
 PatternData newPatternData;
 
 volatile bool isInitialized = false;
+SystemConfiguration* systemConfiguration;
 
 void setup()
 {
     Serial.begin(9600);
     delay(2000);
     Serial.println("Starting...");
-    
-    display.setDisplay("---1");
 
-    initializeIO();
-    initializeButtonProcessor();
-    int signType = LEGACY_SIGN_TYPE;
-    if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
+    systemConfiguration = readSystemConfiguration();
+    if (!systemConfiguration->isValid())
     {
-        currentBrightness = DEFAULT_BRIGHTNESS_LOW;
-        newBrightness = DEFAULT_BRIGHTNESS_LOW;
-        signType = 0; // Test matrix
-    }
-
-    display.setDisplay("---2");
-
-    //
-    // Read from config!!!
-    //
-    std::vector<DisplayConfiguration>* displayConfigs;
-    if (signType == 0)
-    {
-        displayConfigs = DisplayConfigFactory::createForTestMatrix();
-    }
-    else
-    {
-        displayConfigs = DisplayConfigFactory::createForLegacySign();
-    }
-
-    styleConfiguration = StyleConfigFactory::createDefaultStyleConfiguration();
-
-    display.setDisplay("---3");
-
-    neoPixelDisplay = new NeoPixelDisplay(displayConfigs->at(0));
-    neoPixelDisplay->setBrightness(currentBrightness);
-    newPatternData = styleConfiguration->getDefaultStyle().getPatternData();
-    currentPatternData = newPatternData;
-    DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
-    currentSpeed = styleConfiguration->getDefaultStyle().getSpeed();
-    newSpeed = currentSpeed;
-    initialPattern->setSpeed(newSpeed);
-    neoPixelDisplay->setDisplayPattern(initialPattern);
-
-    display.setDisplay("---4");
-
-    if (!BLE.begin())
-    {
-        Serial.println("BLE initialization failed!");
-        display.setDisplay("E-1");
         while (true)
         {
-            Serial.println("BLE initialization failed!");
+            Serial.println("System configuration is invalid!");
             delay(1000);
         }
     }
 
-    startBLEService();
+    display = createStatusDisplay(systemConfiguration->getTm1637DisplayConfiguration());
+    display->setDisplay("---1");
+
+    buttonProcessor = systemConfiguration->getButtonProcessor();
+    buttonProcessor->setActionProcessor(processButtonAction);
+
+    display->setDisplay("---2");
+
+    neoPixelDisplay = createNeoPixelDisplay(systemConfiguration->getDisplayConfigurationFile());
+
+    display->setDisplay("---3");
+
+    styleConfiguration = readStyleConfiguration(systemConfiguration->getStyleConfigurationFile());
+
+    display->setDisplay("---4");
+    initializeDefaultStyleProperties(styleConfiguration->getDefaultStyle());
+
+    display->setDisplay("---5");
+
+    initializeBatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
+
+    display->setDisplay("---6");
+
+    initializeBLEService(systemConfiguration->getBluetoothConfiguration());
+    display->clear();
     isInitialized = true;
 }
 
 void loop()
 {
-    BLE.poll();
-    display.update();
+    display->update();
     updateTelemetry();
     checkForLowPowerState();
 
-    if (btService.isConnected())
+    if (isBluetoothEnabled && btService.isConnected())
     {
         // Something is connected via BT.
         // Set the display to "--" to show something connected to us.
         // Display it as "temporary" since it's a low-priority message.
-        display.displayTemporary(" --", 200);
+        display->displayTemporary(" --", 200);
     }
 
     if (!inLowPowerMode)
     {
         // Only process inputs if we're not in low power mode.
         readSettingsFromBLE();
-        buttonProcessor.update();
+        buttonProcessor->update();
     }
 }
 
@@ -124,28 +105,82 @@ void setup1()
 void loop1()
 {
     // Check for threading issues!!!
+    // TODO: Found occasional issues when spamming the input buttons where the LED update crashes.
+    // Need to ensure that the LED update and style updates don't interfere.
     updateLEDs();
     updateLedTelemetry();
 }
 
-void initializeButtonProcessor()
+SystemConfiguration* readSystemConfiguration()
 {
-    buttonProcessor.setActionProcessor(ProcessButtonAction);
+    // For now, just return the default configuration.
+    String configJson = String(SystemConfigurationFileContents);
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        configJson.c_str(), 
+        configJson.length(), 
+        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
+    
+    return sc;
+}
 
-    // Add the buttons
-    std::vector<int> manualInputPins{MANUAL_INPUT_PINS};
-    for (uint i = 0; i < manualInputPins.size(); i++)
+StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
+{
+    if (config.isEnabled())
     {
-        buttonProcessor.addButtonDefinition(String(i), new ArduinoPushButton(manualInputPins[i], INPUT_PULLUP));
+        return (StatusDisplay*)(new TM1637StatusDisplay(
+            config.getClockGpioPin(),
+            config.getDataGpioPin(),
+            config.getBrightness()));
     }
 
-    // Add the button actions
-    buttonProcessor.addTapAction({"0"}, "changeStyle", {"RainbowRandom", "Pink"});
-    buttonProcessor.addTapAction({"1"}, "changeStyle", {"BluePinkRandom", "BluePinkDigit"});
-    buttonProcessor.addTapAction({"2"}, "changeStyle", {"RedPinkRandom", "RedPinkDigit"});
-    buttonProcessor.addLongTapAction({"0"}, "changeStyle", {"Fire"});
-    buttonProcessor.addLongTapAction({"1"}, "batteryVoltage");
-    buttonProcessor.addLongTapAction({"2"}, "disconnectBT");
+    return (StatusDisplay*)(new NullStatusDisplay());
+}
+
+NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile)
+{
+    pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
+
+    // Actually read from the file!
+    std::vector<DisplayConfiguration>* displayConfigs;
+    if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
+    {
+        displayConfigs = DisplayConfigFactory::createForTestMatrix();
+    }
+    else
+    {
+        displayConfigs = DisplayConfigFactory::createForLegacySign();
+    }
+
+    return new NeoPixelDisplay(displayConfigs->at(0));
+}
+
+StyleConfiguration* readStyleConfiguration(String styleConfigFile)
+{
+    // For now, just return the default style configuration.
+    return StyleConfigFactory::createDefaultStyleConfiguration();
+}
+
+void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition)
+{
+    // Setup the default display pattern for the sign,
+    // and initialize the starting values for the pattern, speed, etc.
+
+    // Set the default pattern data
+    newPatternData = defaultStyleDefinition.getPatternData();
+    currentPatternData = newPatternData;
+    DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
+    
+    // Set default speed
+    currentSpeed = defaultStyleDefinition.getSpeed();
+    newSpeed = currentSpeed;
+    initialPattern->setSpeed(newSpeed);
+
+    // Set default brightness
+    currentBrightness = neoPixelDisplay->getBrightness();
+    newBrightness = currentBrightness;
+
+    // Set the initial pattern on the display
+    neoPixelDisplay->setDisplayPattern(initialPattern);
 }
 
 void setManualStyle(StyleDefinition styleDefinition)
@@ -154,73 +189,129 @@ void setManualStyle(StyleDefinition styleDefinition)
     newPatternData = styleDefinition.getPatternData();
 
     // Update the local BLE settings to reflect the new manual settings.
-    btService.setSpeed(newSpeed);
-    btService.setPatternData(newPatternData);
+    if (isBluetoothEnabled)
+    {
+        btService.setSpeed(newSpeed);
+        btService.setPatternData(newPatternData);
+    }
 }
 
-void startBLEService()
+void initializeBLEService( BluetoothConfiguration& config)
 {
-    display.setDisplay("C  =");
+    if (!config.isEnabled())
+    {
+        Serial.println("Bluetooth is disabled in configuration.");
+        display->setDisplay("boff");
+        delay(1500);
+        return;
+    }
+
+    if (!BLE.begin())
+    {
+        Serial.println("BLE initialization failed!");
+        display->setDisplay("E-1");
+        while (true)
+        {
+            Serial.println("BLE initialization failed!");
+            delay(1000);
+        }
+    }
+
+    display->setDisplay("C  =");
     Serial.println("Setting up Peripheral service using common logic.");
-    String localName = "Small 3181 Sign";
-    btService.initialize(BTCOMMON_PRIMARYCONTROLLER_UUID, localName);
+    btService.initialize(config.getUuid(), config.getLocalName());
 
     // Set the various characteristics based on the defaults
-    display.setDisplay("C ==");
+    display->setDisplay("C ==");
 
     btService.setBrightness(currentBrightness);
-    btService.setSpeed(styleConfiguration->getDefaultStyle().getSpeed());
-    btService.setPatternData(styleConfiguration->getDefaultStyle().getPatternData());
+    btService.setSpeed(currentSpeed);
+    btService.setPatternData(currentPatternData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
-
+    isBluetoothEnabled = true;
     Serial.println("Peripheral service started.");
-    display.clear();
 }
 
 void readSettingsFromBLE()
 {
+    if (!isBluetoothEnabled)
+    {
+        return;
+    }
+
+    BLE.poll();
     newBrightness = btService.getBrightness();
     newSpeed = btService.getSpeed();
     newPatternData = btService.getPatternData();
 }
 
-void initializeIO()
+void initializeBatteryMonitor(BatteryMonitorConfiguration& config)
 {
-    pinMode(VOLTAGEINPUTPIN, INPUT);
-    pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
+    batteryMonitorConfig = systemConfiguration->getBatteryMonitorConfiguration();
+    
+    if (batteryMonitorConfig.isEnabled())
+    {
+        pinMode(config.getAnalogInputPin(), INPUT);
+    }
+}
+
+void configurePowerLed(PowerLedConfiguration& config)
+{
+    if (!config.isEnabled())
+    {
+        return;
+    }
+     
+    pinMode(config.getGpioPin(), OUTPUT);
+    digitalWrite(config.getGpioPin(), HIGH); // Turn on the power LED
 }
 
 // Read the analog input from the "voltage input" pin and calculate the battery voltage.
 float getCalculatedBatteryVoltage()
 {
+    if (!batteryMonitorConfig.isEnabled())
+    {
+        return 0.0f;
+    }
+
     // The analog input ranges from 0 (0V) to 1024 (3.3V), resulting in 0.00322 Volts per "tick".
     // The battery voltage passes through a voltage divider so we have to multiply the input by
     // a scale factor to get the actual voltage.
-    float rawLevel = getVoltageInputLevel();
-    return rawLevel * VOLTAGEMULTIPLIER * 3.3 / 1024;
+    float rawLevel = getRawVoltageInputLevel();
+    return rawLevel * batteryMonitorConfig.getInputMultiplier() * 3.3 / 1024;
 }
 
 // Read the raw value from the "voltage input" pin.
-int getVoltageInputLevel()
+int getRawVoltageInputLevel()
 {
-    return analogRead(VOLTAGEINPUTPIN);
+    if (!batteryMonitorConfig.isEnabled())
+    {
+        return 0;
+    }
+
+    return analogRead(batteryMonitorConfig.getAnalogInputPin());
 }
 
 void displayBatteryVoltage()
 {
     double voltage = getCalculatedBatteryVoltage();
-    display.displayTemporary(String(voltage, 2), 1500);
+    display->displayTemporary(String(voltage, 2), 1500);
 }
 
 // Check if the current battery voltage is too low to run the sign,
 // or if the battery has been charged enough to restart operation.
 void checkForLowPowerState()
 {
+    if (!batteryMonitorConfig.isEnabled())
+    {
+        return;
+    }
+
     double currentVoltage = getCalculatedBatteryVoltage();
 
     // Check if the voltage is too low.
-    if (currentVoltage < LOWPOWERTHRESHOLD)
+    if (currentVoltage < batteryMonitorConfig.getVoltageToEnterLowPowerState())
     {
         if (inLowPowerMode)
         {
@@ -231,7 +322,7 @@ void checkForLowPowerState()
             Serial.print("Battery voltage is below threshold. Voltage: ");
             Serial.print(currentVoltage);
             Serial.print(", threshold: ");
-            Serial.println(LOWPOWERTHRESHOLD);
+            Serial.println(batteryMonitorConfig.getVoltageToEnterLowPowerState());
             Serial.println("Entering low power mode.");
             inLowPowerMode = true;
 
@@ -249,7 +340,7 @@ void checkForLowPowerState()
     }
 
     // Check if the voltage is high enough for normal operation.
-    if (currentVoltage > NORMALPOWERTHRESHOLD)
+    if (currentVoltage > batteryMonitorConfig.getVoltageToExitLowPowerState())
     {
         if (!inLowPowerMode)
         {
@@ -260,7 +351,7 @@ void checkForLowPowerState()
             Serial.print("Battery voltage is above normal threshold. Voltage: ");
             Serial.print(currentVoltage);
             Serial.print(", threshold: ");
-            Serial.println(NORMALPOWERTHRESHOLD);
+            Serial.println(batteryMonitorConfig.getVoltageToExitLowPowerState());
             Serial.println("Exiting low power mode.");
             neoPixelDisplay->setBrightness(currentBrightness);
             inLowPowerMode = false;
@@ -287,14 +378,16 @@ void updateTelemetry()
         loopCounter = 0;
 
         // Output voltage info periodically
-        int rawLevel = getVoltageInputLevel();
+        int rawLevel = getRawVoltageInputLevel();
         float voltage = getCalculatedBatteryVoltage();
 
         // Emit battery voltage information on Bluetooth as well as Serial.
         btService.emitBatteryVoltage(voltage);
-        Serial.print("Analog input: ");
+        Serial.print("Battery monitor: ");
+        Serial.print(batteryMonitorConfig.isEnabled() ? "Enabled" : "Disabled");
+        Serial.print("; Raw input: ");
         Serial.print(rawLevel);
-        Serial.print("; calculated voltage: ");
+        Serial.print("; Calculated voltage: ");
         Serial.println(voltage);
     }
 }
@@ -329,11 +422,7 @@ void updateLEDs()
 
     if (newSpeed != currentSpeed)
     {
-        if (currentLightStyle)
-        {
-            currentLightStyle->setSpeed(newSpeed);
-        }
-        
+        neoPixelDisplay->getDisplayPattern()->setSpeed(newSpeed);
         currentSpeed = newSpeed;
     }
 
@@ -356,8 +445,15 @@ void updateLEDs()
     neoPixelDisplay->updateDisplay();
 }
 
-void ProcessButtonAction(int callerId, String actionName, std::vector<String> arguments)
+void processButtonAction(int callerId, String actionName, std::vector<String> arguments)
 {
+    Serial.print("Processing button action for'");
+    Serial.print(callerId);
+    Serial.print("', action '");
+    Serial.print(actionName);
+    Serial.print("', argument count: ");
+    Serial.println(arguments.size());
+
     if (actionName == "batteryVoltage")
     {
         displayBatteryVoltage();

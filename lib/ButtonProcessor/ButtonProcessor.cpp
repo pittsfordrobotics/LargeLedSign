@@ -9,7 +9,7 @@ void ButtonProcessor::addButtonDefinition(String buttonName, GenericButton* butt
     if (m_buttonMap.find(buttonName) != m_buttonMap.end())
     {
         // button already exists
-        ("Button with name '");
+        DebugUtils::print("Button with name '");
         DebugUtils::print(buttonName.c_str());
         DebugUtils::println("' already exists");
         return;

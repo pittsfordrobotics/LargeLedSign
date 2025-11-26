@@ -12,6 +12,7 @@ class StyleConfiguration
 {
     public:
         static StyleConfiguration* ParseJson(const char* jsonString, size_t length);
+        ~StyleConfiguration() = default;  // No dynamic memory to clean up
 
         StyleDefinition& getDefaultStyle() { return m_defaultStyle; };
         std::vector<StyleDefinition>& getStyles() { return m_styles; };
