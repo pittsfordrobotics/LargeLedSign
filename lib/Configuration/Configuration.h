@@ -2,9 +2,7 @@
 #define CONFIGURATION_H
 
 #include "DisplayConfiguration.h"
-#include "DisplayConfigFactory.h"
 #include "StyleConfiguration.h"
-#include "StyleConfigFactory.h"
 #include "SystemConfiguration.h"
 #include "BluetoothConfiguration.h"
 #include "BatteryMonitorConfiguration.h"
