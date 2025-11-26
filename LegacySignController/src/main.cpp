@@ -61,7 +61,7 @@ void setup()
     styleConfiguration = readStyleConfiguration(systemConfiguration->getStyleConfigurationFile());
 
     display->setDisplay("---4");
-    initializeDefaultStyleProperties();
+    initializeDefaultStyleProperties(styleConfiguration->getDefaultStyle());
 
     display->setDisplay("---5");
 
@@ -69,10 +69,7 @@ void setup()
 
     display->setDisplay("---6");
 
-    // TODO: Set up battery monitor and power LED based on configuration.
-    // Configure BLE based on config.
-
-    initializeBLEService();
+    initializeBLEService(systemConfiguration->getBluetoothConfiguration());
     display->clear();
     isInitialized = true;
 }
@@ -164,18 +161,18 @@ StyleConfiguration* readStyleConfiguration(String styleConfigFile)
     return StyleConfigFactory::createDefaultStyleConfiguration();
 }
 
-void initializeDefaultStyleProperties()
+void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition)
 {
     // Setup the default display pattern for the sign,
     // and initialize the starting values for the pattern, speed, etc.
 
     // Set the default pattern data
-    newPatternData = styleConfiguration->getDefaultStyle().getPatternData();
+    newPatternData = defaultStyleDefinition.getPatternData();
     currentPatternData = newPatternData;
     DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
     
     // Set default speed
-    currentSpeed = styleConfiguration->getDefaultStyle().getSpeed();
+    currentSpeed = defaultStyleDefinition.getSpeed();
     newSpeed = currentSpeed;
     initialPattern->setSpeed(newSpeed);
 
@@ -200,10 +197,9 @@ void setManualStyle(StyleDefinition styleDefinition)
     }
 }
 
-void initializeBLEService()
+void initializeBLEService( BluetoothConfiguration& config)
 {
-    BluetoothConfiguration& btConfig = systemConfiguration->getBluetoothConfiguration();
-    if (!btConfig.isEnabled())
+    if (!config.isEnabled())
     {
         Serial.println("Bluetooth is disabled in configuration.");
         display->setDisplay("boff");
@@ -224,14 +220,14 @@ void initializeBLEService()
 
     display->setDisplay("C  =");
     Serial.println("Setting up Peripheral service using common logic.");
-    btService.initialize(btConfig.getUuid(), btConfig.getLocalName());
+    btService.initialize(config.getUuid(), config.getLocalName());
 
     // Set the various characteristics based on the defaults
     display->setDisplay("C ==");
 
     btService.setBrightness(currentBrightness);
-    btService.setSpeed(styleConfiguration->getDefaultStyle().getSpeed());
-    btService.setPatternData(styleConfiguration->getDefaultStyle().getPatternData());
+    btService.setSpeed(currentSpeed);
+    btService.setPatternData(currentPatternData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
     isBluetoothEnabled = true;
