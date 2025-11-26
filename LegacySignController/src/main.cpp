@@ -57,23 +57,16 @@ void setup()
 
     display->setDisplay("---3");
 
-    styleConfiguration = createStyleConfiguration(systemConfiguration->getStyleConfigurationFile());
-
-    // Set default style
-    newPatternData = styleConfiguration->getDefaultStyle().getPatternData();
-    currentPatternData = newPatternData;
-    DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
-    currentSpeed = styleConfiguration->getDefaultStyle().getSpeed();
-    newSpeed = currentSpeed;
-    initialPattern->setSpeed(newSpeed);
-    neoPixelDisplay->setDisplayPattern(initialPattern);
+    styleConfiguration = readStyleConfiguration(systemConfiguration->getStyleConfigurationFile());
 
     display->setDisplay("---4");
+    initializeDefaultStyleProperties();
+
+    display->setDisplay("---5");
 
     initializeBatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
 
-    display->setDisplay("---5");
-    display->setDisplay("---5");
+    display->setDisplay("---6");
 
     // TODO: Set up battery monitor and power LED based on configuration.
     // Remove initializeIO method.
@@ -173,18 +166,36 @@ NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile)
         displayConfigs = DisplayConfigFactory::createForLegacySign();
     }
 
-    NeoPixelDisplay* display = new NeoPixelDisplay(displayConfigs->at(0));
-    currentBrightness = displayConfigs->at(0).getDefaultBrightness();
-    newBrightness = currentBrightness;
-    display->setBrightness(currentBrightness);
-
-    return display;
+    return new NeoPixelDisplay(displayConfigs->at(0));
 }
 
-StyleConfiguration* createStyleConfiguration(String styleConfigFile)
+StyleConfiguration* readStyleConfiguration(String styleConfigFile)
 {
     // For now, just return the default style configuration.
     return StyleConfigFactory::createDefaultStyleConfiguration();
+}
+
+void initializeDefaultStyleProperties()
+{
+    // Setup the default display pattern for the sign,
+    // and initialize the starting values for the pattern, speed, etc.
+
+    // Set the default pattern data
+    newPatternData = styleConfiguration->getDefaultStyle().getPatternData();
+    currentPatternData = newPatternData;
+    DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
+    
+    // Set default speed
+    currentSpeed = styleConfiguration->getDefaultStyle().getSpeed();
+    newSpeed = currentSpeed;
+    initialPattern->setSpeed(newSpeed);
+
+    // Set default brightness
+    currentBrightness = neoPixelDisplay->getBrightness();
+    newBrightness = currentBrightness;
+
+    // Set the initial pattern on the display
+    neoPixelDisplay->setDisplayPattern(initialPattern);
 }
 
 void setManualStyle(StyleDefinition styleDefinition)

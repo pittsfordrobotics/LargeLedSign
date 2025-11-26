@@ -15,7 +15,7 @@ class DisplayConfiguration
         DisplayConfiguration(const DisplayConfiguration& other);
         ~DisplayConfiguration();
         
-        byte getDefaultBrightness() { return m_defaultBrightness; }
+        byte getDefaultBrightness() const { return m_defaultBrightness; }
         byte getGpioPin() const { return m_gpioPin; }
         uint16_t getNumberOfPixels() { return m_numPixels; }
         uint16_t getNumberOfRows() { return m_numRows; }

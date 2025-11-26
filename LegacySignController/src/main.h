@@ -18,9 +18,9 @@
 SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
 NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile);
-StyleConfiguration* createStyleConfiguration(String styleConfigFile);
+StyleConfiguration* readStyleConfiguration(String styleConfigFile);
 void initializeBatteryMonitor(BatteryMonitorConfiguration& config);
-
+void initializeDefaultStyleProperties();
 void startBLEService();
 void readSettingsFromBLE();
 void setManualStyle(StyleDefinition styleDefinition);
