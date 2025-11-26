@@ -422,21 +422,15 @@ void updateLEDs()
 
     if (newSpeed != currentSpeed)
     {
-        neoPixelDisplay->getDisplayPattern()->setSpeed(newSpeed);
+        neoPixelDisplay->setSpeed(newSpeed);
         currentSpeed = newSpeed;
     }
 
     if (currentPatternData != newPatternData)
     {
-        DisplayPattern* oldPattern = neoPixelDisplay->getDisplayPattern();;
         DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
-        newPattern->setSpeed(newSpeed);
         neoPixelDisplay->setDisplayPattern(newPattern);
-        if (oldPattern)
-        {
-            delete oldPattern;
-        }
-
+        neoPixelDisplay->setSpeed(newSpeed);
         neoPixelDisplay->resetDisplay();
 
         currentPatternData = newPatternData;
@@ -483,11 +477,28 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
         {
             manualButtonSequenceNumber = 0;
         }
+        Serial.println("Manual button sequence number: " + String(manualButtonSequenceNumber));
 
         lastManualButtonPressed = callerId;
 
+        if (manualButtonSequenceNumber >= arguments.size())
+        {
+            // Invalid sequence number - reset to 0.
+            Serial.println("Invalid manual button sequence number detected. Resetting to 0.");
+            manualButtonSequenceNumber = 0;
+        }
+
+        if (arguments.size() == 0)
+        {
+            Serial.println("No styles defined in button action arguments.");
+            return;
+        }
+
         // Get styleName from argument list, based on the number of times the callerId was pressed.
         String styleName = arguments[manualButtonSequenceNumber];
+        Serial.print("Setting manual style to '");
+        Serial.print(styleName);
+        Serial.println("'.");
 
         StyleDefinition styleDef = styleConfiguration->getDefaultStyle();
         for (StyleDefinition& def : styleConfiguration->getStyles())
@@ -495,6 +506,9 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
             if (def.getName().equalsIgnoreCase(styleName))
             {
                 styleDef = def;
+                Serial.print("Found style definition for '");
+                Serial.print(styleName);
+                Serial.println("'.");
                 break;
             }
         }

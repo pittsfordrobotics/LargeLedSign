@@ -10,6 +10,7 @@ class PixelMap
 {
     public:
         PixelMap(const DisplayConfiguration& displayConfiguration);
+        ~PixelMap();
 
         uint16_t getDigitsToLeft() { return m_digitsToLeft; }
         uint16_t getDigitsToRight() { return m_digitsToRight; }
