@@ -142,7 +142,7 @@ void PixelMap::clearBuffer()
     }
 }
 
-uint32_t PixelMap::getPixel(uint16_t pixel)
+uint32_t PixelMap::getRawPixelColor(uint16_t pixel)
 {
     if (pixel >= m_numPixels)
     {
@@ -172,7 +172,7 @@ uint16_t PixelMap::getPixelCount()
     return m_numPixels;
 }
 
-void PixelMap::setPixel(uint16_t pixel, uint32_t color)
+void PixelMap::setRawPixel(uint16_t pixel, uint32_t color)
 {
     if (pixel >= m_numPixels)
     {
@@ -208,6 +208,20 @@ void PixelMap::setColumnColor(uint16_t column, uint32_t newColor)
     }
 }
 
+void PixelMap::setDigitColor(uint16_t digit, uint32_t newColor)
+{
+    if (digit >= m_digits.size())
+    {
+        return;
+    }
+
+    std::vector<int>* digitPixels = m_digits.at(digit);
+    for (int pixelIndex : *digitPixels)
+    {
+        setRawPixel(pixelIndex, newColor);
+    }
+}
+
 void PixelMap::fill(uint32_t newColor)
 {
     for (uint16_t i = 0; i < m_numPixels; i++)
@@ -236,6 +250,15 @@ void PixelMap::shiftPixelsRight(uint32_t newColor)
     m_pixelColors[0] = newColor;
 }
 
+void PixelMap::shiftPixelsRight()
+{
+    // Use signed int to avoid underflow when decrementing from 0
+    for (int i = m_numPixels - 1; i >= 1; i--)
+    {
+        m_pixelColors[i] = m_pixelColors[i - 1];
+    }
+}
+
 void PixelMap::shiftPixelsLeft(uint32_t newColor)
 {
     for (uint16_t i = 0; i < m_numPixels - 1; i++)
@@ -244,6 +267,27 @@ void PixelMap::shiftPixelsLeft(uint32_t newColor)
     }
 
     m_pixelColors[m_numPixels - 1] = newColor;
+}
+
+void PixelMap::shiftPixelsLeft()
+{
+    for (uint16_t i = 0; i < m_numPixels - 1; i++)
+    {
+        m_pixelColors[i] = m_pixelColors[i + 1];
+    }
+}
+
+void PixelMap::shiftColumnsRight()
+{
+    if (m_columns.size() == 0) return;  // Safety check
+    
+    for (int row = 0; row < m_rows.size(); row++)
+    {
+        for (int col = m_columns.size() - 1; col > 0; col--)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row][col-1]);
+        }
+    }
 }
 
 void PixelMap::shiftColumnsRight(uint32_t newColor)
@@ -268,6 +312,17 @@ void PixelMap::shiftColumnsRight(uint32_t newColor)
 void PixelMap::shiftColumnsRight(uint32_t newColor, uint16_t startingColumn)
 {
     shiftPixelBlocksRight(m_columns, newColor, startingColumn);
+}
+
+void PixelMap::shiftColumnsLeft()
+{
+    for (int row = 0; row < m_rows.size(); row++)
+    {
+        for (int col = 0; col < m_columns.size() - 1; col++)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row][col+1]);
+        }
+    }
 }
 
 void PixelMap::shiftColumnsLeft(uint32_t newColor)
@@ -305,6 +360,17 @@ void PixelMap::shiftRowsUp(uint32_t newColor)
     }
 }
 
+void PixelMap::shiftRowsUp()
+{
+    for (int col = 0; col < m_columns.size(); col++)
+    {
+        for (int row = 0; row < m_rows.size() - 1; row++)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row+1][col]);
+        }
+    }
+}
+
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
 void PixelMap::shiftRowsUp(uint32_t newColor, uint16_t startingRow)
@@ -329,6 +395,19 @@ void PixelMap::shiftRowsDown(uint32_t newColor)
     }
 }
 
+void PixelMap::shiftRowsDown()
+{
+    if (m_rows.size() == 0) return;  // Safety check
+    
+    for (int col = 0; col < m_columns.size(); col++)
+    {
+        for (int row = m_rows.size() - 1; row > 0; row--)
+        {
+            setColorInPixelMap(row, col, m_colorMap[row-1][col]);
+        }
+    }
+}
+
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
 void PixelMap::shiftRowsDown(uint32_t newColor, uint16_t startingRow)
@@ -341,6 +420,52 @@ void PixelMap::shiftRowsDown(uint32_t newColor, uint16_t startingRow)
 void PixelMap::shiftDigitsRight(uint32_t newColor)
 {
     shiftPixelBlocksRight(m_digits, newColor, 0);
+}
+
+void PixelMap::shiftDigitsRight()
+{
+    if (m_digits.size() < 2) 
+    {
+        // If less than 2 digits, nothing to shift.
+        return;
+    }
+
+    // Assumption: all pixels in a digit are the same color.
+    for (int digit = m_digits.size() - 1; digit > 0; digit--)
+    {
+        if (m_digits.at(digit - 1)->size() == 0)
+        {
+            // Empty digit we can't shift colors if there's nothing there.
+            // Shouldn't happen in practice -- just exit.
+            return;
+        }
+
+        uint32_t previousColor = m_pixelColors[m_digits.at(digit - 1)->at(0)];
+        setDigitColor(digit, previousColor);
+    }
+}
+
+void PixelMap::shiftDigitsLeft()
+{
+    if (m_digits.size() < 2) 
+    {
+        // If less than 2 digits, nothing to shift.
+        return;
+    }
+
+    // Assumption: all pixels in a digit are the same color.
+    for (int digit = 0; digit < m_digits.size() - 1; digit++)
+    {
+        if (m_digits.at(digit + 1)->size() == 0)
+        {
+            // Empty digit we can't shift colors if there's nothing there.
+            // Shouldn't happen in practice -- just exit.
+            return;
+        }
+
+        uint32_t previousColor = m_pixelColors[m_digits.at(digit + 1)->at(0)];
+        setDigitColor(digit, previousColor);
+    }
 }
 
 void PixelMap::shiftPixelBlocksRight(std::vector<std::vector<int> *> pixelBlocks, uint32_t newColor, uint16_t startingBlock)

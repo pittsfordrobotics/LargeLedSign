@@ -25,10 +25,19 @@ class PixelMap
         // Sets the first pixel in the buffer to the new color,
         // shifting all the pixels in the buffer to the right by one.
         void shiftPixelsRight(uint32_t newColor);
+        void shiftPixelsRight();
 
         // Sets the last pixel in the buffer to the new color,
         // shifting all the pixels in the buffer to the left by one.
         void shiftPixelsLeft(uint32_t newColor);
+        void shiftPixelsLeft();
+
+        void shiftColumnsRight();
+        void shiftColumnsLeft();
+        void shiftRowsUp();
+        void shiftRowsDown();
+        void shiftDigitsRight();
+        void shiftDigitsLeft();
 
         // Sets the pixels in the first column to the new color,
         // shifting all the columns to the right by one.
@@ -86,7 +95,7 @@ class PixelMap
         uint16_t getDigitCount();
 
         // Set an individual pixel in the raw pixel buffer to a color.
-        void setPixel(uint16_t pixel, uint32_t color);
+        void setRawPixel(uint16_t pixel, uint32_t color);
 
         // Set the color of a specific pixel in the row/column map.
         void setColorInPixelMap(uint16_t row, uint16_t column, uint32_t color);
@@ -96,6 +105,8 @@ class PixelMap
         
         // Set all pixels in the given column to the given color.
         void setColumnColor(uint16_t column, uint32_t newColor);
+
+        void setDigitColor(uint16_t digit, uint32_t newColor);
 
         // Get the row-to-pixel mapping for all rows.
         const std::vector<std::vector<int>*>& getAllRows();
@@ -110,7 +121,7 @@ class PixelMap
         // Clears the internal pixel buffer.
         void clearBuffer();
 
-        uint32_t getPixel(uint16_t pixel);
+        uint32_t getRawPixelColor(uint16_t pixel);
 
     private:
         uint16_t m_numPixels{0};       // Size of internal buffer

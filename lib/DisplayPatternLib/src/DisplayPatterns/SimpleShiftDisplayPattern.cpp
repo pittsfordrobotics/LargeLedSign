@@ -24,22 +24,28 @@ void SimpleShiftDisplayPattern::updateInternal(PixelMap* pixelMap)
     switch (m_shiftType)
     {
         case ShiftType::Right:
-            pixelMap->shiftColumnsRight(newColor);
+            pixelMap->shiftColumnsRight();
+            pixelMap->setColumnColor(0, newColor);
             return;
         case ShiftType::Left:
-            pixelMap->shiftColumnsLeft(newColor);
+            pixelMap->shiftColumnsLeft();
+            pixelMap->setColumnColor(pixelMap->getColumnCount() - 1, newColor);
             return;
         case ShiftType::Up:
-            pixelMap->shiftRowsUp(newColor);
+            pixelMap->shiftRowsUp();
+            pixelMap->setRowColor(pixelMap->getRowCount() - 1, newColor);
             return;
         case ShiftType::Down:
-            pixelMap->shiftRowsDown(newColor);
+            pixelMap->shiftRowsDown();
+            pixelMap->setRowColor(0, newColor);
             return;
         case ShiftType::Digit:
-            pixelMap->shiftDigitsRight(newColor);
+            pixelMap->shiftDigitsRight();
+            pixelMap->setDigitColor(0, newColor);
             return;
         case ShiftType::Line:
-            pixelMap->shiftPixelsRight(newColor);
+            pixelMap->shiftPixelsRight();
+            pixelMap->setRawPixel(0, newColor);
             return;
         default:
             // Default to Solid (ie, all lights the same color)
