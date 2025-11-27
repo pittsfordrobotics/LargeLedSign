@@ -108,7 +108,7 @@ void CenterOutDisplayPattern::updateHorizontal(PixelMap* pixelMap, uint32_t newC
 
 void CenterOutDisplayPattern::updateRadial(PixelMap* pixelMap, uint32_t newColor)
 {
-    // Simple case for now -- assume the center is within this display.
+    // doesn't work when the center is off the display
     pixelMap->shiftColumnsLeft(m_centerColumn);
     pixelMap->shiftColumnsRight(m_centerColumn + 1);
     pixelMap->shiftRowsUp(m_centerRow);

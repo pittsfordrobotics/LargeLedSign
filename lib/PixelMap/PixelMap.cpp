@@ -182,9 +182,9 @@ void PixelMap::setRawPixelColor(uint16_t pixel, uint32_t color)
     m_pixelColors[pixel] = color;
 }
 
-void PixelMap::setRowColor(uint16_t row, uint32_t newColor)
+void PixelMap::setRowColor(int row, uint32_t newColor)
 {
-    if (row >= m_rows.size())
+    if (row >= m_rows.size() || row < 0)
     {
         return;
     }
@@ -195,9 +195,9 @@ void PixelMap::setRowColor(uint16_t row, uint32_t newColor)
     }
 }
 
-void PixelMap::setColumnColor(uint16_t column, uint32_t newColor)
+void PixelMap::setColumnColor(int column, uint32_t newColor)
 {
-    if (column >= m_columns.size())
+    if (column >= m_columns.size() || column < 0)
     {
         return;
     }
@@ -208,9 +208,9 @@ void PixelMap::setColumnColor(uint16_t column, uint32_t newColor)
     }
 }
 
-void PixelMap::setDigitColor(uint16_t digit, uint32_t newColor)
+void PixelMap::setDigitColor(int digit, uint32_t newColor)
 {
-    if (digit >= m_digits.size())
+    if (digit >= m_digits.size() || digit < 0)
     {
         return;
     }
@@ -260,11 +260,16 @@ void PixelMap::shiftColumnsRight()
     shiftColumnsRight(0);
 }
 
-void PixelMap::shiftColumnsRight(uint16_t startingColumn)
+void PixelMap::shiftColumnsRight(int startingColumn)
 {
     if (m_columns.size() == 0 || startingColumn >= m_columns.size() - 1) 
     {
         return;
+    }
+
+    if (startingColumn < 0)
+    {
+        startingColumn = 0;
     }
 
     for (int row = 0; row < m_rows.size(); row++)
@@ -281,9 +286,9 @@ void PixelMap::shiftColumnsLeft()
     shiftColumnsLeft(m_columns.size() - 1);
 }
 
-void PixelMap::shiftColumnsLeft(uint16_t startingColumn)
+void PixelMap::shiftColumnsLeft(int startingColumn)
 {
-    if (m_columns.size() == 0 || startingColumn == 0) 
+    if (m_columns.size() == 0 || startingColumn <= 0) 
     {
         return;
     }
@@ -307,9 +312,9 @@ void PixelMap::shiftRowsUp()
     shiftRowsUp(m_rows.size() - 1);
 }
 
-void PixelMap::shiftRowsUp(uint16_t startingRow)
+void PixelMap::shiftRowsUp(int startingRow)
 {
-    if (m_rows.size() == 0 || startingRow == 0)
+    if (m_rows.size() == 0 || startingRow <= 0)
     {
         return;
     }
@@ -333,11 +338,16 @@ void PixelMap::shiftRowsDown()
     shiftRowsDown(0);
 }
 
-void PixelMap::shiftRowsDown(uint16_t startingRow)
+void PixelMap::shiftRowsDown(int startingRow)
 {
     if (m_rows.size() == 0 || startingRow >= m_rows.size() - 1) 
     {
         return;
+    }
+
+    if (startingRow < 0)
+    {
+        startingRow = 0;
     }
 
     for (int col = 0; col < m_columns.size(); col++)

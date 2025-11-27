@@ -25,13 +25,13 @@ class PixelMap
         void shiftPixelsRight();
         void shiftPixelsLeft();
         void shiftColumnsRight();
-        void shiftColumnsRight(uint16_t startingColumn);
+        void shiftColumnsRight(int startingColumn);
         void shiftColumnsLeft();
-        void shiftColumnsLeft(uint16_t startingColumn);
+        void shiftColumnsLeft(int startingColumn);
         void shiftRowsUp();
-        void shiftRowsUp(uint16_t startingRow);
+        void shiftRowsUp(int startingRow);
         void shiftRowsDown();
-        void shiftRowsDown(uint16_t startingRow);
+        void shiftRowsDown(int startingRow);
         void shiftDigitsRight();
         void shiftDigitsLeft();
 
@@ -52,9 +52,9 @@ class PixelMap
         // Set the color of a specific pixel in the row/column map.
         void setColorInPixelMap(uint16_t row, uint16_t column, uint32_t color);
 
-        void setRowColor(uint16_t row, uint32_t newColor);
-        void setColumnColor(uint16_t column, uint32_t newColor);
-        void setDigitColor(uint16_t digit, uint32_t newColor);
+        void setRowColor(int row, uint32_t newColor);
+        void setColumnColor(int column, uint32_t newColor);
+        void setDigitColor(int digit, uint32_t newColor);
 
         // Get the row-to-pixel mapping for all rows.
         const std::vector<std::vector<int>*>& getAllRows();
