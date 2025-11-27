@@ -29,10 +29,29 @@ void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)
     m_displayPattern->reset(m_pixelMap);
     mutex_exit(&m_lockObject);
     
-    // Delete old pattern AFTER releasing lock to avoid holding lock during delete
     if (oldPattern) {
         delete oldPattern;
     }
+}
+
+void NeoPixelDisplay::setDigitsToLeft(uint16_t digitsToLeft)
+{
+    m_pixelMap->setDigitsToLeft(digitsToLeft);
+}
+
+void NeoPixelDisplay::setDigitsToRight(uint16_t digitsToRight)
+{
+    m_pixelMap->setDigitsToRight(digitsToRight);
+}
+
+void NeoPixelDisplay::setColumnsToLeft(uint16_t colsToLeft)
+{
+    m_pixelMap->setColsToLeft(colsToLeft);
+}
+
+void NeoPixelDisplay::setColumnsToRight(uint16_t colsToRight)
+{
+    m_pixelMap->setColsToRight(colsToRight);
 }
 
 void NeoPixelDisplay::updateDisplay()

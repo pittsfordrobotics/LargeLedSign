@@ -17,6 +17,11 @@ class PixelMap
         uint16_t getColsToLeft() { return m_colsToLeft; }
         uint16_t getColsToRight() { return m_colsToRight; }
 
+        void setDigitsToLeft(uint16_t digitsToLeft) { m_digitsToLeft = digitsToLeft; }
+        void setDigitsToRight(uint16_t digitsToRight) { m_digitsToRight = digitsToRight; }
+        void setColsToLeft(uint16_t colsToLeft) { m_colsToLeft = colsToLeft; }
+        void setColsToRight(uint16_t colsToRight) { m_colsToRight = colsToRight; }
+
         // Sets the first pixel in the buffer to the new color,
         // shifting all the pixels in the buffer to the right by one.
         void shiftPixelsRight(uint32_t newColor);
