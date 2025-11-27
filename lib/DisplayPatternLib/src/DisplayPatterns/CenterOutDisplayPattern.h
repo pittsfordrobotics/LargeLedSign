@@ -30,9 +30,6 @@ class CenterOutDisplayPattern : public DisplayPattern {
         void updateHorizontal(PixelMap* pixelMap, uint32_t newColor);
         void updateVertical(PixelMap* pixelMap, uint32_t newColor);
         void updateRadial(PixelMap* pixelMap, uint32_t newColor);
-
-        void shiftColumns(PixelMap* pixelMap);
-        void shiftRows(PixelMap* pixelMap);
 };
 
 #endif
