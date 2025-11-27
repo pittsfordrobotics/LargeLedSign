@@ -79,12 +79,14 @@ void CenterOutDisplayPattern::updateInternal(PixelMap* pixelMap)
         if (m_centerLine > pixelMap->getColsToLeft() + pixelMap->getColumnCount())
         {
             // Center line is to the right of this display, so we'll only be shifting left.
-            pixelMap->shiftColumnsLeft(newColor);
+            pixelMap->shiftColumnsLeft();
+            pixelMap->setColumnColor(pixelMap->getColumnCount() - 1, newColor);
         }
         else if (m_centerLine < pixelMap->getColsToLeft())
         {
             // Center line is to the left of this display, so we'll only be shifting right.
-            pixelMap->shiftColumnsRight(newColor);
+            pixelMap->shiftColumnsRight();
+            pixelMap->setColumnColor(0, newColor);
         }
         else
         {

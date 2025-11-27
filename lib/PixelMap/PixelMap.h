@@ -22,14 +22,7 @@ class PixelMap
         void setColsToLeft(uint16_t colsToLeft) { m_colsToLeft = colsToLeft; }
         void setColsToRight(uint16_t colsToRight) { m_colsToRight = colsToRight; }
 
-        // Sets the first pixel in the buffer to the new color,
-        // shifting all the pixels in the buffer to the right by one.
-        void shiftPixelsRight(uint32_t newColor);
         void shiftPixelsRight();
-
-        // Sets the last pixel in the buffer to the new color,
-        // shifting all the pixels in the buffer to the left by one.
-        void shiftPixelsLeft(uint32_t newColor);
         void shiftPixelsLeft();
 
         void shiftColumnsRight();
@@ -39,41 +32,21 @@ class PixelMap
         void shiftDigitsRight();
         void shiftDigitsLeft();
 
-        // Sets the pixels in the first column to the new color,
-        // shifting all the columns to the right by one.
-        void shiftColumnsRight(uint32_t newColor);
-
         // Sets the pixels in the starting column to the new color,
         // shifting the columns to the right by one.
         void shiftColumnsRight(uint32_t newColor, uint16_t startingColumn);
-
-        // Sets the pixels in the last column to the new color,
-        // shifting all the columns to the left by one.
-        void shiftColumnsLeft(uint32_t newColor);
 
         // Sets the pixels in the starting column to the new color,
         // shifting the columns to the left by one.
         void shiftColumnsLeft(uint32_t newColor, uint16_t startingColumn);
 
-        // Sets the pixels in the bottom row to the new color,
-        // shifting all the rows up by one.
-        void shiftRowsUp(uint32_t newColor);
-
         // Sets the pixels in the starting row to the new color,
         // shifting subsequent the rows up by one.
         void shiftRowsUp(uint32_t newColor, uint16_t startingRow);
 
-        // Sets the pixels in the top row to the new color,
-        // shifting all the rows down by one.
-        void shiftRowsDown(uint32_t newColor);
-
         // Sets the pixels in the starting row to the new color,
         // shifting prior rows down by one.
         void shiftRowsDown(uint32_t newColor, uint16_t startingRow);
-
-        // Sets the pixels in the leftmost digit to the new color,
-        // shifting all the digit colors one place to the right.
-        void shiftDigitsRight(uint32_t newColor);
 
         // Sets a random assortment of pixels in the buffer to the given color.
         void fillRandomly(uint32_t newColor, uint16_t numberOfPixels);

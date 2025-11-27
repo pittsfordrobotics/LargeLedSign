@@ -239,17 +239,6 @@ void PixelMap::fillRandomly(uint32_t newColor, uint16_t numberOfPixels)
     }
 }
 
-void PixelMap::shiftPixelsRight(uint32_t newColor)
-{
-    // Use signed int to avoid underflow when decrementing from 0
-    for (int i = m_numPixels - 1; i >= 1; i--)
-    {
-        m_pixelColors[i] = m_pixelColors[i - 1];
-    }
-
-    m_pixelColors[0] = newColor;
-}
-
 void PixelMap::shiftPixelsRight()
 {
     // Use signed int to avoid underflow when decrementing from 0
@@ -257,16 +246,6 @@ void PixelMap::shiftPixelsRight()
     {
         m_pixelColors[i] = m_pixelColors[i - 1];
     }
-}
-
-void PixelMap::shiftPixelsLeft(uint32_t newColor)
-{
-    for (uint16_t i = 0; i < m_numPixels - 1; i++)
-    {
-        m_pixelColors[i] = m_pixelColors[i + 1];
-    }
-
-    m_pixelColors[m_numPixels - 1] = newColor;
 }
 
 void PixelMap::shiftPixelsLeft()
@@ -290,23 +269,6 @@ void PixelMap::shiftColumnsRight()
     }
 }
 
-void PixelMap::shiftColumnsRight(uint32_t newColor)
-{
-    if (m_columns.size() == 0) return;  // Safety check
-    
-    // Shift all columns to the right, then fill the first column with the new color.
-    for (uint16_t row = 0; row < m_rows.size(); row++)
-    {
-        // Use signed int to prevent underflow
-        for (int col = m_columns.size() - 1; col > 0; col--)
-        {
-            setColorInPixelMap(row, col, m_colorMap[row][col-1]);
-        }
-
-        setColorInPixelMap(row, 0, newColor);
-    }
-}
-
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
 void PixelMap::shiftColumnsRight(uint32_t newColor, uint16_t startingColumn)
@@ -325,39 +287,11 @@ void PixelMap::shiftColumnsLeft()
     }
 }
 
-void PixelMap::shiftColumnsLeft(uint32_t newColor)
-{
-    // Shift all columns to the left, then fill the last column with the new color.
-    for (uint16_t row = 0; row < m_rows.size(); row++)
-    {
-        for (uint16_t col = 0; col < m_columns.size() - 1; col++)
-        {
-            setColorInPixelMap(row, col, m_colorMap[row][col+1]);
-        }
-
-        setColorInPixelMap(row, m_columns.size() - 1, newColor);
-    }
-}
-
 // Update to use the new pixel map.
 // Currently only used by the CenterOut pattern.
 void PixelMap::shiftColumnsLeft(uint32_t newColor, uint16_t startingColumn)
 {
     shiftPixelBlocksLeft(m_columns, newColor, startingColumn);
-}
-
-void PixelMap::shiftRowsUp(uint32_t newColor)
-{
-    // Shift all rows up, then fill the last row with the new color.
-    for (uint16_t col = 0; col < m_columns.size(); col++)
-    {
-        for (uint16_t row = 0; row < m_rows.size() - 1; row++)
-        {
-            setColorInPixelMap(row, col, m_colorMap[row+1][col]);
-        }
-
-        setColorInPixelMap(m_rows.size() - 1, col, newColor);
-    }
 }
 
 void PixelMap::shiftRowsUp()
@@ -378,23 +312,6 @@ void PixelMap::shiftRowsUp(uint32_t newColor, uint16_t startingRow)
     shiftPixelBlocksLeft(m_rows, newColor, startingRow);
 }
 
-void PixelMap::shiftRowsDown(uint32_t newColor)
-{
-    if (m_rows.size() == 0) return;  // Safety check
-    
-    // Shift all rows down, then fill the first row with the new color.
-    for (uint16_t col = 0; col < m_columns.size(); col++)
-    {
-        // Use signed int to prevent underflow
-        for (int row = m_rows.size() - 1; row > 0; row--)
-        {
-            setColorInPixelMap(row, col, m_colorMap[row-1][col]);
-        }
-
-        setColorInPixelMap(0, col, newColor);
-    }
-}
-
 void PixelMap::shiftRowsDown()
 {
     if (m_rows.size() == 0) return;  // Safety check
@@ -413,13 +330,6 @@ void PixelMap::shiftRowsDown()
 void PixelMap::shiftRowsDown(uint32_t newColor, uint16_t startingRow)
 {
     shiftPixelBlocksRight(m_rows, newColor, startingRow);
-}
-
-// Update to use the new pixel map.
-// Currently only used by the CenterOut pattern.
-void PixelMap::shiftDigitsRight(uint32_t newColor)
-{
-    shiftPixelBlocksRight(m_digits, newColor, 0);
 }
 
 void PixelMap::shiftDigitsRight()
