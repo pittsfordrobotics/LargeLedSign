@@ -45,7 +45,7 @@ void SimpleShiftDisplayPattern::updateInternal(PixelMap* pixelMap)
             return;
         case ShiftType::Line:
             pixelMap->shiftPixelsRight();
-            pixelMap->setRawPixel(0, newColor);
+            pixelMap->setRawPixelColor(0, newColor);
             return;
         default:
             // Default to Solid (ie, all lights the same color)

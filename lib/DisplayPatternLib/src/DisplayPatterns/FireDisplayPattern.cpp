@@ -62,7 +62,7 @@ void FireDisplayPattern::updateInternal(PixelMap* pixelMap)
             uint32_t color = m_heatColors[temperature];
             for (int pixel : m_combinedRowGroups[group][numRows - row - 1])
             {
-                pixelMap->setRawPixel(pixel, color);
+                pixelMap->setRawPixelColor(pixel, color);
             }
         }
     }
