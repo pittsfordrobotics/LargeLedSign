@@ -13,7 +13,7 @@ std::vector<String> CenterOutDisplayPattern::getParameterNames()
 void CenterOutDisplayPattern::resetInternal(PixelMap* pixelMap)
 {
     m_colorPattern->reset();
-    m_centerColumn = (pixelMap->getColsToLeft() + pixelMap->getColsToRight() + pixelMap->getColumnCount()) / 2 - 1;
+    m_centerColumn = (pixelMap->getColsToLeft() + pixelMap->getColsToRight() + pixelMap->getColumnCount()) / 2  - 1;
 
     m_centerRow = pixelMap->getRowCount() / 2 - 1;
 
@@ -126,8 +126,11 @@ void CenterOutDisplayPattern::updateRadial(PixelMap* pixelMap, uint32_t newColor
 {
     // Simple case for now -- assume the center is within this display.
     pixelMap->shiftColumnsLeft(m_centerColumn);
-    pixelMap->shiftColumnsRight(m_centerColumn);
+    pixelMap->shiftColumnsRight(m_centerColumn + 1);
     pixelMap->shiftRowsUp(m_centerRow);
-    pixelMap->shiftRowsDown(m_centerRow);
+    pixelMap->shiftRowsDown(m_centerRow + 1);
     pixelMap->setColorInPixelMap(m_centerRow, m_centerColumn, newColor);
+    pixelMap->setColorInPixelMap(m_centerRow+1, m_centerColumn, newColor);
+    pixelMap->setColorInPixelMap(m_centerRow, m_centerColumn+1, newColor);
+    pixelMap->setColorInPixelMap(m_centerRow+1, m_centerColumn+1, newColor);
 }
