@@ -90,33 +90,56 @@ void CenterOutDisplayPattern::updateInternal(PixelMap* pixelMap)
 
 void CenterOutDisplayPattern::updateVertical(PixelMap* pixelMap, uint32_t newColor)
 {
-        pixelMap->shiftRowsUp(m_centerColumn);
-        pixelMap->setRowColor(m_centerColumn, newColor);
-        pixelMap->shiftRowsDown(m_centerColumn + 1);
-        pixelMap->setRowColor(m_centerColumn + 1, newColor);
+    shiftRows(pixelMap);
+    pixelMap->setRowColor(m_centerColumn, newColor);
+    pixelMap->setRowColor(m_centerColumn + 1, newColor);
 }
 
-void CenterOutDisplayPattern::updateHorizontal(PixelMap* pixelMap, uint32_t newColor)
+void CenterOutDisplayPattern::shiftRows(PixelMap* pixelMap)
+{
+        pixelMap->shiftRowsUp(m_centerColumn);    
+        pixelMap->shiftRowsDown(m_centerColumn + 1);
+}
+
+void CenterOutDisplayPattern::shiftColumns(PixelMap* pixelMap)
 {
     if (m_centerRow > pixelMap->getColsToLeft() + pixelMap->getColumnCount())
     {
         // Center line is to the right of this display, so we'll only be shifting left.
         pixelMap->shiftColumnsLeft();
-        pixelMap->setColumnColor(pixelMap->getColumnCount() - 1, newColor);
     }
     else if (m_centerRow < pixelMap->getColsToLeft())
     {
         // Center line is to the left of this display, so we'll only be shifting right.
         pixelMap->shiftColumnsRight();
-        pixelMap->setColumnColor(0, newColor);
     }
     else
     {
         uint16_t localCenter = m_centerRow - pixelMap->getColsToLeft();
         pixelMap->shiftColumnsLeft(localCenter);
-        pixelMap->setColumnColor(localCenter, newColor);
         if (localCenter < pixelMap->getColumnCount() - 1) {
             pixelMap->shiftColumnsRight(localCenter + 1);
+        }
+    }
+}
+
+void CenterOutDisplayPattern::updateHorizontal(PixelMap* pixelMap, uint32_t newColor)
+{
+    shiftColumns(pixelMap);
+
+    if (m_centerRow > pixelMap->getColsToLeft() + pixelMap->getColumnCount())
+    {
+        pixelMap->setColumnColor(pixelMap->getColumnCount() - 1, newColor);
+    }
+    else if (m_centerRow < pixelMap->getColsToLeft())
+    {
+        pixelMap->setColumnColor(0, newColor);
+    }
+    else
+    {
+        uint16_t localCenter = m_centerRow - pixelMap->getColsToLeft();
+        pixelMap->setColumnColor(localCenter, newColor);
+        if (localCenter < pixelMap->getColumnCount() - 1) {
             pixelMap->setColumnColor(localCenter + 1, newColor);
         }
     }
@@ -125,10 +148,16 @@ void CenterOutDisplayPattern::updateHorizontal(PixelMap* pixelMap, uint32_t newC
 void CenterOutDisplayPattern::updateRadial(PixelMap* pixelMap, uint32_t newColor)
 {
     // Simple case for now -- assume the center is within this display.
-    pixelMap->shiftColumnsLeft(m_centerColumn);
-    pixelMap->shiftColumnsRight(m_centerColumn + 1);
-    pixelMap->shiftRowsUp(m_centerRow);
-    pixelMap->shiftRowsDown(m_centerRow + 1);
+    // pixelMap->shiftColumnsLeft(m_centerColumn);
+    // pixelMap->shiftColumnsRight(m_centerColumn + 1);
+    // pixelMap->shiftRowsUp(m_centerRow);
+    // pixelMap->shiftRowsDown(m_centerRow + 1);
+    // pixelMap->setColorInPixelMap(m_centerRow, m_centerColumn, newColor);
+    // pixelMap->setColorInPixelMap(m_centerRow+1, m_centerColumn, newColor);
+    // pixelMap->setColorInPixelMap(m_centerRow, m_centerColumn+1, newColor);
+    // pixelMap->setColorInPixelMap(m_centerRow+1, m_centerColumn+1, newColor);
+    shiftColumns(pixelMap);
+    shiftRows(pixelMap);
     pixelMap->setColorInPixelMap(m_centerRow, m_centerColumn, newColor);
     pixelMap->setColorInPixelMap(m_centerRow+1, m_centerColumn, newColor);
     pixelMap->setColorInPixelMap(m_centerRow, m_centerColumn+1, newColor);
