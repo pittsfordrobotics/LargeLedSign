@@ -71,27 +71,33 @@ void CenterOutDisplayPattern::updateInternal(PixelMap* pixelMap)
 
     if (m_orientation == CenterOutOrientation::Vertical)
     {
-        pixelMap->shiftRowsUp(newColor, m_centerLine);
-        pixelMap->shiftRowsDown(newColor, m_centerLine + 1);
+        pixelMap->shiftRowsUp(m_centerLine);
+        pixelMap->setRowColor(m_centerLine, newColor);
+        pixelMap->shiftRowsDown(m_centerLine + 1);
+        pixelMap->setRowColor(m_centerLine + 1, newColor);
     }
     else
     {
         if (m_centerLine > pixelMap->getColsToLeft() + pixelMap->getColumnCount())
         {
             // Center line is to the right of this display, so we'll only be shifting left.
-            pixelMap->shiftColumnsLeft(newColor);
+            pixelMap->shiftColumnsLeft();
+            pixelMap->setColumnColor(pixelMap->getColumnCount() - 1, newColor);
         }
         else if (m_centerLine < pixelMap->getColsToLeft())
         {
             // Center line is to the left of this display, so we'll only be shifting right.
-            pixelMap->shiftColumnsRight(newColor);
+            pixelMap->shiftColumnsRight();
+            pixelMap->setColumnColor(0, newColor);
         }
         else
         {
             uint16_t localCenter = m_centerLine - pixelMap->getColsToLeft();
-            pixelMap->shiftColumnsLeft(newColor, localCenter);
+            pixelMap->shiftColumnsLeft(localCenter);
+            pixelMap->setColumnColor(localCenter, newColor);
             if (localCenter < pixelMap->getColumnCount() - 1) {
-                pixelMap->shiftColumnsRight(newColor, localCenter + 1);
+                pixelMap->shiftColumnsRight(localCenter + 1);
+                pixelMap->setColumnColor(localCenter + 1, newColor);
             }
         }
     }

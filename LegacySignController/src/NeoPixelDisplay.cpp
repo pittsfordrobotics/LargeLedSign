@@ -29,10 +29,29 @@ void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)
     m_displayPattern->reset(m_pixelMap);
     mutex_exit(&m_lockObject);
     
-    // Delete old pattern AFTER releasing lock to avoid holding lock during delete
     if (oldPattern) {
         delete oldPattern;
     }
+}
+
+void NeoPixelDisplay::setDigitsToLeft(uint16_t digitsToLeft)
+{
+    m_pixelMap->setDigitsToLeft(digitsToLeft);
+}
+
+void NeoPixelDisplay::setDigitsToRight(uint16_t digitsToRight)
+{
+    m_pixelMap->setDigitsToRight(digitsToRight);
+}
+
+void NeoPixelDisplay::setColumnsToLeft(uint16_t colsToLeft)
+{
+    m_pixelMap->setColsToLeft(colsToLeft);
+}
+
+void NeoPixelDisplay::setColumnsToRight(uint16_t colsToRight)
+{
+    m_pixelMap->setColsToRight(colsToRight);
 }
 
 void NeoPixelDisplay::updateDisplay()
@@ -76,9 +95,11 @@ void NeoPixelDisplay::setSpeed(byte speed)
 
 void NeoPixelDisplay::outputPixels()
 {
+    // No locking here:
+    // This is an internal method and we should have already taken a lock.
     for (uint i = 0; i < m_pixelMap->getPixelCount(); i++)
     {
-        m_neoPixels->setPixelColor(i, m_pixelMap->getPixel(i));
+        m_neoPixels->setPixelColor(i, m_pixelMap->getRawPixelColor(i));
     }
 
     unsigned long start = millis();
