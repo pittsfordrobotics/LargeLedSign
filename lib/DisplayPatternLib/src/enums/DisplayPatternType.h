@@ -22,7 +22,8 @@ enum class DisplayPatternType : byte
     Rotation = 14,
     RotationCCW = 15,
     SpotLight = 16,
-    SpotLightCCW = 17
+    SpotLightCCW = 17,
+    CenterOutRadial = 18
 };
 
 class DisplayPatternTypeHelper
@@ -101,6 +102,10 @@ class DisplayPatternTypeHelper
             if (type.equalsIgnoreCase("spotlightccw"))
             {
                 return DisplayPatternType::SpotLightCCW;
+            }
+            if (type.equalsIgnoreCase("centeroutradial"))
+            {
+                return DisplayPatternType::CenterOutRadial;
             }
             return DisplayPatternType::Solid;
         }

@@ -88,6 +88,13 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
+        case DisplayPatternType::CenterOutRadial:
+        {
+            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Radial);
+            pattern->setColorPattern(colorPattern);
+            displayPattern = pattern;
+            break;
+        }
         case DisplayPatternType::Fire3:
         {
             FireDisplayPattern* pattern = new FireDisplayPattern(FirePatternType::Solid);
