@@ -21,11 +21,11 @@ void LowPowerDisplayPattern::updateInternal(PixelMap* pixelMap)
     // to the "next color" from the pattern (which should normally be just a solid color).
     if (m_iterationCount % 2 == 0)
     {
-        pixelMap->setPixel(0, m_colorPattern->getNextColor());
+        pixelMap->setRawPixelColor(0, m_colorPattern->getNextColor());
     }
     else
     {
-        pixelMap->setPixel(0, 0);
+        pixelMap->setRawPixelColor(0, 0);
     }
     
     m_iterationCount++;    

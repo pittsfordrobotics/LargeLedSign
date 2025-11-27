@@ -95,9 +95,11 @@ void NeoPixelDisplay::setSpeed(byte speed)
 
 void NeoPixelDisplay::outputPixels()
 {
+    // No locking here:
+    // This is an internal method and we should have already taken a lock.
     for (uint i = 0; i < m_pixelMap->getPixelCount(); i++)
     {
-        m_neoPixels->setPixelColor(i, m_pixelMap->getPixel(i));
+        m_neoPixels->setPixelColor(i, m_pixelMap->getRawPixelColor(i));
     }
 
     unsigned long start = millis();
