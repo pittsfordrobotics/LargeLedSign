@@ -8,7 +8,8 @@
 
 enum class CenterOutOrientation {
     Horizontal,
-    Vertical
+    Vertical,
+    Square
 };
 
 class CenterOutDisplayPattern : public DisplayPattern {
@@ -23,7 +24,12 @@ class CenterOutDisplayPattern : public DisplayPattern {
 
     private:
         CenterOutOrientation m_orientation{CenterOutOrientation::Horizontal};
-        uint16_t m_centerLine;
+        int m_centerRow;
+        int m_centerColumn;
+
+        void updateHorizontal(PixelMap* pixelMap, uint32_t newColor);
+        void updateVertical(PixelMap* pixelMap, uint32_t newColor);
+        void updateSquare(PixelMap* pixelMap, uint32_t newColor);
 };
 
 #endif
