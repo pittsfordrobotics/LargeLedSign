@@ -10,3 +10,18 @@ int MathUtils::rescaleInput(int outputMin, int outputMax, byte inputValue)
 
     return inputValue * m + b;
 }
+
+int MathUtils::clamp(int value, int minValue, int maxValue)
+{
+    if (value < minValue)
+    {
+        return minValue;
+    }
+ 
+    if (value > maxValue)
+    {
+        return maxValue;
+    }
+ 
+    return value;
+}
