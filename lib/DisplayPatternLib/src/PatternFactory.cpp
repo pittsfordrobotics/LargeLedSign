@@ -88,9 +88,9 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
-        case DisplayPatternType::CenterOutRadial:
+        case DisplayPatternType::CenterOutSquare:
         {
-            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Radial);
+            CenterOutDisplayPattern* pattern = new CenterOutDisplayPattern(CenterOutOrientation::Square);
             pattern->setColorPattern(colorPattern);
             displayPattern = pattern;
             break;

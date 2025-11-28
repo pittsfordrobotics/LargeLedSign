@@ -10,7 +10,7 @@ std::vector<DisplayConfiguration>* DisplayConfigFactory::createForTestMatrix()
         "            \"name\": \"TestMatrix\","
         "            \"gpioPin\": 25,"
         "            \"numberOfPixels\": 64,"
-        "            \"columnsToLeft\": 6,"
+        "            \"columnsToLeft\": 0,"
         "            \"columnPixelMapping\": ["
         "                [56,57,58,59,60,61,62,63],"
         "                [55,54,53,52,51,50,49,48],"

@@ -67,6 +67,11 @@ void CenterOutDisplayPattern::resetInternal(PixelMap* pixelMap)
     {
         // For the radial pattern, just fill with the first color for now.
         pixelMap->fill(m_colorPattern->getNextColor());
+        
+        // This doesn't yet work with offset displays, so just
+        // calculate the center point for this display.
+        m_centerColumn = pixelMap->getColumnCount() / 2 - 1;
+        m_centerRow = pixelMap->getRowCount() / 2 - 1;
     }
 }
 
@@ -82,8 +87,8 @@ void CenterOutDisplayPattern::updateInternal(PixelMap* pixelMap)
         case CenterOutOrientation::Vertical:
             updateVertical(pixelMap, newColor);
             break;
-        case CenterOutOrientation::Radial:
-            updateRadial(pixelMap, newColor);
+        case CenterOutOrientation::Square:
+            updateSquare(pixelMap, newColor);
             break;
     }
 }
@@ -106,7 +111,7 @@ void CenterOutDisplayPattern::updateHorizontal(PixelMap* pixelMap, uint32_t newC
     pixelMap->setColumnColor(columnToShift + 1, newColor);
 }
 
-void CenterOutDisplayPattern::updateRadial(PixelMap* pixelMap, uint32_t newColor)
+void CenterOutDisplayPattern::updateSquare(PixelMap* pixelMap, uint32_t newColor)
 {
     // doesn't work when the center is off the display
     pixelMap->shiftColumnsLeft(m_centerColumn);

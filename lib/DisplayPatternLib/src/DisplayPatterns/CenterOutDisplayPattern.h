@@ -9,7 +9,7 @@
 enum class CenterOutOrientation {
     Horizontal,
     Vertical,
-    Radial
+    Square
 };
 
 class CenterOutDisplayPattern : public DisplayPattern {
@@ -29,7 +29,7 @@ class CenterOutDisplayPattern : public DisplayPattern {
 
         void updateHorizontal(PixelMap* pixelMap, uint32_t newColor);
         void updateVertical(PixelMap* pixelMap, uint32_t newColor);
-        void updateRadial(PixelMap* pixelMap, uint32_t newColor);
+        void updateSquare(PixelMap* pixelMap, uint32_t newColor);
 };
 
 #endif
