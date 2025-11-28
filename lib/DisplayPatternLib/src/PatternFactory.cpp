@@ -158,6 +158,13 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
+        case DisplayPatternType::Radial:
+        {
+            RadialDisplayPattern* pattern = new RadialDisplayPattern();
+            pattern->setColorPattern(colorPattern);
+            displayPattern = pattern;
+            break;
+        }
         default:
         {
             SolidDisplayPattern* pattern = new SolidDisplayPattern();
