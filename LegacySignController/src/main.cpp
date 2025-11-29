@@ -13,6 +13,7 @@ ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
 ulong lastLedTelemetryTimestamp = 0;
+int sdCardChipSelectPin = SDCARD_CHIPSELECT;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
@@ -32,12 +33,13 @@ SystemConfiguration* systemConfiguration;
 void setup()
 {
     Serial.begin(9600);
-    delay(2000);
+    delay(INITIAL_DELAY);
     Serial.println("Starting...");
 
     systemConfiguration = readSystemConfiguration();
     if (!systemConfiguration->isValid())
     {
+        // Invalid config.  Not much we can do.
         while (true)
         {
             Serial.println("System configuration is invalid!");
@@ -54,6 +56,18 @@ void setup()
     display->setDisplay("---2");
 
     neoPixelDisplay = createNeoPixelDisplay(systemConfiguration->getDisplayConfigurationFile());
+    if (!neoPixelDisplay)
+    {
+        // Can't create the NeoPixelDisplay.
+        // For now, this is fatal.  When consolidating the controller types to include
+        // the Primary, which has no LED display, this will be changed to handle it better.
+        display->setDisplay("E-2");
+        while (true)
+        {
+            Serial.println("Failed to create NeoPixelDisplay!");
+            delay(1000);
+        }
+    }
 
     display->setDisplay("---3");
 
@@ -113,14 +127,90 @@ void loop1()
 
 SystemConfiguration* readSystemConfiguration()
 {
-    // For now, just return the default configuration.
-    String configJson = String(SystemConfigurationFileContents);
-    SystemConfiguration* sc = SystemConfiguration::ParseJson(
-        configJson.c_str(), 
-        configJson.length(), 
-        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
+    // Initialize the SD Card reader
+    SPI.setSCK(SDCARD_SPI_CLOCK);
+    SPI.setMOSI(SDCARD_SPI_COPI);
+    SPI.setMISO(SDCARD_SPI_CIPO);
+    sdCardChipSelectPin = SDCARD_CHIPSELECT;
+
+    const char* fileJson = getSdFileContents("systemconfiguration.json");
+
+    if (fileJson != nullptr)
+    {
+        Serial.println("Parsing system configuration file.");
+        SystemConfiguration* sc = SystemConfiguration::ParseJson(
+            fileJson, 
+            strlen(fileJson), 
+            [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});    
+            
+        delete[] fileJson;
+
+        return sc;
+    }
+
+    Serial.println("Failed to read system configuration file from SD Card on primary pins.");
+    Serial.println("Attempting to read configuration from alternate SD Card pins.");
+    SPI.setSCK(SDCARD_ALT_SPI_CLOCK);
+    SPI.setMOSI(SDCARD_ALT_SPI_COPI);
+    SPI.setMISO(SDCARD_ALT_SPI_CIPO);
+    sdCardChipSelectPin = SDCARD_ALT_CHIPSELECT;
+
+    fileJson = getSdFileContents("systemconfiguration.json");
+
+    if (fileJson != nullptr)
+    {
+        Serial.println("Parsing system configuration file.");
+        SystemConfiguration* sc = SystemConfiguration::ParseJson(
+            fileJson, 
+            strlen(fileJson), 
+            [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});    
+            
+        delete[] fileJson;
+
+        return sc;
+    }
+
+    // Still can't read from the SD card.
+    // See if we can create a default configuration based on the physical config.
+    Serial.println("Failed to read system configuration file from SD Card.");
+    Serial.println("Attempting to generate default system configuration.");
     
-    return sc;
+    byte signType = getSignType();
+    byte signPosition = getSignPosition();
+    
+    // Legacy sign type with SD Card connected on "alt" pins
+    // but no SD card present (for testing) gives Type=0, Position=2.
+    // Shouldn't be an issue in practice.
+
+    // TBD: what does Primary give?
+    // Shouldn't be an issue in practice (???).
+
+    // Secondaries should give correct type and position.
+    // Assume if we got here, we're dealing with a Secondary or the pit sign.
+    Serial.print("Detected sign type: ");
+    Serial.println(signType);
+    Serial.print("Detected sign position: ");
+    Serial.println(signPosition);
+
+    // For now, only support secondaries.
+    // Worry about the pit sign if it ever reappears.
+    String defaultConfigJson(defaultSystemConfigJson);
+    defaultConfigJson.replace("[[BUTTONS]]", "");
+    defaultConfigJson.replace("[[BT_UUID]]", "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0");
+    String localName = "3181 LED Controller ";
+    localName.concat(signPosition);
+    localName.concat("-");
+    localName.concat(signType);
+    defaultConfigJson.replace("[[BT_LOCALNAME]]", localName);
+    String displayTypeName = "Display";
+    displayTypeName.concat(signType);
+    defaultConfigJson.replace("[[DISPLAYTYPENAME]]", displayTypeName);
+    defaultConfigJson.replace("[[STYLECONFIGTYPENAME]]", "none");
+
+    return SystemConfiguration::ParseJson(
+        defaultConfigJson.c_str(),
+        defaultConfigJson.length(), 
+        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
 }
 
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
@@ -138,26 +228,62 @@ StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
 
 NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile)
 {
-    pinMode(LOW_BRIGHTNESS_PIN, INPUT_PULLUP);
-
-    // Actually read from the file!
-    std::vector<DisplayConfiguration>* displayConfigs;
-    if (digitalRead(LOW_BRIGHTNESS_PIN) == LOW)
-    {
-        displayConfigs = DisplayConfigFactory::createForTestMatrix();
+    const char* fileJson = getSdFileContents(displayConfigFile);
+    
+    // Not much we can do if we can't read the file.
+    // Extend later to allow no displays.
+    if (!fileJson) {
+        while(true)
+        {
+            Serial.println("Failed to read system configuration file.");
+            delay(1000);
+        }
     }
-    else
+    
+    Serial.println("Parsing display configuration file.");
+    std::vector<DisplayConfiguration>* displayConfigs = DisplayConfiguration::ParseJson(
+        fileJson,
+        strlen(fileJson));
+
+    if (!displayConfigs || displayConfigs->size() == 0)
     {
-        displayConfigs = DisplayConfigFactory::createForLegacySign();
+        while (true)
+        {
+            Serial.println("No display configurations found in file.");
+            delay(1000);
+        }
     }
 
+    // Only delete if memory was dynamically allocated (from SD card), not if it's a static built-in file
+    bool isAllocated = !displayConfigFile.startsWith("::");  // Track if memory was dynamically allocated
+    if (isAllocated) {
+        delete[] fileJson;
+    }
+    
     return new NeoPixelDisplay(displayConfigs->at(0));
 }
 
 StyleConfiguration* readStyleConfiguration(String styleConfigFile)
 {
-    // For now, just return the default style configuration.
-    return StyleConfigFactory::createDefaultStyleConfiguration();
+    const char* fileJson = getSdFileContents(styleConfigFile);
+    
+    // If we can't read the style configuration file, return an empty style configuration.
+    if (!fileJson) {
+        Serial.println("Failed to read style configuration file.");
+        return StyleConfiguration::ParseJson("", 0);
+    }
+    
+    StyleConfiguration* styleConfiguration = StyleConfiguration::ParseJson(
+        fileJson,
+        strlen(fileJson));
+        
+    // Only delete if memory was dynamically allocated (from SD card), not if it's a static built-in file
+    bool isAllocated = !styleConfigFile.startsWith("::");  // Track if memory was dynamically allocated
+    if (isAllocated) {
+        delete[] fileJson;
+    }
+
+    return styleConfiguration;
 }
 
 void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition)
@@ -196,7 +322,7 @@ void setManualStyle(StyleDefinition styleDefinition)
     }
 }
 
-void initializeBLEService( BluetoothConfiguration& config)
+void initializeBLEService(BluetoothConfiguration& config)
 {
     if (!config.isEnabled())
     {
@@ -508,4 +634,120 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
 
         setManualStyle(styleDef);
     }
+}
+
+const char* getSdFileContents(String filename)
+{
+    if (filename.startsWith("::") && filename.endsWith("::"))
+    {
+        // It's a built-in file.
+        return readBuiltInFile(filename);
+    }
+
+    if (!SD.begin(sdCardChipSelectPin))
+    {
+        Serial.println("SD card initialization failed!");
+        return nullptr;
+    }
+
+    if (!SD.exists(filename))
+    {
+        Serial.println("File does not exist on SD card: " + filename);
+        SD.end();
+        return nullptr;
+    }
+    Serial.println("Reading file '" + filename + "' from SD card.");
+    File file = SD.open(filename);
+
+    if (!file)
+    {
+        Serial.println("Could not open file!");
+        SD.end();
+        return nullptr;
+    }
+
+    size_t fileSize = file.size();
+
+    Serial.println("Reading file.");
+    char* fileContents = new char[fileSize + 1];
+    file.readBytes(fileContents, fileSize);
+    fileContents[fileSize] = '\0';  // Add null terminator
+
+    Serial.println("File read successfully.");
+
+    file.close();
+    SD.end();
+
+    return fileContents;
+}
+
+byte getSignType()
+{
+    std::vector<int> typeSelectorPins = {STYLE_TYPE_SELECTOR_PINS};
+
+    // Pull the pin low to indicate active.
+    byte type = 0;
+    for (uint i = 0; i < typeSelectorPins.size(); i++)
+    {
+        pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
+        type = type << 1;
+        if (digitalRead(typeSelectorPins.at(i)) == LOW)
+        {
+            type++;
+        }
+    }
+
+    return type;
+}
+
+byte getSignPosition()
+{
+    std::vector<int> orderSelectorPins = {ORDER_SELECTOR_PINS};
+
+    // Pull the pin low to indicate active.
+    byte order = 0;
+    for (uint i = 0; i < orderSelectorPins.size(); i++)
+    {
+        order = order << 1;
+        pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
+        if (digitalRead(orderSelectorPins.at(i)) == LOW)
+        {
+            order++;
+        }
+    }
+
+    return order;
+}
+
+const char* readBuiltInFile(String filename)
+{
+    // "Read" Default display configs.
+    Serial.println("'Reading' built-in file: " + filename);
+
+    if (filename == "::Display1::")
+    {
+        return DisplayConfigFactory::getDigit1Json();
+    }
+
+    if (filename == "::Display3::")
+    {
+        return DisplayConfigFactory::getDigit3Json();
+    }
+
+    if (filename == "::Display8::")
+    {
+        return DisplayConfigFactory::getDigit8Json();
+    }
+
+    if (filename == "::Display15::")
+    {
+        return DisplayConfigFactory::getLogoJson();
+    }
+
+    // TODO (if the pit sign comes back):
+    // ::Display10:: is the pit sign
+    // ::PitSignStyle:: should be the default styles
+
+    Serial.println("Built-in file not found. Returning null.");
+    return nullptr;
 }

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ArduinoBLE.h>
+#include <SD.h>
 #include <vector>
 #include <algorithm>
 #include <BluetoothCommon.h>
@@ -10,9 +11,27 @@
 #include <Configuration.h>
 #include "NeoPixelDisplay.h"
 
+#define INITIAL_DELAY 2000  // Initial delay to allow serial monitor to connect.
 #define TELEMETRYINTERVAL 2000     // Interval (msec) for updating the telemetry.
 
-#define LOW_BRIGHTNESS_PIN  12  // When this GPIO pin # is pulled low, the default brightness will be much lower than normal.
+/*
+Valid GPIO pins for SPI0:
+CLK: 2, 6, 18, 22
+CIPO: 0, 4, 16, 20
+COPI: 3, 7, 19, 23
+ */
+#define SDCARD_CHIPSELECT  18
+#define SDCARD_SPI_CLOCK  6
+#define SDCARD_SPI_COPI   7
+#define SDCARD_SPI_CIPO    4
+// The legacy sign uses the default COPI pin for the Status Display CLK signal.
+#define SDCARD_ALT_CHIPSELECT  20
+#define SDCARD_ALT_SPI_CLOCK  18
+#define SDCARD_ALT_SPI_COPI   19
+#define SDCARD_ALT_SPI_CIPO    4
+
+#define ORDER_SELECTOR_PINS  20, 21, 5 // The set of GPIO pin #s that tell the controller what position the sign should be in (MSB to LSB).
+#define STYLE_TYPE_SELECTOR_PINS 16, 17, 18, 19  // The set of GPIO pin #s that tell the controller what style (digit # or logo) the sign should be (MSB to LSB).
 
 // Function prototypes
 SystemConfiguration* readSystemConfiguration();
@@ -33,20 +52,32 @@ void displayBatteryVoltage();
 void checkForLowPowerState();
 void updateLEDs();
 void processButtonAction(int callerId, String actionName, std::vector<String> arguments);
+const char* getSdFileContents(String filename);
+byte getSignType();
+byte getSignPosition();
+const char* readBuiltInFile(String filename);
 
-// Default system configuration for the legacy sign.
-// Should eventually read from a configuration file.
-const char* SystemConfigurationFileContents = R"json(
-{
-    "comment": "Legacy sign",
-    "displayConfigurationFile": "displayconfiguration.json",
-    "styleConfigurationFile": "styleconfigurations.json",
-    "bluetooth": {
-        "enabled": true,
-        "uuid": "99be4fac-c708-41e5-a149-74047f554cc1",
-        "localName": "Lucia's Sign"
-    },
-    "buttons": {
+const char* defaultSystemConfigJson = R"json(
+    {
+        "displayConfigurationFile": "::[[DISPLAYTYPENAME]]::",
+        "styleConfigurationFile": "::[[STYLECONFIGTYPENAME]]::",
+        "bluetooth": {
+            "enabled": true,
+            "uuid": "[[BT_UUID]]",
+            "localName": "[[BT_LOCALNAME]]"
+        },
+        "buttons": {[[BUTTONS]]},
+        "batteryMonitor": {
+            "enabled": true,
+            "analogInputGpioPin": 26,
+            "inputMultiplier": 4.83,
+            "voltageToEnterLowPowerState": 6.7,
+            "voltageToExitLowPowerState": 7.2
+        }
+    }
+)json";
+
+const char* legacyButtonDefinitionJson = R"json(
         "definitions": [
             {
                 "id": "1",
@@ -87,24 +118,5 @@ const char* SystemConfigurationFileContents = R"json(
                 "longTapActionArguments": []
             }
         ]
-    },
-    "batteryMonitor": {
-        "enabled": true,
-        "analogInputGpioPin": 29,
-        "inputMultiplier": 4.83,
-        "voltageToEnterLowPowerState": 6.7,
-        "voltageToExitLowPowerState": 7.2
-    },
-    "powerLed": {
-        "enabled": false,
-        "gpioPin": 22
-    },
-    "clockMultiplier": 1.0,
-    "tm1637Display": {
-        "enabled": true,
-        "clockGpioPin": 7,
-        "dataGpioPin": 5,
-        "brightness": 5
     }
-}
 )json";

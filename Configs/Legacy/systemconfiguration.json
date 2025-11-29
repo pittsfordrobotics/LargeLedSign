@@ -1,0 +1,70 @@
+{
+    "comment": "Legacy sign",
+    "displayConfigurationFile": "displayconfiguration.json",
+    "styleConfigurationFile": "styleconfiguration.json",
+    "bluetooth": {
+        "enabled": true,
+        "uuid": "99be4fac-c708-41e5-a149-74047f554cc1",
+        "localName": "Lucia's Sign"
+    },
+    "buttons": {
+        "definitions": [
+            {
+                "id": "1",
+                "enabled": true,
+                "gpioPin": 27
+            },
+            {
+                "id": "2",
+                "enabled": true,
+                "gpioPin": 28
+            },
+            {
+                "id": "3",
+                "enabled": true,
+                "gpioPin": 26
+            }
+        ],
+        "actions": [
+            {
+                "buttonIds": ["1"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["Pink", "RainbowRandom"],
+                "longTapAction": "changeStyle",
+                "longTapActionArguments": ["Fire"]
+            },
+            {
+                "buttonIds": ["2"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["BluePinkRandom", "BluePinkDigit"],
+                "longTapAction": "batteryVoltage",
+                "longTapActionArguments": []
+            },
+            {
+                "buttonIds": ["3"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"],
+                "longTapAction": "disconnectBT",
+                "longTapActionArguments": []
+            }
+        ]
+    },
+    "batteryMonitor": {
+        "enabled": true,
+        "analogInputGpioPin": 29,
+        "inputMultiplier": 4.83,
+        "voltageToEnterLowPowerState": 6.7,
+        "voltageToExitLowPowerState": 7.2
+    },
+    "powerLed": {
+        "enabled": false,
+        "gpioPin": 22
+    },
+    "clockMultiplier": 1.0,
+    "tm1637Display": {
+        "enabled": true,
+        "clockGpioPin": 7,
+        "dataGpioPin": 5,
+        "brightness": 5
+    }
+}
