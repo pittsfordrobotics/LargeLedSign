@@ -8,9 +8,9 @@ class NullStatusDisplay : public StatusDisplay {
     public:
         NullStatusDisplay() : StatusDisplay() {}
 
-        void setDisplay(String stringToDisplay) override {}
+        void setDisplay(String stringToDisplay) override {Serial.println(stringToDisplay);}
 
-        void displayTemporary(String stringToDisplay, uint durationMsec) override {}
+        void displayTemporary(String stringToDisplay, uint durationMsec) override {Serial.println(stringToDisplay);}
 
         void displaySequence(std::vector<String> stringsToDisplay, uint durationMsec) override {}
 

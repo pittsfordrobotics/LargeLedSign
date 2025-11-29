@@ -11,6 +11,7 @@
 #include <Configuration.h>
 #include "NeoPixelDisplay.h"
 
+#define INITIAL_DELAY 2000  // Initial delay to allow serial monitor to connect.
 #define TELEMETRYINTERVAL 2000     // Interval (msec) for updating the telemetry.
 
 /*
@@ -29,12 +30,14 @@ COPI: 3, 7, 19, 23
 #define SDCARD_ALT_SPI_COPI   19
 #define SDCARD_ALT_SPI_CIPO    4
 
+#define ORDER_SELECTOR_PINS  20, 21, 5 // The set of GPIO pin #s that tell the controller what position the sign should be in (MSB to LSB).
+#define STYLE_TYPE_SELECTOR_PINS 16, 17, 18, 19  // The set of GPIO pin #s that tell the controller what style (digit # or logo) the sign should be (MSB to LSB).
+
 // Function prototypes
 SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
 NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile);
 StyleConfiguration* readStyleConfiguration(String styleConfigFile);
-String autogenerateSystemConfigurationJson();
 void initializeBatteryMonitor(BatteryMonitorConfiguration& config);
 void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition);
 void initializeBLEService(BluetoothConfiguration& config);
@@ -50,6 +53,9 @@ void checkForLowPowerState();
 void updateLEDs();
 void processButtonAction(int callerId, String actionName, std::vector<String> arguments);
 const char* getSdFileContents(String filename);
+byte getSignType();
+byte getSignPosition();
+const char* readBuiltInFile(String filename);
 
 const char* defaultSystemConfigJson = R"json(
     {
@@ -63,7 +69,7 @@ const char* defaultSystemConfigJson = R"json(
         "buttons": {[[BUTTONS]]},
         "batteryMonitor": {
             "enabled": true,
-            "analogInputGpioPin": 29,
+            "analogInputGpioPin": 26,
             "inputMultiplier": 4.83,
             "voltageToEnterLowPowerState": 6.7,
             "voltageToExitLowPowerState": 7.2

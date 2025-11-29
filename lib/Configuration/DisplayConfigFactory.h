@@ -9,6 +9,10 @@
 class DisplayConfigFactory
 {
     public:
+        static const char* getDigit1Json();
+        static const char* getDigit3Json();
+        static const char* getDigit8Json();
+        static const char* getLogoJson();
         static std::vector<DisplayConfiguration>* createForTestMatrix();
         static std::vector<DisplayConfiguration>* createForLegacySign();
         static std::vector<DisplayConfiguration>* createForDigit1();
