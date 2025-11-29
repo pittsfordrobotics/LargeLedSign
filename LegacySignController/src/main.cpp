@@ -3,7 +3,7 @@
 // Global variables
 CommonPeripheral btService;
 StatusDisplay* display;
-NeoPixelDisplay* neoPixelDisplay;
+std::vector<NeoPixelDisplay*>* neoPixelDisplays;
 ButtonProcessor* buttonProcessor;
 StyleConfiguration* styleConfiguration;
 BatteryMonitorConfiguration batteryMonitorConfig;
@@ -55,19 +55,7 @@ void setup()
 
     display->setDisplay("---2");
 
-    neoPixelDisplay = createNeoPixelDisplay(systemConfiguration->getDisplayConfigurationFile());
-    if (!neoPixelDisplay)
-    {
-        // Can't create the NeoPixelDisplay.
-        // For now, this is fatal.  When consolidating the controller types to include
-        // the Primary, which has no LED display, this will be changed to handle it better.
-        display->setDisplay("E-2");
-        while (true)
-        {
-            Serial.println("Failed to create NeoPixelDisplay!");
-            delay(1000);
-        }
-    }
+    neoPixelDisplays = createNeoPixelDisplays(systemConfiguration->getDisplayConfigurationFile());
 
     display->setDisplay("---3");
 
@@ -118,10 +106,10 @@ void setup1()
 // Main loop for the second core
 void loop1()
 {
-    // Check for threading issues!!!
-    // TODO: Found occasional issues when spamming the input buttons where the LED update crashes.
-    // Need to ensure that the LED update and style updates don't interfere.
-    updateLEDs();
+    if (neoPixelDisplays->size() > 0) {
+        updateLEDs();
+    }
+
     updateLedTelemetry();
 }
 
@@ -226,18 +214,14 @@ StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
     return (StatusDisplay*)(new NullStatusDisplay());
 }
 
-NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile)
+std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile)
 {
+    std::vector<NeoPixelDisplay*>* displays = new std::vector<NeoPixelDisplay*>();
     const char* fileJson = getSdFileContents(displayConfigFile);
     
-    // Not much we can do if we can't read the file.
-    // Extend later to allow no displays.
     if (!fileJson) {
-        while(true)
-        {
-            Serial.println("Failed to read system configuration file.");
-            delay(1000);
-        }
+        Serial.println("Failed to read display configuration file.");
+        return displays;
     }
     
     Serial.println("Parsing display configuration file.");
@@ -245,22 +229,24 @@ NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile)
         fileJson,
         strlen(fileJson));
 
-    if (!displayConfigs || displayConfigs->size() == 0)
-    {
-        while (true)
-        {
-            Serial.println("No display configurations found in file.");
-            delay(1000);
-        }
-    }
-
     // Only delete if memory was dynamically allocated (from SD card), not if it's a static built-in file
     bool isAllocated = !displayConfigFile.startsWith("::");  // Track if memory was dynamically allocated
     if (isAllocated) {
         delete[] fileJson;
     }
     
-    return new NeoPixelDisplay(displayConfigs->at(0));
+    if (!displayConfigs || displayConfigs->size() == 0)
+    {
+        Serial.println("No display configurations found in file.");
+        return displays;
+    }
+
+    for (size_t i = 0; i < displayConfigs->size(); i++)
+    {
+        displays->push_back(new NeoPixelDisplay(displayConfigs->at(i)));
+    }
+
+    return displays;
 }
 
 StyleConfiguration* readStyleConfiguration(String styleConfigFile)
@@ -294,19 +280,26 @@ void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition)
     // Set the default pattern data
     newPatternData = defaultStyleDefinition.getPatternData();
     currentPatternData = newPatternData;
-    DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
-    
+
     // Set default speed
-    currentSpeed = defaultStyleDefinition.getSpeed();
-    newSpeed = currentSpeed;
-    initialPattern->setSpeed(newSpeed);
+    newSpeed = defaultStyleDefinition.getSpeed();
+    currentSpeed = newSpeed;
 
     // Set default brightness
-    currentBrightness = neoPixelDisplay->getBrightness();
-    newBrightness = currentBrightness;
+    newBrightness = 0;
+    if (neoPixelDisplays->size() > 0)
+    {
+        newBrightness = neoPixelDisplays->at(0)->getBrightness();
+    }
 
-    // Set the initial pattern on the display
-    neoPixelDisplay->setDisplayPattern(initialPattern);
+    currentBrightness = newBrightness;
+
+    for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
+    {
+        DisplayPattern* initialPattern = PatternFactory::createForPatternData(newPatternData);
+        initialPattern->setSpeed(newSpeed);
+        neoPixelDisplay->setDisplayPattern(initialPattern);
+    }
 }
 
 void setManualStyle(StyleDefinition styleDefinition)
@@ -479,7 +472,10 @@ void checkForLowPowerState()
             Serial.print(", threshold: ");
             Serial.println(batteryMonitorConfig.getVoltageToExitLowPowerState());
             Serial.println("Exiting low power mode.");
-            neoPixelDisplay->setBrightness(currentBrightness);
+            for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
+            {
+                neoPixelDisplay->setBrightness(currentBrightness);
+            }
             inLowPowerMode = false;
         }
     }
@@ -525,14 +521,21 @@ void updateLedTelemetry()
 
     if (timestamp > lastLedTelemetryTimestamp + TELEMETRYINTERVAL)
     {
-        // Calculate loop timing data
-        unsigned long diff = timestamp - lastLedTelemetryTimestamp;
-        double timePerIteration = (double)diff / ledLoopCounter;
-        Serial.print(ledLoopCounter);
-        Serial.print(" LED iterations done in ");
-        Serial.print(diff);
-        Serial.print(" msec; avg msec per iteration: ");
-        Serial.println(timePerIteration);
+        if (neoPixelDisplays->size() == 0) {
+            Serial.println("No LED displays configured.");
+        }
+        else
+        {
+            // Calculate loop timing data
+            unsigned long diff = timestamp - lastLedTelemetryTimestamp;
+            double timePerIteration = (double)diff / ledLoopCounter;
+            Serial.print(ledLoopCounter);
+            Serial.print(" LED iterations done in ");
+            Serial.print(diff);
+            Serial.print(" msec; avg msec per iteration: ");
+            Serial.println(timePerIteration);
+        }
+        
         lastLedTelemetryTimestamp = timestamp;
         ledLoopCounter = 0;
     }
@@ -542,27 +545,38 @@ void updateLEDs()
 {
     if (newBrightness != currentBrightness)
     {
-        neoPixelDisplay->setBrightness(newBrightness);
+        for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
+        {
+            neoPixelDisplay->setBrightness(newBrightness);
+        }
         currentBrightness = newBrightness;
     }
 
     if (newSpeed != currentSpeed)
     {
-        neoPixelDisplay->setSpeed(newSpeed);
+        for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
+        {
+            neoPixelDisplay->setSpeed(newSpeed);
+        }
         currentSpeed = newSpeed;
     }
 
     if (currentPatternData != newPatternData)
     {
-        DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
-        neoPixelDisplay->setDisplayPattern(newPattern);
-        neoPixelDisplay->setSpeed(newSpeed);
-        neoPixelDisplay->resetDisplay();
-
+        for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
+        {
+            DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
+            neoPixelDisplay->setDisplayPattern(newPattern);
+            neoPixelDisplay->setSpeed(newSpeed);
+            neoPixelDisplay->resetDisplay();
+        }
         currentPatternData = newPatternData;
     }
 
-    neoPixelDisplay->updateDisplay();
+    for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
+    {
+        neoPixelDisplay->updateDisplay();
+    }
 }
 
 void processButtonAction(int callerId, String actionName, std::vector<String> arguments)

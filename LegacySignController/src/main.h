@@ -36,7 +36,7 @@ COPI: 3, 7, 19, 23
 // Function prototypes
 SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
-NeoPixelDisplay* createNeoPixelDisplay(String displayConfigFile);
+std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile);
 StyleConfiguration* readStyleConfiguration(String styleConfigFile);
 void initializeBatteryMonitor(BatteryMonitorConfiguration& config);
 void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition);
