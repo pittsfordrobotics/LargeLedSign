@@ -13,6 +13,7 @@ ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
 ulong lastLedTelemetryTimestamp = 0;
+int sdCardChipSelectPin = SDCARD_CHIPSELECT;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
@@ -34,11 +35,6 @@ void setup()
     Serial.begin(9600);
     delay(2000);
     Serial.println("Starting...");
-
-    // Initialize the SD Card reader
-    SPI.setSCK(SDCARD_SPI_CLOCK);
-    SPI.setMOSI(SDCARD_SPI_COPI);
-    SPI.setMISO(SDCARD_SPI_CIPO);
 
     systemConfiguration = readSystemConfiguration();
     if (!systemConfiguration->isValid())
@@ -131,22 +127,62 @@ void loop1()
 
 SystemConfiguration* readSystemConfiguration()
 {
-    const char* fileJson = getSdFileContents("systemconfiguration.json");
     
-    // Not much we can do if we can't read the file.
-    if (!fileJson) {
-        Serial.println("Failed to read system configuration file.");
-        delay(1000);
+    // Initialize the SD Card reader
+    SPI.setSCK(SDCARD_SPI_CLOCK);
+    SPI.setMOSI(SDCARD_SPI_COPI);
+    SPI.setMISO(SDCARD_SPI_CIPO);
+    sdCardChipSelectPin = SDCARD_CHIPSELECT;
+
+    const char* fileJson = getSdFileContents("systemconfiguration.json");
+
+    if (fileJson != nullptr)
+    {
+        Serial.println("Parsing system configuration file.");
+        SystemConfiguration* sc = SystemConfiguration::ParseJson(
+            fileJson, 
+            strlen(fileJson), 
+            [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});    
+            
+        delete[] fileJson;
+
+        return sc;
     }
 
-    SystemConfiguration* sc = SystemConfiguration::ParseJson(
-        fileJson, 
-        strlen(fileJson), 
-        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});    
-        
-    delete[] fileJson;  // Use delete[] for arrays allocated with new[]
+    Serial.println("Failed to read system configuration file from SD Card on primary pins.");
+    Serial.println("Attempting to read configuration from alternate SD Card pins.");
+    SPI.setSCK(SDCARD_ALT_SPI_CLOCK);
+    SPI.setMOSI(SDCARD_ALT_SPI_COPI);
+    SPI.setMISO(SDCARD_ALT_SPI_CIPO);
+    sdCardChipSelectPin = SDCARD_ALT_CHIPSELECT;
 
-    return sc;
+    fileJson = getSdFileContents("systemconfiguration.json");
+
+    if (fileJson != nullptr)
+    {
+        Serial.println("Parsing system configuration file.");
+        SystemConfiguration* sc = SystemConfiguration::ParseJson(
+            fileJson, 
+            strlen(fileJson), 
+            [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});    
+            
+        delete[] fileJson;
+
+        return sc;
+    }
+
+    // Still can't read from the SD card.
+    // See if we can create a default configuration based on the physical config.
+    Serial.println("Failed to read system configuration file from SD Card.");
+    Serial.println("Attempting to generate default system configuration.");
+    String defaultConfigJson = autogenerateSystemConfigurationJson();
+    
+    sdCardChipSelectPin = -1;
+
+    return SystemConfiguration::ParseJson(
+        defaultConfigJson.c_str(),
+        defaultConfigJson.length(), 
+        [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});
 }
 
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
@@ -198,8 +234,7 @@ StyleConfiguration* readStyleConfiguration(String styleConfigFile)
 {
     const char* fileJson = getSdFileContents(styleConfigFile);
     
-    // Not much we can do if we can't read the file.
-    // Extend later to allow no displays.
+    // If we can't read the style configuration file, return an empty style configuration.
     if (!fileJson) {
         Serial.println("Failed to read style configuration file.");
         return StyleConfiguration::ParseJson("", 0);
@@ -249,7 +284,7 @@ void setManualStyle(StyleDefinition styleDefinition)
     }
 }
 
-void initializeBLEService( BluetoothConfiguration& config)
+void initializeBLEService(BluetoothConfiguration& config)
 {
     if (!config.isEnabled())
     {
@@ -565,8 +600,13 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
 
 const char* getSdFileContents(String filename)
 {
-    Serial.println("Initializing SD card...");
-    if (!SD.begin(SDCARD_CHIPSELECT))
+    if (filename.startsWith("::") && filename.endsWith("::"))
+    {
+        // It's a built-in file.
+        // do stuff...
+    }
+
+    if (!SD.begin(sdCardChipSelectPin))
     {
         Serial.println("SD card initialization failed!");
         return nullptr;
@@ -601,4 +641,20 @@ const char* getSdFileContents(String filename)
     SD.end();
 
     return fileContents;
+}
+
+String autogenerateSystemConfigurationJson()
+{
+    // Check the "debug" pin
+
+    String configJson(defaultSystemConfigJson);
+ 
+    configJson.replace("[[DISPLAYTYPENAME]]", "TESTMATRIX");
+    configJson.replace("[[STYLECONFIGTYPENAME]]", "TESTMATRIX");
+    configJson.replace("[[BT_UUID]]", "99be4fac-c708-41e5-a149-74047f554cc1");
+    configJson.replace("[[BT_LOCALNAME]]", "Legacy Sign");
+    String buttonJson(legacyButtonDefinitionJson);
+    configJson.replace("[[BUTTONS]]", buttonJson);
+
+    return configJson;
 }
