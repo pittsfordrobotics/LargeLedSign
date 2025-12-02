@@ -56,6 +56,7 @@ const char* getSdFileContents(String filename);
 byte getSignType();
 byte getSignPosition();
 const char* readBuiltInFile(String filename);
+const char* copyString(const char* source, size_t length);
 
 const char* defaultSystemConfigJson = R"json(
     {

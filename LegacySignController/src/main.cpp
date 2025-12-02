@@ -229,11 +229,7 @@ std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile)
         fileJson,
         strlen(fileJson));
 
-    // Only delete if memory was dynamically allocated (from SD card), not if it's a static built-in file
-    bool isAllocated = !displayConfigFile.startsWith("::");  // Track if memory was dynamically allocated
-    if (isAllocated) {
-        delete[] fileJson;
-    }
+    delete[] fileJson;
     
     if (!displayConfigs || displayConfigs->size() == 0)
     {
@@ -263,11 +259,7 @@ StyleConfiguration* readStyleConfiguration(String styleConfigFile)
         fileJson,
         strlen(fileJson));
         
-    // Only delete if memory was dynamically allocated (from SD card), not if it's a static built-in file
-    bool isAllocated = !styleConfigFile.startsWith("::");  // Track if memory was dynamically allocated
-    if (isAllocated) {
-        delete[] fileJson;
-    }
+    delete[] fileJson;
 
     return styleConfiguration;
 }
@@ -535,7 +527,7 @@ void updateLedTelemetry()
             Serial.print(" msec; avg msec per iteration: ");
             Serial.println(timePerIteration);
         }
-        
+
         lastLedTelemetryTimestamp = timestamp;
         ledLoopCounter = 0;
     }
@@ -740,22 +732,22 @@ const char* readBuiltInFile(String filename)
 
     if (filename == "::Display1::")
     {
-        return DisplayConfigFactory::getDigit1Json();
+        return copyString(DisplayConfigFactory::getDigit1Json(), strlen(DisplayConfigFactory::getDigit1Json()));
     }
 
     if (filename == "::Display3::")
     {
-        return DisplayConfigFactory::getDigit3Json();
+        return copyString(DisplayConfigFactory::getDigit3Json(), strlen(DisplayConfigFactory::getDigit3Json()));
     }
 
     if (filename == "::Display8::")
     {
-        return DisplayConfigFactory::getDigit8Json();
+        return copyString(DisplayConfigFactory::getDigit8Json(), strlen(DisplayConfigFactory::getDigit8Json()));
     }
 
     if (filename == "::Display15::")
     {
-        return DisplayConfigFactory::getLogoJson();
+        return copyString(DisplayConfigFactory::getLogoJson(), strlen(DisplayConfigFactory::getLogoJson()));
     }
 
     // TODO (if the pit sign comes back):
@@ -764,4 +756,12 @@ const char* readBuiltInFile(String filename)
 
     Serial.println("Built-in file not found. Returning null.");
     return nullptr;
+}
+
+const char* copyString(const char* source, size_t length)
+{
+    char* dest = new char[length + 1];
+    strncpy(dest, source, length);
+    dest[length] = '\0';
+    return dest;
 }
