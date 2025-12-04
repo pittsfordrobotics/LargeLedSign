@@ -1,5 +1,5 @@
-#ifndef RADIAL_H
-#define RADIAL_H
+#ifndef RADIAL_DISPLAYPATTERN_H
+#define RADIAL_DISPLAYPATTERN_H
 
 #include <Arduino.h>
 #include <vector>

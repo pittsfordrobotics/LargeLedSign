@@ -1,4 +1,4 @@
-#include "Radial.h"
+#include "RadialDisplayPattern.h"
 
 RadialDisplayPattern::RadialDisplayPattern() : DisplayPattern()
 {

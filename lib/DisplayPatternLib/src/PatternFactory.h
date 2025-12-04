@@ -10,7 +10,7 @@
 #include "DisplayPatterns\CenterOutDisplayPattern.h"
 #include "DisplayPatterns\LowPowerDisplayPattern.h"
 #include "DisplayPatterns\RotationDisplayPattern.h"
-#include "DisplayPatterns\Radial.h"
+#include "DisplayPatterns\RadialDisplayPattern.h"
 #include "ColorPatterns\ColorPattern.h"
 #include "ColorPatterns\ColorFadePattern.h"
 #include "ColorPatterns\RainbowColorPattern.h"
