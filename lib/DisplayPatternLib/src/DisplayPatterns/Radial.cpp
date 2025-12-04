@@ -59,7 +59,7 @@ void RadialDisplayPattern::updateInternal(PixelMap* pixelMap)
         for (int col = 0; col < pixelMap->getColumnCount(); col++)
         {
             float distanceToPixel = m_pixelDistances[row][col];
-            int distanceIndex = static_cast<int>(std::round(distanceToPixel));
+            int distanceIndex = static_cast<int>(distanceToPixel + 0.5f);
             if (distanceIndex >= m_radialColors.size())
             {
                 // Shouldn't happen, but just in case...

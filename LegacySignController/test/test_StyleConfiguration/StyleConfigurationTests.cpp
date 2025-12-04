@@ -8,6 +8,7 @@ const char* invalidDefaultName();
 const char* singlePinkStyle();
 const char* multipleStyles();
 const char* invalidStyleEntries();
+const char* integersForDisplayAndColorEnums();
 
 void verifyUnknownDefaultStyle(StyleDefinition& style);
 
@@ -111,6 +112,15 @@ void invalidStyleEntriesAreSkipped() {
     TEST_ASSERT_EQUAL_STRING_MESSAGE("RedPink", config->getStyles().at(2).getName().c_str(), "Style name (2) is not correct.");
 }
 
+void integersCanBeUsedForDisplayAndColorEnums() {
+    const char* jsonString = integersForDisplayAndColorEnums();
+    StyleConfiguration* config = StyleConfiguration::ParseJson(jsonString, strlen(jsonString));
+    TEST_ASSERT_EQUAL_MESSAGE(1, config->getStyles().size(), "Number of styles is not correct.");
+    StyleDefinition style = config->getStyles().at(0);
+    TEST_ASSERT_EQUAL_MESSAGE(ColorPatternType::Rainbow, style.getPatternData().colorPattern, "Color pattern is not correct.");
+    TEST_ASSERT_EQUAL_MESSAGE(DisplayPatternType::Random, style.getPatternData().displayPattern, "Display pattern is not correct.");
+}
+
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
@@ -122,6 +132,7 @@ int main(int argc, char **argv) {
     RUN_TEST(singlePinkStyleParsesCorrectly);
     RUN_TEST(fullListParsesCorrectly);
     RUN_TEST(invalidStyleEntriesAreSkipped);
+    RUN_TEST(integersCanBeUsedForDisplayAndColorEnums);
     
     return UNITY_END();
 }
@@ -178,6 +189,22 @@ const char* noDefault()
            "        }"
            "    ]"
            "}";
+}
+
+const char* integersForDisplayAndColorEnums()
+{
+    return R"json(
+    {
+        "predefinedStyles": [
+            {
+                "name": "RainbowRandom",
+                "colorPattern": 3,
+                "displayPattern": 6,
+                "speed": 1
+            }
+        ]
+    }
+    )json";
 }
 
 const char* multipleStyles()
