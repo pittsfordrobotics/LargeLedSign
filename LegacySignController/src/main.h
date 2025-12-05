@@ -3,7 +3,7 @@
 #include <SD.h>
 #include <vector>
 #include <algorithm>
-#include <BluetoothCommon.h>
+#include "Bluetooth\SecondaryPeripheral.h"
 #include <DisplayPatternLib.h>
 #include <StatusDisplayLib.h>
 #include "ArduinoPushButton/ArduinoPushButton.h"
@@ -59,12 +59,13 @@ byte getSignPosition();
 const char* readBuiltInFile(String filename);
 const char* copyString(const char* source, size_t length);
 
-const char* defaultSystemConfigJson = R"json(
+const char* defaultSystemConfigJsonForSecondaries = R"json(
     {
         "displayConfigurationFile": "::Display[[SIGNTYPE]]::",
         "styleConfigurationFile": "::[[STYLECONFIGTYPENAME]]::",
         "bluetooth": {
             "enabled": true,
+            "isSecondaryModeEnabled": true
             "uuid": "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0",
             "localName": "3181 LED Controller [[SIGNPOSITION]]-[[SIGNTYPE]]"
         },
@@ -79,6 +80,7 @@ const char* defaultSystemConfigJson = R"json(
     }
 )json";
 
+// Not needed ???  We should assume we can read the config from the SD card.
 const char* legacyButtonDefinitionJson = R"json(
         "definitions": [
             {

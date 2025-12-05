@@ -327,6 +327,7 @@ BluetoothConfiguration SystemConfiguration::parseBluetoothConfiguration(JsonVari
     bool enabled = defaultBtc.isEnabled();
     String uuid = defaultBtc.getUuid();
     String localName = defaultBtc.getLocalName();
+    bool isSecondaryModeEnabled = defaultBtc.isSecondaryModeEnabled();
     
     if (btcVariant["enabled"].is<JsonVariant>())
     {
@@ -345,8 +346,14 @@ BluetoothConfiguration SystemConfiguration::parseBluetoothConfiguration(JsonVari
         localName = String(localNamestr.c_str());
     }
 
+    if (btcVariant["isSecondaryModeEnabled"].is<JsonVariant>())
+    {
+        isSecondaryModeEnabled = btcVariant["isSecondaryModeEnabled"].as<bool>();
+    }
+
     return BluetoothConfiguration(
         enabled,
         uuid,
-        localName);
+        localName,
+        isSecondaryModeEnabled);
 }

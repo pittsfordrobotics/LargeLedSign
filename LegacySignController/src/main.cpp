@@ -1,7 +1,7 @@
 #include "main.h"
 
 // Global variables
-CommonPeripheral btService;
+SecondaryPeripheral btService;
 StatusDisplay* display;
 std::vector<NeoPixelDisplay*>* neoPixelDisplays;
 ButtonProcessor* buttonProcessor;
@@ -182,7 +182,7 @@ SystemConfiguration* readSystemConfiguration()
 
     // For now, only support secondaries.
     // Worry about the pit sign if it ever reappears.
-    String defaultConfigJson(defaultSystemConfigJson);
+    String defaultConfigJson(defaultSystemConfigJsonForSecondaries);
     defaultConfigJson.replace("[[SIGNTYPE]]", String(signType));
     defaultConfigJson.replace("[[SIGNPOSITION]]", String(signPosition));
     defaultConfigJson.replace("[[BUTTONS]]", "");
@@ -334,6 +334,20 @@ void initializeBLEService(BluetoothConfiguration& config)
     btService.setPatternData(currentPatternData);
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
+    
+    SignConfigurationData signConfigData;
+    if (config.isSecondaryModeEnabled() && neoPixelDisplays->size() > 0) {
+        // The assumption here is that if we're in secondary mode, the configuration is read from the pins.
+        signConfigData.signType = getSignType();
+        signConfigData.signOrder = getSignPosition();
+        
+        // Not exactly sure how to handle multiple displays...
+        signConfigData.columnCount = neoPixelDisplays->at(0)->getColumnCount();
+        signConfigData.digitCount = neoPixelDisplays->at(0)->getDigitCount();
+    }
+
+    btService.setSignConfigurationData(signConfigData);
+
     isBluetoothEnabled = true;
     Serial.println("Peripheral service started.");
 }
