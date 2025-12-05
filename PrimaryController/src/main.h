@@ -7,7 +7,7 @@
 #include <SignDataLib.h>
 #include <DisplayPatternLib.h>
 #include <PushButton.h>
-#include <StatusDisplay.h>
+#include <StatusDisplayLib.h>
 #include <PredefinedStyleLib.h>
 
 #define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line

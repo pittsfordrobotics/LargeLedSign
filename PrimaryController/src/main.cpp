@@ -9,7 +9,7 @@
 
 // Global variables
 CommonPeripheral btService;
-StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
+TM1637StatusDisplay display(TM1637_CLOCK, TM1637_DIO, TM1637_BRIGHTNESS);
 
 std::vector<PushButton *> manualInputButtons;
 std::vector<SecondaryClient *> allSecondaries;
@@ -107,7 +107,7 @@ void processManualInputs()
 {
     // First look for any long-presses that happened.
     // If button 1 (id 0) was long-pressed, display battery voltages for the clients.
-    if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == ButtonPressType::Long)
+    if (manualInputButtons[0]->wasPressed() && manualInputButtons[0]->lastPressType() == PushButton_ButtonPressType::Long)
     {
         manualInputButtons[0]->clearPress();
         displayBatteryVoltages();
@@ -115,10 +115,10 @@ void processManualInputs()
 
     // If button 4 (id 3) was long-pressed, force-disconnect any BT clients.
     // If both buttons 3 and 4 (ids 2 and 3) were long-pressed, reconnect the clients.
-    if (manualInputButtons[3]->wasPressed() && manualInputButtons[3]->lastPressType() == ButtonPressType::Long)
+    if (manualInputButtons[3]->wasPressed() && manualInputButtons[3]->lastPressType() == PushButton_ButtonPressType::Long)
     {
         manualInputButtons[3]->clearPress();
-        if (manualInputButtons[2]->wasPressed() && manualInputButtons[2]->lastPressType() == ButtonPressType::Long)
+        if (manualInputButtons[2]->wasPressed() && manualInputButtons[2]->lastPressType() == PushButton_ButtonPressType::Long)
         {
             manualInputButtons[2]->clearPress();
             resetSecondaryConnections();
@@ -133,7 +133,7 @@ void processManualInputs()
     // If the same button was pressed previously, cycle through the styles.
     for (uint i = 0; i < manualInputButtons.size(); i++)
     {
-        if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == ButtonPressType::Normal)
+        if (manualInputButtons[i]->wasPressed() && manualInputButtons[i]->lastPressType() == PushButton_ButtonPressType::Normal)
         {
             if ((int)i == lastManualButtonPressed)
             {
