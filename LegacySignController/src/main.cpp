@@ -689,6 +689,14 @@ const char* getSdFileContents(String filename)
 
 byte getSignType()
 {
+    // Check the "test" pin
+    pinMode(TEST_MODE_PIN, INPUT_PULLUP);
+    if (digitalRead(TEST_MODE_PIN) == LOW)
+    {
+        Serial.println("Test mode detected. Returning 255 for TestMatrix sign type.");
+        return 255;
+    }
+
     std::vector<int> typeSelectorPins = {STYLE_TYPE_SELECTOR_PINS};
 
     // Pull the pin low to indicate active.
@@ -748,6 +756,11 @@ const char* readBuiltInFile(String filename)
     if (filename == "::Display15::")
     {
         return copyString(DisplayConfigFactory::getLogoJson(), strlen(DisplayConfigFactory::getLogoJson()));
+    }
+
+    if (filename == "::Display255::")
+    {
+        return copyString(DisplayConfigFactory::getTestMatrixJson(), strlen(DisplayConfigFactory::getTestMatrixJson()));
     }
 
     // TODO (if the pit sign comes back):

@@ -13,6 +13,7 @@ class DisplayConfigFactory
         static const char* getDigit3Json();
         static const char* getDigit8Json();
         static const char* getLogoJson();
+        static const char* getTestMatrixJson();
         static std::vector<DisplayConfiguration>* createForTestMatrix();
         static std::vector<DisplayConfiguration>* createForLegacySign();
         static std::vector<DisplayConfiguration>* createForDigit1();
