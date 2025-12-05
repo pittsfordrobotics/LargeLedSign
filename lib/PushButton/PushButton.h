@@ -7,7 +7,7 @@
 #define PUSHBUTTON_LONGPRESS 500
 #define DOUBLETAP_INTERVAL 150
 
-enum class ButtonPressType {
+enum class PushButton_ButtonPressType {
     None,
     Normal,
     Long,
@@ -19,7 +19,7 @@ class PushButton {
         PushButton(int pinNumber, PinMode pinMode);
         void update();
         bool wasPressed();
-        ButtonPressType lastPressType();
+        PushButton_ButtonPressType lastPressType();
         PinStatus rawPinStatus();
         void clearPress();
     
@@ -32,7 +32,7 @@ class PushButton {
         bool m_inDelayInterval{false};
         bool m_wasPressed{false};
         int m_consecutiveCount{0};
-        ButtonPressType m_lastPressType{ButtonPressType::None};
+        PushButton_ButtonPressType m_lastPressType{PushButton_ButtonPressType::None};
         void setPressType(ulong pressTime);
 };
 

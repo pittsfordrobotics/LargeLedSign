@@ -290,14 +290,9 @@ void updateLEDs()
 
     if (shouldResetStyle)
     {
-        DisplayPattern* oldPattern = neoPixelDisplay->getDisplayPattern();
         DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
         newPattern->setSpeed(newSpeed);
         neoPixelDisplay->setDisplayPattern(newPattern);
-        if (oldPattern)
-        {
-            delete oldPattern;
-        }
 
         neoPixelDisplay->resetDisplay();
 
@@ -483,10 +478,10 @@ void resetPixelBufferOffsets(SignOffsetData offsetData)
     // This shouldn't be needed once the display configs
     // can be read via the SD Card.
     // In the mean time, the offsests won't do anything.
-    // pixelBuffer->setDigitsToLeft(offsetData.digitsToLeft);
-    // pixelBuffer->setDigitsToRight(offsetData.digitsToRight);
-    // pixelBuffer->setColsToLeft(offsetData.columnsToLeft);
-    // pixelBuffer->setColsToRight(offsetData.columnsToRight);
+    neoPixelDisplay->setDigitsToLeft(offsetData.digitsToLeft);
+    neoPixelDisplay->setDigitsToRight(offsetData.digitsToRight);
+    neoPixelDisplay->setColumnsToLeft(offsetData.columnsToLeft);
+    neoPixelDisplay->setColumnsToRight(offsetData.columnsToRight);
 }
 
 void turnOnPowerLed()
@@ -505,7 +500,7 @@ void readInputButton()
 
     if (powerButton.wasPressed())
     {
-        if (powerButton.lastPressType() == ButtonPressType::Long)
+        if (powerButton.lastPressType() == PushButton_ButtonPressType::Long)
         {
             // Long-press: Update our power state.
             if (isOff)

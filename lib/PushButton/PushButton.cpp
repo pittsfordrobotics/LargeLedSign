@@ -15,10 +15,10 @@ bool PushButton::wasPressed()
 void PushButton::clearPress()
 {
     m_wasPressed = false;
-    m_lastPressType = ButtonPressType::None;
+    m_lastPressType = PushButton_ButtonPressType::None;
 }
 
-ButtonPressType PushButton::lastPressType()
+PushButton_ButtonPressType PushButton::lastPressType()
 {
     return m_lastPressType;
 }
@@ -90,17 +90,17 @@ void PushButton::setPressType(ulong pressTime)
 {
     if (pressTime > PUSHBUTTON_LONGPRESS)
     {
-        m_lastPressType = ButtonPressType::Long;
+        m_lastPressType = PushButton_ButtonPressType::Long;
     }
     else
     {
         if (m_consecutiveCount > 1)
         {
-            m_lastPressType = ButtonPressType::Double;
+            m_lastPressType = PushButton_ButtonPressType::Double;
         }
         else
         {
-            m_lastPressType = ButtonPressType::Normal;
+            m_lastPressType = PushButton_ButtonPressType::Normal;
         }
     }
 }
