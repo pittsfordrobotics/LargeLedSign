@@ -61,12 +61,12 @@ const char* copyString(const char* source, size_t length);
 
 const char* defaultSystemConfigJson = R"json(
     {
-        "displayConfigurationFile": "::[[DISPLAYTYPENAME]]::",
+        "displayConfigurationFile": "::Display[[SIGNTYPE]]::",
         "styleConfigurationFile": "::[[STYLECONFIGTYPENAME]]::",
         "bluetooth": {
             "enabled": true,
-            "uuid": "[[BT_UUID]]",
-            "localName": "[[BT_LOCALNAME]]"
+            "uuid": "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0",
+            "localName": "3181 LED Controller [[SIGNPOSITION]]-[[SIGNTYPE]]"
         },
         "buttons": {[[BUTTONS]]},
         "batteryMonitor": {
@@ -118,6 +118,64 @@ const char* legacyButtonDefinitionJson = R"json(
                 "tapActionArguments": ["RedPinkRandom", "RedPinkDigit"],
                 "longTapAction": "disconnectBT",
                 "longTapActionArguments": []
+            }
+        ]
+    }
+)json";
+
+const char* defaultPrimaryButtonDefinitionJson = R"json(
+        "definitions": [
+            {
+                "id": "1",
+                "enabled": true,
+                "gpioPin": 27
+            },
+            {
+                "id": "2",
+                "enabled": true,
+                "gpioPin": 21
+            },
+            {
+                "id": "3",
+                "enabled": true,
+                "gpioPin": 26
+            },
+            {
+                "id": "4",
+                "enabled": true,
+                "gpioPin": 5
+            }
+        ],
+        "actions": [
+            {
+                "buttonIds": ["1"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["Pink"],
+                "longTapAction": "secondaryBatteryVoltage"
+            },
+            {
+                "buttonIds": ["2"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["BluePinkRandom_Large", "BluePinkDigit"]
+            },
+            {
+                "buttonIds": ["3"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["RedPinkRandom_Large", "RedPinkDigit"],
+                "longTapAction": "disconnectBT",
+                "longTapActionArguments": []
+            },
+            {
+                "buttonIds": ["4"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["RainbowRandom_Large", "RainbowRight"],
+                "longTapAction": "disconnectBT",
+                "longTapActionArguments": []
+            },
+            {
+                "buttonIds": ["3", "4"],
+                "tapAction": "changeStyle",
+                "longTapAction": "resetSecondaries"
             }
         ]
     }

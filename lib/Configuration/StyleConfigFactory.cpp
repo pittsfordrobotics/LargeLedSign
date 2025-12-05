@@ -22,6 +22,21 @@ StyleConfiguration* StyleConfigFactory::createDefaultStyleConfiguration()
                     "param2": 30
                 },
                 {
+                    "name": "RainbowRight",
+                    "colorPattern": "Rainbow",
+                    "displayPattern": "Right",
+                    "speed": 255,
+                    "param1": 120
+                },
+                {
+                    "name": "RainbowRandom_Large",
+                    "colorPattern": "Rainbow",
+                    "displayPattern": "Random",
+                    "speed": 240,
+                    "param1": 255,
+                    "param2": 50
+                },
+                {
                     "name": "Fire",
                     "colorPattern": "SingleColor",
                     "displayPattern": "Fire",
@@ -52,6 +67,17 @@ StyleConfiguration* StyleConfigFactory::createDefaultStyleConfiguration()
                     "param3": 75
                 },
                 {
+                    "name": "BluePinkRandom_Large",
+                    "colorPattern": "TwoColor",
+                    "displayPattern": "Random",
+                    "speed": 220,
+                    "color1": "0x0000FF",
+                    "color2": "0xE616A1",
+                    "param1": 100,
+                    "param2": 100,
+                    "param3": 200
+                },
+                {
                     "name": "RedPinkDigit",
                     "colorPattern": "TwoColor",
                     "displayPattern": "Digit",
@@ -71,6 +97,17 @@ StyleConfiguration* StyleConfigFactory::createDefaultStyleConfiguration()
                     "param1": 255,
                     "param2": 255,
                     "param3": 75
+                },
+                {
+                    "name": "RedPinkRandom_Large",
+                    "colorPattern": "TwoColor",
+                    "displayPattern": "Random",
+                    "speed": 220,
+                    "color1": "0xFF0000",
+                    "color2": "0xE616A1",
+                    "param1": 100,
+                    "param2": 100,
+                    "param3": 200
                 }
             ]
         }

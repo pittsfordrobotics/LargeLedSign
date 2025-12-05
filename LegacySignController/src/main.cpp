@@ -183,16 +183,10 @@ SystemConfiguration* readSystemConfiguration()
     // For now, only support secondaries.
     // Worry about the pit sign if it ever reappears.
     String defaultConfigJson(defaultSystemConfigJson);
+    defaultConfigJson.replace("[[SIGNTYPE]]", String(signType));
+    defaultConfigJson.replace("[[SIGNPOSITION]]", String(signPosition));
     defaultConfigJson.replace("[[BUTTONS]]", "");
-    defaultConfigJson.replace("[[BT_UUID]]", "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0");
-    String localName = "3181 LED Controller ";
-    localName.concat(signPosition);
-    localName.concat("-");
-    localName.concat(signType);
-    defaultConfigJson.replace("[[BT_LOCALNAME]]", localName);
-    String displayTypeName = "Display";
-    displayTypeName.concat(signType);
-    defaultConfigJson.replace("[[DISPLAYTYPENAME]]", displayTypeName);
+    // Secondaries don't have their own style configuration, since they're driven by the primary.
     defaultConfigJson.replace("[[STYLECONFIGTYPENAME]]", "none");
 
     return SystemConfiguration::ParseJson(
