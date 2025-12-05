@@ -168,13 +168,19 @@ void setManualStyle(PredefinedStyle style)
 
 void displayBatteryVoltages()
 {
+    if (allSecondaries.size() == 0)
+    {
+        display.displayTemporary("-0-", 1000);
+        return;
+    }
+
     std::vector<String> stringsToDisplay;
+    stringsToDisplay.reserve(allSecondaries.size());
     for (uint i = 0; i < allSecondaries.size(); i++)
     {
-        String voltageString(i + 1);
-        voltageString.concat("=");
-        voltageString.concat(String(allSecondaries[i]->getBatteryVoltage(), 2));
-        stringsToDisplay.push_back(voltageString);
+        char buffer[16];
+        snprintf(buffer, sizeof(buffer), "%d=%.2f", i + 1, allSecondaries[i]->getBatteryVoltage());
+        stringsToDisplay.push_back(String(buffer));
     }
 
     display.displaySequence(stringsToDisplay, 1500);
@@ -307,6 +313,7 @@ SecondaryClient *scanForSecondary()
         if (millis() > scanTimeout)
         {
             Serial.println("Scan timed out.");
+            BLE.stopScan();
             // Return a dummy client - it'll be ignored and cleaned up.
             return new SecondaryClient(peripheral);
         }
@@ -389,6 +396,13 @@ void startBLEService()
 
     Serial.println("Proxying characteristics.");
 
+    if (allSecondaries.size() == 0)
+    {
+        Serial.println("ERROR: No secondaries found!");
+        display.setDisplay("E2");
+        while (true) {}
+    }
+
     SignStatus status = allSecondaries[0]->getSignStatus();
     // Override brightness to be 150 for now
     // btService.setBrightness(status.brightness);
@@ -465,8 +479,12 @@ void updateTelemetry()
         for (uint i = 0; i < allSecondaries.size(); i++)
         {
             long secondaryTimestamp = allSecondaries[i]->getTimestamp();
-            long timestampDiff = secondaryTimestamp - secondaryTimestamps[i];
-            secondaryTimestamps[i] = secondaryTimestamp;
+            long timestampDiff = 0;
+            if (i < secondaryTimestamps.size())
+            {
+                timestampDiff = secondaryTimestamp - secondaryTimestamps[i];
+                secondaryTimestamps[i] = secondaryTimestamp;
+            }
 
             Serial.print("Sign ");
             Serial.print(allSecondaries[i]->getSignOrder());

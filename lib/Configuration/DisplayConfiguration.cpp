@@ -196,6 +196,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
     }
 
     JsonArray columnMapping = display["columnPixelMapping"].as<JsonArray>();
+    config.m_numCols = columnMapping.size();
     for (int i = 0; i < columnMapping.size(); i++)
     {
         std::vector<uint16_t>* columnPixels = new std::vector<uint16_t>();
@@ -220,6 +221,7 @@ bool DisplayConfiguration::tryParseDisplayEntryFromJsonVariant(JsonVariant displ
     }
 
     JsonArray rowMapping = display["rowPixelMapping"].as<JsonArray>();
+    config.m_numRows = rowMapping.size();
     for (int i = 0; i < rowMapping.size(); i++)
     {
         std::vector<uint16_t>* rowPixels = new std::vector<uint16_t>();

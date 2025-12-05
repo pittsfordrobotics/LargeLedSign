@@ -10,12 +10,12 @@
 #include <StatusDisplayLib.h>
 #include <PredefinedStyleLib.h>
 
-#define TM1637_CLOCK 8    // Digital pin # for the TM1637 clock line
-#define TM1637_DIO 7      // Digital pin # for the TM1637 data line
+#define TM1637_CLOCK 20    // GPIO pin # for the TM1637 clock line
+#define TM1637_DIO 19      // GPIO pin # for the TM1637 data line
 #define TM1637_BRIGHTNESS 5  // Brightness of the TM1637, between 0 and 7
 
 #define CONNECTION_CHECK_INTERVAL 1500   // Number of milliseconds between checks to see if the secondaries are connected.
-#define MANUAL_INPUT_PINS 15, 9, 14, 10  // Digital pin #s for the manual input buttons.
+#define MANUAL_INPUT_PINS 27, 21, 26, 5  // Digital pin #s for the manual input buttons.
 #define SECONDARY_RESYNC_INTERVAL 10000   // Resync secondaries (msec)
 
 #define TELEMETRYINTERVAL 5000     // Interval (msec) for updating the telemetry.
