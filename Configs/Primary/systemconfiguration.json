@@ -1,0 +1,82 @@
+{
+    "comment": "Primary controller config",
+    "displayConfigurationFile": "displayconfiguration.json",
+    "styleConfigurationFile": "styleconfiguration.json",
+    "bluetooth": {
+        "enabled": true,
+        "uuid": "99be4fac-c708-41e5-a149-74047f554cc1",
+        "localName": "3181 Primary",
+        "deleteThisComment": "Need to add a 'proxy' boolean"
+    },
+    "buttons": {
+        "definitions": [
+            {
+                "id": "1",
+                "enabled": true,
+                "gpioPin": 27
+            },
+            {
+                "id": "2",
+                "enabled": true,
+                "gpioPin": 21
+            },
+            {
+                "id": "3",
+                "enabled": true,
+                "gpioPin": 26
+            },
+            {
+                "id": "4",
+                "enabled": true,
+                "gpioPin": 5
+            }
+        ],
+        "actions": [
+            {
+                "buttonIds": ["1"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["Pink"],
+                "longTapAction": "secondaryBatteryVoltage"
+            },
+            {
+                "buttonIds": ["2"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["BluePinkRandom_Large", "BluePinkDigit"]
+            },
+            {
+                "buttonIds": ["3"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["RedPinkRandom_Large", "RedPinkDigit"]
+            },
+            {
+                "buttonIds": ["4"],
+                "tapAction": "changeStyle",
+                "tapActionArguments": ["RainbowRandom_Large", "RainbowRight"],
+                "longTapAction": "disconnectBT",
+                "longTapActionArguments": []
+            },
+            {
+                "buttonIds": ["3", "4"],
+                "longTapAction": "resetSecondaries"
+            }
+        ]
+    },
+    "batteryMonitor": {
+        "enabled": false,
+        "analogInputGpioPin": 29,
+        "inputMultiplier": 4.83,
+        "voltageToEnterLowPowerState": 6.7,
+        "voltageToExitLowPowerState": 7.2
+    },
+    "powerLed": {
+        "enabled": false,
+        "gpioPin": 22
+    },
+    "clockMultiplier": 1.0,
+    "tm1637Display": {
+        "enabled": true,
+        "clockGpioPin": 20,
+        "dataGpioPin": 19,
+        "brightness": 5
+    }
+}
