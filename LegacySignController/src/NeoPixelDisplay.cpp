@@ -34,6 +34,46 @@ void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)
     }
 }
 
+uint16_t NeoPixelDisplay::getPixelCount()
+{
+    if (m_pixelMap == nullptr) 
+    {
+        return 0;
+    }
+
+    return m_pixelMap->getPixelCount();
+}
+
+uint16_t NeoPixelDisplay::getColumnCount()
+{
+    if (m_pixelMap == nullptr) 
+    {
+        return 0;
+    }
+
+    return m_pixelMap->getColumnCount();
+}
+
+uint16_t NeoPixelDisplay::getRowCount()
+{
+    if (m_pixelMap == nullptr) 
+    {
+        return 0;
+    }
+
+    return m_pixelMap->getRowCount();
+}
+
+uint16_t NeoPixelDisplay::getDigitCount()
+{
+    if (m_pixelMap == nullptr) 
+    {
+        return 0;
+    }
+
+    return m_pixelMap->getDigitCount();
+}
+
 void NeoPixelDisplay::setDigitsToLeft(uint16_t digitsToLeft)
 {
     m_pixelMap->setDigitsToLeft(digitsToLeft);

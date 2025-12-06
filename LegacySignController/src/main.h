@@ -3,7 +3,7 @@
 #include <SD.h>
 #include <vector>
 #include <algorithm>
-#include <BluetoothCommon.h>
+#include "Bluetooth\SecondaryPeripheral.h"
 #include <DisplayPatternLib.h>
 #include <StatusDisplayLib.h>
 #include "ArduinoPushButton/ArduinoPushButton.h"
@@ -39,10 +39,10 @@ SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
 std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile);
 StyleConfiguration* readStyleConfiguration(String styleConfigFile);
-void initializeBatteryMonitor(BatteryMonitorConfiguration& config);
+void initializeBatteryMonitor(const BatteryMonitorConfiguration& config);
 void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition);
 void initializeBLEService(BluetoothConfiguration& config);
-void configurePowerLed(PowerLedConfiguration& config);
+void initializePowerLed(const PowerLedConfiguration& config);
 void readSettingsFromBLE();
 void setManualStyle(StyleDefinition styleDefinition);
 void updateTelemetry();
@@ -59,14 +59,15 @@ byte getSignPosition();
 const char* readBuiltInFile(String filename);
 const char* copyString(const char* source, size_t length);
 
-const char* defaultSystemConfigJson = R"json(
+const char* defaultSystemConfigJsonForSecondaries = R"json(
     {
-        "displayConfigurationFile": "::Display[[SIGNTYPE]]::",
+        "displayConfigurationFile": "::Display[[SIGNTYPE1]]::",
         "styleConfigurationFile": "::[[STYLECONFIGTYPENAME]]::",
         "bluetooth": {
             "enabled": true,
+            "isSecondaryModeEnabled": true,
             "uuid": "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0",
-            "localName": "3181 LED Controller [[SIGNPOSITION]]-[[SIGNTYPE]]"
+            "localName": "3181 LED Controller [[SIGNPOSITION]]-[[SIGNTYPE2]]"
         },
         "buttons": {[[BUTTONS]]},
         "batteryMonitor": {
@@ -79,6 +80,7 @@ const char* defaultSystemConfigJson = R"json(
     }
 )json";
 
+// Not needed ???  We should assume we can read the config from the SD card.
 const char* legacyButtonDefinitionJson = R"json(
         "definitions": [
             {
@@ -161,9 +163,7 @@ const char* defaultPrimaryButtonDefinitionJson = R"json(
             {
                 "buttonIds": ["3"],
                 "tapAction": "changeStyle",
-                "tapActionArguments": ["RedPinkRandom_Large", "RedPinkDigit"],
-                "longTapAction": "disconnectBT",
-                "longTapActionArguments": []
+                "tapActionArguments": ["RedPinkRandom_Large", "RedPinkDigit"]
             },
             {
                 "buttonIds": ["4"],
@@ -174,9 +174,7 @@ const char* defaultPrimaryButtonDefinitionJson = R"json(
             },
             {
                 "buttonIds": ["3", "4"],
-                "tapAction": "changeStyle",
                 "longTapAction": "resetSecondaries"
             }
         ]
-    }
 )json";

@@ -9,11 +9,12 @@ class BluetoothConfiguration
     public:
         BluetoothConfiguration();
         BluetoothConfiguration(const BluetoothConfiguration& other);
-        BluetoothConfiguration(bool isEnabled, String uuid, String localName);
+        BluetoothConfiguration(bool isEnabled, String uuid, String localName, bool secondaryModeEnabled);
         
         bool isEnabled() { return m_enabled; }
         String getUuid() { return m_uuid; }
         String getLocalName() { return m_localName; }
+        bool isSecondaryModeEnabled() { return m_secondaryModeEnabled; }
 
         BluetoothConfiguration& operator=(const BluetoothConfiguration& other);
 
@@ -23,6 +24,7 @@ class BluetoothConfiguration
         bool m_enabled{true};
         String m_uuid{"99be4fac-c708-41e5-a149-74047f554cc1"};
         String m_localName{"LED Sign Controller"};
+        bool m_secondaryModeEnabled{false};
 };
 
 #endif
