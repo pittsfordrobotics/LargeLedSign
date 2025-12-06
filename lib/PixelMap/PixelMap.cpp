@@ -262,14 +262,14 @@ void PixelMap::shiftColumnsRight()
 
 void PixelMap::shiftColumnsRight(int startingColumn)
 {
-    if (m_columns.size() == 0 || startingColumn >= m_columns.size() - 1) 
-    {
-        return;
-    }
-
     if (startingColumn < 0)
     {
         startingColumn = 0;
+    }
+
+    if (m_columns.size() == 0 || startingColumn >= m_columns.size() - 1)
+    {
+        return;
     }
 
     for (int row = 0; row < m_rows.size(); row++)
@@ -340,14 +340,14 @@ void PixelMap::shiftRowsDown()
 
 void PixelMap::shiftRowsDown(int startingRow)
 {
-    if (m_rows.size() == 0 || startingRow >= m_rows.size() - 1) 
-    {
-        return;
-    }
-
     if (startingRow < 0)
     {
         startingRow = 0;
+    }
+
+    if (m_rows.size() == 0 || startingRow >= m_rows.size() - 1) 
+    {
+        return;
     }
 
     for (int col = 0; col < m_columns.size(); col++)
