@@ -34,6 +34,16 @@ void NeoPixelDisplay::setDisplayPattern(DisplayPattern* displayPattern)
     }
 }
 
+uint16_t NeoPixelDisplay::getPixelCount()
+{
+    if (m_pixelMap == nullptr) 
+    {
+        return 0;
+    }
+
+    return m_pixelMap->getPixelCount();
+}
+
 uint16_t NeoPixelDisplay::getColumnCount()
 {
     if (m_pixelMap == nullptr) 

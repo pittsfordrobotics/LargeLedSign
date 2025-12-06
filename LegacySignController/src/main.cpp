@@ -357,6 +357,7 @@ void initializeBLEService(BluetoothConfiguration& config)
         // Not exactly sure how to handle multiple displays...
         signConfigData.columnCount = neoPixelDisplays->at(0)->getColumnCount();
         signConfigData.digitCount = neoPixelDisplays->at(0)->getDigitCount();
+        signConfigData.pixelCount = neoPixelDisplays->at(0)->getPixelCount();
     }
 
     btService.setSignConfigurationData(signConfigData);

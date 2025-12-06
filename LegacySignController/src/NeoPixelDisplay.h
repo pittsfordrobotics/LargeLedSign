@@ -20,6 +20,7 @@ class NeoPixelDisplay
         DisplayPattern* getDisplayPattern() { return m_displayPattern; }
         void updateDisplay();
         void resetDisplay();
+        uint16_t getPixelCount();
         uint16_t getColumnCount();
         uint16_t getRowCount();
         uint16_t getDigitCount();
