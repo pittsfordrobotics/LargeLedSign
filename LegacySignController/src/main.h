@@ -39,10 +39,10 @@ SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
 std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile);
 StyleConfiguration* readStyleConfiguration(String styleConfigFile);
-void initializeBatteryMonitor(BatteryMonitorConfiguration& config);
+void initializeBatteryMonitor(const BatteryMonitorConfiguration& config);
 void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition);
 void initializeBLEService(BluetoothConfiguration& config);
-void configurePowerLed(PowerLedConfiguration& config);
+void initializePowerLed(const PowerLedConfiguration& config);
 void readSettingsFromBLE();
 void setManualStyle(StyleDefinition styleDefinition);
 void updateTelemetry();
@@ -61,13 +61,13 @@ const char* copyString(const char* source, size_t length);
 
 const char* defaultSystemConfigJsonForSecondaries = R"json(
     {
-        "displayConfigurationFile": "::Display[[SIGNTYPE]]::",
+        "displayConfigurationFile": "::Display[[SIGNTYPE1]]::",
         "styleConfigurationFile": "::[[STYLECONFIGTYPENAME]]::",
         "bluetooth": {
             "enabled": true,
-            "isSecondaryModeEnabled": true
+            "isSecondaryModeEnabled": true,
             "uuid": "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0",
-            "localName": "3181 LED Controller [[SIGNPOSITION]]-[[SIGNTYPE]]"
+            "localName": "3181 LED Controller [[SIGNPOSITION]]-[[SIGNTYPE2]]"
         },
         "buttons": {[[BUTTONS]]},
         "batteryMonitor": {
@@ -163,9 +163,7 @@ const char* defaultPrimaryButtonDefinitionJson = R"json(
             {
                 "buttonIds": ["3"],
                 "tapAction": "changeStyle",
-                "tapActionArguments": ["RedPinkRandom_Large", "RedPinkDigit"],
-                "longTapAction": "disconnectBT",
-                "longTapActionArguments": []
+                "tapActionArguments": ["RedPinkRandom_Large", "RedPinkDigit"]
             },
             {
                 "buttonIds": ["4"],
@@ -176,9 +174,7 @@ const char* defaultPrimaryButtonDefinitionJson = R"json(
             },
             {
                 "buttonIds": ["3", "4"],
-                "tapAction": "changeStyle",
                 "longTapAction": "resetSecondaries"
             }
         ]
-    }
 )json";

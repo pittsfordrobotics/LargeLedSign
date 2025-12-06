@@ -7,8 +7,10 @@ std::vector<NeoPixelDisplay*>* neoPixelDisplays;
 ButtonProcessor* buttonProcessor;
 StyleConfiguration* styleConfiguration;
 BatteryMonitorConfiguration batteryMonitorConfig;
+PowerLedConfiguration powerLedConfig;
 
 bool isBluetoothEnabled = false;
+bool isSecondaryModeEnabled = false;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
@@ -26,6 +28,9 @@ byte currentSpeed;
 byte newSpeed;
 PatternData currentPatternData;
 PatternData newPatternData;
+ulong currentSyncData = 0;
+ulong newSyncData = 0;
+SignOffsetData currentOffsetData;
 
 volatile bool isInitialized = false;
 SystemConfiguration* systemConfiguration;
@@ -69,6 +74,10 @@ void setup()
     initializeBatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
 
     display->setDisplay("---6");
+
+    initializePowerLed(systemConfiguration->getPowerLedConfiguration());
+
+    display->setDisplay("---7");
 
     initializeBLEService(systemConfiguration->getBluetoothConfiguration());
     display->clear();
@@ -182,8 +191,11 @@ SystemConfiguration* readSystemConfiguration()
 
     // For now, only support secondaries.
     // Worry about the pit sign if it ever reappears.
-    String defaultConfigJson(defaultSystemConfigJsonForSecondaries);
-    defaultConfigJson.replace("[[SIGNTYPE]]", String(signType));
+    String defaultConfigJson = String(copyString(defaultSystemConfigJsonForSecondaries, strlen(defaultSystemConfigJsonForSecondaries)));
+    
+    // The replace function seems to get very confused when the source string is present more than once.
+    defaultConfigJson.replace("[[SIGNTYPE1]]", String(signType));
+    defaultConfigJson.replace("[[SIGNTYPE2]]", String(signType));
     defaultConfigJson.replace("[[SIGNPOSITION]]", String(signPosition));
     defaultConfigJson.replace("[[BUTTONS]]", "");
     // Secondaries don't have their own style configuration, since they're driven by the primary.
@@ -335,8 +347,9 @@ void initializeBLEService(BluetoothConfiguration& config)
     btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
     btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
     
+    isSecondaryModeEnabled = config.isSecondaryModeEnabled();
     SignConfigurationData signConfigData;
-    if (config.isSecondaryModeEnabled() && neoPixelDisplays->size() > 0) {
+    if (isSecondaryModeEnabled && neoPixelDisplays->size() > 0) {
         // The assumption here is that if we're in secondary mode, the configuration is read from the pins.
         signConfigData.signType = getSignType();
         signConfigData.signOrder = getSignPosition();
@@ -360,30 +373,47 @@ void readSettingsFromBLE()
     }
 
     BLE.poll();
+    if (isSecondaryModeEnabled)
+    {
+        newSyncData = btService.getSyncData();
+
+        SignOffsetData newOffsetData = btService.getSignOffsetData();
+        if (newOffsetData != currentOffsetData && neoPixelDisplays->size() > 0)
+        {
+            // Secondary offsets don't really handle multiple displays well.
+            // Just update the first one (should only be one).
+            neoPixelDisplays->at(0)->setDigitsToLeft(newOffsetData.digitsToLeft);
+            neoPixelDisplays->at(0)->setDigitsToRight(newOffsetData.digitsToRight);
+            neoPixelDisplays->at(0)->setColumnsToLeft(newOffsetData.columnsToLeft);
+            neoPixelDisplays->at(0)->setColumnsToRight(newOffsetData.columnsToRight);            
+            currentOffsetData = newOffsetData;
+        }
+    }
+
     newBrightness = btService.getBrightness();
     newSpeed = btService.getSpeed();
     newPatternData = btService.getPatternData();
 }
 
-void initializeBatteryMonitor(BatteryMonitorConfiguration& config)
+void initializeBatteryMonitor(const BatteryMonitorConfiguration& config)
 {
-    batteryMonitorConfig = systemConfiguration->getBatteryMonitorConfiguration();
+    batteryMonitorConfig = config;
     
     if (batteryMonitorConfig.isEnabled())
     {
-        pinMode(config.getAnalogInputPin(), INPUT);
+        pinMode(batteryMonitorConfig.getAnalogInputPin(), INPUT);
     }
 }
 
-void configurePowerLed(PowerLedConfiguration& config)
+void initializePowerLed(const PowerLedConfiguration& config)
 {
-    if (!config.isEnabled())
+    powerLedConfig = config;
+
+    if (powerLedConfig.isEnabled())
     {
-        return;
+        pinMode(powerLedConfig.getGpioPin(), OUTPUT);
+        digitalWrite(powerLedConfig.getGpioPin(), HIGH); // Turn on the power LED
     }
-     
-    pinMode(config.getGpioPin(), OUTPUT);
-    digitalWrite(config.getGpioPin(), HIGH); // Turn on the power LED
 }
 
 // Read the analog input from the "voltage input" pin and calculate the battery voltage.
@@ -455,6 +485,7 @@ void checkForLowPowerState()
             newBrightness = 255;
             newPatternData = lowPowerPattern;
             newSpeed = 1;
+            newSyncData++;
         }
     }
 
@@ -477,6 +508,7 @@ void checkForLowPowerState()
                 neoPixelDisplay->setBrightness(currentBrightness);
             }
             inLowPowerMode = false;
+            newSyncData++;
         }
     }
 }
@@ -511,6 +543,9 @@ void updateTelemetry()
         Serial.print(rawLevel);
         Serial.print("; Calculated voltage: ");
         Serial.println(voltage);
+
+        Serial.print("Bluetooth connected: ");
+        Serial.println(btService.isConnected());
     }
 }
 
@@ -543,33 +578,44 @@ void updateLedTelemetry()
 
 void updateLEDs()
 {
-    if (newBrightness != currentBrightness)
+    bool shouldUpdate = false;
+
+    if (isSecondaryModeEnabled)
+    {
+        // We're in secondary mode, so only update when the sync data changes.
+        if (newSyncData != currentSyncData)
+        {
+            shouldUpdate = true;
+            currentSyncData = newSyncData;
+        }
+    }
+    else
+    {
+        // We're in standalone mode, so trigger on any changes.
+        if (newBrightness != currentBrightness ||
+            newSpeed != currentSpeed ||
+            newPatternData != currentPatternData)
+        {
+            shouldUpdate = true;
+        }
+    }
+
+    if (shouldUpdate)
     {
         for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
         {
             neoPixelDisplay->setBrightness(newBrightness);
+            // If we're in secondary mode, force a reset of the display pattern even if the pattern didn't change.
+            if (isSecondaryModeEnabled || currentPatternData != newPatternData)
+            {
+                DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
+                neoPixelDisplay->setDisplayPattern(newPattern);
+                neoPixelDisplay->resetDisplay();
+            }
+            neoPixelDisplay->setSpeed(newSpeed);
         }
         currentBrightness = newBrightness;
-    }
-
-    if (newSpeed != currentSpeed)
-    {
-        for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
-        {
-            neoPixelDisplay->setSpeed(newSpeed);
-        }
         currentSpeed = newSpeed;
-    }
-
-    if (currentPatternData != newPatternData)
-    {
-        for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
-        {
-            DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
-            neoPixelDisplay->setDisplayPattern(newPattern);
-            neoPixelDisplay->setSpeed(newSpeed);
-            neoPixelDisplay->resetDisplay();
-        }
         currentPatternData = newPatternData;
     }
 
@@ -599,6 +645,8 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
         btService.disconnect();
         return;
     }
+
+    // TBD: logic for "secondaryBatteryVoltage" and possibly "resetSecondaries"
 
     if (actionName == "changeStyle")
     {
