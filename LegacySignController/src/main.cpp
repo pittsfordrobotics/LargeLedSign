@@ -359,7 +359,7 @@ void initializeBLEService(const BluetoothConfiguration& config)
     blePeripheralService->setColorPatternList(PatternFactory::getKnownColorPatterns());
     blePeripheralService->setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
     
-    if (bluetoothConfig.isSecondaryModeEnabled() && neoPixelDisplays->size() > 0)
+    if (bluetoothConfig.isSecondaryModeEnabled())
     {
         SignConfigurationData signConfigData;
         if (neoPixelDisplays->size() > 0) {
