@@ -4,12 +4,13 @@ BluetoothConfiguration::BluetoothConfiguration()
 {
 }
 
-BluetoothConfiguration::BluetoothConfiguration(bool isEnabled, String uuid, String localName, bool isSecondaryModeEnabled)
+BluetoothConfiguration::BluetoothConfiguration(bool isEnabled, String uuid, String localName, bool isSecondaryModeEnabled, bool isProxyModeEnabled)
 {
     m_enabled = isEnabled;
     m_uuid = uuid;
     m_localName = localName;
     m_secondaryModeEnabled = isSecondaryModeEnabled;
+    m_proxyModeEnabled = isProxyModeEnabled;
 }
 
 BluetoothConfiguration::BluetoothConfiguration(const BluetoothConfiguration& other)
@@ -30,4 +31,5 @@ void BluetoothConfiguration::copy(const BluetoothConfiguration& other)
     this->m_uuid = other.m_uuid;
     this->m_localName = other.m_localName;
     this->m_secondaryModeEnabled = other.m_secondaryModeEnabled;
+    this->m_proxyModeEnabled = other.m_proxyModeEnabled;
 }

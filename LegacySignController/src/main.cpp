@@ -1,16 +1,15 @@
 #include "main.h"
 
 // Global variables
-SecondaryPeripheral btService;
+CommonPeripheral* blePeripheralService = nullptr;
 StatusDisplay* display;
 std::vector<NeoPixelDisplay*>* neoPixelDisplays;
 ButtonProcessor* buttonProcessor;
 StyleConfiguration* styleConfiguration;
 BatteryMonitorConfiguration batteryMonitorConfig;
 PowerLedConfiguration powerLedConfig;
+BluetoothConfiguration bluetoothConfig;
 
-bool isBluetoothEnabled = false;
-bool isSecondaryModeEnabled = false;
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
@@ -90,7 +89,7 @@ void loop()
     updateTelemetry();
     checkForLowPowerState();
 
-    if (isBluetoothEnabled && btService.isConnected())
+    if (bluetoothConfig.isEnabled() && blePeripheralService->isConnected())
     {
         // Something is connected via BT.
         // Set the display to "--" to show something connected to us.
@@ -306,16 +305,17 @@ void setManualStyle(StyleDefinition styleDefinition)
     newPatternData = styleDefinition.getPatternData();
 
     // Update the local BLE settings to reflect the new manual settings.
-    if (isBluetoothEnabled)
+    if (bluetoothConfig.isEnabled())
     {
-        btService.setSpeed(newSpeed);
-        btService.setPatternData(newPatternData);
+        blePeripheralService->setSpeed(newSpeed);
+        blePeripheralService->setPatternData(newPatternData);
     }
 }
 
-void initializeBLEService(BluetoothConfiguration& config)
+void initializeBLEService(const BluetoothConfiguration& config)
 {
-    if (!config.isEnabled())
+    bluetoothConfig = config;
+    if (!bluetoothConfig.isEnabled())
     {
         Serial.println("Bluetooth is disabled in configuration.");
         display->setDisplay("boff");
@@ -335,50 +335,63 @@ void initializeBLEService(BluetoothConfiguration& config)
     }
 
     display->setDisplay("C  =");
-    Serial.println("Setting up Peripheral service using common logic.");
-    btService.initialize(config.getUuid(), config.getLocalName());
+    if (bluetoothConfig.isSecondaryModeEnabled())
+    {
+        // Initialize the secondary peripheral service.
+        Serial.println("Initializing secondary peripheral service.");
+        blePeripheralService = new SecondaryPeripheral();
+    }
+    else
+    {
+        // Initialize the common peripheral service.
+        Serial.println("Initializing common peripheral service.");
+        blePeripheralService = new CommonPeripheral();
+    }
+
+    blePeripheralService->initialize(bluetoothConfig.getUuid(), bluetoothConfig.getLocalName());
 
     // Set the various characteristics based on the defaults
     display->setDisplay("C ==");
 
-    btService.setBrightness(currentBrightness);
-    btService.setSpeed(currentSpeed);
-    btService.setPatternData(currentPatternData);
-    btService.setColorPatternList(PatternFactory::getKnownColorPatterns());
-    btService.setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
+    blePeripheralService->setBrightness(currentBrightness);
+    blePeripheralService->setSpeed(currentSpeed);
+    blePeripheralService->setPatternData(currentPatternData);
+    blePeripheralService->setColorPatternList(PatternFactory::getKnownColorPatterns());
+    blePeripheralService->setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
     
-    isSecondaryModeEnabled = config.isSecondaryModeEnabled();
-    SignConfigurationData signConfigData;
-    if (isSecondaryModeEnabled && neoPixelDisplays->size() > 0) {
-        // The assumption here is that if we're in secondary mode, the configuration is read from the pins.
-        signConfigData.signType = getSignType();
-        signConfigData.signOrder = getSignPosition();
-        
-        // Not exactly sure how to handle multiple displays...
-        signConfigData.columnCount = neoPixelDisplays->at(0)->getColumnCount();
-        signConfigData.digitCount = neoPixelDisplays->at(0)->getDigitCount();
-        signConfigData.pixelCount = neoPixelDisplays->at(0)->getPixelCount();
+    if (bluetoothConfig.isSecondaryModeEnabled())
+    {
+        SignConfigurationData signConfigData;
+        if (neoPixelDisplays->size() > 0) {
+            // The assumption here is that if we're in secondary mode, the configuration is read from the pins.
+            signConfigData.signType = getSignType();
+            signConfigData.signOrder = getSignPosition();
+            
+            // Not exactly sure how to handle multiple displays...
+            signConfigData.columnCount = neoPixelDisplays->at(0)->getColumnCount();
+            signConfigData.digitCount = neoPixelDisplays->at(0)->getDigitCount();
+            signConfigData.pixelCount = neoPixelDisplays->at(0)->getPixelCount();
+        }
+
+        ((SecondaryPeripheral*)blePeripheralService)->setSignConfigurationData(signConfigData);
     }
 
-    btService.setSignConfigurationData(signConfigData);
-
-    isBluetoothEnabled = true;
     Serial.println("Peripheral service started.");
 }
 
 void readSettingsFromBLE()
 {
-    if (!isBluetoothEnabled)
+    if (!bluetoothConfig.isEnabled())
     {
         return;
     }
 
     BLE.poll();
-    if (isSecondaryModeEnabled)
+    if (bluetoothConfig.isSecondaryModeEnabled())
     {
-        newSyncData = btService.getSyncData();
+        newSyncData = ((SecondaryPeripheral*)blePeripheralService)->getSyncData();
 
-        SignOffsetData newOffsetData = btService.getSignOffsetData();
+        SignOffsetData newOffsetData = ((SecondaryPeripheral*)blePeripheralService)->getSignOffsetData();
         if (newOffsetData != currentOffsetData && neoPixelDisplays->size() > 0)
         {
             // Secondary offsets don't really handle multiple displays well.
@@ -391,9 +404,9 @@ void readSettingsFromBLE()
         }
     }
 
-    newBrightness = btService.getBrightness();
-    newSpeed = btService.getSpeed();
-    newPatternData = btService.getPatternData();
+    newBrightness = blePeripheralService->getBrightness();
+    newSpeed = blePeripheralService->getSpeed();
+    newPatternData = blePeripheralService->getPatternData();
 }
 
 void initializeBatteryMonitor(const BatteryMonitorConfiguration& config)
@@ -537,7 +550,11 @@ void updateTelemetry()
         float voltage = getCalculatedBatteryVoltage();
 
         // Emit battery voltage information on Bluetooth as well as Serial.
-        btService.emitBatteryVoltage(voltage);
+        if (bluetoothConfig.isEnabled())
+        {
+            blePeripheralService->emitBatteryVoltage(voltage);
+        }
+
         Serial.print("Battery monitor: ");
         Serial.print(batteryMonitorConfig.isEnabled() ? "Enabled" : "Disabled");
         Serial.print("; Raw input: ");
@@ -545,8 +562,11 @@ void updateTelemetry()
         Serial.print("; Calculated voltage: ");
         Serial.println(voltage);
 
-        Serial.print("Bluetooth connected: ");
-        Serial.println(btService.isConnected());
+        if (bluetoothConfig.isEnabled())
+        {
+            Serial.print("Bluetooth connected: ");
+            Serial.println(blePeripheralService->isConnected());
+        }
     }
 }
 
@@ -581,7 +601,7 @@ void updateLEDs()
 {
     bool shouldUpdate = false;
 
-    if (isSecondaryModeEnabled)
+    if (bluetoothConfig.isSecondaryModeEnabled())
     {
         // We're in secondary mode, so only update when the sync data changes.
         if (newSyncData != currentSyncData)
@@ -607,7 +627,7 @@ void updateLEDs()
         {
             neoPixelDisplay->setBrightness(newBrightness);
             // If we're in secondary mode, force a reset of the display pattern even if the pattern didn't change.
-            if (isSecondaryModeEnabled || currentPatternData != newPatternData)
+            if (bluetoothConfig.isSecondaryModeEnabled() || currentPatternData != newPatternData)
             {
                 DisplayPattern* newPattern = PatternFactory::createForPatternData(newPatternData);
                 neoPixelDisplay->setDisplayPattern(newPattern);
@@ -641,9 +661,9 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
         return;
     }
 
-    if (actionName == "disconnectBT")
+    if (actionName == "disconnectBT" && bluetoothConfig.isEnabled())
     {
-        btService.disconnect();
+        blePeripheralService->disconnect();
         return;
     }
 

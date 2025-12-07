@@ -9,22 +9,25 @@ class BluetoothConfiguration
     public:
         BluetoothConfiguration();
         BluetoothConfiguration(const BluetoothConfiguration& other);
-        BluetoothConfiguration(bool isEnabled, String uuid, String localName, bool secondaryModeEnabled);
+        BluetoothConfiguration(bool isEnabled, String uuid, String localName, bool secondaryModeEnabled, bool proxyModeEnabled);
         
         bool isEnabled() { return m_enabled; }
         String getUuid() { return m_uuid; }
         String getLocalName() { return m_localName; }
         bool isSecondaryModeEnabled() { return m_secondaryModeEnabled; }
+        bool isProxyModeEnabled() { return m_proxyModeEnabled; }
 
         BluetoothConfiguration& operator=(const BluetoothConfiguration& other);
 
     private:
         void copy(const BluetoothConfiguration& other);
 
+        // Default to "primary" / "standalone" mode
         bool m_enabled{true};
         String m_uuid{"99be4fac-c708-41e5-a149-74047f554cc1"};
         String m_localName{"LED Sign Controller"};
         bool m_secondaryModeEnabled{false};
+        bool m_proxyModeEnabled{false};
 };
 
 #endif

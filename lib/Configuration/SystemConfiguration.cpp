@@ -328,6 +328,7 @@ BluetoothConfiguration SystemConfiguration::parseBluetoothConfiguration(JsonVari
     String uuid = defaultBtc.getUuid();
     String localName = defaultBtc.getLocalName();
     bool isSecondaryModeEnabled = defaultBtc.isSecondaryModeEnabled();
+    bool isProxyModeEnabled = defaultBtc.isProxyModeEnabled();
     
     if (btcVariant["enabled"].is<JsonVariant>())
     {
@@ -351,9 +352,15 @@ BluetoothConfiguration SystemConfiguration::parseBluetoothConfiguration(JsonVari
         isSecondaryModeEnabled = btcVariant["isSecondaryModeEnabled"].as<bool>();
     }
 
+    if (btcVariant["isProxyModeEnabled"].is<JsonVariant>())
+    {
+        isProxyModeEnabled = btcVariant["isProxyModeEnabled"].as<bool>();
+    }
+
     return BluetoothConfiguration(
         enabled,
         uuid,
         localName,
-        isSecondaryModeEnabled);
+        isSecondaryModeEnabled,
+        isProxyModeEnabled);
 }

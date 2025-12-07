@@ -41,7 +41,7 @@ std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile);
 StyleConfiguration* readStyleConfiguration(String styleConfigFile);
 void initializeBatteryMonitor(const BatteryMonitorConfiguration& config);
 void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition);
-void initializeBLEService(BluetoothConfiguration& config);
+void initializeBLEService(const BluetoothConfiguration& config);
 void initializePowerLed(const PowerLedConfiguration& config);
 void readSettingsFromBLE();
 void setManualStyle(StyleDefinition styleDefinition);

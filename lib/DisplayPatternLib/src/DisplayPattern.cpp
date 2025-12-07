@@ -45,15 +45,15 @@ bool DisplayPattern::update(PixelMap* pixelMap)
     int consecutiveUpdates = 0;
     while (m_nextUpdate <= millis())
     {
-        m_nextUpdate += m_iterationDelay;
-        updateInternal(pixelMap);
-        consecutiveUpdates++;
         if (consecutiveUpdates >= 3)
         {
             // Prevent potential infinite loop if updates are taking too long.
             m_nextUpdate = millis() + m_iterationDelay;
             break;
         }
+        m_nextUpdate += m_iterationDelay;
+        updateInternal(pixelMap);
+        consecutiveUpdates++;
     }
 
     return true;
