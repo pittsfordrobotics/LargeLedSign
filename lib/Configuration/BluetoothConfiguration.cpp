@@ -3,33 +3,11 @@
 BluetoothConfiguration BluetoothConfiguration::fromJson(JsonVariant bluetoothConfig)
 {
     BluetoothConfiguration config;
-
-    if (bluetoothConfig["enabled"].is<JsonVariant>())
-    {
-        config.m_enabled = bluetoothConfig["enabled"].as<bool>();
-    }
-
-    if (bluetoothConfig["uuid"].is<JsonVariant>())
-    {
-        std::string uuidStr = bluetoothConfig["uuid"].as<std::string>();
-        config.m_uuid = String(uuidStr.c_str());
-    }
-
-    if (bluetoothConfig["localName"].is<JsonVariant>())
-    {
-        std::string localNamestr = bluetoothConfig["localName"].as<std::string>();
-        config.m_localName = String(localNamestr.c_str());
-    }
-
-    if (bluetoothConfig["isSecondaryModeEnabled"].is<JsonVariant>())
-    {
-        config.m_secondaryModeEnabled = bluetoothConfig["isSecondaryModeEnabled"].as<bool>();
-    }
-
-    if (bluetoothConfig["isProxyModeEnabled"].is<JsonVariant>())
-    {
-        config.m_proxyModeEnabled = bluetoothConfig["isProxyModeEnabled"].as<bool>();
-    }
+    config.m_enabled = JsonUtils::getValueOrDefault<bool>(bluetoothConfig, "enabled", config.m_enabled);
+    config.m_uuid = JsonUtils::getValueOrDefault<String>(bluetoothConfig, "uuid", config.m_uuid);
+    config.m_localName = JsonUtils::getValueOrDefault<String>(bluetoothConfig, "localName", config.m_localName);
+    config.m_secondaryModeEnabled = JsonUtils::getValueOrDefault<bool>(bluetoothConfig, "isSecondaryModeEnabled", config.m_secondaryModeEnabled);
+    config.m_proxyModeEnabled = JsonUtils::getValueOrDefault<bool>(bluetoothConfig, "isProxyModeEnabled", config.m_proxyModeEnabled);
 
     return config;
 }

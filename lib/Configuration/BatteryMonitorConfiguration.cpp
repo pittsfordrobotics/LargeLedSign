@@ -3,31 +3,11 @@
 BatteryMonitorConfiguration BatteryMonitorConfiguration::fromJson(JsonVariant batteryMonitorConfig)
 {
     BatteryMonitorConfiguration config;
-
-    if (batteryMonitorConfig["enabled"].is<JsonVariant>())
-    {
-        config.m_enabled = batteryMonitorConfig["enabled"].as<bool>();
-    }
-
-    if (batteryMonitorConfig["analogInputGpioPin"].is<JsonVariant>())
-    {
-        config.m_analogInputPin = batteryMonitorConfig["analogInputGpioPin"].as<int>();
-    }
-
-    if (batteryMonitorConfig["inputMultiplier"].is<JsonVariant>())
-    {
-        config.m_inputMultiplier = batteryMonitorConfig["inputMultiplier"].as<float>();
-    }
-
-    if (batteryMonitorConfig["voltageToEnterLowPowerState"].is<JsonVariant>())
-    {
-        config.m_voltageToEnterLowPowerState = batteryMonitorConfig["voltageToEnterLowPowerState"].as<float>();
-    }
-
-    if (batteryMonitorConfig["voltageToExitLowPowerState"].is<JsonVariant>())
-    {
-        config.m_voltageToExitLowPowerState = batteryMonitorConfig["voltageToExitLowPowerState"].as<float>();
-    }
+    config.m_enabled = JsonUtils::getValueOrDefault<bool>(batteryMonitorConfig, "enabled", config.m_enabled);
+    config.m_analogInputPin = JsonUtils::getValueOrDefault<int>(batteryMonitorConfig, "analogInputGpioPin", config.m_analogInputPin);
+    config.m_inputMultiplier = JsonUtils::getValueOrDefault<float>(batteryMonitorConfig, "inputMultiplier", config.m_inputMultiplier);
+    config.m_voltageToEnterLowPowerState = JsonUtils::getValueOrDefault<float>(batteryMonitorConfig, "voltageToEnterLowPowerState", config.m_voltageToEnterLowPowerState);
+    config.m_voltageToExitLowPowerState = JsonUtils::getValueOrDefault<float>(batteryMonitorConfig, "voltageToExitLowPowerState", config.m_voltageToExitLowPowerState);
 
     return config;
 }

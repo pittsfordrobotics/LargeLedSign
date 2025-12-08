@@ -9,6 +9,7 @@
 #include "PowerLedConfiguration.h"
 #include "Tm1637DisplayConfiguration.h"
 #include "BluetoothConfiguration.h"
+#include "JsonUtils.h"
 #include "..\ButtonProcessor\ButtonProcessor.h"
 #include "..\DebugUtils\DebugUtils.h"
 

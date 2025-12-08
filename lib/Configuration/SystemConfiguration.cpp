@@ -228,18 +228,8 @@ std::vector<String> SystemConfiguration::getStringList(JsonVariant array)
 PowerLedConfiguration SystemConfiguration::parsePowerLedConfiguration(JsonVariant plcVariant)
 {
     PowerLedConfiguration defaultPlc;
-    bool enabled = defaultPlc.isEnabled();
-    int gpioPin = defaultPlc.getGpioPin();
-    
-    if (plcVariant["enabled"].is<JsonVariant>())
-    {
-        enabled = plcVariant["enabled"].as<bool>();
-    }
-
-    if (plcVariant["gpioPin"].is<JsonVariant>())
-    {
-        gpioPin = plcVariant["gpioPin"].as<int>();
-    }
+    bool enabled = JsonUtils::getValueOrDefault<bool>(plcVariant, "enabled", defaultPlc.isEnabled());
+    int gpioPin = JsonUtils::getValueOrDefault<int>(plcVariant, "gpioPin", defaultPlc.getGpioPin());
 
     return PowerLedConfiguration(enabled, gpioPin);
 }

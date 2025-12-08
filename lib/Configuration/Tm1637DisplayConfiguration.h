@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include "JsonUtils.h"
 
 class Tm1637DisplayConfiguration {
     public:

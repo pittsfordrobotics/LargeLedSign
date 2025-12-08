@@ -3,26 +3,10 @@
 Tm1637DisplayConfiguration Tm1637DisplayConfiguration::fromJson(JsonVariant displayConfig)
 {
     Tm1637DisplayConfiguration config;
-
-    if (displayConfig["enabled"].is<JsonVariant>())
-    {
-        config.m_enabled = displayConfig["enabled"].as<bool>();
-    }
-
-    if (displayConfig["clockGpioPin"].is<JsonVariant>())
-    {
-        config.m_clockGpioPin = displayConfig["clockGpioPin"].as<int>();
-    }
-
-    if (displayConfig["dataGpioPin"].is<JsonVariant>())
-    {
-        config.m_dataGpioPin = displayConfig["dataGpioPin"].as<int>();
-    }
-
-    if (displayConfig["brightness"].is<JsonVariant>())
-    {
-        config.m_brightness = displayConfig["brightness"].as<byte>();
-    }
+    config.m_enabled = JsonUtils::getValueOrDefault<bool>(displayConfig, "enabled", config.m_enabled);
+    config.m_clockGpioPin = JsonUtils::getValueOrDefault<int>(displayConfig, "clockGpioPin", config.m_clockGpioPin);
+    config.m_dataGpioPin = JsonUtils::getValueOrDefault<int>(displayConfig, "dataGpioPin", config.m_dataGpioPin);
+    config.m_brightness = JsonUtils::getValueOrDefault<byte>(displayConfig, "brightness", config.m_brightness);
 
     return config;
 }
