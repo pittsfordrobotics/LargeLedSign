@@ -56,7 +56,6 @@ class SystemConfiguration {
         PowerLedConfiguration parsePowerLedConfiguration(JsonVariant plcVariant);
         BatteryMonitorConfiguration parseBatteryMonitorConfiguration(JsonVariant bmcVariant);
         Tm1637DisplayConfiguration parseTm1637DisplayConfiguration(JsonVariant tdcVariant);
-        BluetoothConfiguration parseBluetoothConfiguration(JsonVariant btcVariant);
 };
 
 #endif

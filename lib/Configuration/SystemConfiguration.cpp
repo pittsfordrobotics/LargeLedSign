@@ -76,7 +76,7 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     if (configDoc["bluetooth"].is<JsonVariant>())
     {
         config->m_bluetoothConfiguration = 
-            config->parseBluetoothConfiguration(configDoc["bluetooth"].as<JsonVariant>());
+            BluetoothConfiguration::fromJson(configDoc["bluetooth"].as<JsonVariant>());
     }
 
     config->m_isValid = true;
@@ -319,48 +319,4 @@ Tm1637DisplayConfiguration SystemConfiguration::parseTm1637DisplayConfiguration(
         clockGpioPin,
         dataGpioPin,
         brightness);
-}
-
-BluetoothConfiguration SystemConfiguration::parseBluetoothConfiguration(JsonVariant btcVariant)
-{
-    BluetoothConfiguration defaultBtc;
-    bool enabled = defaultBtc.isEnabled();
-    String uuid = defaultBtc.getUuid();
-    String localName = defaultBtc.getLocalName();
-    bool isSecondaryModeEnabled = defaultBtc.isSecondaryModeEnabled();
-    bool isProxyModeEnabled = defaultBtc.isProxyModeEnabled();
-    
-    if (btcVariant["enabled"].is<JsonVariant>())
-    {
-        enabled = btcVariant["enabled"].as<bool>();
-    }
-
-    if (btcVariant["uuid"].is<JsonVariant>())
-    {
-        std::string uuidStr = btcVariant["uuid"].as<std::string>();
-        uuid = String(uuidStr.c_str());
-    }
-
-    if (btcVariant["localName"].is<JsonVariant>())
-    {
-        std::string localNamestr = btcVariant["localName"].as<std::string>();
-        localName = String(localNamestr.c_str());
-    }
-
-    if (btcVariant["isSecondaryModeEnabled"].is<JsonVariant>())
-    {
-        isSecondaryModeEnabled = btcVariant["isSecondaryModeEnabled"].as<bool>();
-    }
-
-    if (btcVariant["isProxyModeEnabled"].is<JsonVariant>())
-    {
-        isProxyModeEnabled = btcVariant["isProxyModeEnabled"].as<bool>();
-    }
-
-    return BluetoothConfiguration(
-        enabled,
-        uuid,
-        localName,
-        isSecondaryModeEnabled,
-        isProxyModeEnabled);
 }
