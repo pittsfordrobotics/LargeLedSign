@@ -54,7 +54,6 @@ class SystemConfiguration {
         void addButtonActions(JsonArray actions);
         std::vector<String> getStringList(JsonVariant array);
         PowerLedConfiguration parsePowerLedConfiguration(JsonVariant plcVariant);
-        BatteryMonitorConfiguration parseBatteryMonitorConfiguration(JsonVariant bmcVariant);
 };
 
 #endif

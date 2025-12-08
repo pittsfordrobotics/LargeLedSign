@@ -64,14 +64,13 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     if (configDoc["batteryMonitor"].is<JsonVariant>())
     {
         config->m_batteryMonitorConfiguration = 
-            config->parseBatteryMonitorConfiguration(configDoc["batteryMonitor"].as<JsonVariant>());
+            BatteryMonitorConfiguration::fromJson(configDoc["batteryMonitor"].as<JsonVariant>());
     }
 
     if (configDoc["tm1637Display"].is<JsonVariant>())
     {
         config->m_tm1637DisplayConfiguration = 
             Tm1637DisplayConfiguration::fromJson(configDoc["tm1637Display"].as<JsonVariant>());
-            //config->parseTm1637DisplayConfiguration(configDoc["tm1637Display"].as<JsonVariant>());
     }
 
     if (configDoc["bluetooth"].is<JsonVariant>())
@@ -243,46 +242,4 @@ PowerLedConfiguration SystemConfiguration::parsePowerLedConfiguration(JsonVarian
     }
 
     return PowerLedConfiguration(enabled, gpioPin);
-}
-
-BatteryMonitorConfiguration SystemConfiguration::parseBatteryMonitorConfiguration(JsonVariant bmcVariant)
-{
-    BatteryMonitorConfiguration defaultBmc;
-    bool enabled = defaultBmc.isEnabled();
-    int analogInputPin = defaultBmc.getAnalogInputPin();
-    float inputMultiplier = defaultBmc.getInputMultiplier();
-    float voltageToEnterLowPowerState = defaultBmc.getVoltageToEnterLowPowerState();
-    float voltageToExitLowPowerState = defaultBmc.getVoltageToExitLowPowerState();
-    
-    if (bmcVariant["enabled"].is<JsonVariant>())
-    {
-        enabled = bmcVariant["enabled"].as<bool>();
-    }
-
-    if (bmcVariant["analogInputGpioPin"].is<JsonVariant>())
-    {
-        analogInputPin = bmcVariant["analogInputGpioPin"].as<int>();
-    }
-
-    if (bmcVariant["inputMultiplier"].is<JsonVariant>())
-    {
-        inputMultiplier = bmcVariant["inputMultiplier"].as<float>();
-    }
-
-    if (bmcVariant["voltageToEnterLowPowerState"].is<JsonVariant>())
-    {
-        voltageToEnterLowPowerState = bmcVariant["voltageToEnterLowPowerState"].as<float>();
-    }
-
-    if (bmcVariant["voltageToExitLowPowerState"].is<JsonVariant>())
-    {
-        voltageToExitLowPowerState = bmcVariant["voltageToExitLowPowerState"].as<float>();
-    }
-
-    return BatteryMonitorConfiguration(
-        enabled,
-        analogInputPin,
-        inputMultiplier,
-        voltageToEnterLowPowerState,
-        voltageToExitLowPowerState);
 }
