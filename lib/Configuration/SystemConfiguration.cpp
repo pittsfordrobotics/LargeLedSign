@@ -70,7 +70,8 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     if (configDoc["tm1637Display"].is<JsonVariant>())
     {
         config->m_tm1637DisplayConfiguration = 
-            config->parseTm1637DisplayConfiguration(configDoc["tm1637Display"].as<JsonVariant>());
+            Tm1637DisplayConfiguration::fromJson(configDoc["tm1637Display"].as<JsonVariant>());
+            //config->parseTm1637DisplayConfiguration(configDoc["tm1637Display"].as<JsonVariant>());
     }
 
     if (configDoc["bluetooth"].is<JsonVariant>())
@@ -284,39 +285,4 @@ BatteryMonitorConfiguration SystemConfiguration::parseBatteryMonitorConfiguratio
         inputMultiplier,
         voltageToEnterLowPowerState,
         voltageToExitLowPowerState);
-}
-
-Tm1637DisplayConfiguration SystemConfiguration::parseTm1637DisplayConfiguration(JsonVariant tdcVariant)
-{
-    Tm1637DisplayConfiguration defaultTdc;
-    bool enabled = defaultTdc.isEnabled();
-    int clockGpioPin = defaultTdc.getClockGpioPin();
-    int dataGpioPin = defaultTdc.getDataGpioPin();
-    int brightness = defaultTdc.getBrightness();
-    
-    if (tdcVariant["enabled"].is<JsonVariant>())
-    {
-        enabled = tdcVariant["enabled"].as<bool>();
-    }
-
-    if (tdcVariant["clockGpioPin"].is<JsonVariant>())
-    {
-        clockGpioPin = tdcVariant["clockGpioPin"].as<int>();
-    }
-
-    if (tdcVariant["dataGpioPin"].is<JsonVariant>())
-    {
-        dataGpioPin = tdcVariant["dataGpioPin"].as<int>();
-    }
-
-    if (tdcVariant["brightness"].is<JsonVariant>())
-    {
-        brightness = tdcVariant["brightness"].as<byte>();
-    }
-
-    return Tm1637DisplayConfiguration(
-        enabled,
-        clockGpioPin,
-        dataGpioPin,
-        brightness);
 }
