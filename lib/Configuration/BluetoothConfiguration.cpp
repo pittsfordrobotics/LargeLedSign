@@ -1,16 +1,19 @@
 #include "BluetoothConfiguration.h"
 
-BluetoothConfiguration::BluetoothConfiguration()
+BluetoothConfiguration BluetoothConfiguration::fromJson(JsonVariant bluetoothConfig)
 {
+    BluetoothConfiguration config;
+    config.m_enabled = JsonUtils::getValueOrDefault<bool>(bluetoothConfig, "enabled", config.m_enabled);
+    config.m_uuid = JsonUtils::getValueOrDefault<String>(bluetoothConfig, "uuid", config.m_uuid);
+    config.m_localName = JsonUtils::getValueOrDefault<String>(bluetoothConfig, "localName", config.m_localName);
+    config.m_secondaryModeEnabled = JsonUtils::getValueOrDefault<bool>(bluetoothConfig, "isSecondaryModeEnabled", config.m_secondaryModeEnabled);
+    config.m_proxyModeEnabled = JsonUtils::getValueOrDefault<bool>(bluetoothConfig, "isProxyModeEnabled", config.m_proxyModeEnabled);
+
+    return config;
 }
 
-BluetoothConfiguration::BluetoothConfiguration(bool isEnabled, String uuid, String localName, bool isSecondaryModeEnabled, bool isProxyModeEnabled)
+BluetoothConfiguration::BluetoothConfiguration()
 {
-    m_enabled = isEnabled;
-    m_uuid = uuid;
-    m_localName = localName;
-    m_secondaryModeEnabled = isSecondaryModeEnabled;
-    m_proxyModeEnabled = isProxyModeEnabled;
 }
 
 BluetoothConfiguration::BluetoothConfiguration(const BluetoothConfiguration& other)

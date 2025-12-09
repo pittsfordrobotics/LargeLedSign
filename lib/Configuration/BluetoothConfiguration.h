@@ -3,13 +3,14 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include "JsonUtils.h"
 
 class BluetoothConfiguration
 {
     public:
+        static BluetoothConfiguration fromJson(JsonVariant bluetoothConfig);
         BluetoothConfiguration();
         BluetoothConfiguration(const BluetoothConfiguration& other);
-        BluetoothConfiguration(bool isEnabled, String uuid, String localName, bool secondaryModeEnabled, bool proxyModeEnabled);
         
         bool isEnabled() { return m_enabled; }
         String getUuid() { return m_uuid; }

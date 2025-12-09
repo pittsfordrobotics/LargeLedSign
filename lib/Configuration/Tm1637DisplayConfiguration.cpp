@@ -1,18 +1,18 @@
 #include "Tm1637DisplayConfiguration.h"
 
-Tm1637DisplayConfiguration::Tm1637DisplayConfiguration()
+Tm1637DisplayConfiguration Tm1637DisplayConfiguration::fromJson(JsonVariant displayConfig)
 {
+    Tm1637DisplayConfiguration config;
+    config.m_enabled = JsonUtils::getValueOrDefault<bool>(displayConfig, "enabled", config.m_enabled);
+    config.m_clockGpioPin = JsonUtils::getValueOrDefault<int>(displayConfig, "clockGpioPin", config.m_clockGpioPin);
+    config.m_dataGpioPin = JsonUtils::getValueOrDefault<int>(displayConfig, "dataGpioPin", config.m_dataGpioPin);
+    config.m_brightness = JsonUtils::getValueOrDefault<byte>(displayConfig, "brightness", config.m_brightness);
+
+    return config;
 }
 
-Tm1637DisplayConfiguration::Tm1637DisplayConfiguration(bool enabled,
-    int clockGpioPin,
-    int dataGpioPin,
-    byte brightness)
+Tm1637DisplayConfiguration::Tm1637DisplayConfiguration()
 {
-    m_enabled = enabled;
-    m_clockGpioPin = clockGpioPin;
-    m_dataGpioPin = dataGpioPin;
-    m_brightness = brightness;
 }
 
 Tm1637DisplayConfiguration::Tm1637DisplayConfiguration(const Tm1637DisplayConfiguration& other)

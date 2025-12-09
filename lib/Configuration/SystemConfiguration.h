@@ -9,6 +9,7 @@
 #include "PowerLedConfiguration.h"
 #include "Tm1637DisplayConfiguration.h"
 #include "BluetoothConfiguration.h"
+#include "JsonUtils.h"
 #include "..\ButtonProcessor\ButtonProcessor.h"
 #include "..\DebugUtils\DebugUtils.h"
 
@@ -54,9 +55,6 @@ class SystemConfiguration {
         void addButtonActions(JsonArray actions);
         std::vector<String> getStringList(JsonVariant array);
         PowerLedConfiguration parsePowerLedConfiguration(JsonVariant plcVariant);
-        BatteryMonitorConfiguration parseBatteryMonitorConfiguration(JsonVariant bmcVariant);
-        Tm1637DisplayConfiguration parseTm1637DisplayConfiguration(JsonVariant tdcVariant);
-        BluetoothConfiguration parseBluetoothConfiguration(JsonVariant btcVariant);
 };
 
 #endif

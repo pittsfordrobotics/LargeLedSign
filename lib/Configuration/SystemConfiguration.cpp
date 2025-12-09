@@ -32,17 +32,8 @@ SystemConfiguration* SystemConfiguration::ParseJson(
         return config;
     }
 
-    if (configDoc["displayConfigurationFile"].is<JsonVariant>())
-    {
-        std::string displayConfigFile = configDoc["displayConfigurationFile"].as<std::string>();
-        config->m_displayConfigurationFile = String(displayConfigFile.c_str());
-    }
-
-    if (configDoc["styleConfigurationFile"].is<JsonVariant>())
-    {
-        std::string styleConfigFile = configDoc["styleConfigurationFile"].as<std::string>();
-        config->m_styleConfigurationFile = String(styleConfigFile.c_str());
-    }
+    config->m_displayConfigurationFile = JsonUtils::getValueOrDefault(configDoc, "displayConfigurationFile", config->m_displayConfigurationFile);
+    config->m_styleConfigurationFile = JsonUtils::getValueOrDefault(configDoc, "styleConfigurationFile", config->m_styleConfigurationFile);
 
     JsonVariant buttonConfigs = configDoc["buttons"].as<JsonVariant>();
     if (buttonFactory != nullptr && !buttonConfigs.isNull())
@@ -50,10 +41,7 @@ SystemConfiguration* SystemConfiguration::ParseJson(
         config->configureButtonProcessor(buttonConfigs, buttonFactory);
     }
 
-    if (configDoc["clockMultiplier"].is<JsonVariant>())
-    {
-        config->m_clockMultiplier = configDoc["clockMultiplier"].as<float>();
-    }
+    config->m_clockMultiplier = JsonUtils::getValueOrDefault<float>(configDoc, "clockMultiplier", config->m_clockMultiplier);
 
     if (configDoc["powerLed"].is<JsonVariant>())
     {
@@ -64,19 +52,19 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     if (configDoc["batteryMonitor"].is<JsonVariant>())
     {
         config->m_batteryMonitorConfiguration = 
-            config->parseBatteryMonitorConfiguration(configDoc["batteryMonitor"].as<JsonVariant>());
+            BatteryMonitorConfiguration::fromJson(configDoc["batteryMonitor"].as<JsonVariant>());
     }
 
     if (configDoc["tm1637Display"].is<JsonVariant>())
     {
         config->m_tm1637DisplayConfiguration = 
-            config->parseTm1637DisplayConfiguration(configDoc["tm1637Display"].as<JsonVariant>());
+            Tm1637DisplayConfiguration::fromJson(configDoc["tm1637Display"].as<JsonVariant>());
     }
 
     if (configDoc["bluetooth"].is<JsonVariant>())
     {
         config->m_bluetoothConfiguration = 
-            config->parseBluetoothConfiguration(configDoc["bluetooth"].as<JsonVariant>());
+            BluetoothConfiguration::fromJson(configDoc["bluetooth"].as<JsonVariant>());
     }
 
     config->m_isValid = true;
@@ -228,139 +216,8 @@ std::vector<String> SystemConfiguration::getStringList(JsonVariant array)
 PowerLedConfiguration SystemConfiguration::parsePowerLedConfiguration(JsonVariant plcVariant)
 {
     PowerLedConfiguration defaultPlc;
-    bool enabled = defaultPlc.isEnabled();
-    int gpioPin = defaultPlc.getGpioPin();
-    
-    if (plcVariant["enabled"].is<JsonVariant>())
-    {
-        enabled = plcVariant["enabled"].as<bool>();
-    }
-
-    if (plcVariant["gpioPin"].is<JsonVariant>())
-    {
-        gpioPin = plcVariant["gpioPin"].as<int>();
-    }
+    bool enabled = JsonUtils::getValueOrDefault<bool>(plcVariant, "enabled", defaultPlc.isEnabled());
+    int gpioPin = JsonUtils::getValueOrDefault<int>(plcVariant, "gpioPin", defaultPlc.getGpioPin());
 
     return PowerLedConfiguration(enabled, gpioPin);
-}
-
-BatteryMonitorConfiguration SystemConfiguration::parseBatteryMonitorConfiguration(JsonVariant bmcVariant)
-{
-    BatteryMonitorConfiguration defaultBmc;
-    bool enabled = defaultBmc.isEnabled();
-    int analogInputPin = defaultBmc.getAnalogInputPin();
-    float inputMultiplier = defaultBmc.getInputMultiplier();
-    float voltageToEnterLowPowerState = defaultBmc.getVoltageToEnterLowPowerState();
-    float voltageToExitLowPowerState = defaultBmc.getVoltageToExitLowPowerState();
-    
-    if (bmcVariant["enabled"].is<JsonVariant>())
-    {
-        enabled = bmcVariant["enabled"].as<bool>();
-    }
-
-    if (bmcVariant["analogInputGpioPin"].is<JsonVariant>())
-    {
-        analogInputPin = bmcVariant["analogInputGpioPin"].as<int>();
-    }
-
-    if (bmcVariant["inputMultiplier"].is<JsonVariant>())
-    {
-        inputMultiplier = bmcVariant["inputMultiplier"].as<float>();
-    }
-
-    if (bmcVariant["voltageToEnterLowPowerState"].is<JsonVariant>())
-    {
-        voltageToEnterLowPowerState = bmcVariant["voltageToEnterLowPowerState"].as<float>();
-    }
-
-    if (bmcVariant["voltageToExitLowPowerState"].is<JsonVariant>())
-    {
-        voltageToExitLowPowerState = bmcVariant["voltageToExitLowPowerState"].as<float>();
-    }
-
-    return BatteryMonitorConfiguration(
-        enabled,
-        analogInputPin,
-        inputMultiplier,
-        voltageToEnterLowPowerState,
-        voltageToExitLowPowerState);
-}
-
-Tm1637DisplayConfiguration SystemConfiguration::parseTm1637DisplayConfiguration(JsonVariant tdcVariant)
-{
-    Tm1637DisplayConfiguration defaultTdc;
-    bool enabled = defaultTdc.isEnabled();
-    int clockGpioPin = defaultTdc.getClockGpioPin();
-    int dataGpioPin = defaultTdc.getDataGpioPin();
-    int brightness = defaultTdc.getBrightness();
-    
-    if (tdcVariant["enabled"].is<JsonVariant>())
-    {
-        enabled = tdcVariant["enabled"].as<bool>();
-    }
-
-    if (tdcVariant["clockGpioPin"].is<JsonVariant>())
-    {
-        clockGpioPin = tdcVariant["clockGpioPin"].as<int>();
-    }
-
-    if (tdcVariant["dataGpioPin"].is<JsonVariant>())
-    {
-        dataGpioPin = tdcVariant["dataGpioPin"].as<int>();
-    }
-
-    if (tdcVariant["brightness"].is<JsonVariant>())
-    {
-        brightness = tdcVariant["brightness"].as<byte>();
-    }
-
-    return Tm1637DisplayConfiguration(
-        enabled,
-        clockGpioPin,
-        dataGpioPin,
-        brightness);
-}
-
-BluetoothConfiguration SystemConfiguration::parseBluetoothConfiguration(JsonVariant btcVariant)
-{
-    BluetoothConfiguration defaultBtc;
-    bool enabled = defaultBtc.isEnabled();
-    String uuid = defaultBtc.getUuid();
-    String localName = defaultBtc.getLocalName();
-    bool isSecondaryModeEnabled = defaultBtc.isSecondaryModeEnabled();
-    bool isProxyModeEnabled = defaultBtc.isProxyModeEnabled();
-    
-    if (btcVariant["enabled"].is<JsonVariant>())
-    {
-        enabled = btcVariant["enabled"].as<bool>();
-    }
-
-    if (btcVariant["uuid"].is<JsonVariant>())
-    {
-        std::string uuidStr = btcVariant["uuid"].as<std::string>();
-        uuid = String(uuidStr.c_str());
-    }
-
-    if (btcVariant["localName"].is<JsonVariant>())
-    {
-        std::string localNamestr = btcVariant["localName"].as<std::string>();
-        localName = String(localNamestr.c_str());
-    }
-
-    if (btcVariant["isSecondaryModeEnabled"].is<JsonVariant>())
-    {
-        isSecondaryModeEnabled = btcVariant["isSecondaryModeEnabled"].as<bool>();
-    }
-
-    if (btcVariant["isProxyModeEnabled"].is<JsonVariant>())
-    {
-        isProxyModeEnabled = btcVariant["isProxyModeEnabled"].as<bool>();
-    }
-
-    return BluetoothConfiguration(
-        enabled,
-        uuid,
-        localName,
-        isSecondaryModeEnabled,
-        isProxyModeEnabled);
 }

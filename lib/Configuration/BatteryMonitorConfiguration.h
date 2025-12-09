@@ -1,14 +1,13 @@
 #ifndef BATTERYMONITORCONFIGURATION_H
 #define BATTERYMONITORCONFIGURATION_H
 
+#include <ArduinoJson.h>
+#include "JsonUtils.h"
+
 class BatteryMonitorConfiguration {
     public:
+        static BatteryMonitorConfiguration fromJson(JsonVariant batteryMonitorConfig);
         BatteryMonitorConfiguration();
-        BatteryMonitorConfiguration(bool enabled,
-                                    int analogInputPin,
-                                    float inputMultiplier,
-                                    float voltageToEnterLowPowerState,
-                                    float voltageToExitLowPowerState);
 
         BatteryMonitorConfiguration(const BatteryMonitorConfiguration& other);
 

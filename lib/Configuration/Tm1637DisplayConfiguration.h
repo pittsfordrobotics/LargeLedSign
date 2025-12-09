@@ -2,15 +2,13 @@
 #define TM1637DISPLAYCONFIGURATION_H
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
+#include "JsonUtils.h"
 
 class Tm1637DisplayConfiguration {
     public:
+        static Tm1637DisplayConfiguration fromJson(JsonVariant displayConfig);
         Tm1637DisplayConfiguration();
-        Tm1637DisplayConfiguration(bool enabled,
-                                   int clockGpioPin,
-                                   int dataGpioPin,
-                                   byte brightness);
-
         Tm1637DisplayConfiguration(const Tm1637DisplayConfiguration& other);
 
         bool isEnabled() { return m_enabled; }
