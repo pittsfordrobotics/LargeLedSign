@@ -32,17 +32,8 @@ SystemConfiguration* SystemConfiguration::ParseJson(
         return config;
     }
 
-    if (configDoc["displayConfigurationFile"].is<JsonVariant>())
-    {
-        std::string displayConfigFile = configDoc["displayConfigurationFile"].as<std::string>();
-        config->m_displayConfigurationFile = String(displayConfigFile.c_str());
-    }
-
-    if (configDoc["styleConfigurationFile"].is<JsonVariant>())
-    {
-        std::string styleConfigFile = configDoc["styleConfigurationFile"].as<std::string>();
-        config->m_styleConfigurationFile = String(styleConfigFile.c_str());
-    }
+    config->m_displayConfigurationFile = JsonUtils::getValueOrDefault(configDoc, "displayConfigurationFile", config->m_displayConfigurationFile);
+    config->m_styleConfigurationFile = JsonUtils::getValueOrDefault(configDoc, "styleConfigurationFile", config->m_styleConfigurationFile);
 
     JsonVariant buttonConfigs = configDoc["buttons"].as<JsonVariant>();
     if (buttonFactory != nullptr && !buttonConfigs.isNull())
@@ -50,10 +41,7 @@ SystemConfiguration* SystemConfiguration::ParseJson(
         config->configureButtonProcessor(buttonConfigs, buttonFactory);
     }
 
-    if (configDoc["clockMultiplier"].is<JsonVariant>())
-    {
-        config->m_clockMultiplier = configDoc["clockMultiplier"].as<float>();
-    }
+    config->m_clockMultiplier = JsonUtils::getValueOrDefault<float>(configDoc, "clockMultiplier", config->m_clockMultiplier);
 
     if (configDoc["powerLed"].is<JsonVariant>())
     {
