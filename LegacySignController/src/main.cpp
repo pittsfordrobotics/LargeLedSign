@@ -71,21 +71,49 @@ void setup()
 
     display->setDisplay("---5");
     Serial.println("---5");
-    initializeBatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
+    batteryMonitorConfig = systemConfiguration->getBatteryMonitorConfiguration();
+    initializeBatteryMonitor();
 
     display->setDisplay("---6");
     Serial.println("---6");
-    initializePowerLed(systemConfiguration->getPowerLedConfiguration());
+    powerLedConfig = systemConfiguration->getPowerLedConfiguration();
+    initializePowerLed();
 
     display->setDisplay("---7");
     Serial.println("---7");
-    initializeBLEService(systemConfiguration->getBluetoothConfiguration());
+    bluetoothConfig = systemConfiguration->getBluetoothConfiguration();
+    if (bluetoothConfig.isEnabled() || bluetoothConfig.isProxyModeEnabled())
+    {
+        if (!BLE.begin())
+        {
+            Serial.println("BLE initialization failed!");
+            display->setDisplay("E-1");
+            while (true)
+            {
+                Serial.println("BLE initialization failed!");
+                delay(1000);
+            }
+        }
+    }
 
+    display->setDisplay("---8");
+    Serial.println("---8");
     if (bluetoothConfig.isProxyModeEnabled())
     {
+        Serial.println("Populating secondary clients...");
         populateSecondaryClients();
         updateOffsetDataForSecondaryClients();
+        // Need to grab default brightness from someplace.
+        if (allSecondaries.size() > 0)
+        {
+            newBrightness = allSecondaries[0]->getSignStatus().brightness;
+            currentBrightness = newBrightness;
+        }
     }
+
+    display->setDisplay("---9");
+    Serial.println("---9");
+    initializeBlePeripheralService();
 
     display->clear();
     isInitialized = true;
@@ -326,26 +354,14 @@ void setManualStyle(StyleDefinition styleDefinition)
     }
 }
 
-void initializeBLEService(const BluetoothConfiguration& config)
+void initializeBlePeripheralService()
 {
-    bluetoothConfig = config;
     if (!bluetoothConfig.isEnabled())
     {
         Serial.println("Bluetooth is disabled in configuration.");
         display->setDisplay("boff");
         delay(1500);
         return;
-    }
-
-    if (!BLE.begin())
-    {
-        Serial.println("BLE initialization failed!");
-        display->setDisplay("E-1");
-        while (true)
-        {
-            Serial.println("BLE initialization failed!");
-            delay(1000);
-        }
     }
 
     display->setDisplay("C  =");
@@ -423,20 +439,16 @@ void readSettingsFromBLE()
     newPatternData = blePeripheralService->getPatternData();
 }
 
-void initializeBatteryMonitor(const BatteryMonitorConfiguration& config)
+void initializeBatteryMonitor()
 {
-    batteryMonitorConfig = config;
-    
     if (batteryMonitorConfig.isEnabled())
     {
         pinMode(batteryMonitorConfig.getAnalogInputPin(), INPUT);
     }
 }
 
-void initializePowerLed(const PowerLedConfiguration& config)
+void initializePowerLed()
 {
-    powerLedConfig = config;
-
     if (powerLedConfig.isEnabled())
     {
         pinMode(powerLedConfig.getGpioPin(), OUTPUT);
@@ -958,6 +970,12 @@ void updateOffsetDataForSecondaryClients()
 {
     display->setDisplay("C---");
     uint numSecondaries = allSecondaries.size();
+    if (numSecondaries == 0)
+    {
+        // Not sure how we got here with no secondary clients.
+        display->clear();
+        return;
+    }
 
     // Stash the sign config data for each secondary so we don't retrieve it every time.
     std::vector<SignConfigurationData> signConfigurations;
