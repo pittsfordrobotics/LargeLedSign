@@ -31,6 +31,8 @@ ulong currentSyncData = 0;
 ulong newSyncData = 0;
 SignOffsetData currentOffsetData;
 
+std::vector<SecondaryClient *> allSecondaries;
+
 volatile bool isInitialized = false;
 SystemConfiguration* systemConfiguration;
 
@@ -52,33 +54,39 @@ void setup()
     }
 
     display = createStatusDisplay(systemConfiguration->getTm1637DisplayConfiguration());
-    display->setDisplay("---1");
 
+    display->setDisplay("---1");
     buttonProcessor = systemConfiguration->getButtonProcessor();
     buttonProcessor->setActionProcessor(processButtonAction);
 
     display->setDisplay("---2");
-
     neoPixelDisplays = createNeoPixelDisplays(systemConfiguration->getDisplayConfigurationFile());
 
     display->setDisplay("---3");
-
     styleConfiguration = readStyleConfiguration(systemConfiguration->getStyleConfigurationFile());
 
     display->setDisplay("---4");
+    Serial.println("---4");
     initializeDefaultStyleProperties(styleConfiguration->getDefaultStyle());
 
     display->setDisplay("---5");
-
+    Serial.println("---5");
     initializeBatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
 
     display->setDisplay("---6");
-
+    Serial.println("---6");
     initializePowerLed(systemConfiguration->getPowerLedConfiguration());
 
     display->setDisplay("---7");
-
+    Serial.println("---7");
     initializeBLEService(systemConfiguration->getBluetoothConfiguration());
+
+    if (bluetoothConfig.isProxyModeEnabled())
+    {
+        populateSecondaryClients();
+        updateOffsetDataForSecondaryClients();
+    }
+
     display->clear();
     isInitialized = true;
 }
@@ -102,6 +110,11 @@ void loop()
         // Only process inputs if we're not in low power mode.
         readSettingsFromBLE();
         buttonProcessor->update();
+
+        if (bluetoothConfig.isProxyModeEnabled())
+        {
+            updateAllSecondaries();
+        }
     }
 }
 
@@ -855,4 +868,161 @@ const char* copyString(const char* source, size_t length)
     strncpy(dest, source, length);
     dest[length] = '\0';
     return dest;
+}
+
+void populateSecondaryClients()
+{
+    ulong scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
+
+    display->setDisplay("C-0");
+    // Continue to look for secondaries until we pass the timeout after finding at least one.
+    while (millis() < scanTimeout || allSecondaries.size() == 0)
+    {
+        SecondaryClient *secondary = scanForSecondaryClient();
+        if (secondary->isValidClient())
+        {
+            allSecondaries.push_back(secondary);
+            display->setDisplay("C-" + String(allSecondaries.size()));
+
+            // Reset timeout and continue looking for secondaries.
+            scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
+        }
+        else
+        {
+            // Clean up the memory from the invalid peripheral.
+            delete secondary;
+        }
+    }
+
+    // We found all we could in the time interval. Order them by position, lowest position first.
+    std::sort(
+            allSecondaries.begin(),
+            allSecondaries.end(),
+            [](SecondaryClient *&a, SecondaryClient *&b)
+            { return a->getSignOrder() < b->getSignOrder(); });
+
+    display->clear();
+}
+
+SecondaryClient *scanForSecondaryClient()
+{
+    ulong scanTimeout = millis() + MAX_SECONDARY_SCAN_TIME;
+
+    Serial.print("Scanning for peripherals with uuid = ");
+    Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
+    bool allowDuplicateAdvertisements = true;
+    BLE.scanForUuid(BTCOMMON_SECONDARYCONTROLLER_UUID, allowDuplicateAdvertisements);
+
+    BLEDevice peripheral = BLE.available();
+    while (!peripheral)
+    {
+        peripheral = BLE.available();
+
+        if (millis() > scanTimeout)
+        {
+            Serial.println("Scan timed out.");
+            BLE.stopScan();
+            // Return a dummy client - it'll be ignored and cleaned up.
+            return new SecondaryClient(peripheral);
+        }
+    }
+
+    String localName = "unknown";
+    if (peripheral)
+    {
+        Serial.println("Found peripheral.");
+        if (peripheral.hasLocalName())
+        {
+            localName = peripheral.localName();
+            Serial.print("Peripheral name: ");
+            Serial.println(localName);
+        }
+    }
+
+    BLE.stopScan();
+
+    if (peripheral.connect())
+    {
+        Serial.print("Connected to ");
+        Serial.println(localName);
+    }
+    else
+    {
+        Serial.println("Failed to connect!");
+    }
+
+    return new SecondaryClient(peripheral);
+}
+
+void updateOffsetDataForSecondaryClients()
+{
+    display->setDisplay("C---");
+    uint numSecondaries = allSecondaries.size();
+
+    // Stash the sign config data for each secondary so we don't retrieve it every time.
+    std::vector<SignConfigurationData> signConfigurations;
+    for (uint i = 0; i < numSecondaries; i++)
+    {
+        SignStatus status = allSecondaries[i]->getSignStatus();
+        signConfigurations.push_back(status.signConfigurationData);
+    }
+
+    int numCols = 0;
+    for (uint i = 0; i < numSecondaries; i++)
+    {
+        numCols += signConfigurations[i].columnCount;
+    }
+
+    int colsSoFar = 0;
+    for (uint i = 0; i < numSecondaries; i++)
+    {
+        display->setDisplay("C--" + String(i + 1));
+        SignOffsetData offsetData;
+        offsetData.digitsToLeft = i;
+        offsetData.digitsToRight = numSecondaries - i - 1;
+        offsetData.columnsToLeft = colsSoFar;
+        offsetData.columnsToRight = numCols - colsSoFar - signConfigurations[i].columnCount;
+        colsSoFar += signConfigurations[i].columnCount;
+
+        // Write the data back to the secondary
+        allSecondaries[i]->setSignOffsetData(offsetData);
+    }
+
+    display->clear();
+}
+
+void updateAllSecondaries()
+{
+    // NOTE:
+    // After calling this method, the currentXXX variables will be updated to match the newXXX variables.
+    // It's assumed that we won't be running "proxy" and be updating NeoPixel displays at the same time.
+    if (allSecondaries.size() == 0)
+    {
+        return;
+    }
+
+    if (currentBrightness == newBrightness &&
+        currentSpeed == newSpeed &&
+        currentPatternData == newPatternData)
+    {
+        // No changes to propagate.
+        return;
+    }
+    
+    for (uint i = 0; i < allSecondaries.size(); i++)
+    {
+        allSecondaries[i]->setBrightness(newBrightness);
+        allSecondaries[i]->setSpeed(newSpeed);
+        allSecondaries[i]->setPatternData(newPatternData);
+    }
+
+    ulong timestamp = millis();
+    for (uint i = 0; i < allSecondaries.size(); i++)
+    {
+        allSecondaries[i]->updateSyncData(timestamp);
+    }
+
+    currentBrightness = newBrightness;
+    currentSpeed = newSpeed;
+    currentPatternData = newPatternData;
 }

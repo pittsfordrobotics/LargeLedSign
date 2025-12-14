@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include "Bluetooth\SecondaryPeripheral.h"
+#include "Bluetooth\SecondaryClient.h"
 #include <DisplayPatternLib.h>
 #include <StatusDisplayLib.h>
 #include "ArduinoPushButton/ArduinoPushButton.h"
@@ -34,6 +35,9 @@ COPI: 3, 7, 19, 23
 #define ORDER_SELECTOR_PINS  20, 21, 5 // The set of GPIO pin #s that tell the controller what position the sign should be in (MSB to LSB).
 #define STYLE_TYPE_SELECTOR_PINS 16, 17, 18, 19  // The set of GPIO pin #s that tell the controller what style (digit # or logo) the sign should be (MSB to LSB).
 
+#define MAX_SECONDARY_SCAN_TIME 2000  // The amount of time (msec) to wait for a connection to a secondary peripheral.
+#define MAX_TOTAL_SCAN_TIME 10000     // The total time (msec) to spend looking for secondary peripherals.
+
 // Function prototypes
 SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
@@ -58,6 +62,10 @@ byte getSignType();
 byte getSignPosition();
 const char* readBuiltInFile(String filename);
 const char* copyString(const char* source, size_t length);
+void populateSecondaryClients();
+SecondaryClient* scanForSecondaryClient();
+void updateOffsetDataForSecondaryClients();
+void updateAllSecondaries();
 
 const char* defaultSystemConfigJsonForSecondaries = R"json(
     {

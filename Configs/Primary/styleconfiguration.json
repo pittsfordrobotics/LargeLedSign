@@ -9,12 +9,12 @@
             "color1": "0xE616A1"
         },
         {
-            "name": "RainbowRandom",
+            "name": "RainbowRandom_Large",
             "colorPattern": "Rainbow",
             "displayPattern": "Random",
-            "speed": 245,
+            "speed": 240,
             "param1": 255,
-            "param2": 30
+            "param2": 50
         },
         {
             "name": "Fire",
@@ -36,15 +36,15 @@
             "param2": 20
         },
         {
-            "name": "BluePinkRandom",
+            "name": "BluePinkRandom_Large",
             "colorPattern": "TwoColor",
             "displayPattern": "Random",
-            "speed": 255,
+            "speed": 220,
             "color1": "0x0000FF",
             "color2": "0xE616A1",
-            "param1": 255,
-            "param2": 255,
-            "param3": 75
+            "param1": 100,
+            "param2": 100,
+            "param3": 200
         },
         {
             "name": "RedPinkDigit",
@@ -57,15 +57,15 @@
             "param2": 20
         },
         {
-            "name": "RedPinkRandom",
+            "name": "RedPinkRandom_Large",
             "colorPattern": "TwoColor",
             "displayPattern": "Random",
-            "speed": 255,
+            "speed": 220,
             "color1": "0xFF0000",
             "color2": "0xE616A1",
-            "param1": 255,
-            "param2": 255,
-            "param3": 75
+            "param1": 100,
+            "param2": 100,
+            "param3": 200
         }
     ]
 }
