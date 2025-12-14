@@ -17,6 +17,7 @@ class BluetoothConfiguration
         String getLocalName() { return m_localName; }
         bool isSecondaryModeEnabled() { return m_secondaryModeEnabled; }
         bool isProxyModeEnabled() { return m_proxyModeEnabled; }
+        String getProxyClientUuid() { return m_proxyClientUuid; }
 
         BluetoothConfiguration& operator=(const BluetoothConfiguration& other);
 
@@ -29,6 +30,7 @@ class BluetoothConfiguration
         String m_localName{"LED Sign Controller"};
         bool m_secondaryModeEnabled{false};
         bool m_proxyModeEnabled{false};
+        String m_proxyClientUuid{"1221ca8d-4172-4946-bcd1-f9e4b40ba6b0"};
 };
 
 #endif

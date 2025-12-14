@@ -8,6 +8,7 @@ BluetoothConfiguration BluetoothConfiguration::fromJson(JsonVariant bluetoothCon
     config.m_localName = JsonUtils::getValueOrDefault<String>(bluetoothConfig, "localName", config.m_localName);
     config.m_secondaryModeEnabled = JsonUtils::getValueOrDefault<bool>(bluetoothConfig, "isSecondaryModeEnabled", config.m_secondaryModeEnabled);
     config.m_proxyModeEnabled = JsonUtils::getValueOrDefault<bool>(bluetoothConfig, "isProxyModeEnabled", config.m_proxyModeEnabled);
+    config.m_proxyClientUuid = JsonUtils::getValueOrDefault<String>(bluetoothConfig, "proxyClientUuid", config.m_proxyClientUuid);
 
     return config;
 }
@@ -35,4 +36,5 @@ void BluetoothConfiguration::copy(const BluetoothConfiguration& other)
     this->m_localName = other.m_localName;
     this->m_secondaryModeEnabled = other.m_secondaryModeEnabled;
     this->m_proxyModeEnabled = other.m_proxyModeEnabled;
+    this->m_proxyClientUuid = other.m_proxyClientUuid;
 }

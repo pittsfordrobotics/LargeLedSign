@@ -151,6 +151,8 @@ void minimalJsonSetsProperties() {
     TEST_ASSERT_EQUAL_STRING_MESSAGE("LED Sign Controller", btc.getLocalName().c_str(), "Bluetooth local name is not the expected default value.");
     TEST_ASSERT_FALSE_MESSAGE(btc.isSecondaryModeEnabled(), "Secondary mode should be disabled by default.");
     TEST_ASSERT_FALSE_MESSAGE(btc.isProxyModeEnabled(), "Proxy mode should be disabled by default.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("1221ca8d-4172-4946-bcd1-f9e4b40ba6b0", btc.getProxyClientUuid().c_str(), "Bluetooth proxy client UUID is not the expected default value.");
+
     delete sc;
 }
 
@@ -260,6 +262,7 @@ void additionalConfigurationsAreParsed() {
     TEST_ASSERT_EQUAL_STRING_MESSAGE("My LED Sign", btc.getLocalName().c_str(), "Bluetooth local name is not correct.");
     TEST_ASSERT_TRUE_MESSAGE(btc.isSecondaryModeEnabled(), "Secondary mode should be enabled.");
     TEST_ASSERT_TRUE_MESSAGE(btc.isProxyModeEnabled(), "Proxy mode should be enabled.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("11111111-2222-3333-4444-5555555555", btc.getProxyClientUuid().c_str(), "Bluetooth proxy client UUID is not correct.");
     delete sc;
 }
 
@@ -368,7 +371,8 @@ const char* additionalConfigurations()
                 "uuid": "a32090db-3b1f-44f6-8b37-37a28b1a44dd",
                 "localName": "My LED Sign",
                 "isSecondaryModeEnabled": true,
-                "isProxyModeEnabled": true
+                "isProxyModeEnabled": true,
+                "proxyClientUuid": "11111111-2222-3333-4444-5555555555"
             },
             "batteryMonitor": {
                 "enabled": true,
