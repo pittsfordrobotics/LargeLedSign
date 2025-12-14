@@ -2,10 +2,10 @@
 
 // Global variables
 CommonPeripheral* blePeripheralService = nullptr;
-StatusDisplay* display;
-std::vector<NeoPixelDisplay*>* neoPixelDisplays;
-ButtonProcessor* buttonProcessor;
-StyleConfiguration* styleConfiguration;
+StatusDisplay* display = nullptr;
+std::vector<NeoPixelDisplay*>* neoPixelDisplays = nullptr;
+ButtonProcessor* buttonProcessor = nullptr;
+StyleConfiguration* styleConfiguration = nullptr;
 BatteryMonitorConfiguration batteryMonitorConfig;
 PowerLedConfiguration powerLedConfig;
 BluetoothConfiguration bluetoothConfig;
@@ -18,7 +18,7 @@ int sdCardChipSelectPin = SDCARD_CHIPSELECT;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
-byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
+bool inLowPowerMode = false;
 
 // Settings that are updated via bluetooth
 byte currentBrightness;
@@ -196,6 +196,7 @@ SystemConfiguration* readSystemConfiguration()
     defaultConfigJson.replace("[[SIGNTYPE1]]", String(signType));
     defaultConfigJson.replace("[[SIGNTYPE2]]", String(signType));
     defaultConfigJson.replace("[[SIGNPOSITION]]", String(signPosition));
+    // Secondaries don't have their own buttons, so don't bother configuring them.
     defaultConfigJson.replace("[[BUTTONS]]", "");
     // Secondaries don't have their own style configuration, since they're driven by the primary.
     defaultConfigJson.replace("[[STYLECONFIGTYPENAME]]", "none");
