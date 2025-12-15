@@ -82,34 +82,11 @@ void setup()
     display->setDisplay("---7");
     Serial.println("---7");
     bluetoothConfig = systemConfiguration->getBluetoothConfiguration();
-    if (bluetoothConfig.isEnabled() || bluetoothConfig.isProxyModeEnabled())
-    {
-        if (!BLE.begin())
-        {
-            Serial.println("BLE initialization failed!");
-            display->setDisplay("E-1");
-            while (true)
-            {
-                Serial.println("BLE initialization failed!");
-                delay(1000);
-            }
-        }
-    }
+    startBleService();
 
     display->setDisplay("---8");
     Serial.println("---8");
-    if (bluetoothConfig.isProxyModeEnabled())
-    {
-        Serial.println("Populating secondary clients...");
-        populateSecondaryClients();
-        updateOffsetDataForSecondaryClients();
-        // Need to grab default brightness from someplace.
-        if (allSecondaries.size() > 0)
-        {
-            newBrightness = allSecondaries[0]->getSignStatus().brightness;
-            currentBrightness = newBrightness;
-        }
-    }
+    initializeProxyService();
 
     display->setDisplay("---9");
     Serial.println("---9");
@@ -351,6 +328,43 @@ void setManualStyle(StyleDefinition styleDefinition)
     {
         blePeripheralService->setSpeed(newSpeed);
         blePeripheralService->setPatternData(newPatternData);
+    }
+}
+
+void startBleService()
+{
+    if (!bluetoothConfig.isEnabled() && !bluetoothConfig.isProxyModeEnabled())
+    {
+        Serial.println("Neither standalone nor proxy mode is enabled in configuration.");
+        return;
+    }
+
+    if (!BLE.begin())
+    {
+        Serial.println("BLE initialization failed!");
+        display->setDisplay("E-1");
+        while (true)
+        {
+            Serial.println("BLE initialization failed!");
+            delay(1000);
+        }
+    }
+}
+
+void initializeProxyService()
+{
+    if (bluetoothConfig.isProxyModeEnabled())
+    {
+        Serial.println("Populating secondary clients...");
+        populateSecondaryClients();
+        updateOffsetDataForSecondaryClients();
+        // Need to grab default brightness from someplace.
+        // Maybe move the default to be part of the system configuration?
+        if (allSecondaries.size() > 0)
+        {
+            newBrightness = allSecondaries[0]->getSignStatus().brightness;
+            currentBrightness = newBrightness;
+        }
     }
 }
 
