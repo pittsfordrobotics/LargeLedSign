@@ -32,6 +32,7 @@ ulong newSyncData = 0;
 SignOffsetData currentOffsetData;
 
 std::vector<SecondaryClient *> allSecondaries;
+ulong nextSecondaryConnectionCheck = 0;
 
 volatile bool isInitialized = false;
 SystemConfiguration* systemConfiguration;
@@ -87,6 +88,7 @@ void setup()
     display->setDisplay("---8");
     Serial.println("---8");
     initializeProxyService();
+    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
 
     display->setDisplay("---9");
     Serial.println("---9");
@@ -119,6 +121,7 @@ void loop()
         if (bluetoothConfig.isProxyModeEnabled())
         {
             updateAllSecondaries();
+            checkSecondaryConnections();
         }
     }
 }
@@ -1057,4 +1060,60 @@ void updateAllSecondaries()
     currentBrightness = newBrightness;
     currentSpeed = newSpeed;
     currentPatternData = newPatternData;
+}
+
+void checkSecondaryConnections()
+{
+    if (millis() < nextSecondaryConnectionCheck || blePeripheralService->isConnected())
+    {
+        return;
+    }
+
+    display->displayTemporary(" .", 200);
+    bool atLeastOneDisconnected = false;
+    for (uint i = 0; i < allSecondaries.size(); i++)
+    {
+        Serial.print("Secondary [");
+        Serial.print(allSecondaries.at(i)->getLocalName());
+        Serial.print("]");
+        if (allSecondaries.at(i)->isConnected())
+        {
+            Serial.println(" is connected.");
+        }
+        else
+        {
+            Serial.println(" has been disconnected.");
+            atLeastOneDisconnected = true;
+        }
+    }
+
+    if (atLeastOneDisconnected)
+    {
+        resetSecondaryConnections();
+    }
+
+    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
+}
+
+void resetSecondaryConnections()
+{
+    // Taking the easy way out...
+    // Rather than trying to pinpoint which one (or more) of the devices
+    // dropped the connection and trying to only re-establish those connections,
+    // we'll just disconnect all secondaries and reconnect all of them.
+    Serial.println("Resetting all secondary devices and reconnecting...");
+    for (uint i = 0; i < allSecondaries.size(); i++)
+    {
+        if (allSecondaries.at(i)->isConnected())
+        {
+            // deleting the secondary will disconnect the peripheral automatically, but do it here anyways.
+            allSecondaries.at(i)->disconnect();
+        }
+        delete allSecondaries.at(i);
+    }
+
+    allSecondaries.clear();
+    populateSecondaryClients();
+    updateOffsetDataForSecondaryClients();
+    setManualStyle(styleConfiguration->getDefaultStyle());
 }

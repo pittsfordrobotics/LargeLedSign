@@ -37,6 +37,7 @@ COPI: 3, 7, 19, 23
 
 #define MAX_SECONDARY_SCAN_TIME 2000  // The amount of time (msec) to wait for a connection to a secondary peripheral.
 #define MAX_TOTAL_SCAN_TIME 10000     // The total time (msec) to spend looking for secondary peripherals.
+#define SECONDARY_PING_INTERVAL 1500  // The interval (msec) at which to ping secondaries to verify connection.
 
 // Function prototypes
 SystemConfiguration* readSystemConfiguration();
@@ -68,6 +69,8 @@ void populateSecondaryClients();
 SecondaryClient* scanForSecondaryClient();
 void updateOffsetDataForSecondaryClients();
 void updateAllSecondaries();
+void checkSecondaryConnections();
+void resetSecondaryConnections();
 
 const char* defaultSystemConfigJsonForSecondaries = R"json(
     {
