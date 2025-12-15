@@ -6,7 +6,8 @@
         "enabled": true,
         "uuid": "99be4fac-c708-41e5-a149-74047f554cc1",
         "localName": "3181 Primary",
-        "deleteThisComment": "Need to add a 'proxy' boolean"
+        "isProxyModeEnabled": true,
+        "proxyClientUuid": "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0"
     },
     "buttons": {
         "definitions": [

@@ -2,10 +2,10 @@
 
 // Global variables
 CommonPeripheral* blePeripheralService = nullptr;
-StatusDisplay* display;
-std::vector<NeoPixelDisplay*>* neoPixelDisplays;
-ButtonProcessor* buttonProcessor;
-StyleConfiguration* styleConfiguration;
+StatusDisplay* display = nullptr;
+std::vector<NeoPixelDisplay*>* neoPixelDisplays = nullptr;
+ButtonProcessor* buttonProcessor = nullptr;
+StyleConfiguration* styleConfiguration = nullptr;
 BatteryMonitorConfiguration batteryMonitorConfig;
 PowerLedConfiguration powerLedConfig;
 BluetoothConfiguration bluetoothConfig;
@@ -18,7 +18,7 @@ int sdCardChipSelectPin = SDCARD_CHIPSELECT;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
-byte inLowPowerMode = false;          // Indicates the system should be in "low power" mode. This should be a boolean, but there are no bool types.
+bool inLowPowerMode = false;
 
 // Settings that are updated via bluetooth
 byte currentBrightness;
@@ -30,6 +30,9 @@ PatternData newPatternData;
 ulong currentSyncData = 0;
 ulong newSyncData = 0;
 SignOffsetData currentOffsetData;
+
+std::vector<SecondaryClient *> allSecondaries;
+ulong nextSecondaryConnectionCheck = 0;
 
 volatile bool isInitialized = false;
 SystemConfiguration* systemConfiguration;
@@ -52,33 +55,45 @@ void setup()
     }
 
     display = createStatusDisplay(systemConfiguration->getTm1637DisplayConfiguration());
-    display->setDisplay("---1");
 
+    display->setDisplay("---1");
     buttonProcessor = systemConfiguration->getButtonProcessor();
     buttonProcessor->setActionProcessor(processButtonAction);
 
     display->setDisplay("---2");
-
     neoPixelDisplays = createNeoPixelDisplays(systemConfiguration->getDisplayConfigurationFile());
 
     display->setDisplay("---3");
-
     styleConfiguration = readStyleConfiguration(systemConfiguration->getStyleConfigurationFile());
 
     display->setDisplay("---4");
+    Serial.println("---4");
     initializeDefaultStyleProperties(styleConfiguration->getDefaultStyle());
 
     display->setDisplay("---5");
-
-    initializeBatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
+    Serial.println("---5");
+    batteryMonitorConfig = systemConfiguration->getBatteryMonitorConfiguration();
+    initializeBatteryMonitor();
 
     display->setDisplay("---6");
-
-    initializePowerLed(systemConfiguration->getPowerLedConfiguration());
+    Serial.println("---6");
+    powerLedConfig = systemConfiguration->getPowerLedConfiguration();
+    initializePowerLed();
 
     display->setDisplay("---7");
+    Serial.println("---7");
+    bluetoothConfig = systemConfiguration->getBluetoothConfiguration();
+    startBleService();
 
-    initializeBLEService(systemConfiguration->getBluetoothConfiguration());
+    display->setDisplay("---8");
+    Serial.println("---8");
+    initializeProxyService();
+    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
+
+    display->setDisplay("---9");
+    Serial.println("---9");
+    initializeBlePeripheralService();
+
     display->clear();
     isInitialized = true;
 }
@@ -102,6 +117,12 @@ void loop()
         // Only process inputs if we're not in low power mode.
         readSettingsFromBLE();
         buttonProcessor->update();
+
+        if (bluetoothConfig.isProxyModeEnabled())
+        {
+            updateAllSecondaries();
+            checkSecondaryConnections();
+        }
     }
 }
 
@@ -196,6 +217,7 @@ SystemConfiguration* readSystemConfiguration()
     defaultConfigJson.replace("[[SIGNTYPE1]]", String(signType));
     defaultConfigJson.replace("[[SIGNTYPE2]]", String(signType));
     defaultConfigJson.replace("[[SIGNPOSITION]]", String(signPosition));
+    // Secondaries don't have their own buttons, so don't bother configuring them.
     defaultConfigJson.replace("[[BUTTONS]]", "");
     // Secondaries don't have their own style configuration, since they're driven by the primary.
     defaultConfigJson.replace("[[STYLECONFIGTYPENAME]]", "none");
@@ -312,14 +334,11 @@ void setManualStyle(StyleDefinition styleDefinition)
     }
 }
 
-void initializeBLEService(const BluetoothConfiguration& config)
+void startBleService()
 {
-    bluetoothConfig = config;
-    if (!bluetoothConfig.isEnabled())
+    if (!bluetoothConfig.isEnabled() && !bluetoothConfig.isProxyModeEnabled())
     {
-        Serial.println("Bluetooth is disabled in configuration.");
-        display->setDisplay("boff");
-        delay(1500);
+        Serial.println("Neither standalone nor proxy mode is enabled in configuration.");
         return;
     }
 
@@ -332,6 +351,34 @@ void initializeBLEService(const BluetoothConfiguration& config)
             Serial.println("BLE initialization failed!");
             delay(1000);
         }
+    }
+}
+
+void initializeProxyService()
+{
+    if (bluetoothConfig.isProxyModeEnabled())
+    {
+        Serial.println("Populating secondary clients...");
+        populateSecondaryClients();
+        updateOffsetDataForSecondaryClients();
+        // Need to grab default brightness from someplace.
+        // Maybe move the default to be part of the system configuration?
+        if (allSecondaries.size() > 0)
+        {
+            newBrightness = allSecondaries[0]->getSignStatus().brightness;
+            currentBrightness = newBrightness;
+        }
+    }
+}
+
+void initializeBlePeripheralService()
+{
+    if (!bluetoothConfig.isEnabled())
+    {
+        Serial.println("Bluetooth is disabled in configuration.");
+        display->setDisplay("boff");
+        delay(1500);
+        return;
     }
 
     display->setDisplay("C  =");
@@ -409,20 +456,16 @@ void readSettingsFromBLE()
     newPatternData = blePeripheralService->getPatternData();
 }
 
-void initializeBatteryMonitor(const BatteryMonitorConfiguration& config)
+void initializeBatteryMonitor()
 {
-    batteryMonitorConfig = config;
-    
     if (batteryMonitorConfig.isEnabled())
     {
         pinMode(batteryMonitorConfig.getAnalogInputPin(), INPUT);
     }
 }
 
-void initializePowerLed(const PowerLedConfiguration& config)
+void initializePowerLed()
 {
-    powerLedConfig = config;
-
     if (powerLedConfig.isEnabled())
     {
         pinMode(powerLedConfig.getGpioPin(), OUTPUT);
@@ -854,4 +897,223 @@ const char* copyString(const char* source, size_t length)
     strncpy(dest, source, length);
     dest[length] = '\0';
     return dest;
+}
+
+void populateSecondaryClients()
+{
+    ulong scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
+
+    display->setDisplay("C-0");
+    // Continue to look for secondaries until we pass the timeout after finding at least one.
+    while (millis() < scanTimeout || allSecondaries.size() == 0)
+    {
+        SecondaryClient *secondary = scanForSecondaryClient();
+        if (secondary->isValidClient())
+        {
+            allSecondaries.push_back(secondary);
+            display->setDisplay("C-" + String(allSecondaries.size()));
+
+            // Reset timeout and continue looking for secondaries.
+            scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
+        }
+        else
+        {
+            // Clean up the memory from the invalid peripheral.
+            delete secondary;
+        }
+    }
+
+    // We found all we could in the time interval. Order them by position, lowest position first.
+    std::sort(
+            allSecondaries.begin(),
+            allSecondaries.end(),
+            [](SecondaryClient *&a, SecondaryClient *&b)
+            { return a->getSignOrder() < b->getSignOrder(); });
+
+    display->clear();
+}
+
+SecondaryClient *scanForSecondaryClient()
+{
+    ulong scanTimeout = millis() + MAX_SECONDARY_SCAN_TIME;
+
+    Serial.print("Scanning for peripherals with uuid = ");
+    Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
+    bool allowDuplicateAdvertisements = true;
+    BLE.scanForUuid(BTCOMMON_SECONDARYCONTROLLER_UUID, allowDuplicateAdvertisements);
+
+    BLEDevice peripheral = BLE.available();
+    while (!peripheral)
+    {
+        peripheral = BLE.available();
+
+        if (millis() > scanTimeout)
+        {
+            Serial.println("Scan timed out.");
+            BLE.stopScan();
+            // Return a dummy client - it'll be ignored and cleaned up.
+            return new SecondaryClient(peripheral);
+        }
+    }
+
+    String localName = "unknown";
+    if (peripheral)
+    {
+        Serial.println("Found peripheral.");
+        if (peripheral.hasLocalName())
+        {
+            localName = peripheral.localName();
+            Serial.print("Peripheral name: ");
+            Serial.println(localName);
+        }
+    }
+
+    BLE.stopScan();
+
+    if (peripheral.connect())
+    {
+        Serial.print("Connected to ");
+        Serial.println(localName);
+    }
+    else
+    {
+        Serial.println("Failed to connect!");
+    }
+
+    return new SecondaryClient(peripheral);
+}
+
+void updateOffsetDataForSecondaryClients()
+{
+    display->setDisplay("C---");
+    uint numSecondaries = allSecondaries.size();
+    if (numSecondaries == 0)
+    {
+        // Not sure how we got here with no secondary clients.
+        display->clear();
+        return;
+    }
+
+    // Stash the sign config data for each secondary so we don't retrieve it every time.
+    std::vector<SignConfigurationData> signConfigurations;
+    for (uint i = 0; i < numSecondaries; i++)
+    {
+        SignStatus status = allSecondaries[i]->getSignStatus();
+        signConfigurations.push_back(status.signConfigurationData);
+    }
+
+    int numCols = 0;
+    for (uint i = 0; i < numSecondaries; i++)
+    {
+        numCols += signConfigurations[i].columnCount;
+    }
+
+    int colsSoFar = 0;
+    for (uint i = 0; i < numSecondaries; i++)
+    {
+        display->setDisplay("C--" + String(i + 1));
+        SignOffsetData offsetData;
+        offsetData.digitsToLeft = i;
+        offsetData.digitsToRight = numSecondaries - i - 1;
+        offsetData.columnsToLeft = colsSoFar;
+        offsetData.columnsToRight = numCols - colsSoFar - signConfigurations[i].columnCount;
+        colsSoFar += signConfigurations[i].columnCount;
+
+        // Write the data back to the secondary
+        allSecondaries[i]->setSignOffsetData(offsetData);
+    }
+
+    display->clear();
+}
+
+void updateAllSecondaries()
+{
+    // NOTE:
+    // After calling this method, the currentXXX variables will be updated to match the newXXX variables.
+    // It's assumed that we won't be running "proxy" and be updating NeoPixel displays at the same time.
+    if (allSecondaries.size() == 0)
+    {
+        return;
+    }
+
+    if (currentBrightness == newBrightness &&
+        currentSpeed == newSpeed &&
+        currentPatternData == newPatternData)
+    {
+        // No changes to propagate.
+        return;
+    }
+    
+    for (uint i = 0; i < allSecondaries.size(); i++)
+    {
+        allSecondaries[i]->setBrightness(newBrightness);
+        allSecondaries[i]->setSpeed(newSpeed);
+        allSecondaries[i]->setPatternData(newPatternData);
+    }
+
+    ulong timestamp = millis();
+    for (uint i = 0; i < allSecondaries.size(); i++)
+    {
+        allSecondaries[i]->updateSyncData(timestamp);
+    }
+
+    currentBrightness = newBrightness;
+    currentSpeed = newSpeed;
+    currentPatternData = newPatternData;
+}
+
+void checkSecondaryConnections()
+{
+    if (millis() < nextSecondaryConnectionCheck || blePeripheralService->isConnected())
+    {
+        return;
+    }
+
+    display->displayTemporary(" .", 200);
+    bool atLeastOneDisconnected = false;
+    for (uint i = 0; i < allSecondaries.size(); i++)
+    {
+        Serial.print("Secondary [");
+        Serial.print(allSecondaries.at(i)->getLocalName());
+        Serial.print("]");
+        if (allSecondaries.at(i)->isConnected())
+        {
+            Serial.println(" is connected.");
+        }
+        else
+        {
+            Serial.println(" has been disconnected.");
+            atLeastOneDisconnected = true;
+        }
+    }
+
+    if (atLeastOneDisconnected)
+    {
+        resetSecondaryConnections();
+    }
+
+    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
+}
+
+void resetSecondaryConnections()
+{
+    // Taking the easy way out...
+    // Rather than trying to pinpoint which one (or more) of the devices
+    // dropped the connection and trying to only re-establish those connections,
+    // we'll just disconnect all secondaries and reconnect all of them.
+    Serial.println("Resetting all secondary devices and reconnecting...");
+    for (uint i = 0; i < allSecondaries.size(); i++)
+    {
+        if (allSecondaries.at(i)->isConnected())
+        {
+            // deleting the secondary will disconnect the peripheral automatically, but do it here anyways.
+            allSecondaries.at(i)->disconnect();
+        }
+        delete allSecondaries.at(i);
+    }
+
+    allSecondaries.clear();
+    populateSecondaryClients();
+    updateOffsetDataForSecondaryClients();
+    setManualStyle(styleConfiguration->getDefaultStyle());
 }
