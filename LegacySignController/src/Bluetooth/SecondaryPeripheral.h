@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <ArduinoBLE.h>
-#include <BluetoothCommon.h>
+#include "BluetoothCommon.h"
 #include <SignConfigurationData.h>
 #include <SignOffsetData.h>
 
