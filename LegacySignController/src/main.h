@@ -6,7 +6,9 @@
 #include "Bluetooth\SecondaryPeripheral.h"
 #include "Bluetooth\SecondaryClient.h"
 #include <DisplayPatternLib.h>
-#include <StatusDisplayLib.h>
+#include "StatusDisplay\StatusDisplay.h"
+#include "StatusDisplay\NullStatusDisplay.h"
+#include "StatusDisplay\TM1637StatusDisplay.h"
 #include "ArduinoPushButton/ArduinoPushButton.h"
 #include <ButtonProcessor.h>
 #include <Configuration.h>
