@@ -1,8 +1,13 @@
 #ifndef STYLEDEFINITION_H
 #define STYLEDEFINITION_H
 
+#ifdef PIO_UNIT_TESTING
+#include <ArduinoFake.h>
+#else
 #include <Arduino.h>
+#endif
 #include <DisplayPatternLib.h>
+#include <PatternData.h>
 
 class StyleDefinition
 {

@@ -1,10 +1,15 @@
 #ifndef STYLECONFIGURATION_H
 #define STYLECONFIGURATION_H
 
+#ifdef PIO_UNIT_TESTING
+#include <ArduinoFake.h>
+#else
 #include <Arduino.h>
+#endif
 #include <ArduinoJson.h>
 #include <vector>
 #include "Colors.h"
+#include <PatternData.h>
 #include "StyleDefinition.h"
 #include "..\DebugUtils\DebugUtils.h"
 

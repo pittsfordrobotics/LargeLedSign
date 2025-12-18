@@ -17,7 +17,7 @@
 #include "ColorPatterns\SingleColorPattern.h"
 #include "ColorPatterns\TwoColorPattern.h"
 #include "ColorPatterns\BackgroundPlusThree.h"
-#include "PatternData.h"
+#include <PatternData.h>
 #include <vector>
 
 class PatternFactory

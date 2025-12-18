@@ -2,6 +2,7 @@
   "name": "Configuration",
   "version": "1.0.0",
   "dependencies": {
-    "bblanchon/ArduinoJson": "^7.3.0"
+    "bblanchon/ArduinoJson": "^7.3.0",
+    "DebugUtils": "*"
   }
 }

@@ -1,10 +1,14 @@
 #ifndef DISPLAY_CONFIGURATION_H
 #define DISPLAY_CONFIGURATION_H
 
+#ifdef PIO_UNIT_TESTING
+#include <ArduinoFake.h>
+#else
 #include <Arduino.h>
+#endif
 #include <vector>
 #include <ArduinoJson.h>
-#include "..\DebugUtils\DebugUtils.h"
+#include <DebugUtils.h>
 
 #define DISPLAY_CONFIG_DEFAULTBRIGHTNESS 170
 
