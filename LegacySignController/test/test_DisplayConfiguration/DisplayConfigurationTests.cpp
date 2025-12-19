@@ -1,7 +1,7 @@
 #ifdef PIO_UNIT_TESTING
-    #include <ArduinoFake.h>
+#include <ArduinoFake.h>
 #else
-    #include <Arduino.h>
+#include <Arduino.h>
 #endif
 
 #include <unity.h>

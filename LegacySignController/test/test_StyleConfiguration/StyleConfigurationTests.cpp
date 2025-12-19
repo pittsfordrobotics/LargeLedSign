@@ -1,4 +1,9 @@
+#ifdef PIO_UNIT_TESTING
+#include <ArduinoFake.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <unity.h>
 #include <vector>
 #include "StyleConfiguration.h"
