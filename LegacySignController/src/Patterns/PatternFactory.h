@@ -1,8 +1,8 @@
 #ifndef PATTERNFACTORY_H
 #define PATTERNFACTORY_H
 
-#include <Arduino.h>
-#include "DisplayPattern.h"
+#include "ArduinoHeader.h"
+#include "DisplayPatterns\DisplayPattern.h"
 #include "DisplayPatterns\FireDisplayPattern.h"
 #include "DisplayPatterns\SolidDisplayPattern.h"
 #include "DisplayPatterns\SimpleShiftDisplayPattern.h"
