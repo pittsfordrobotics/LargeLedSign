@@ -4,9 +4,9 @@
 #include <Arduino.h>
 #include <pico/mutex.h>
 #include <Adafruit_NeoPixel.h>
-#include <PixelMap.h>
-#include <DisplayConfiguration.h>
-#include <DisplayPattern.h>
+#include "PixelMap\PixelMap.h"
+#include "Configuration\DisplayConfiguration.h"
+#include "Patterns\DisplayPatterns\DisplayPattern.h"
 
 class NeoPixelDisplay
 {

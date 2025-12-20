@@ -3,9 +3,10 @@
 
 #include <Arduino.h>
 #include <ArduinoBLE.h>
-#include <BluetoothCommon.h>
-#include <SignDataLib.h>
-#include <PatternData.h>
+#include "BluetoothCommon.h"
+#include "SignData\SignOffsetData.h"
+#include "SignData\SignStatus.h"
+#include "Patterns\PatternData.h"
 
 /******************************
  * Provides communication functionality to the secondary sign controllers.

@@ -1,7 +1,15 @@
+#ifdef PIO_UNIT_TESTING
+#include <ArduinoFake.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <unity.h>
 #include <vector>
-#include "StyleConfiguration.h"
+#include "Utils\DebugUtils.cpp"
+#include "Configuration\StyleConfiguration.cpp"
+#include "Configuration\StyleDefinition.cpp"
+#include "Patterns\PatternData.cpp"
 
 const char* noDefault();
 const char* invalidDefaultName();

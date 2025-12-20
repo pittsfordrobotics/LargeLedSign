@@ -1,7 +1,13 @@
+#ifdef PIO_UNIT_TESTING
+#include <ArduinoFake.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <unity.h>
 #include <vector>
-#include "DisplayConfiguration.h"
+#include "Utils\DebugUtils.cpp"
+#include "Configuration\DisplayConfiguration.cpp"
 
 const char* fullTestMatrixJson();
 const char* minimalTestMatrixJson();

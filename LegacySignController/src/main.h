@@ -5,11 +5,12 @@
 #include <algorithm>
 #include "Bluetooth\SecondaryPeripheral.h"
 #include "Bluetooth\SecondaryClient.h"
-#include <DisplayPatternLib.h>
-#include <StatusDisplayLib.h>
+#include "Patterns\PatternFactory.h"
+#include "StatusDisplay\NullStatusDisplay.h"
+#include "StatusDisplay\TM1637StatusDisplay.h"
 #include "ArduinoPushButton/ArduinoPushButton.h"
-#include <ButtonProcessor.h>
-#include <Configuration.h>
+#include "ButtonProcessor\ButtonProcessor.h"
+#include "Configuration\Configuration.h"
 #include "NeoPixelDisplay.h"
 
 #define INITIAL_DELAY 2000  // Initial delay to allow serial monitor to connect.

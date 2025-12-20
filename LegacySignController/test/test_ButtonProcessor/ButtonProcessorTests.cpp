@@ -1,12 +1,18 @@
+#ifdef PIO_UNIT_TESTING
+#include <ArduinoFake.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <unity.h>
 #include <vector>
 
 // Reference any needed cpp files directly to avoid pulling in
 // references that can't be resolved with the "fake" Arduino environment.
-#include <DebugUtils.h>
-#include <ButtonProcessor.h>
-#include "../TestHelpers/MockButton.cpp"
+#include "Utils\DebugUtils.cpp"
+#include "ButtonProcessor\ButtonProcessor.cpp"
+#include "ButtonProcessor\ButtonAction.cpp"
+#include "..\TestHelpers\MockButton.cpp"
 
 int lastCallerId(-1);
 String lastActionName("");
