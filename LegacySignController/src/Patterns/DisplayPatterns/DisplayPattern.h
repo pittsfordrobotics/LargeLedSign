@@ -2,7 +2,7 @@
 #define DISPLAYPATTERNS_H
 
 #include <Arduino.h>
-#include "ColorPatterns\ColorPattern.h"
+#include "Patterns\ColorPatterns\ColorPattern.h"
 #include <MathUtils.h>
 #include <PixelMap.h>
 #include <vector>
