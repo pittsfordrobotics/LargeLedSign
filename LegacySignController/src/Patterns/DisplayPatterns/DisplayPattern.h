@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "Patterns\ColorPatterns\ColorPattern.h"
-#include <MathUtils.h>
+#include "Utils\MathUtils.h"
 #include <PixelMap.h>
 #include <vector>
 

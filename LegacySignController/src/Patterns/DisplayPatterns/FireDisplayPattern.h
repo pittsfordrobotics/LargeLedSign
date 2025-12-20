@@ -2,9 +2,9 @@
 #define FIREDISPLAYPATTERN_H
 
 #include <Arduino.h>
-#include "NeoPixelUtils.h"
+#include "Utils\NeoPixelUtils.h"
 #include "DisplayPattern.h"
-#include <MathUtils.h>
+#include "Utils\MathUtils.h"
 #include <vector>
 
 enum class FirePatternType : byte

@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "DisplayPattern.h"
-#include <MathUtils.h>
+#include "Utils\MathUtils.h"
 
 class RandomDisplayPattern : public DisplayPattern
 {
