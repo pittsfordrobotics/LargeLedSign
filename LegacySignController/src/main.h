@@ -5,7 +5,6 @@
 #include <algorithm>
 #include "Bluetooth\SecondaryPeripheral.h"
 #include "Bluetooth\SecondaryClient.h"
-#include <DisplayPatternLib.h>
 #include "Patterns\PatternFactory.h"
 #include "StatusDisplay\NullStatusDisplay.h"
 #include "StatusDisplay\TM1637StatusDisplay.h"

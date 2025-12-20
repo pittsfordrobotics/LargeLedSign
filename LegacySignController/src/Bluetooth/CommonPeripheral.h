@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <vector>
 #include <ArduinoBLE.h>
-#include <PatternData.h>
+#include "Patterns\PatternData.h"
 #include "BluetoothCommon.h"
 
 class CommonPeripheral {

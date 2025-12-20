@@ -9,7 +9,7 @@
 #include <ArduinoJson.h>
 #include <vector>
 #include "Colors.h"
-#include <PatternData.h>
+#include "Patterns\PatternData.h"
 #include "StyleDefinition.h"
 #include "Utils\DebugUtils.h"
 

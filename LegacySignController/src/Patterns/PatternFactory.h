@@ -1,7 +1,7 @@
 #ifndef PATTERNFACTORY_H
 #define PATTERNFACTORY_H
 
-#include "ArduinoHeader.h"
+#include <Arduino.h>
 #include "DisplayPatterns\DisplayPattern.h"
 #include "DisplayPatterns\FireDisplayPattern.h"
 #include "DisplayPatterns\SolidDisplayPattern.h"
@@ -17,7 +17,7 @@
 #include "ColorPatterns\SingleColorPattern.h"
 #include "ColorPatterns\TwoColorPattern.h"
 #include "ColorPatterns\BackgroundPlusThree.h"
-#include <PatternData.h>
+#include "PatternData.h"
 #include <vector>
 
 class PatternFactory

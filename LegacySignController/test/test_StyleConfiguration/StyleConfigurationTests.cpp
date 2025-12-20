@@ -9,6 +9,7 @@
 #include "Utils\DebugUtils.cpp"
 #include "Configuration\StyleConfiguration.cpp"
 #include "Configuration\StyleDefinition.cpp"
+#include "Patterns\PatternData.cpp"
 
 const char* noDefault();
 const char* invalidDefaultName();
