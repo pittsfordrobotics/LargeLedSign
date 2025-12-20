@@ -4,7 +4,8 @@
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include "BluetoothCommon.h"
-#include <SignDataLib.h>
+#include "SignData/SignOffsetData.h"
+#include "SignData/SignStatus.h"
 #include <PatternData.h>
 
 /******************************

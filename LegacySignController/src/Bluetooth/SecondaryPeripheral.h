@@ -4,8 +4,8 @@
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include "BluetoothCommon.h"
-#include <SignConfigurationData.h>
-#include <SignOffsetData.h>
+#include "SignData/SignConfigurationData.h"
+#include "SignData/SignOffsetData.h"
 
 class SecondaryPeripheral : public CommonPeripheral {
   public:

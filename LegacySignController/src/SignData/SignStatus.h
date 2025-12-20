@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <vector>
-#include <SignConfigurationData.h>
+#include "SignConfigurationData.h"
 #include <PatternData.h>
 
 struct SignStatus {
