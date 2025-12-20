@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "Patterns\ColorPatterns\ColorPattern.h"
 #include "Utils\MathUtils.h"
-#include <PixelMap.h>
+#include "PixelMap\PixelMap.h"
 #include <vector>
 
 class DisplayPattern {

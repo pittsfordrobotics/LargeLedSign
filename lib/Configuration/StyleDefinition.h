@@ -6,7 +6,6 @@
 #else
 #include <Arduino.h>
 #endif
-#include <DisplayPatternLib.h>
 #include <PatternData.h>
 
 class StyleDefinition
