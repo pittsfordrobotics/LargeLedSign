@@ -9,8 +9,8 @@
 #include "PowerLedConfiguration.h"
 #include "Tm1637DisplayConfiguration.h"
 #include "BluetoothConfiguration.h"
+#include "ButtonProcessor\ButtonProcessor.h"
 #include "Utils\JsonUtils.h"
-#include <ButtonProcessor.h>
 #include "Utils\DebugUtils.h"
 
 // Typedef for "ButtonFactory".

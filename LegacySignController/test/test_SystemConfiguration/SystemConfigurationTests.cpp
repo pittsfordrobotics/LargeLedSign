@@ -15,8 +15,9 @@
 #include "Configuration\Tm1637DisplayConfiguration.cpp"
 #include "Configuration\BluetoothConfiguration.cpp"
 #include "Configuration\SystemConfiguration.cpp"
-#include <ButtonProcessor.h>
-#include "../TestHelpers/MockButton.cpp"
+#include "ButtonProcessor\ButtonProcessor.cpp"
+#include "ButtonProcessor\ButtonAction.cpp"
+#include "..\TestHelpers\MockButton.cpp"
 
 int lastCallerId(-1);
 String lastActionName("");

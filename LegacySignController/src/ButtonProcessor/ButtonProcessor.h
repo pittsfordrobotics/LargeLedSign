@@ -7,7 +7,7 @@
 #include <algorithm>
 #include "GenericButton.h"
 #include "ButtonAction.h"
-#include "..\DebugUtils\DebugUtils.h"
+#include "Utils\DebugUtils.h"
 
 // The "ButtonActionProcessor" is a function pointer type for processing button actions.
 // It accepts the caller button ID, action name, and a list of string arguments.

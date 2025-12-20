@@ -10,7 +10,7 @@
 #include "StatusDisplay\NullStatusDisplay.h"
 #include "StatusDisplay\TM1637StatusDisplay.h"
 #include "ArduinoPushButton/ArduinoPushButton.h"
-#include <ButtonProcessor.h>
+#include "ButtonProcessor\ButtonProcessor.h"
 #include "Configuration\Configuration.h"
 #include "NeoPixelDisplay.h"
 
