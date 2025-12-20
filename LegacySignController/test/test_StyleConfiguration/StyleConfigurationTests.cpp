@@ -6,7 +6,9 @@
 
 #include <unity.h>
 #include <vector>
-#include "StyleConfiguration.h"
+#include "Utils\DebugUtils.cpp"
+#include "Configuration\StyleConfiguration.cpp"
+#include "Configuration\StyleDefinition.cpp"
 
 const char* noDefault();
 const char* invalidDefaultName();

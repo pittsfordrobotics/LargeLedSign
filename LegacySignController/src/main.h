@@ -11,7 +11,7 @@
 #include "StatusDisplay\TM1637StatusDisplay.h"
 #include "ArduinoPushButton/ArduinoPushButton.h"
 #include <ButtonProcessor.h>
-#include <Configuration.h>
+#include "Configuration\Configuration.h"
 #include "NeoPixelDisplay.h"
 
 #define INITIAL_DELAY 2000  // Initial delay to allow serial monitor to connect.

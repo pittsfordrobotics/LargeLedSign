@@ -8,7 +8,7 @@
 #endif
 #include <vector>
 #include <ArduinoJson.h>
-#include <DebugUtils.h>
+#include "Utils\DebugUtils.h"
 
 #define DISPLAY_CONFIG_DEFAULTBRIGHTNESS 170
 

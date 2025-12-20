@@ -9,9 +9,13 @@
 
 // Reference any needed cpp files directly to avoid pulling in
 // references that can't be resolved with the "fake" Arduino environment.
-#include <Configuration.h>
+#include "Utils\DebugUtils.cpp"
+#include "Configuration\PowerLedConfiguration.cpp"
+#include "Configuration\BatteryMonitorConfiguration.cpp"
+#include "Configuration\Tm1637DisplayConfiguration.cpp"
+#include "Configuration\BluetoothConfiguration.cpp"
+#include "Configuration\SystemConfiguration.cpp"
 #include <ButtonProcessor.h>
-#include <DebugUtils.h>
 #include "../TestHelpers/MockButton.cpp"
 
 int lastCallerId(-1);

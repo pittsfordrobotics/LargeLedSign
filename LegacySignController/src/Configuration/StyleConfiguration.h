@@ -11,7 +11,7 @@
 #include "Colors.h"
 #include <PatternData.h>
 #include "StyleDefinition.h"
-#include "..\DebugUtils\DebugUtils.h"
+#include "Utils\DebugUtils.h"
 
 class StyleConfiguration
 {

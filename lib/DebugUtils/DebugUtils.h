@@ -1,7 +1,11 @@
 #ifndef DEBUGUTILS_H
 #define DEBUGUTILS_H
 
+#ifdef PIO_UNIT_TESTING
+#include <ArduinoFake.h>
+#else
 #include <Arduino.h>
+#endif
 
 // This class is used to provide debug output.
 // Unit tests can't use the 'Serial' object, so this

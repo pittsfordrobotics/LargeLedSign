@@ -5,7 +5,7 @@
 #include <pico/mutex.h>
 #include <Adafruit_NeoPixel.h>
 #include "PixelMap\PixelMap.h"
-#include <DisplayConfiguration.h>
+#include "Configuration\DisplayConfiguration.h"
 #include "Patterns\DisplayPatterns\DisplayPattern.h"
 
 class NeoPixelDisplay

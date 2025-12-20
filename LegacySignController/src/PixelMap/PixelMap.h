@@ -1,9 +1,10 @@
 #ifndef PIXEL_MAP_H
 #define PIXEL_MAP_H
 
+#include <Arduino.h>
 #include <vector>
 #include <algorithm>
-#include <DisplayConfiguration.h>
+#include "Configuration\DisplayConfiguration.h"
 
 class PixelMap
 {

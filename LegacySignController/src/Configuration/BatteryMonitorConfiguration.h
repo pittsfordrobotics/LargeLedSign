@@ -2,7 +2,7 @@
 #define BATTERYMONITORCONFIGURATION_H
 
 #include <ArduinoJson.h>
-#include "JsonUtils.h"
+#include "Utils\JsonUtils.h"
 
 class BatteryMonitorConfiguration {
     public:

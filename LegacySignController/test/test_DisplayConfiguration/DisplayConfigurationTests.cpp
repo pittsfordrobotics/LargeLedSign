@@ -6,7 +6,8 @@
 
 #include <unity.h>
 #include <vector>
-#include "DisplayConfiguration.h"
+#include "Utils\DebugUtils.cpp"
+#include "Configuration\DisplayConfiguration.cpp"
 
 const char* fullTestMatrixJson();
 const char* minimalTestMatrixJson();

@@ -9,9 +9,9 @@
 #include "PowerLedConfiguration.h"
 #include "Tm1637DisplayConfiguration.h"
 #include "BluetoothConfiguration.h"
-#include "JsonUtils.h"
-#include "..\ButtonProcessor\ButtonProcessor.h"
-#include "..\DebugUtils\DebugUtils.h"
+#include "Utils\JsonUtils.h"
+#include <ButtonProcessor.h>
+#include "Utils\DebugUtils.h"
 
 // Typedef for "ButtonFactory".
 // It takes a GPIO pin number and returns a pointer to a GenericButton implementation.
