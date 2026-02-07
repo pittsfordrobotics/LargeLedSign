@@ -1,8 +1,7 @@
 #include "FireDisplayPattern.h"
 
-FireDisplayPattern::FireDisplayPattern(FirePatternType patternType) : DisplayPattern()
+FireDisplayPattern::FireDisplayPattern() : DisplayPattern()
 {
-    m_patternType = patternType;
     generatePallet();
 }
 
@@ -19,117 +18,41 @@ void FireDisplayPattern::setCoolingAmount(byte coolingAmount)
 void FireDisplayPattern::resetInternal(PixelMap* pixelMap)
 {
     pixelMap->fill(0);
-    m_combinedRowGroups.clear();
 
-    switch (m_patternType)
-    {
-        case FirePatternType::IndividualRows:
-            populateCombinedGroupsForIndividualColumns(pixelMap);
-            break;
-        case FirePatternType::Digit:
-            populateCombinedGroupsForDigits(pixelMap);
-            break;
-        case FirePatternType::Solid:
-        default:
-            populateAllRows(pixelMap);
-            break;
-    }
+    int numRows = pixelMap->getRowCount();
+    int numCols = pixelMap->getColumnCount();
 
     // Initialize the row heat groups based on the row groupings
     // and set all the initial heats to 0
-    m_combinedRowHeats.clear();
-    for (std::vector<std::vector<int>> rowGroup : m_combinedRowGroups)
+    m_heatMap.clear();
+    for (int col = 0; col < numCols; col++)
     {
-        std::vector<int> rowHeatsForGroup;
-        for (std::vector<int> rows : rowGroup)
+        std::vector<int> heatsForRow;
+        for (int row = 0; row < numRows; row++)
         {
-            rowHeatsForGroup.push_back(0);
+            heatsForRow.push_back(0);
         }
 
-        m_combinedRowHeats.push_back(rowHeatsForGroup);
+        m_heatMap.push_back(heatsForRow);
     }
 }
 
 void FireDisplayPattern::updateInternal(PixelMap* pixelMap)
 {
-    for (int group = 0; group < m_combinedRowGroups.size(); group++)
+    for (int col = 0; col < m_heatMap.size(); col++)
     {
-        updateRowHeats(m_combinedRowHeats[group]);
-        int numRows = m_combinedRowHeats[group].size();
-        for (int row = 0; row < numRows; row++)
+        updateRowHeats(m_heatMap[col]);
+        int numRows = m_heatMap[col].size();
+
+        for (int row = 0; row < m_heatMap[col].size(); row++)
         {
-            byte temperature = m_combinedRowHeats[group][row];
+            byte temperature = m_heatMap[col][row];
             uint32_t color = m_heatColors[temperature];
-            for (int pixel : m_combinedRowGroups[group][numRows - row - 1])
-            {
-                pixelMap->setRawPixelColor(pixel, color);
-            }
+
+            // Row 0 in the pixel map is on top, 
+            // row 0 in the heat map is on the bottom.
+            pixelMap->setColorInPixelMap(numRows - row, col, color);
         }
-    }
-}
-
-void FireDisplayPattern::populateAllRows(PixelMap* pixelMap)
-{
-    std::vector<std::vector<int>> allRows;
-    for (std::vector<int>* row : pixelMap->getAllRows())
-    {
-        std::vector<int> pixelsInRow;
-        for (int pixel : *row)
-        {
-            pixelsInRow.push_back(pixel);
-        }
-        allRows.push_back(pixelsInRow);
-    }
-
-    m_combinedRowGroups.push_back(allRows);
-}
-
-void FireDisplayPattern::populateCombinedGroupsForIndividualColumns(PixelMap* pixelMap)
-{
-    // Get the full list of columns and rows.
-    // Each column will be a grouping.
-    // Find what row each column's pixels are in to get the row mappings.
-    // If a column doesn't have a pixel in a specific row, add and empty pixel list for that row.
-    std::vector<std::vector<int>*> columns = pixelMap->getAllColumns();
-    std::vector<std::vector<int>*> rows = pixelMap->getAllRows();
-    
-    for(std::vector<int>* column : columns)
-    {
-        std::vector<std::vector<int>> rowGroup;
-        for (std::vector<int>* row : rows)
-        {
-            std::vector<int> pixelsInRow;
-            for (int pixel : *column)
-            {
-                if (std::find(row->begin(), row->end(), pixel) != row->end())
-                {
-                    pixelsInRow.push_back(pixel);
-                }
-            }
-
-            rowGroup.push_back(pixelsInRow);
-        }
-
-        m_combinedRowGroups.push_back(rowGroup);
-    }
-}
-
-void FireDisplayPattern::populateCombinedGroupsForDigits(PixelMap* pixelMap)
-{
-    for (uint16_t digitNumber = 0; digitNumber < pixelMap->getDigitCount(); digitNumber++)
-    {
-        std::vector<std::vector<int>> digitRows;
-        for (std::vector<int>* row : pixelMap->getRowsForDigit(digitNumber))
-        {
-            std::vector<int> rowPixels;
-            for (int pixel : *row)
-            {
-                rowPixels.push_back(pixel);
-            }
-            digitRows.push_back(rowPixels);
-        }
-
-        m_combinedRowGroups.push_back(digitRows);
     }
 }
 

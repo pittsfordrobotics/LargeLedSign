@@ -17,8 +17,6 @@ enum class DisplayPatternType : byte
     Line = 9,
     LowPower = 10,
     Fire = 11,
-    Fire2 = 12,
-    Fire3 = 13,
     Rotation = 14,
     RotationCCW = 15,
     SpotLight = 16,
@@ -79,14 +77,6 @@ class DisplayPatternTypeHelper
             if (type.equalsIgnoreCase("fire") || type.equalsIgnoreCase(String((int)DisplayPatternType::Fire)))
             {
                 return DisplayPatternType::Fire;
-            }
-            if (type.equalsIgnoreCase("fire2") || type.equalsIgnoreCase(String((int)DisplayPatternType::Fire2)))
-            {
-                return DisplayPatternType::Fire2;
-            }
-            if (type.equalsIgnoreCase("fire3") || type.equalsIgnoreCase(String((int)DisplayPatternType::Fire3)))
-            {
-                return DisplayPatternType::Fire3;
             }
             if (type.equalsIgnoreCase("rotation") || type.equalsIgnoreCase(String((int)DisplayPatternType::Rotation)))
             {
