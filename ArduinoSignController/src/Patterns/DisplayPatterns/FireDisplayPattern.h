@@ -7,11 +7,6 @@
 #include "Utils\MathUtils.h"
 #include <vector>
 
-enum class FirePatternType : byte
-{
-    IndividualRows = 2
-};
-
 class FireDisplayPattern : public DisplayPattern
 {
     public:
@@ -26,7 +21,6 @@ class FireDisplayPattern : public DisplayPattern
         virtual void resetInternal(PixelMap* pixelMap);
 
     private:
-        FirePatternType m_patternType{FirePatternType::IndividualRows};
         byte m_sparking{120};
         byte m_cooling{50};
         uint32_t m_heatColors[256];
@@ -40,8 +34,6 @@ class FireDisplayPattern : public DisplayPattern
 
         void updateRowHeats(std::vector<int> &rowHeats);
         void generatePallet();
-        void populateAllRows(PixelMap* pixelMap);
-        void populateCombinedGroupsForDigits(PixelMap* pixelMap);
         void populateCombinedGroupsForIndividualColumns(PixelMap* pixelMap);
 };
 
