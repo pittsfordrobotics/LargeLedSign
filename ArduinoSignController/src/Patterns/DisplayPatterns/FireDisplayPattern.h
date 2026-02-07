@@ -15,7 +15,7 @@ enum class FirePatternType : byte
 class FireDisplayPattern : public DisplayPattern
 {
     public:
-        FireDisplayPattern(FirePatternType patternType);
+        FireDisplayPattern();
         void setSparkingAmount(byte sparkingAmount);
         void setCoolingAmount(byte coolingAmount);
 

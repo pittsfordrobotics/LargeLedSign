@@ -1,8 +1,7 @@
 #include "FireDisplayPattern.h"
 
-FireDisplayPattern::FireDisplayPattern(FirePatternType patternType) : DisplayPattern()
+FireDisplayPattern::FireDisplayPattern() : DisplayPattern()
 {
-    m_patternType = patternType;
     generatePallet();
 }
 

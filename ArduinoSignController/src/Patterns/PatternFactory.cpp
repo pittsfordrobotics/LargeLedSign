@@ -97,7 +97,7 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         }
         case DisplayPatternType::Fire:
         {
-            FireDisplayPattern* pattern = new FireDisplayPattern(FirePatternType::IndividualRows);
+            FireDisplayPattern* pattern = new FireDisplayPattern();
             pattern->setColorPattern(colorPattern);
             pattern->setSparkingAmount(params[startOfDisplayParameters]);
             pattern->setCoolingAmount(params[startOfDisplayParameters + 1]);
