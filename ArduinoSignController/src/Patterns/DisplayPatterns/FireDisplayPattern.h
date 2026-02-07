@@ -25,8 +25,9 @@ class FireDisplayPattern : public DisplayPattern
         byte m_cooling{50};
         uint32_t m_heatColors[256];
         
-        // Maintains the current "heat" level for each row grouping.
-        std::vector<std::vector<int>> m_combinedRowHeats;
+        // Maintains the current "heat" level for the rows in each column.
+        // m_rowHeats[column][row] = heat_value
+        std::vector<std::vector<int>> m_rowHeats;
 
         // List of row groups (ex: digits), each of which contains a list of rows,
         // each of which contains the set of pixels in the row.
