@@ -9,8 +9,6 @@
 
 enum class FirePatternType : byte
 {
-    Solid = 0,
-    Digit = 1,
     IndividualRows = 2
 };
 
@@ -28,7 +26,7 @@ class FireDisplayPattern : public DisplayPattern
         virtual void resetInternal(PixelMap* pixelMap);
 
     private:
-        FirePatternType m_patternType{FirePatternType::Solid};
+        FirePatternType m_patternType{FirePatternType::IndividualRows};
         byte m_sparking{120};
         byte m_cooling{50};
         uint32_t m_heatColors[256];

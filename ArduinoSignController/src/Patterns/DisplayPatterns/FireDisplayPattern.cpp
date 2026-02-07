@@ -26,10 +26,6 @@ void FireDisplayPattern::resetInternal(PixelMap* pixelMap)
         case FirePatternType::IndividualRows:
             populateCombinedGroupsForIndividualColumns(pixelMap);
             break;
-        case FirePatternType::Digit:
-            populateCombinedGroupsForDigits(pixelMap);
-            break;
-        case FirePatternType::Solid:
         default:
             populateAllRows(pixelMap);
             break;
@@ -111,25 +107,6 @@ void FireDisplayPattern::populateCombinedGroupsForIndividualColumns(PixelMap* pi
         }
 
         m_combinedRowGroups.push_back(rowGroup);
-    }
-}
-
-void FireDisplayPattern::populateCombinedGroupsForDigits(PixelMap* pixelMap)
-{
-    for (uint16_t digitNumber = 0; digitNumber < pixelMap->getDigitCount(); digitNumber++)
-    {
-        std::vector<std::vector<int>> digitRows;
-        for (std::vector<int>* row : pixelMap->getRowsForDigit(digitNumber))
-        {
-            std::vector<int> rowPixels;
-            for (int pixel : *row)
-            {
-                rowPixels.push_back(pixel);
-            }
-            digitRows.push_back(rowPixels);
-        }
-
-        m_combinedRowGroups.push_back(digitRows);
     }
 }
 
