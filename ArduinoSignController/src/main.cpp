@@ -195,13 +195,6 @@ SystemConfiguration* readSystemConfiguration()
     byte signType = getSignType();
     byte signPosition = getSignPosition();
     
-    // Legacy sign type with SD Card connected on "alt" pins
-    // but no SD card present (for testing) gives Type=0, Position=2.
-    // Shouldn't be an issue in practice.
-
-    // TBD: what does Primary give?
-    // Shouldn't be an issue in practice (???).
-
     // Secondaries should give correct type and position.
     // Assume if we got here, we're dealing with a Secondary or the pit sign.
     Serial.print("Detected sign type: ");
@@ -216,11 +209,15 @@ SystemConfiguration* readSystemConfiguration()
     // The replace function seems to get very confused when the source string is present more than once.
     defaultConfigJson.replace("[[SIGNTYPE1]]", String(signType));
     defaultConfigJson.replace("[[SIGNTYPE2]]", String(signType));
+    // **** This replaces as a "7"??
     defaultConfigJson.replace("[[SIGNPOSITION]]", String(signPosition));
     // Secondaries don't have their own buttons, so don't bother configuring them.
     defaultConfigJson.replace("[[BUTTONS]]", "");
     // Secondaries don't have their own style configuration, since they're driven by the primary.
     defaultConfigJson.replace("[[STYLECONFIGTYPENAME]]", "none");
+
+    Serial.println("Generated default system configuration:");
+    Serial.println(defaultConfigJson);
 
     return SystemConfiguration::ParseJson(
         defaultConfigJson.c_str(),
@@ -809,21 +806,27 @@ const char* getSdFileContents(String filename)
 
 byte getSignType()
 {
-    // Check the "test" pin
     pinMode(TEST_MODE_PIN, INPUT_PULLUP);
+    std::vector<int> typeSelectorPins = {STYLE_TYPE_SELECTOR_PINS};
+
+    for (uint i = 0; i < typeSelectorPins.size(); i++)
+    {
+        pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
+    }
+
+    delay(100);
+
+    // Check the "test" pin
     if (digitalRead(TEST_MODE_PIN) == LOW)
     {
         Serial.println("Test mode detected. Returning 255 for TestMatrix sign type.");
         return 255;
     }
 
-    std::vector<int> typeSelectorPins = {STYLE_TYPE_SELECTOR_PINS};
-
     // Pull the pin low to indicate active.
     byte type = 0;
     for (uint i = 0; i < typeSelectorPins.size(); i++)
     {
-        pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
         type = type << 1;
         if (digitalRead(typeSelectorPins.at(i)) == LOW)
         {
@@ -838,12 +841,18 @@ byte getSignPosition()
 {
     std::vector<int> orderSelectorPins = {ORDER_SELECTOR_PINS};
 
+    for (uint i = 0; i < orderSelectorPins.size(); i++)
+    {
+        pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
+    }
+
+    delay(100);
+
     // Pull the pin low to indicate active.
     byte order = 0;
     for (uint i = 0; i < orderSelectorPins.size(); i++)
     {
         order = order << 1;
-        pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
         if (digitalRead(orderSelectorPins.at(i)) == LOW)
         {
             order++;
