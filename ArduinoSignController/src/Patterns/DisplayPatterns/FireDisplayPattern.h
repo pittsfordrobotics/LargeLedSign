@@ -23,19 +23,16 @@ class FireDisplayPattern : public DisplayPattern
     private:
         byte m_sparking{120};
         byte m_cooling{50};
+
+        // Maps the byte value of "temperature" to an actual RGB color value.
         uint32_t m_heatColors[256];
         
         // Maintains the current "heat" level for the rows in each column.
-        // m_rowHeats[column][row] = heat_value
-        std::vector<std::vector<int>> m_rowHeats;
-
-        // List of row groups (ex: digits), each of which contains a list of rows,
-        // each of which contains the set of pixels in the row.
-        std::vector<std::vector<std::vector<int>>> m_combinedRowGroups;
+        // m_heatMap[column][row] = heat_value
+        std::vector<std::vector<int>> m_heatMap;
 
         void updateRowHeats(std::vector<int> &rowHeats);
         void generatePallet();
-        void populateCombinedGroupsForIndividualColumns(PixelMap* pixelMap);
 };
 
 #endif
