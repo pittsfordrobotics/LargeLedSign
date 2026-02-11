@@ -707,7 +707,32 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
         return;
     }
 
-    // TBD: logic for "secondaryBatteryVoltage" and possibly "resetSecondaries"
+    if (actionName == "secondaryBatteryVoltage" && bluetoothConfig.isProxyModeEnabled())
+    {
+        if (allSecondaries.size() == 0)
+        {
+            display->displayTemporary("-0-", 1000);
+            return;
+        }
+
+        std::vector<String> stringsToDisplay;
+        stringsToDisplay.reserve(allSecondaries.size());
+        for (uint i = 0; i < allSecondaries.size(); i++)
+        {
+            char buffer[16];
+            snprintf(buffer, sizeof(buffer), "%d=%.2f", i + 1, allSecondaries[i]->getBatteryVoltage());
+            stringsToDisplay.push_back(String(buffer));
+        }
+
+        display->displaySequence(stringsToDisplay, 1500);
+        return;
+    }
+
+    if (actionName == "resetSecondaries" && bluetoothConfig.isProxyModeEnabled())
+    {
+        resetSecondaryConnections();
+        return;
+    }
 
     if (actionName == "changeStyle")
     {
