@@ -19,7 +19,16 @@ void DisplayPattern::setColorPattern(ColorPattern* colorPattern)
 
 void DisplayPattern::setSpeed(byte speed)
 {
-    m_iterationDelay = MathUtils::rescaleInput(500, 5, speed);
+    // Rescale based on "frame rate".
+    // Slowest speed will be hard-coded to 0.5 frames per sec,
+    // max speed will be the fastest the display pattern can handle.
+    int maxMSecPerFrame = getMaxUpdateTimeMillis() + MAX_NEOPIXEL_UPDATE_TIME_MILLIS;
+    int maxFrameRateX1000 = (double) 1 / maxMSecPerFrame * 1000 * 1000;
+    int minFrameRateX1000 = 500;  // 1 frame every 2 seconds
+    int scaledFrameRateX1000 = MathUtils::rescaleInput(minFrameRateX1000, maxFrameRateX1000, speed);
+
+    // Convert scaled frame rate back to millisecond iteration delay between frames.
+    m_iterationDelay = (1000 * 1000) / scaledFrameRateX1000;
 }
 
 void DisplayPattern::reset(PixelMap* pixelMap)

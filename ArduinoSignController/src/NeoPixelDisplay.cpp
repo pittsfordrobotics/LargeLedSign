@@ -144,7 +144,6 @@ void NeoPixelDisplay::outputPixels()
         m_neoPixels->setPixelColor(i, m_pixelMap->getRawPixelColor(i));
     }
 
-    unsigned long start = millis();
     m_neoPixels->show();
     
     while (!m_neoPixels->canShow())

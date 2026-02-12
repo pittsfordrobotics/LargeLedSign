@@ -1,6 +1,9 @@
 #ifndef DISPLAYPATTERNS_H
 #define DISPLAYPATTERNS_H
 
+#define DEFAULT_MAX_UPDATE_TIME_MILLIS 10
+#define MAX_NEOPIXEL_UPDATE_TIME_MILLIS 15
+
 #include <Arduino.h>
 #include "Patterns\ColorPatterns\ColorPattern.h"
 #include "Utils\MathUtils.h"
@@ -32,6 +35,9 @@ class DisplayPattern {
 
         // Called by the "reset" method to perform any pattern-specific reset logic.
         virtual void resetInternal(PixelMap* pixelMap) = 0;
+
+        // The maximum amount of time (in msec) that this pattern should take to update the largest pixel map.
+        virtual uint16_t getMaxUpdateTimeMillis() {return DEFAULT_MAX_UPDATE_TIME_MILLIS;};
         
         ColorPattern* m_colorPattern;
 
