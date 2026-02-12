@@ -22,6 +22,10 @@ class DisplayPattern {
         bool update(PixelMap* pixelMap);
         void reset(PixelMap* pixelMap);
 
+        double getAverageTimeUpdatingPixelMap();
+        uint16_t getDroppedFrames();
+        void resetTelemetry();
+
     protected:
         // Called by the "update" method when it's time to update the display.
         virtual void updateInternal(PixelMap* pixelMap) = 0;
@@ -34,6 +38,9 @@ class DisplayPattern {
     private:
         uint32_t m_nextUpdate{0};
         uint16_t m_iterationDelay{0};
+        uint16_t m_droppedFrames{0};
+        uint32_t m_totalTimeUpdatingPixelMap{0};
+        uint16_t m_numberOfPixelMapUpdates{0};
 };
 
 #endif

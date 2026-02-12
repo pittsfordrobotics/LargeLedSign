@@ -30,11 +30,19 @@ class NeoPixelDisplay
         void setColumnsToLeft(uint16_t colsToLeft);
         void setColumnsToRight(uint16_t colsToRight);
 
+        void resetTelemetry();
+        double getAverageTimeUpdatingPixelMap();
+        uint16_t getDroppedFrames();
+        double getAverageTimeUpdatingLeds();
+
     private:
         mutex_t m_lockObject;  // Pico SDK mutex for locking when dealing with display pattern changes.
         Adafruit_NeoPixel* m_neoPixels;
         PixelMap* m_pixelMap;
         DisplayPattern* m_displayPattern;
+
+        uint32_t m_totalTimeUpdatingPixels{0};
+        uint16_t m_numberOfPixelUpdates{0};
 
         void outputPixels();
 };

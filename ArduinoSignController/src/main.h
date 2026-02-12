@@ -14,7 +14,7 @@
 #include "NeoPixelDisplay.h"
 
 #define INITIAL_DELAY 2000  // Initial delay to allow serial monitor to connect.
-#define TELEMETRYINTERVAL 2000     // Interval (msec) for updating the telemetry.
+#define TELEMETRYINTERVAL 3000     // Interval (msec) for updating the telemetry.
 #define TEST_MODE_PIN 13       // The GPIO pin # that is used to put the controller into test mode. (Low brightness, and use TestMatrix display.)
 
 /*

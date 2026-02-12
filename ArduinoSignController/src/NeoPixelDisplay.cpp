@@ -135,6 +135,8 @@ void NeoPixelDisplay::setSpeed(byte speed)
 
 void NeoPixelDisplay::outputPixels()
 {
+    uint32_t startTime = millis();
+
     // No locking here:
     // This is an internal method and we should have already taken a lock.
     for (uint i = 0; i < m_pixelMap->getPixelCount(); i++)
@@ -149,5 +151,50 @@ void NeoPixelDisplay::outputPixels()
     {
         // wait for the "show" to complete
     }
+
+    m_totalTimeUpdatingPixels += (millis() - startTime);
+    m_numberOfPixelUpdates++;
 }
+
+void NeoPixelDisplay::resetTelemetry()
+{
+    m_numberOfPixelUpdates = 0;
+    m_totalTimeUpdatingPixels = 0;
+
+    if (m_displayPattern)
+    {
+        m_displayPattern->resetTelemetry();
+    }
+}
+
+double NeoPixelDisplay::getAverageTimeUpdatingLeds()
+{
+    if (m_numberOfPixelUpdates == 0)
+    {
+        return 0;
+    }
+
+    return (double) m_totalTimeUpdatingPixels / m_numberOfPixelUpdates;
+}
+
+double NeoPixelDisplay::getAverageTimeUpdatingPixelMap()
+{
+    if (m_displayPattern)
+    {
+        return m_displayPattern->getAverageTimeUpdatingPixelMap();
+    }
+
+    return 0;
+}
+
+uint16_t NeoPixelDisplay::getDroppedFrames()
+{
+    if (m_displayPattern)
+    {
+        return m_displayPattern->getDroppedFrames();
+    }
+
+    return 0;
+}
+
 

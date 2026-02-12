@@ -630,6 +630,16 @@ void updateLedTelemetry()
             Serial.print(diff);
             Serial.print(" msec; avg msec per iteration: ");
             Serial.println(timePerIteration);
+
+            NeoPixelDisplay* firstDisplay = neoPixelDisplays->at(0);
+            Serial.print("Dropped frames: ");
+            Serial.print(firstDisplay->getDroppedFrames());
+            Serial.print("; Avg pixelmap time: ");
+            Serial.print(firstDisplay->getAverageTimeUpdatingPixelMap());
+            Serial.print("; Avg NeoPixel time: ");
+            Serial.println(firstDisplay->getAverageTimeUpdatingLeds());
+            
+            firstDisplay->resetTelemetry();
         }
 
         lastLedTelemetryTimestamp = timestamp;
