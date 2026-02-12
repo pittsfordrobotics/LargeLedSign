@@ -60,17 +60,22 @@ void RotationDisplayPattern::resetInternal(PixelMap* pixelMap)
 
 void RotationDisplayPattern::updateInternal(PixelMap* pixelMap)
 {
+    // Cache values that don't change
+    const int rowCount = pixelMap->getRowCount();
+    const int colCount = pixelMap->getColumnCount();
+    const float rayAngleIncrement = 360.0f / m_numberOfRays;
+    
     // Due to the fact that the pixel buffer's row and column numbers start
     // at 0 in the top-left, an increasing angle is clockwise.
     float newAngleDeg = m_isClockwise ? m_currentAngleDeg + m_angleIncrementDeg : m_currentAngleDeg - m_angleIncrementDeg;
     uint32_t currentColor = m_colorPattern->getNextColor();
 
-    for (int row = 0; row < pixelMap->getRowCount(); row++)
+    for (int row = 0; row < rowCount; row++)
     {
-        for (int col = 0; col < pixelMap->getColumnCount(); col++)
+        for (int col = 0; col < colCount; col++)
         {
             float angleToPixelDeg = m_pixelAnglesDeg[row][col];
-            float rayAngleIncrement = 360.0f / m_numberOfRays;
+            
             for (uint16_t rayIndex = 0; rayIndex < m_numberOfRays; rayIndex++)
             {
                 float adjustedStartAngle = m_currentAngleDeg + rayIndex * rayAngleIncrement;
@@ -78,25 +83,21 @@ void RotationDisplayPattern::updateInternal(PixelMap* pixelMap)
 
                 if (isAngleInRange(angleToPixelDeg, adjustedStartAngle, adjustedEndAngle))
                 {
-                    if (m_isSpotLight)
-                    {
-                        pixelMap->setColorInPixelMap(row, col, m_spotLightColors[rayIndex]);
-                    }
-                    else
-                    {
-                        pixelMap->setColorInPixelMap(row, col, currentColor);
-                    }
+                    uint32_t colorToSet = m_isSpotLight ? m_spotLightColors[rayIndex] : currentColor;
+                    pixelMap->setColorInPixelMap(row, col, colorToSet);
+                    break; // Early exit - pixel found its ray
                 }
             }
         }
     }
 
+    // Normalize angle once at the end
     m_currentAngleDeg = newAngleDeg;
     if (m_currentAngleDeg >= 360.0f)
     {
         m_currentAngleDeg -= 360.0f;
     }
-    if (m_currentAngleDeg < 0.0f)
+    else if (m_currentAngleDeg < 0.0f)
     {
         m_currentAngleDeg += 360.0f;
     }
@@ -132,11 +133,12 @@ boolean RotationDisplayPattern::isAngleInRange(float angleToCheck, float startAn
 
 float RotationDisplayPattern::normalizeAngle(float angle)
 {
-    angle = fmod(angle, 360.0);
-    if (angle < 0) {
-        angle += 360.0;
+    while (angle >= 360.0f) {
+        angle -= 360.0f;
     }
-
+    while (angle < 0.0f) {
+        angle += 360.0f;
+    }
     return angle;
 }
 
