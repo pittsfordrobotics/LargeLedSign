@@ -6,18 +6,37 @@ RadialDisplayPattern::RadialDisplayPattern() : DisplayPattern()
 
 void RadialDisplayPattern::resetInternal(PixelMap* pixelMap)
 {
+    uint16_t columnCount = pixelMap->getColumnCount();
+    uint16_t colsToLeft = pixelMap->getColsToLeft();
+    uint16_t colsToRight = pixelMap->getColsToRight();
+    uint16_t rowCount = pixelMap->getRowCount();
+    uint16_t colCount = pixelMap->getColumnCount();
+
     // Simple logic for now:
     // Center point is only this display, not including offests.
     // Initialize the radial color list with the first colors from the color pattern.
     m_colorPattern->reset();
-    m_centerColumn = (pixelMap->getColumnCount()-1) / 2.0f;
-    m_centerRow = (pixelMap->getRowCount()-1) / 2.0f;
+    m_centerColumn = (colsToLeft + columnCount + colsToRight) / 2.0f;
+    m_centerRow = (rowCount - 1) / 2.0f;
 
     m_radialColors.clear();
     m_pixelDistances.clear();
 
     // Initialize the radial colors based on the maximum distance from center.
-    float xMax = m_centerColumn;  // Take offsets into account later
+    float xMax = 0.0f;
+    if (m_centerColumn <= colsToLeft)
+    {
+        xMax = (colsToLeft - m_centerColumn + columnCount);
+    } 
+    else if(m_centerColumn >= (colsToLeft + columnCount))
+    {
+        xMax = (m_centerColumn - colsToLeft);
+    } 
+    else
+    {
+        xMax = std::max(m_centerColumn - colsToLeft, (colsToLeft + columnCount) - m_centerColumn);
+    }
+
     float yMax = m_centerRow;
 
     uint32_t startingColor = m_colorPattern->getNextColor();
@@ -28,13 +47,13 @@ void RadialDisplayPattern::resetInternal(PixelMap* pixelMap)
     }
 
     // Initialize the distance map for each pixel.
-    for (int row = 0; row < pixelMap->getRowCount(); row++)
+    for (int row = 0; row < rowCount; row++)
     {
         std::vector<float> distancesInRow;
-        for (int col = 0; col < pixelMap->getColumnCount(); col++)
+        for (int col = 0; col < colCount; col++)
         {
             float deltaY = row - m_centerRow;
-            float deltaX = col - m_centerColumn;
+            float deltaX = col + colsToLeft - m_centerColumn;
             float distanceToPixel = std::sqrt(deltaX * deltaX + deltaY * deltaY);
             distancesInRow.push_back(distanceToPixel);
         }
@@ -54,9 +73,11 @@ void RadialDisplayPattern::updateInternal(PixelMap* pixelMap)
     m_radialColors[0] = m_colorPattern->getNextColor();
 
     // Now update the pixel map based on the distance map and radial colors.
-    for (int row = 0; row < pixelMap->getRowCount(); row++)
+    uint16_t rowCount = pixelMap->getRowCount();
+    uint16_t colCount = pixelMap->getColumnCount();
+    for (int row = 0; row < rowCount; row++)
     {
-        for (int col = 0; col < pixelMap->getColumnCount(); col++)
+        for (int col = 0; col < colCount; col++)
         {
             float distanceToPixel = m_pixelDistances[row][col];
             int distanceIndex = static_cast<int>(distanceToPixel + 0.5f);
