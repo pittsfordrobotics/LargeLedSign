@@ -324,10 +324,10 @@ const char* configWithPublishSettings() {
     return R"json(
         {
             "displayConfigurationFile": "display.json",
-            "styleConfigurationFile": "styles.json"
-        },
-        "publishedColorPatterns": ["TwoColor", "Rainbow"],
-        "publishedDisplayPatterns": ["Right", "Fire"]
+            "styleConfigurationFile": "styles.json",
+            "publishedColorPatterns": ["TwoColor", "Rainbow"],
+            "publishedDisplayPatterns": ["Right", "Fire"]
+        }
     )json";
 }
 
