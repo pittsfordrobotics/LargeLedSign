@@ -32,19 +32,23 @@ void RotationDisplayPattern::resetInternal(PixelMap* pixelMap)
         m_spotLightColors.push_back(m_colorPattern->getNextColor());
     }
 
+    uint16_t columnCount = pixelMap->getColumnCount();
+    uint16_t colsToLeft = pixelMap->getColsToLeft();
+    uint16_t colsToRight = pixelMap->getColsToRight();
+    uint16_t rowCount = pixelMap->getRowCount();
+
     // Calculate center point
-    // TODO: take into account offsets for columns to left/right
-    m_centerRow = pixelMap->getRowCount() / 2.0f;
-    m_centerColumn = pixelMap->getColumnCount() / 2.0f;
+    m_centerRow = rowCount / 2.0f;
+    m_centerColumn = (columnCount + colsToLeft + colsToRight) / 2.0f;
 
     // Calculate the angle from the center to each pixel.
-    for (int row = 0; row < pixelMap->getRowCount(); row++)
+    for (int row = 0; row < rowCount; row++)
     {
         std::vector<float> anglesInRow;
-        for (int col = 0; col < pixelMap->getColumnCount(); col++)
+        for (int col = 0; col < columnCount; col++)
         {
             float deltaY = row - m_centerRow;
-            float deltaX = col - m_centerColumn;
+            float deltaX = colsToLeft + col - m_centerColumn;
             float angleToPixelDeg = std::atan2(deltaY, deltaX) * (180.0f / M_PI);
             if (angleToPixelDeg < 0.0f)
             {
