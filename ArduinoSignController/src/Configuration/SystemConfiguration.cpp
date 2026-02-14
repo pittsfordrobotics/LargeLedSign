@@ -35,6 +35,16 @@ SystemConfiguration* SystemConfiguration::ParseJson(
     config->m_displayConfigurationFile = JsonUtils::getValueOrDefault(configDoc, "displayConfigurationFile", config->m_displayConfigurationFile);
     config->m_styleConfigurationFile = JsonUtils::getValueOrDefault(configDoc, "styleConfigurationFile", config->m_styleConfigurationFile);
 
+    if (configDoc["publishedColorPatterns"].is<JsonVariant>())
+    {
+        config->m_publishedColorPatterns = config->getStringList(configDoc["publishedColorPatterns"]);
+    }
+
+    if (configDoc["publishedDisplayPatterns"].is<JsonVariant>())
+    {
+        config->m_publishedDisplayPatterns = config->getStringList(configDoc["publishedDisplayPatterns"]);
+    }
+
     JsonVariant buttonConfigs = configDoc["buttons"].as<JsonVariant>();
     if (buttonFactory != nullptr && !buttonConfigs.isNull())
     {

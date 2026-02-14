@@ -66,6 +66,13 @@
             "param1": 100,
             "param2": 100,
             "param3": 200
+        },
+        {
+            "name": "RainbowRight",
+            "colorPattern": "Rainbow",
+            "displayPattern": "Right",
+            "speed": 255,
+            "param1": 120
         }
     ]
 }

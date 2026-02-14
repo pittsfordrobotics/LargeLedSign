@@ -9,6 +9,8 @@
         "isProxyModeEnabled": true,
         "proxyClientUuid": "1221ca8d-4172-4946-bcd1-f9e4b40ba6b0"
     },
+    "publishedColorPatterns": ["SingleColor", "TwoColor", "BackgroundPlusThree", "Rainbow"],
+    "publishedDisplayPatterns": ["Solid", "Right", "Digit", "Random", "Line", "Radial", "Spotlight", "Fire"],
     "buttons": {
         "definitions": [
             {

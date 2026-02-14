@@ -32,6 +32,9 @@ class SystemConfiguration {
         String getStyleConfigurationFile() { return m_styleConfigurationFile; }
         float getClockMultiplier() { return m_clockMultiplier; }
 
+        std::vector<String>& getPublishedColorPatterns() { return m_publishedColorPatterns; }
+        std::vector<String>& getPublishedDisplayPatterns() { return m_publishedDisplayPatterns; }
+
         PowerLedConfiguration& getPowerLedConfiguration() { return m_powerLedConfiguration; }
         BatteryMonitorConfiguration& getBatteryMonitorConfiguration() { return m_batteryMonitorConfiguration; }
         Tm1637DisplayConfiguration& getTm1637DisplayConfiguration() { return m_tm1637DisplayConfiguration; }
@@ -48,6 +51,8 @@ class SystemConfiguration {
         BatteryMonitorConfiguration m_batteryMonitorConfiguration;
         Tm1637DisplayConfiguration m_tm1637DisplayConfiguration;
         BluetoothConfiguration m_bluetoothConfiguration;
+        std::vector<String> m_publishedColorPatterns;
+        std::vector<String> m_publishedDisplayPatterns;
 
         SystemConfiguration() {};
         void configureButtonProcessor(JsonVariant buttonConfigs, ButtonFactory buttonFactory);

@@ -30,6 +30,7 @@ const char* oneButtonWithActions();
 const char* buttonsWithActions();
 const char* disabledButton();
 const char* additionalConfigurations();
+const char* configWithPublishSettings();
 
 void resetActionParameters() {
     lastCallerId = -1;
@@ -276,6 +277,26 @@ void additionalConfigurationsAreParsed() {
     delete sc;
 }
 
+void publishedPatternsAreParsed() {
+    String json = configWithPublishSettings();
+    SystemConfiguration* sc = SystemConfiguration::ParseJson(
+        json.c_str(), 
+        json.length(), 
+        mockButtonFactory);
+    
+    TEST_ASSERT_TRUE_MESSAGE(sc->isValid(), "SystemConfiguration should be valid.");
+    std::vector<String> publishedColorPatterns = sc->getPublishedColorPatterns();
+    TEST_ASSERT_EQUAL_MESSAGE(2, publishedColorPatterns.size(), "There should be 2 published color patterns.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("TwoColor", publishedColorPatterns[0].c_str(), "First published color pattern is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Rainbow", publishedColorPatterns[1].c_str(), "Second published color pattern is not correct.");
+    std::vector<String> publishedDisplayPatterns = sc->getPublishedDisplayPatterns();
+    TEST_ASSERT_EQUAL_MESSAGE(2, publishedDisplayPatterns.size(), "There should be 2 published display patterns.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Right", publishedDisplayPatterns[0].c_str(), "First published display pattern is not correct.");
+    TEST_ASSERT_EQUAL_STRING_MESSAGE("Fire", publishedDisplayPatterns[1].c_str(), "Second published display pattern is not correct.");
+
+    delete sc;
+}
+
 int main(int argc, char **argv) {
     UNITY_BEGIN();
 
@@ -286,7 +307,7 @@ int main(int argc, char **argv) {
     RUN_TEST(buttonsAndActionsAreParsed);
     RUN_TEST(disabledButtonDefinitionIsIgnored);
     RUN_TEST(additionalConfigurationsAreParsed);
-
+    RUN_TEST(publishedPatternsAreParsed);
     return UNITY_END();
 }
 
@@ -295,6 +316,17 @@ const char* minimalConfigurationJson() {
         {
             "displayConfigurationFile": "display.json",
             "styleConfigurationFile": "styles.json"
+        }
+    )json";
+}
+
+const char* configWithPublishSettings() {
+    return R"json(
+        {
+            "displayConfigurationFile": "display.json",
+            "styleConfigurationFile": "styles.json",
+            "publishedColorPatterns": ["TwoColor", "Rainbow"],
+            "publishedDisplayPatterns": ["Right", "Fire"]
         }
     )json";
 }

@@ -10,6 +10,8 @@ class RadialDisplayPattern : public DisplayPattern {
     public:
         RadialDisplayPattern();
 
+        static std::vector<String> getParameterNames();
+
     protected:
         virtual void updateInternal(PixelMap* pixelMap) override;
         virtual void resetInternal(PixelMap* pixelMap) override;
