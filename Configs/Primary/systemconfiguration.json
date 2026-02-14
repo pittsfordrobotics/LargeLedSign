@@ -62,6 +62,8 @@
             }
         ]
     },
+    "publishedColorPatterns": [],
+    "publishedDisplayPatterns": [],
     "batteryMonitor": {
         "enabled": false,
         "analogInputGpioPin": 29,

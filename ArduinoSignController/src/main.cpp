@@ -9,6 +9,7 @@ StyleConfiguration* styleConfiguration = nullptr;
 BatteryMonitorConfiguration batteryMonitorConfig;
 PowerLedConfiguration powerLedConfig;
 BluetoothConfiguration bluetoothConfig;
+SystemConfiguration* systemConfiguration;
 
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
@@ -35,7 +36,6 @@ std::vector<SecondaryClient *> allSecondaries;
 ulong nextSecondaryConnectionCheck = 0;
 
 volatile bool isInitialized = false;
-SystemConfiguration* systemConfiguration;
 
 void setup()
 {
