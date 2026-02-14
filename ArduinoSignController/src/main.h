@@ -73,6 +73,11 @@ void updateAllSecondaries();
 void checkSecondaryConnections();
 void resetSecondaryConnections();
 
+// Default values
+std::vector<String> DefaultColorPatterns {"SingleColor","TwoColor","Rainbow", "BackgroundPlusThree"};
+std::vector<String> DefaultDisplayPatterns {"Solid","Right","Digit","Random","Line","Fire","Spotlight","Radial"};
+
+// JSON configs for signs that can't read from the SD card.
 const char* defaultSystemConfigJsonForSecondaries = R"json(
     {
         "displayConfigurationFile": "::Display[[SIGNTYPE1]]::",

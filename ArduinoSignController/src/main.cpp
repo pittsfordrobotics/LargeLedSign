@@ -400,9 +400,27 @@ void initializeBlePeripheralService()
     blePeripheralService->setBrightness(currentBrightness);
     blePeripheralService->setSpeed(currentSpeed);
     blePeripheralService->setPatternData(currentPatternData);
-    blePeripheralService->setColorPatternList(PatternFactory::getKnownColorPatterns());
-    blePeripheralService->setDisplayPatternList(PatternFactory::getKnownDisplayPatterns());
+
+    String colorPatternList = PatternFactory::generateColorPatternString(
+            systemConfiguration->getPublishedColorPatterns().size() > 0 ?
+                systemConfiguration->getPublishedColorPatterns() :
+                DefaultColorPatterns);
+
+    Serial.println("Published color pattern list:");
+    Serial.println(colorPatternList);
+
+    blePeripheralService->setColorPatternList(colorPatternList);
     
+    String displayPatternList = PatternFactory::generateDisplayPatternString(
+            systemConfiguration->getPublishedDisplayPatterns().size() > 0 ?
+                systemConfiguration->getPublishedDisplayPatterns() :
+                DefaultDisplayPatterns);
+        
+    Serial.println("Published display pattern list:");
+    Serial.println(displayPatternList);
+
+    blePeripheralService->setDisplayPatternList(displayPatternList);
+
     if (bluetoothConfig.isSecondaryModeEnabled())
     {
         SignConfigurationData signConfigData;

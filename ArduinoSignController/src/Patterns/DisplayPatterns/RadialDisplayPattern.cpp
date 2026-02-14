@@ -93,3 +93,7 @@ void RadialDisplayPattern::updateInternal(PixelMap* pixelMap)
     }
 }
 
+std::vector<String> RadialDisplayPattern::getParameterNames()
+{
+    return std::vector<String>();
+}

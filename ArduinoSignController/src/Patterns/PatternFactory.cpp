@@ -1,5 +1,8 @@
 #include "PatternFactory.h"
 
+std::unordered_map<ColorPatternType, String> PatternFactory::colorPatternStringLookup;
+std::unordered_map<DisplayPatternType, String> PatternFactory::displayPatternStringLookup;
+
 DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternData)
 {
     std::vector<byte> params;
@@ -235,6 +238,46 @@ String PatternFactory::getKnownColorPatterns()
     return knownPatterns;
 }
 
+String PatternFactory::generateColorPatternString(const std::vector<String>& colorPatterns)
+{
+    populateColorPatternStringLookup();
+    String patternString;
+
+    for (uint16_t i = 0; i < colorPatterns.size(); i++)
+    {
+        ColorPatternType patternType = ColorPatternTypeHelper::fromString(colorPatterns[i]);
+
+        if (colorPatternStringLookup.find(patternType) == colorPatternStringLookup.end())
+        {
+            // Not found - just skip it.
+            continue;
+        }
+
+        patternString += colorPatternStringLookup[patternType] + ";";
+    }
+
+    return patternString;
+}
+
+String PatternFactory::generateDisplayPatternString(const std::vector<String>& displayPatterns)
+{
+    populateDisplayPatternStringLookup();
+    String patternString;
+    for (uint16_t i = 0; i < displayPatterns.size(); i++)
+    {
+        DisplayPatternType patternType = DisplayPatternTypeHelper::fromString(displayPatterns[i]);
+
+        if (displayPatternStringLookup.find(patternType) == displayPatternStringLookup.end())
+        {
+            continue;
+        }
+
+        patternString += displayPatternStringLookup[patternType] + ";";
+    }
+
+    return patternString;
+}
+
 String PatternFactory::getKnownDisplayPatterns()
 {
     String knownPatterns;
@@ -255,7 +298,7 @@ String PatternFactory::getKnownDisplayPatterns()
     return knownPatterns;
 }
 
-String PatternFactory::getColorPatternString(String patternName, ColorPatternType patternType, uint16_t numberOfColors, std::vector<String> parameterNames)
+String PatternFactory::getColorPatternString(String patternName, ColorPatternType patternType, uint16_t numberOfColors, const std::vector<String>& parameterNames)
 {
     // Format:
     // <name>,<number>,<#colors>,<param1>,...
@@ -271,7 +314,7 @@ String PatternFactory::getColorPatternString(String patternName, ColorPatternTyp
     return patternString;
 }
 
-String PatternFactory::getDisplayPatternString(String patternName, DisplayPatternType patternType, std::vector<String> parameterNames)
+String PatternFactory::getDisplayPatternString(String patternName, DisplayPatternType patternType, const std::vector<String>& parameterNames)
 {
     // Format:
     // <name>,<number>,<#colors>,<param1>,...
@@ -284,4 +327,42 @@ String PatternFactory::getDisplayPatternString(String patternName, DisplayPatter
     }
 
     return patternString;
+}
+
+void PatternFactory::populateColorPatternStringLookup()
+{
+    if (colorPatternStringLookup.size() == 0)
+    {
+        colorPatternStringLookup[ColorPatternType::SingleColor] = getColorPatternString("Single Color", ColorPatternType::SingleColor, 1, SingleColorPattern::getParameterNames());
+        colorPatternStringLookup[ColorPatternType::TwoColor] = getColorPatternString("Two Color", ColorPatternType::TwoColor, 2, TwoColorPattern::getParameterNames());
+        colorPatternStringLookup[ColorPatternType::TwoColorFade] = getColorPatternString("Two Color Fade", ColorPatternType::TwoColorFade, 2, ColorFadePattern::getParameterNames());
+        colorPatternStringLookup[ColorPatternType::ThreeColorFade] = getColorPatternString("Three Color Fade", ColorPatternType::ThreeColorFade, 3, ColorFadePattern::getParameterNames());
+        colorPatternStringLookup[ColorPatternType::FourColorFade] = getColorPatternString("Four Color Fade", ColorPatternType::FourColorFade, 4, ColorFadePattern::getParameterNames());
+        colorPatternStringLookup[ColorPatternType::BackgroundPlusThree] = getColorPatternString("Background+3", ColorPatternType::BackgroundPlusThree, 4, BackgroundPlusThree::getParameterNames());
+        colorPatternStringLookup[ColorPatternType::Rainbow] = getColorPatternString("Rainbow", ColorPatternType::Rainbow, 0, RainbowColorPattern::getParameterNames());
+    }
+}
+
+void PatternFactory::populateDisplayPatternStringLookup()
+{
+    if (displayPatternStringLookup.size() == 0)
+    {
+        displayPatternStringLookup[DisplayPatternType::Solid] = getDisplayPatternString("Solid", DisplayPatternType::Solid, SolidDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Right] = getDisplayPatternString("Right", DisplayPatternType::Right, SimpleShiftDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Left] = getDisplayPatternString("Left", DisplayPatternType::Left, SimpleShiftDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Up] = getDisplayPatternString("Up", DisplayPatternType::Up, SimpleShiftDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Down] = getDisplayPatternString("Down", DisplayPatternType::Down, SimpleShiftDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Digit] = getDisplayPatternString("Digit", DisplayPatternType::Digit, SimpleShiftDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Random] = getDisplayPatternString("Random", DisplayPatternType::Random, RandomDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::CenterOutVertical] = getDisplayPatternString("CenterOut-V", DisplayPatternType::CenterOutVertical, CenterOutDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::CenterOutHorizontal] = getDisplayPatternString("CenterOut", DisplayPatternType::CenterOutHorizontal, CenterOutDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Line] = getDisplayPatternString("Line", DisplayPatternType::Line, SimpleShiftDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Fire] = getDisplayPatternString("Fire", DisplayPatternType::Fire, FireDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Rotation] = getDisplayPatternString("Rotation", DisplayPatternType::Rotation, RotationDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::RotationCCW] = getDisplayPatternString("RotationCCW", DisplayPatternType::RotationCCW, RotationDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::SpotLight] = getDisplayPatternString("SpotLight", DisplayPatternType::SpotLight, RotationDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::SpotLightCCW] = getDisplayPatternString("SpotLightCCW", DisplayPatternType::SpotLightCCW, RotationDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::CenterOutSquare] = getDisplayPatternString("CenterOutSquare", DisplayPatternType::CenterOutSquare, CenterOutDisplayPattern::getParameterNames());
+        displayPatternStringLookup[DisplayPatternType::Radial] = getDisplayPatternString("Radial", DisplayPatternType::Radial, RadialDisplayPattern::getParameterNames());
+    }
 }
