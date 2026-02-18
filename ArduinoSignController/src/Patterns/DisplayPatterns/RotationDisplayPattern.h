@@ -16,7 +16,7 @@ class RotationDisplayPattern : public DisplayPattern
     protected:
         virtual void resetInternal(PixelMap* pixelMap);
         virtual void updateInternal(PixelMap* pixelMap);
-        virtual uint16_t getMaxUpdateTimeMillis() {return 75;};
+        virtual uint16_t getMaxUpdateTimeMillis() {return 85;};
 
     private:
         bool isAngleInRange(float angleToCheck, float startAngle, float endAngle);
