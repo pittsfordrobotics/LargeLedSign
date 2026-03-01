@@ -40,6 +40,8 @@ COPI: 3, 7, 19, 23
 #define MAX_TOTAL_SCAN_TIME 10000     // The total time (msec) to spend looking for secondary peripherals.
 #define SECONDARY_PING_INTERVAL 1500  // The interval (msec) at which to ping secondaries to verify connection.
 
+#define LOW_POWER_DURATION 5000  // The amount of time that must elapse before exiting low power mode.
+
 // Function prototypes
 SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);

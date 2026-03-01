@@ -20,6 +20,7 @@ int sdCardChipSelectPin = SDCARD_CHIPSELECT;
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
 bool inLowPowerMode = false;
+ulong lastLowPowerTime = 0; // The timestamp when we last entered low power mode.
 
 // Settings that are updated via bluetooth
 byte currentBrightness;
@@ -529,6 +530,12 @@ void checkForLowPowerState()
         return;
     }
 
+    if (inLowPowerMode && (millis() - lastLowPowerTime < LOW_POWER_DURATION))
+    {
+        // We're in low power mode and not enough time has elapsed to try to turn back on yet.
+        return;
+    }
+
     double currentVoltage = getCalculatedBatteryVoltage();
 
     // Check if the voltage is too low.
@@ -558,6 +565,7 @@ void checkForLowPowerState()
             newPatternData = lowPowerPattern;
             newSpeed = 1;
             newSyncData++;
+            lastLowPowerTime = millis();
         }
     }
 
@@ -716,7 +724,7 @@ void updateLEDs()
 
 void processButtonAction(int callerId, String actionName, std::vector<String> arguments)
 {
-    Serial.print("Processing button action for'");
+    Serial.print("Processing button action for '");
     Serial.print(callerId);
     Serial.print("', action '");
     Serial.print(actionName);
