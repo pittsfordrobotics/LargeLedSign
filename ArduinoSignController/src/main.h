@@ -5,6 +5,8 @@
 #include <algorithm>
 #include "Bluetooth\SecondaryPeripheral.h"
 #include "Bluetooth\SecondaryClient.h"
+#include "IO\BatteryMonitor.h"
+#include "IO\HardwareSignConfig.h"
 #include "Patterns\PatternFactory.h"
 #include "StatusDisplay\NullStatusDisplay.h"
 #include "StatusDisplay\TM1637StatusDisplay.h"
@@ -15,7 +17,6 @@
 
 #define INITIAL_DELAY 2000  // Initial delay to allow serial monitor to connect.
 #define TELEMETRYINTERVAL 3000     // Interval (msec) for updating the telemetry.
-#define TEST_MODE_PIN 13       // The GPIO pin # that is used to put the controller into test mode. (Low brightness, and use TestMatrix display.)
 
 /*
 Valid GPIO pins for SPI0:
@@ -33,9 +34,6 @@ COPI: 3, 7, 19, 23
 #define SDCARD_ALT_SPI_COPI   19
 #define SDCARD_ALT_SPI_CIPO    4
 
-#define ORDER_SELECTOR_PINS  20, 21, 5 // The set of GPIO pin #s that tell the controller what position the sign should be in (MSB to LSB).
-#define STYLE_TYPE_SELECTOR_PINS 16, 17, 18, 19  // The set of GPIO pin #s that tell the controller what style (digit # or logo) the sign should be (MSB to LSB).
-
 #define MAX_SECONDARY_SCAN_TIME 2000  // The amount of time (msec) to wait for a connection to a secondary peripheral.
 #define MAX_TOTAL_SCAN_TIME 10000     // The total time (msec) to spend looking for secondary peripherals.
 #define SECONDARY_PING_INTERVAL 1500  // The interval (msec) at which to ping secondaries to verify connection.
@@ -47,7 +45,6 @@ SystemConfiguration* readSystemConfiguration();
 StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config);
 std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile);
 StyleConfiguration* readStyleConfiguration(String styleConfigFile);
-void initializeBatteryMonitor();
 void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition);
 void startBleService();
 void initializeBlePeripheralService();
@@ -57,15 +54,11 @@ void readSettingsFromBLE();
 void setManualStyle(StyleDefinition styleDefinition);
 void updateTelemetry();
 void updateLedTelemetry();
-float getCalculatedBatteryVoltage();
-int getRawVoltageInputLevel();
 void displayBatteryVoltage();
 void checkForLowPowerState();
 void updateLEDs();
 void processButtonAction(int callerId, String actionName, std::vector<String> arguments);
 const char* getSdFileContents(String filename);
-byte getSignType();
-byte getSignPosition();
 const char* readBuiltInFile(String filename);
 const char* copyString(const char* source, size_t length);
 void populateSecondaryClients();

@@ -6,7 +6,7 @@ StatusDisplay* display = nullptr;
 std::vector<NeoPixelDisplay*>* neoPixelDisplays = nullptr;
 ButtonProcessor* buttonProcessor = nullptr;
 StyleConfiguration* styleConfiguration = nullptr;
-BatteryMonitorConfiguration batteryMonitorConfig;
+BatteryMonitor* batteryMonitor = nullptr;
 PowerLedConfiguration powerLedConfig;
 BluetoothConfiguration bluetoothConfig;
 SystemConfiguration* systemConfiguration;
@@ -73,8 +73,7 @@ void setup()
 
     display->setDisplay("---5");
     Serial.println("---5");
-    batteryMonitorConfig = systemConfiguration->getBatteryMonitorConfiguration();
-    initializeBatteryMonitor();
+    batteryMonitor = new BatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
 
     display->setDisplay("---6");
     Serial.println("---6");
@@ -193,8 +192,8 @@ SystemConfiguration* readSystemConfiguration()
     Serial.println("Failed to read system configuration file from SD Card.");
     Serial.println("Attempting to generate default system configuration.");
     
-    byte signType = getSignType();
-    byte signPosition = getSignPosition();
+    byte signType = HardwareSignConfig::getSignType();
+    byte signPosition = HardwareSignConfig::getSignPosition();
     
     // Secondaries should give correct type and position.
     // Assume if we got here, we're dealing with a Secondary or the pit sign.
@@ -427,8 +426,8 @@ void initializeBlePeripheralService()
         SignConfigurationData signConfigData;
         if (neoPixelDisplays->size() > 0) {
             // The assumption here is that if we're in secondary mode, the configuration is read from the pins.
-            signConfigData.signType = getSignType();
-            signConfigData.signOrder = getSignPosition();
+            signConfigData.signType = HardwareSignConfig::getSignType();
+            signConfigData.signOrder = HardwareSignConfig::getSignPosition();
             
             // Not exactly sure how to handle multiple displays...
             signConfigData.columnCount = neoPixelDisplays->at(0)->getColumnCount();
@@ -472,14 +471,6 @@ void readSettingsFromBLE()
     newPatternData = blePeripheralService->getPatternData();
 }
 
-void initializeBatteryMonitor()
-{
-    if (batteryMonitorConfig.isEnabled())
-    {
-        pinMode(batteryMonitorConfig.getAnalogInputPin(), INPUT);
-    }
-}
-
 void initializePowerLed()
 {
     if (powerLedConfig.isEnabled())
@@ -489,35 +480,9 @@ void initializePowerLed()
     }
 }
 
-// Read the analog input from the "voltage input" pin and calculate the battery voltage.
-float getCalculatedBatteryVoltage()
-{
-    if (!batteryMonitorConfig.isEnabled())
-    {
-        return 0.0f;
-    }
-
-    // The analog input ranges from 0 (0V) to 1024 (3.3V), resulting in 0.00322 Volts per "tick".
-    // The battery voltage passes through a voltage divider so we have to multiply the input by
-    // a scale factor to get the actual voltage.
-    float rawLevel = getRawVoltageInputLevel();
-    return rawLevel * batteryMonitorConfig.getInputMultiplier() * 3.3 / 1024;
-}
-
-// Read the raw value from the "voltage input" pin.
-int getRawVoltageInputLevel()
-{
-    if (!batteryMonitorConfig.isEnabled())
-    {
-        return 0;
-    }
-
-    return analogRead(batteryMonitorConfig.getAnalogInputPin());
-}
-
 void displayBatteryVoltage()
 {
-    double voltage = getCalculatedBatteryVoltage();
+    double voltage = batteryMonitor->getCalculatedBatteryVoltage();
     display->displayTemporary(String(voltage, 2), 1500);
 }
 
@@ -525,7 +490,7 @@ void displayBatteryVoltage()
 // or if the battery has been charged enough to restart operation.
 void checkForLowPowerState()
 {
-    if (!batteryMonitorConfig.isEnabled())
+    if (!batteryMonitor->isEnabled())
     {
         return;
     }
@@ -536,10 +501,8 @@ void checkForLowPowerState()
         return;
     }
 
-    double currentVoltage = getCalculatedBatteryVoltage();
-
     // Check if the voltage is too low.
-    if (currentVoltage < batteryMonitorConfig.getVoltageToEnterLowPowerState())
+    if (batteryMonitor->isBatteryBelowLowPowerThreshold())
     {
         if (inLowPowerMode)
         {
@@ -548,10 +511,8 @@ void checkForLowPowerState()
         else
         {
             Serial.print("Battery voltage is below threshold. Voltage: ");
-            Serial.print(currentVoltage);
-            Serial.print(", threshold: ");
-            Serial.println(batteryMonitorConfig.getVoltageToEnterLowPowerState());
-            Serial.println("Entering low power mode.");
+            Serial.print(batteryMonitor->getCalculatedBatteryVoltage());
+            Serial.println(". Entering low power mode.");
             inLowPowerMode = true;
 
             // Set up the "low power" display pattern.
@@ -570,7 +531,7 @@ void checkForLowPowerState()
     }
 
     // Check if the voltage is high enough for normal operation.
-    if (currentVoltage > batteryMonitorConfig.getVoltageToExitLowPowerState())
+    if (batteryMonitor->isBatteryAboveRestartThreshold())
     {
         if (!inLowPowerMode)
         {
@@ -578,15 +539,14 @@ void checkForLowPowerState()
         }
         else
         {
-            Serial.print("Battery voltage is above normal threshold. Voltage: ");
-            Serial.print(currentVoltage);
-            Serial.print(", threshold: ");
-            Serial.println(batteryMonitorConfig.getVoltageToExitLowPowerState());
-            Serial.println("Exiting low power mode.");
+            Serial.print("Battery voltage is above recovery threshold. Voltage: ");
+            Serial.print(batteryMonitor->getCalculatedBatteryVoltage());
+            Serial.println(". Exiting low power mode.");
             for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
             {
                 neoPixelDisplay->setBrightness(currentBrightness);
             }
+
             inLowPowerMode = false;
             newSyncData++;
         }
@@ -612,8 +572,7 @@ void updateTelemetry()
         loopCounter = 0;
 
         // Output voltage info periodically
-        int rawLevel = getRawVoltageInputLevel();
-        float voltage = getCalculatedBatteryVoltage();
+        float voltage = batteryMonitor->getCalculatedBatteryVoltage();
 
         // Emit battery voltage information on Bluetooth as well as Serial.
         if (bluetoothConfig.isEnabled())
@@ -622,10 +581,8 @@ void updateTelemetry()
         }
 
         Serial.print("Battery monitor: ");
-        Serial.print(batteryMonitorConfig.isEnabled() ? "Enabled" : "Disabled");
-        Serial.print("; Raw input: ");
-        Serial.print(rawLevel);
-        Serial.print("; Calculated voltage: ");
+        Serial.print(batteryMonitor->isEnabled() ? "Enabled" : "Disabled");
+        Serial.print("; Voltage: ");
         Serial.println(voltage);
 
         if (bluetoothConfig.isEnabled())
@@ -863,64 +820,6 @@ const char* getSdFileContents(String filename)
     SD.end();
 
     return fileContents;
-}
-
-byte getSignType()
-{
-    pinMode(TEST_MODE_PIN, INPUT_PULLUP);
-    std::vector<int> typeSelectorPins = {STYLE_TYPE_SELECTOR_PINS};
-
-    for (uint i = 0; i < typeSelectorPins.size(); i++)
-    {
-        pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
-    }
-
-    delay(100);
-
-    // Check the "test" pin
-    if (digitalRead(TEST_MODE_PIN) == LOW)
-    {
-        Serial.println("Test mode detected. Returning 255 for TestMatrix sign type.");
-        return 255;
-    }
-
-    // Pull the pin low to indicate active.
-    byte type = 0;
-    for (uint i = 0; i < typeSelectorPins.size(); i++)
-    {
-        type = type << 1;
-        if (digitalRead(typeSelectorPins.at(i)) == LOW)
-        {
-            type++;
-        }
-    }
-
-    return type;
-}
-
-byte getSignPosition()
-{
-    std::vector<int> orderSelectorPins = {ORDER_SELECTOR_PINS};
-
-    for (uint i = 0; i < orderSelectorPins.size(); i++)
-    {
-        pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
-    }
-
-    delay(100);
-
-    // Pull the pin low to indicate active.
-    byte order = 0;
-    for (uint i = 0; i < orderSelectorPins.size(); i++)
-    {
-        order = order << 1;
-        if (digitalRead(orderSelectorPins.at(i)) == LOW)
-        {
-            order++;
-        }
-    }
-
-    return order;
 }
 
 const char* readBuiltInFile(String filename)
