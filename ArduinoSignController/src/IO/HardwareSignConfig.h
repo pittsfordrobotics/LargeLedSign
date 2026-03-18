@@ -1,3 +1,6 @@
+#ifndef HARDWARE_SIGN_CONFIG_H
+#define HARDWARE_SIGN_CONFIG_H
+
 #include <Arduino.h>
 
 #define ORDER_SELECTOR_PINS  20, 21, 5 // The set of GPIO pin #s that tell the controller what position the sign should be in (MSB to LSB).
@@ -13,3 +16,5 @@ class HardwareSignConfig
     private:
         HardwareSignConfig();
 };
+
+#endif // HARDWARE_SIGN_CONFIG_H

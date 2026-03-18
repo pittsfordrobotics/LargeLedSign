@@ -1,3 +1,6 @@
+#ifndef BATTERY_MONITOR_H
+#define BATTERY_MONITOR_H
+
 #include <Arduino.h>
 #include "Configuration/BatteryMonitorConfiguration.h"
 
@@ -15,3 +18,5 @@ class BatteryMonitor
     private:
         BatteryMonitorConfiguration m_config;
 };
+
+#endif // BATTERY_MONITOR_H

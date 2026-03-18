@@ -5,5 +5,6 @@
 #include "JsonUtils.h"
 #include "MathUtils.h"
 #include "NeoPixelUtils.h"
+#include "StringUtils.h"
 
 #endif
