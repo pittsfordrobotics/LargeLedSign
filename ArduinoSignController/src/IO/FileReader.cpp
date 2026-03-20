@@ -1,6 +1,10 @@
 #include "FileReader.h"
 
-const char* FileReader::getSdFileContents(String filename) 
+FileReader::FileReader()
+{
+}
+
+const char* FileReader::getFileContents(String filename) 
 {
     if (isBuiltInFile(filename))
     {

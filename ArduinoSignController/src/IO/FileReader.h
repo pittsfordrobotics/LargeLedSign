@@ -30,8 +30,8 @@ class FileReader
 {
     public:
         FileReader();
-        const char* getSystemConfig() { return getSdFileContents(SYSTEM_CONFIG_FILE); };
-        const char* getSdFileContents(String filename);
+        const char* getSystemConfig() { return getFileContents(SYSTEM_CONFIG_FILE); };
+        const char* getFileContents(String filename);
 
     private:
         bool isInitialized{false};

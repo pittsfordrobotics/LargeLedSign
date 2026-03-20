@@ -10,12 +10,12 @@ BatteryMonitor* batteryMonitor = nullptr;
 PowerLedConfiguration powerLedConfig;
 BluetoothConfiguration bluetoothConfig;
 SystemConfiguration* systemConfiguration;
+FileReader fileReader;
 
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
 ulong lastLedTelemetryTimestamp = 0;
-int sdCardChipSelectPin = SDCARD_CHIPSELECT;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
@@ -41,7 +41,7 @@ volatile bool isInitialized = false;
 void setup()
 {
     Serial.begin(9600);
-    delay(INITIAL_DELAY);
+    //delay(INITIAL_DELAY);
     Serial.println("Starting...");
 
     systemConfiguration = readSystemConfiguration();
@@ -144,13 +144,7 @@ void loop1()
 
 SystemConfiguration* readSystemConfiguration()
 {
-    // Initialize the SD Card reader
-    SPI.setSCK(SDCARD_SPI_CLOCK);
-    SPI.setMOSI(SDCARD_SPI_COPI);
-    SPI.setMISO(SDCARD_SPI_CIPO);
-    sdCardChipSelectPin = SDCARD_CHIPSELECT;
-
-    const char* fileJson = getSdFileContents("systemconfiguration.json");
+    const char* fileJson = fileReader.getSystemConfig();
 
     if (fileJson != nullptr)
     {
@@ -165,33 +159,16 @@ SystemConfiguration* readSystemConfiguration()
         return sc;
     }
 
-    Serial.println("Failed to read system configuration file from SD Card on primary pins.");
-    Serial.println("Attempting to read configuration from alternate SD Card pins.");
-    SPI.setSCK(SDCARD_ALT_SPI_CLOCK);
-    SPI.setMOSI(SDCARD_ALT_SPI_COPI);
-    SPI.setMISO(SDCARD_ALT_SPI_CIPO);
-    sdCardChipSelectPin = SDCARD_ALT_CHIPSELECT;
-
-    fileJson = getSdFileContents("systemconfiguration.json");
-
-    if (fileJson != nullptr)
-    {
-        Serial.println("Parsing system configuration file.");
-        SystemConfiguration* sc = SystemConfiguration::ParseJson(
-            fileJson, 
-            strlen(fileJson), 
-            [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});    
-            
-        delete[] fileJson;
-
-        return sc;
-    }
-
-    // Still can't read from the SD card.
+    // Can't read from the SD card (expected when running on the secondaries).
     // See if we can create a default configuration based on the physical config.
     Serial.println("Failed to read system configuration file from SD Card.");
     Serial.println("Attempting to generate default system configuration.");
     
+    return generateSystemConfigFromHardware();
+}
+
+SystemConfiguration* generateSystemConfigFromHardware()
+{
     byte signType = HardwareSignConfig::getSignType();
     byte signPosition = HardwareSignConfig::getSignPosition();
     
@@ -203,13 +180,11 @@ SystemConfiguration* readSystemConfiguration()
     Serial.println(signPosition);
 
     // For now, only support secondaries.
-    // Worry about the pit sign if it ever reappears.
-    String defaultConfigJson = String(copyString(defaultSystemConfigJsonForSecondaries, strlen(defaultSystemConfigJsonForSecondaries)));
+    String defaultConfigJson = String(StringUtils::copyString(defaultSystemConfigJsonForSecondaries, strlen(defaultSystemConfigJsonForSecondaries)));
     
     // The replace function seems to get very confused when the source string is present more than once.
     defaultConfigJson.replace("[[SIGNTYPE1]]", String(signType));
     defaultConfigJson.replace("[[SIGNTYPE2]]", String(signType));
-    // **** This replaces as a "7"??
     defaultConfigJson.replace("[[SIGNPOSITION]]", String(signPosition));
     // Secondaries don't have their own buttons, so don't bother configuring them.
     defaultConfigJson.replace("[[BUTTONS]]", "");
@@ -241,7 +216,7 @@ StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
 std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile)
 {
     std::vector<NeoPixelDisplay*>* displays = new std::vector<NeoPixelDisplay*>();
-    const char* fileJson = getSdFileContents(displayConfigFile);
+    const char* fileJson = fileReader.getFileContents(displayConfigFile);
     
     if (!fileJson) {
         Serial.println("Failed to read display configuration file.");
@@ -271,7 +246,7 @@ std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile)
 
 StyleConfiguration* readStyleConfiguration(String styleConfigFile)
 {
-    const char* fileJson = getSdFileContents(styleConfigFile);
+    const char* fileJson = fileReader.getFileContents(styleConfigFile);
     
     // If we can't read the style configuration file, return an empty style configuration.
     if (!fileJson) {
@@ -775,97 +750,6 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
 
         setManualStyle(styleDef);
     }
-}
-
-const char* getSdFileContents(String filename)
-{
-    if (filename.startsWith("::") && filename.endsWith("::"))
-    {
-        // It's a built-in file.
-        return readBuiltInFile(filename);
-    }
-
-    if (!SD.begin(sdCardChipSelectPin))
-    {
-        Serial.println("SD card initialization failed!");
-        return nullptr;
-    }
-
-    if (!SD.exists(filename))
-    {
-        Serial.println("File does not exist on SD card: " + filename);
-        SD.end();
-        return nullptr;
-    }
-    Serial.println("Reading file '" + filename + "' from SD card.");
-    File file = SD.open(filename);
-
-    if (!file)
-    {
-        Serial.println("Could not open file!");
-        SD.end();
-        return nullptr;
-    }
-
-    size_t fileSize = file.size();
-
-    Serial.println("Reading file.");
-    char* fileContents = new char[fileSize + 1];
-    file.readBytes(fileContents, fileSize);
-    fileContents[fileSize] = '\0';  // Add null terminator
-
-    Serial.println("File read successfully.");
-
-    file.close();
-    SD.end();
-
-    return fileContents;
-}
-
-const char* readBuiltInFile(String filename)
-{
-    // "Read" Default display configs.
-    Serial.println("'Reading' built-in file: " + filename);
-
-    if (filename == "::Display1::")
-    {
-        return copyString(DisplayConfigFactory::getDigit1Json(), strlen(DisplayConfigFactory::getDigit1Json()));
-    }
-
-    if (filename == "::Display3::")
-    {
-        return copyString(DisplayConfigFactory::getDigit3Json(), strlen(DisplayConfigFactory::getDigit3Json()));
-    }
-
-    if (filename == "::Display8::")
-    {
-        return copyString(DisplayConfigFactory::getDigit8Json(), strlen(DisplayConfigFactory::getDigit8Json()));
-    }
-
-    if (filename == "::Display15::")
-    {
-        return copyString(DisplayConfigFactory::getLogoJson(), strlen(DisplayConfigFactory::getLogoJson()));
-    }
-
-    if (filename == "::Display255::")
-    {
-        return copyString(DisplayConfigFactory::getTestMatrixJson(), strlen(DisplayConfigFactory::getTestMatrixJson()));
-    }
-
-    // TODO (if the pit sign comes back):
-    // ::Display10:: is the pit sign
-    // ::PitSignStyle:: should be the default styles
-
-    Serial.println("Built-in file not found. Returning null.");
-    return nullptr;
-}
-
-const char* copyString(const char* source, size_t length)
-{
-    char* dest = new char[length + 1];
-    strncpy(dest, source, length);
-    dest[length] = '\0';
-    return dest;
 }
 
 void populateSecondaryClients()
