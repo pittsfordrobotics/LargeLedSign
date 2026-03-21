@@ -6,16 +6,16 @@ StatusDisplay* display = nullptr;
 std::vector<NeoPixelDisplay*>* neoPixelDisplays = nullptr;
 ButtonProcessor* buttonProcessor = nullptr;
 StyleConfiguration* styleConfiguration = nullptr;
-BatteryMonitorConfiguration batteryMonitorConfig;
+BatteryMonitor* batteryMonitor = nullptr;
 PowerLedConfiguration powerLedConfig;
 BluetoothConfiguration bluetoothConfig;
 SystemConfiguration* systemConfiguration;
+FileReader fileReader;
 
 ulong loopCounter = 0;
 ulong lastTelemetryTimestamp = 0;
 ulong ledLoopCounter = 0;
 ulong lastLedTelemetryTimestamp = 0;
-int sdCardChipSelectPin = SDCARD_CHIPSELECT;
 
 int lastManualButtonPressed = -1;
 int manualButtonSequenceNumber = 0;
@@ -41,7 +41,7 @@ volatile bool isInitialized = false;
 void setup()
 {
     Serial.begin(9600);
-    delay(INITIAL_DELAY);
+    //delay(INITIAL_DELAY);
     Serial.println("Starting...");
 
     systemConfiguration = readSystemConfiguration();
@@ -73,8 +73,7 @@ void setup()
 
     display->setDisplay("---5");
     Serial.println("---5");
-    batteryMonitorConfig = systemConfiguration->getBatteryMonitorConfiguration();
-    initializeBatteryMonitor();
+    batteryMonitor = new BatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
 
     display->setDisplay("---6");
     Serial.println("---6");
@@ -145,13 +144,7 @@ void loop1()
 
 SystemConfiguration* readSystemConfiguration()
 {
-    // Initialize the SD Card reader
-    SPI.setSCK(SDCARD_SPI_CLOCK);
-    SPI.setMOSI(SDCARD_SPI_COPI);
-    SPI.setMISO(SDCARD_SPI_CIPO);
-    sdCardChipSelectPin = SDCARD_CHIPSELECT;
-
-    const char* fileJson = getSdFileContents("systemconfiguration.json");
+    const char* fileJson = fileReader.getSystemConfig();
 
     if (fileJson != nullptr)
     {
@@ -166,35 +159,18 @@ SystemConfiguration* readSystemConfiguration()
         return sc;
     }
 
-    Serial.println("Failed to read system configuration file from SD Card on primary pins.");
-    Serial.println("Attempting to read configuration from alternate SD Card pins.");
-    SPI.setSCK(SDCARD_ALT_SPI_CLOCK);
-    SPI.setMOSI(SDCARD_ALT_SPI_COPI);
-    SPI.setMISO(SDCARD_ALT_SPI_CIPO);
-    sdCardChipSelectPin = SDCARD_ALT_CHIPSELECT;
-
-    fileJson = getSdFileContents("systemconfiguration.json");
-
-    if (fileJson != nullptr)
-    {
-        Serial.println("Parsing system configuration file.");
-        SystemConfiguration* sc = SystemConfiguration::ParseJson(
-            fileJson, 
-            strlen(fileJson), 
-            [](int gpioPin) {return (GenericButton*)(new ArduinoPushButton(gpioPin, INPUT_PULLUP));});    
-            
-        delete[] fileJson;
-
-        return sc;
-    }
-
-    // Still can't read from the SD card.
+    // Can't read from the SD card (expected when running on the secondaries).
     // See if we can create a default configuration based on the physical config.
     Serial.println("Failed to read system configuration file from SD Card.");
     Serial.println("Attempting to generate default system configuration.");
     
-    byte signType = getSignType();
-    byte signPosition = getSignPosition();
+    return generateSystemConfigFromHardware();
+}
+
+SystemConfiguration* generateSystemConfigFromHardware()
+{
+    byte signType = HardwareSignConfig::getSignType();
+    byte signPosition = HardwareSignConfig::getSignPosition();
     
     // Secondaries should give correct type and position.
     // Assume if we got here, we're dealing with a Secondary or the pit sign.
@@ -204,13 +180,11 @@ SystemConfiguration* readSystemConfiguration()
     Serial.println(signPosition);
 
     // For now, only support secondaries.
-    // Worry about the pit sign if it ever reappears.
-    String defaultConfigJson = String(copyString(defaultSystemConfigJsonForSecondaries, strlen(defaultSystemConfigJsonForSecondaries)));
+    String defaultConfigJson = String(StringUtils::copyString(defaultSystemConfigJsonForSecondaries, strlen(defaultSystemConfigJsonForSecondaries)));
     
     // The replace function seems to get very confused when the source string is present more than once.
     defaultConfigJson.replace("[[SIGNTYPE1]]", String(signType));
     defaultConfigJson.replace("[[SIGNTYPE2]]", String(signType));
-    // **** This replaces as a "7"??
     defaultConfigJson.replace("[[SIGNPOSITION]]", String(signPosition));
     // Secondaries don't have their own buttons, so don't bother configuring them.
     defaultConfigJson.replace("[[BUTTONS]]", "");
@@ -242,7 +216,7 @@ StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
 std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile)
 {
     std::vector<NeoPixelDisplay*>* displays = new std::vector<NeoPixelDisplay*>();
-    const char* fileJson = getSdFileContents(displayConfigFile);
+    const char* fileJson = fileReader.getFileContents(displayConfigFile);
     
     if (!fileJson) {
         Serial.println("Failed to read display configuration file.");
@@ -272,7 +246,7 @@ std::vector<NeoPixelDisplay*>* createNeoPixelDisplays(String displayConfigFile)
 
 StyleConfiguration* readStyleConfiguration(String styleConfigFile)
 {
-    const char* fileJson = getSdFileContents(styleConfigFile);
+    const char* fileJson = fileReader.getFileContents(styleConfigFile);
     
     // If we can't read the style configuration file, return an empty style configuration.
     if (!fileJson) {
@@ -427,8 +401,8 @@ void initializeBlePeripheralService()
         SignConfigurationData signConfigData;
         if (neoPixelDisplays->size() > 0) {
             // The assumption here is that if we're in secondary mode, the configuration is read from the pins.
-            signConfigData.signType = getSignType();
-            signConfigData.signOrder = getSignPosition();
+            signConfigData.signType = HardwareSignConfig::getSignType();
+            signConfigData.signOrder = HardwareSignConfig::getSignPosition();
             
             // Not exactly sure how to handle multiple displays...
             signConfigData.columnCount = neoPixelDisplays->at(0)->getColumnCount();
@@ -472,14 +446,6 @@ void readSettingsFromBLE()
     newPatternData = blePeripheralService->getPatternData();
 }
 
-void initializeBatteryMonitor()
-{
-    if (batteryMonitorConfig.isEnabled())
-    {
-        pinMode(batteryMonitorConfig.getAnalogInputPin(), INPUT);
-    }
-}
-
 void initializePowerLed()
 {
     if (powerLedConfig.isEnabled())
@@ -489,35 +455,9 @@ void initializePowerLed()
     }
 }
 
-// Read the analog input from the "voltage input" pin and calculate the battery voltage.
-float getCalculatedBatteryVoltage()
-{
-    if (!batteryMonitorConfig.isEnabled())
-    {
-        return 0.0f;
-    }
-
-    // The analog input ranges from 0 (0V) to 1024 (3.3V), resulting in 0.00322 Volts per "tick".
-    // The battery voltage passes through a voltage divider so we have to multiply the input by
-    // a scale factor to get the actual voltage.
-    float rawLevel = getRawVoltageInputLevel();
-    return rawLevel * batteryMonitorConfig.getInputMultiplier() * 3.3 / 1024;
-}
-
-// Read the raw value from the "voltage input" pin.
-int getRawVoltageInputLevel()
-{
-    if (!batteryMonitorConfig.isEnabled())
-    {
-        return 0;
-    }
-
-    return analogRead(batteryMonitorConfig.getAnalogInputPin());
-}
-
 void displayBatteryVoltage()
 {
-    double voltage = getCalculatedBatteryVoltage();
+    double voltage = batteryMonitor->getCalculatedBatteryVoltage();
     display->displayTemporary(String(voltage, 2), 1500);
 }
 
@@ -525,7 +465,7 @@ void displayBatteryVoltage()
 // or if the battery has been charged enough to restart operation.
 void checkForLowPowerState()
 {
-    if (!batteryMonitorConfig.isEnabled())
+    if (!batteryMonitor->isEnabled())
     {
         return;
     }
@@ -536,10 +476,8 @@ void checkForLowPowerState()
         return;
     }
 
-    double currentVoltage = getCalculatedBatteryVoltage();
-
     // Check if the voltage is too low.
-    if (currentVoltage < batteryMonitorConfig.getVoltageToEnterLowPowerState())
+    if (batteryMonitor->isBatteryBelowLowPowerThreshold())
     {
         if (inLowPowerMode)
         {
@@ -548,10 +486,8 @@ void checkForLowPowerState()
         else
         {
             Serial.print("Battery voltage is below threshold. Voltage: ");
-            Serial.print(currentVoltage);
-            Serial.print(", threshold: ");
-            Serial.println(batteryMonitorConfig.getVoltageToEnterLowPowerState());
-            Serial.println("Entering low power mode.");
+            Serial.print(batteryMonitor->getCalculatedBatteryVoltage());
+            Serial.println(". Entering low power mode.");
             inLowPowerMode = true;
 
             // Set up the "low power" display pattern.
@@ -570,7 +506,7 @@ void checkForLowPowerState()
     }
 
     // Check if the voltage is high enough for normal operation.
-    if (currentVoltage > batteryMonitorConfig.getVoltageToExitLowPowerState())
+    if (batteryMonitor->isBatteryAboveRestartThreshold())
     {
         if (!inLowPowerMode)
         {
@@ -578,15 +514,14 @@ void checkForLowPowerState()
         }
         else
         {
-            Serial.print("Battery voltage is above normal threshold. Voltage: ");
-            Serial.print(currentVoltage);
-            Serial.print(", threshold: ");
-            Serial.println(batteryMonitorConfig.getVoltageToExitLowPowerState());
-            Serial.println("Exiting low power mode.");
+            Serial.print("Battery voltage is above recovery threshold. Voltage: ");
+            Serial.print(batteryMonitor->getCalculatedBatteryVoltage());
+            Serial.println(". Exiting low power mode.");
             for (NeoPixelDisplay* neoPixelDisplay : *neoPixelDisplays)
             {
                 neoPixelDisplay->setBrightness(currentBrightness);
             }
+
             inLowPowerMode = false;
             newSyncData++;
         }
@@ -612,8 +547,7 @@ void updateTelemetry()
         loopCounter = 0;
 
         // Output voltage info periodically
-        int rawLevel = getRawVoltageInputLevel();
-        float voltage = getCalculatedBatteryVoltage();
+        float voltage = batteryMonitor->getCalculatedBatteryVoltage();
 
         // Emit battery voltage information on Bluetooth as well as Serial.
         if (bluetoothConfig.isEnabled())
@@ -622,10 +556,8 @@ void updateTelemetry()
         }
 
         Serial.print("Battery monitor: ");
-        Serial.print(batteryMonitorConfig.isEnabled() ? "Enabled" : "Disabled");
-        Serial.print("; Raw input: ");
-        Serial.print(rawLevel);
-        Serial.print("; Calculated voltage: ");
+        Serial.print(batteryMonitor->isEnabled() ? "Enabled" : "Disabled");
+        Serial.print("; Voltage: ");
         Serial.println(voltage);
 
         if (bluetoothConfig.isEnabled())
@@ -818,155 +750,6 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
 
         setManualStyle(styleDef);
     }
-}
-
-const char* getSdFileContents(String filename)
-{
-    if (filename.startsWith("::") && filename.endsWith("::"))
-    {
-        // It's a built-in file.
-        return readBuiltInFile(filename);
-    }
-
-    if (!SD.begin(sdCardChipSelectPin))
-    {
-        Serial.println("SD card initialization failed!");
-        return nullptr;
-    }
-
-    if (!SD.exists(filename))
-    {
-        Serial.println("File does not exist on SD card: " + filename);
-        SD.end();
-        return nullptr;
-    }
-    Serial.println("Reading file '" + filename + "' from SD card.");
-    File file = SD.open(filename);
-
-    if (!file)
-    {
-        Serial.println("Could not open file!");
-        SD.end();
-        return nullptr;
-    }
-
-    size_t fileSize = file.size();
-
-    Serial.println("Reading file.");
-    char* fileContents = new char[fileSize + 1];
-    file.readBytes(fileContents, fileSize);
-    fileContents[fileSize] = '\0';  // Add null terminator
-
-    Serial.println("File read successfully.");
-
-    file.close();
-    SD.end();
-
-    return fileContents;
-}
-
-byte getSignType()
-{
-    pinMode(TEST_MODE_PIN, INPUT_PULLUP);
-    std::vector<int> typeSelectorPins = {STYLE_TYPE_SELECTOR_PINS};
-
-    for (uint i = 0; i < typeSelectorPins.size(); i++)
-    {
-        pinMode(typeSelectorPins.at(i), INPUT_PULLUP);
-    }
-
-    delay(100);
-
-    // Check the "test" pin
-    if (digitalRead(TEST_MODE_PIN) == LOW)
-    {
-        Serial.println("Test mode detected. Returning 255 for TestMatrix sign type.");
-        return 255;
-    }
-
-    // Pull the pin low to indicate active.
-    byte type = 0;
-    for (uint i = 0; i < typeSelectorPins.size(); i++)
-    {
-        type = type << 1;
-        if (digitalRead(typeSelectorPins.at(i)) == LOW)
-        {
-            type++;
-        }
-    }
-
-    return type;
-}
-
-byte getSignPosition()
-{
-    std::vector<int> orderSelectorPins = {ORDER_SELECTOR_PINS};
-
-    for (uint i = 0; i < orderSelectorPins.size(); i++)
-    {
-        pinMode(orderSelectorPins.at(i), INPUT_PULLUP);
-    }
-
-    delay(100);
-
-    // Pull the pin low to indicate active.
-    byte order = 0;
-    for (uint i = 0; i < orderSelectorPins.size(); i++)
-    {
-        order = order << 1;
-        if (digitalRead(orderSelectorPins.at(i)) == LOW)
-        {
-            order++;
-        }
-    }
-
-    return order;
-}
-
-const char* readBuiltInFile(String filename)
-{
-    // "Read" Default display configs.
-    Serial.println("'Reading' built-in file: " + filename);
-
-    if (filename == "::Display1::")
-    {
-        return copyString(DisplayConfigFactory::getDigit1Json(), strlen(DisplayConfigFactory::getDigit1Json()));
-    }
-
-    if (filename == "::Display3::")
-    {
-        return copyString(DisplayConfigFactory::getDigit3Json(), strlen(DisplayConfigFactory::getDigit3Json()));
-    }
-
-    if (filename == "::Display8::")
-    {
-        return copyString(DisplayConfigFactory::getDigit8Json(), strlen(DisplayConfigFactory::getDigit8Json()));
-    }
-
-    if (filename == "::Display15::")
-    {
-        return copyString(DisplayConfigFactory::getLogoJson(), strlen(DisplayConfigFactory::getLogoJson()));
-    }
-
-    if (filename == "::Display255::")
-    {
-        return copyString(DisplayConfigFactory::getTestMatrixJson(), strlen(DisplayConfigFactory::getTestMatrixJson()));
-    }
-
-    // TODO (if the pit sign comes back):
-    // ::Display10:: is the pit sign
-    // ::PitSignStyle:: should be the default styles
-
-    Serial.println("Built-in file not found. Returning null.");
-    return nullptr;
-}
-
-const char* copyString(const char* source, size_t length)
-{
-    char* dest = new char[length + 1];
-    strncpy(dest, source, length);
-    dest[length] = '\0';
-    return dest;
 }
 
 void populateSecondaryClients()
