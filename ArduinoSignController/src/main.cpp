@@ -758,7 +758,7 @@ void populateSecondaryClients()
 
     display->setDisplay("C-0");
     // Continue to look for secondaries until we pass the timeout after finding at least one.
-    while (millis() < scanTimeout || allSecondaries.size() == 0)
+    while ((allSecondaries.size() < MAX_SECONDARY_COUNT) && (millis() < scanTimeout || allSecondaries.size() == 0))
     {
         SecondaryClient *secondary = scanForSecondaryClient();
         if (secondary->isValidClient())
@@ -919,6 +919,18 @@ void checkSecondaryConnections()
 {
     if (millis() < nextSecondaryConnectionCheck || blePeripheralService->isConnected())
     {
+        // Not time to check, or someone has connected to us.
+        return;
+    }
+
+    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
+    Serial.print("Number of connected secondaries: ");
+    Serial.println(allSecondaries.size());
+
+    if (allSecondaries.size() == 0)
+    {
+        // No secondaries defined - if we got here it's because we lost connection with the secondaries.
+        display->setDisplay("-NC-");
         return;
     }
 
@@ -942,30 +954,36 @@ void checkSecondaryConnections()
 
     if (atLeastOneDisconnected)
     {
-        resetSecondaryConnections();
+        // Disconnect from all the secondaries.
+        // This will also set the display to show we've disconnected.
+        // Only attempt to reconnect when manually triggered.
+        disconnectSecondaries();
     }
-
-    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
 }
 
-void resetSecondaryConnections()
+void disconnectSecondaries()
 {
-    // Taking the easy way out...
-    // Rather than trying to pinpoint which one (or more) of the devices
-    // dropped the connection and trying to only re-establish those connections,
-    // we'll just disconnect all secondaries and reconnect all of them.
-    Serial.println("Resetting all secondary devices and reconnecting...");
+    Serial.println("Disconnecting all secondary devices.");
+
     for (uint i = 0; i < allSecondaries.size(); i++)
     {
         if (allSecondaries.at(i)->isConnected())
         {
-            // deleting the secondary will disconnect the peripheral automatically, but do it here anyways.
             allSecondaries.at(i)->disconnect();
         }
+
         delete allSecondaries.at(i);
     }
 
     allSecondaries.clear();
+}
+
+void resetSecondaryConnections()
+{
+    // Disconnect any secondaries that we may still be connected to.
+    disconnectSecondaries();
+
+    // Repopulate the secondaries.
     populateSecondaryClients();
     updateOffsetDataForSecondaryClients();
     setManualStyle(styleConfiguration->getDefaultStyle());

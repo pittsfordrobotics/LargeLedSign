@@ -147,55 +147,63 @@ byte TM1637StatusDisplay::convertCharacter(char c)
 {
     switch (c)
     {
-    case '0':
-        return m_display->encodeDigit(0);
-    case '1':
-        return m_display->encodeDigit(1);
-    case '2':
-        return m_display->encodeDigit(2);
-    case '3':
-        return m_display->encodeDigit(3);
-    case '4':
-        return m_display->encodeDigit(4);
-    case '5':
-        return m_display->encodeDigit(5);
-    case '6':
-        return m_display->encodeDigit(6);
-    case '7':
-        return m_display->encodeDigit(7);
-    case '8':
-        return m_display->encodeDigit(8);
-    case '9':
-        return m_display->encodeDigit(9);
-    case 'A':
-    case 'a':
-        return m_display->encodeDigit(10);
-    case 'B':
-    case 'b':
-        return m_display->encodeDigit(11);
-    case 'C':
-    case 'c':
-        return m_display->encodeDigit(12);
-    case 'D':
-    case 'd':
-        return m_display->encodeDigit(13);
-    case 'E':
-    case 'e':
-        return m_display->encodeDigit(14);
-    case 'F':
-    case 'f':
-        return m_display->encodeDigit(15);
-    case '-':
-        return 0b01000000;
-    case ' ':
-        return 0;
-    case '=':
-        return 0b01001000;
-    case 'O':
-    case 'o':
-        return 0b01011100;
-    default:
-        return 0;
+        case '0':
+            return m_display->encodeDigit(0);
+        case '1':
+            return m_display->encodeDigit(1);
+        case '2':
+            return m_display->encodeDigit(2);
+        case '3':
+            return m_display->encodeDigit(3);
+        case '4':
+            return m_display->encodeDigit(4);
+        case '5':
+            return m_display->encodeDigit(5);
+        case '6':
+            return m_display->encodeDigit(6);
+        case '7':
+            return m_display->encodeDigit(7);
+        case '8':
+            return m_display->encodeDigit(8);
+        case '9':
+            return m_display->encodeDigit(9);
+        case 'A':
+        case 'a':
+            return m_display->encodeDigit(10);
+        case 'B':
+        case 'b':
+            return m_display->encodeDigit(11);
+        case 'C':
+            return m_display->encodeDigit(12);
+        case 'c':
+            return 0b01011000; // Small c, bottom half of the digit
+        case 'D':
+        case 'd':
+            return m_display->encodeDigit(13);
+        case 'E':
+        case 'e':
+            return m_display->encodeDigit(14);
+        case 'F':
+        case 'f':
+            return m_display->encodeDigit(15);
+        case 'N':
+            return 0b00110111; // Large N, full digit height
+        case 'n':
+            return 0b01010100; // Small n, bottom half of the digit
+        case 'O':
+            return m_display->encodeDigit(0);
+        case 'o':
+            return 0b01011100; // Small o, bottom half of the digit
+        case '-':
+            return 0b01000000;
+        case '_':
+            return 0b00001000;
+        case '=':
+            return 0b01001000;
+        case ' ':
+            return 0;
+        default:
+            return 0;
     }
 }
 
