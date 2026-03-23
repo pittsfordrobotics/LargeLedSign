@@ -17,13 +17,13 @@
 #include "NeoPixelDisplay.h"
 #include "Utils\StringUtils.h"
 
-#define INITIAL_DELAY 2000  // Initial delay to allow serial monitor to connect.
+#define INITIAL_DELAY 0000  // Initial delay to allow serial monitor to connect.
 #define TELEMETRYINTERVAL 3000     // Interval (msec) for updating the telemetry.
 
 #define MAX_SECONDARY_COUNT 5    // The maximum number of secondary peripherals to connect to in proxy mode.
 #define MAX_SECONDARY_SCAN_TIME 2000  // The amount of time (msec) to wait for a connection to a secondary peripheral.
 #define MAX_TOTAL_SCAN_TIME 10000     // The total time (msec) to spend looking for secondary peripherals.
-#define SECONDARY_PING_INTERVAL 1500  // The interval (msec) at which to ping secondaries to verify connection.
+#define SECONDARY_PING_INTERVAL 3000  // The interval (msec) at which to ping secondaries to verify connection.
 
 #define LOW_POWER_DURATION 5000  // The amount of time that must elapse before exiting low power mode.
 

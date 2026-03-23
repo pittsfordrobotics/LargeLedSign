@@ -41,7 +41,7 @@ volatile bool isInitialized = false;
 void setup()
 {
     Serial.begin(9600);
-    //delay(INITIAL_DELAY);
+    delay(INITIAL_DELAY);
     Serial.println("Starting...");
 
     systemConfiguration = readSystemConfiguration();
@@ -934,7 +934,8 @@ void checkSecondaryConnections()
         return;
     }
 
-    display->displayTemporary(" .", 200);
+    String status = " . . ." + String(allSecondaries.size());
+    display->displayTemporary(status, 200);
     bool atLeastOneDisconnected = false;
     for (uint i = 0; i < allSecondaries.size(); i++)
     {
