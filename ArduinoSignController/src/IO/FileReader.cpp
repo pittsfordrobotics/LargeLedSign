@@ -54,6 +54,49 @@ const char* FileReader::getFileContents(String filename)
     return fileContents;
 }
 
+std::vector<uint8_t> FileReader::getFileBytes(String filename)
+{
+    initialize();
+
+    if (!isSdCardDetected) {
+        Serial.println("SD card not detected. Cannot read file: " + filename);
+        return std::vector<uint8_t>();
+    }
+
+    if (!SD.begin(chipSelectPin))
+    {
+        Serial.println("File reader was initialized but SD.begin failed. Cannot read file: " + filename);
+        return std::vector<uint8_t>();
+    }
+
+    if (!SD.exists(filename))
+    {
+        Serial.println("File does not exist on SD card: " + filename);
+        SD.end();
+        return std::vector<uint8_t>();
+    }
+
+    Serial.println("Reading file from SD card as bytes: " + filename);
+    File file = SD.open(filename);
+
+    if (!file) 
+    {
+        Serial.println("Failed to open file: " + filename);
+        SD.end();
+        return std::vector<uint8_t>();
+    }
+
+    size_t fileSize = file.size();
+    std::vector<uint8_t> fileBytes(fileSize);
+    file.read(fileBytes.data(), fileSize);
+    Serial.println("File read successfully.");
+
+    file.close();
+    SD.end();
+    
+    return fileBytes;
+}
+
 void FileReader::initialize() 
 {
     if (isInitialized) 

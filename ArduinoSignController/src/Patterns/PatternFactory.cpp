@@ -150,6 +150,13 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
             displayPattern = pattern;
             break;
         }
+        case DisplayPatternType::Image:
+        {
+            ImageDisplayPattern* pattern = new ImageDisplayPattern();
+            pattern->setColorPattern(colorPattern);
+            displayPattern = pattern;
+            break;
+        }
         default:
         {
             SolidDisplayPattern* pattern = new SolidDisplayPattern();

@@ -32,6 +32,7 @@ class FileReader
         FileReader();
         const char* getSystemConfig() { return getFileContents(SYSTEM_CONFIG_FILE); };
         const char* getFileContents(String filename);
+        std::vector<uint8_t> getFileBytes(String filename);
 
     private:
         bool isInitialized{false};
