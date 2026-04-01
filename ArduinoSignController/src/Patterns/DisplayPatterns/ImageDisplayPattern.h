@@ -4,8 +4,8 @@
 #include <Arduino.h>
 #include <vector>
 #include "DisplayPattern.h"
-#include "IO\BmpUtils.h"
 #include "IO\FileReader.h"
+#include "Utils\BmpUtils.h"
 #include "Utils\DebugUtils.h"
 
 class ImageDisplayPattern : public DisplayPattern

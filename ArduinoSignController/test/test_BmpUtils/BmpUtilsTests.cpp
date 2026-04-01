@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "IO\BmpUtils.cpp"
+#include "Utils\BmpUtils.cpp"
 
 namespace
 {
