@@ -19,6 +19,7 @@
 
 #define INITIAL_DELAY 0000  // Initial delay to allow serial monitor to connect.
 #define TELEMETRYINTERVAL 3000     // Interval (msec) for updating the telemetry.
+#define LEDTELEMETRYINTERVAL 3010     // Interval (msec) for updating the LED telemetry.
 
 #define MAX_SECONDARY_COUNT 5    // The maximum number of secondary peripherals to connect to in proxy mode.
 #define MAX_SECONDARY_SCAN_TIME 2000  // The amount of time (msec) to wait for a connection to a secondary peripheral.

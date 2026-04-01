@@ -35,10 +35,12 @@ class FileReader
         std::vector<uint8_t> getFileBytes(String filename);
 
     private:
-        bool isInitialized{false};
-        bool isSdCardDetected{true};
-        int chipSelectPin{SDCARD_CHIPSELECT};
-
+        static bool isInitialized;
+        static bool isSdCardDetected;
+        static int chipSelectPin;
+        
+        File openFile(String filename);
+        void closeFile(File file);
         void initialize();
         bool isBuiltInFile(String filename);
         const char* readBuiltInFile(String filename);
