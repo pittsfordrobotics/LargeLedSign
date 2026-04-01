@@ -29,6 +29,7 @@ void DisplayPattern::setSpeed(byte speed)
 
     // Convert scaled frame rate back to millisecond iteration delay between frames.
     m_iterationDelay = (1000 * 1000) / scaledFrameRateX1000;
+    m_nextUpdate = millis() + m_iterationDelay;
 }
 
 void DisplayPattern::reset(PixelMap* pixelMap)
@@ -37,6 +38,8 @@ void DisplayPattern::reset(PixelMap* pixelMap)
     {
         resetInternal(pixelMap);
     }
+
+    m_nextUpdate = millis() + m_iterationDelay;
 }
 
 bool DisplayPattern::update(PixelMap* pixelMap)

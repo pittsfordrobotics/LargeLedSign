@@ -36,6 +36,7 @@ class ImageDisplayPattern : public DisplayPattern
         int imageNumber{0};
 
         void loadImageData(String filename);
+        int edgeRowOrCol{0};
 
     };
 
