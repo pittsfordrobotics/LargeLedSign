@@ -154,6 +154,8 @@ DisplayPattern* PatternFactory::createForPatternData(const PatternData& patternD
         {
             ImageDisplayPattern* pattern = new ImageDisplayPattern();
             pattern->setColorPattern(colorPattern);
+            pattern->setShiftType(params[startOfDisplayParameters]);
+            pattern->setImageNumber(params[startOfDisplayParameters + 1]);
             displayPattern = pattern;
             break;
         }
