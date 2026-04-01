@@ -33,33 +33,6 @@ namespace
     constexpr uint32_t BmpCompressionRgb = 0;
 }
 
-std::vector<std::vector<unsigned long>> BmpUtils::ParseBmp(File& file)
-{
-    if (!file)
-    {
-        return {};
-    }
-
-    if (!file.seek(0))
-    {
-        return {};
-    }
-
-    const size_t fileLength = static_cast<size_t>(file.size());
-    if (fileLength == 0)
-    {
-        return {};
-    }
-
-    std::vector<uint8_t> bytes(fileLength, 0);
-    if (file.read(bytes.data(), fileLength) != fileLength)
-    {
-        return {};
-    }
-
-    return ParseBmp(bytes.data(), bytes.size());
-}
-
 std::vector<std::vector<unsigned long>> BmpUtils::ParseBmp(const std::vector<uint8_t>& bytes)
 {
     if (bytes.empty())

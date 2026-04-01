@@ -34,3 +34,8 @@ void ImageDisplayPattern::updateInternal(PixelMap* pixelMap)
 {
     // No dynamic behavior to update for this pattern.
 }
+
+std::vector<String> ImageDisplayPattern::getParameterNames()
+{
+    return std::vector<String>();
+}

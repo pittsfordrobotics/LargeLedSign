@@ -13,6 +13,8 @@ class ImageDisplayPattern : public DisplayPattern
     public:
         ImageDisplayPattern();
 
+        static std::vector<String> getParameterNames();
+
     protected:
         virtual void updateInternal(PixelMap* pixelMap) override;
         virtual void resetInternal(PixelMap* pixelMap) override;
