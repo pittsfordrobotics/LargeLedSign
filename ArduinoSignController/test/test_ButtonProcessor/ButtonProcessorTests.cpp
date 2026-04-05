@@ -17,6 +17,7 @@
 int lastCallerId(-1);
 String lastActionName("");
 std::vector<String> lastArguments;
+unsigned long mockMillisValue = 1000;  // keep this positive and greater than a few hundred!
 
 void resetActionParameters() {
     lastCallerId = -1;
@@ -30,6 +31,10 @@ void setUp(void) {
 void tearDown(void) {
 }
 
+unsigned long mockMillisMethod() {
+    return mockMillisValue;
+}
+
 void processAction(int callerId, String actionName, std::vector<String> arguments) {
     lastCallerId = callerId;
     lastActionName = actionName;
@@ -38,12 +43,14 @@ void processAction(int callerId, String actionName, std::vector<String> argument
 
 void noButtonsDoNothing() {
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     bp.update();
     TEST_ASSERT_TRUE(true);
 }
 
 void buttonsWithNoActions() {
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     MockButton* button1 = new MockButton();
     MockButton* button2 = new MockButton();
     bp.addButtonDefinition("Button1", button1);
@@ -52,15 +59,23 @@ void buttonsWithNoActions() {
     TEST_ASSERT_TRUE_MESSAGE(button1->wasUpdateCalled(), "Button 1 should have been updated.");
     TEST_ASSERT_TRUE_MESSAGE(button2->wasUpdateCalled(), "Button 2 should have been updated.");
     button1->setPressType(ButtonPressType::Normal);
+    button1->setLastPressTime(mockMillisValue);
     button2->setPressType(ButtonPressType::Long);
+    button2->setLastPressTime(mockMillisValue);
     bp.update();
-    // No action was done, so the buttons shouldn't have been reset.
-    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::Normal, button1->lastPressType(), "Button 1 should have been reset.");
-    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::Long, button2->lastPressType(), "Button 2 should have been reset.");
+    // No action was done, so the buttons shouldn't have been reset since we're still in the interval before the button gets cleared.
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::Normal, button1->lastPressType(), "Button 1 should not have been reset.");
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::Long, button2->lastPressType(), "Button 2 should not have been reset.");
+    // Update the 'current time' to be past the button press clear interval and verify that the buttons get cleared.
+    mockMillisValue += BUTTON_PROCESSOR_PRESS_CLEAR_DELAY + 1;
+    bp.update();
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button1->lastPressType(), "Button 1 should have been reset.");
+    TEST_ASSERT_EQUAL_MESSAGE(ButtonPressType::None, button2->lastPressType(), "Button 2 should have been reset.");
 }
 
 void undefinedActionProcessorDoesNothing() {
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     MockButton* button = new MockButton();
     bp.addButtonDefinition("Button1", button);
     bp.addTapAction({"Button1"}, "Action1");
@@ -78,6 +93,7 @@ void undefinedActionProcessorDoesNothing() {
 void simpleActionsWithProcessor() {
     resetActionParameters();
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     bp.setActionProcessor(processAction);
     MockButton* button1 = new MockButton();
     MockButton* button2 = new MockButton();
@@ -111,6 +127,7 @@ void simpleActionsWithProcessor() {
 void buttonsClearAfterAction() {
     resetActionParameters();
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     bp.setActionProcessor(processAction);
     MockButton* button1 = new MockButton();
     MockButton* button2 = new MockButton();
@@ -129,6 +146,7 @@ void buttonsClearAfterAction() {
 void duplicateButtonsAreIgnored() {
     resetActionParameters();
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     bp.setActionProcessor(processAction);
     MockButton* button1 = new MockButton();
     MockButton* button2 = new MockButton();
@@ -144,6 +162,7 @@ void duplicateButtonsAreIgnored() {
 void combinationActionTests() {
     resetActionParameters();
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     bp.setActionProcessor(processAction);
     MockButton* button1 = new MockButton();
     MockButton* button2 = new MockButton();
@@ -155,15 +174,22 @@ void combinationActionTests() {
     bp.addTapAction({"Button2"}, "Action2"); // This action shouldn't be called
     bp.addTapAction({"Button1", "Button2", "Button3"}, "Action1-2-3");
     button1->setPressType(ButtonPressType::Normal);
+    button1->setLastPressTime(mockMillisValue);
     bp.update();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("", lastActionName.c_str(), "No action should have been run.");
     button2->setPressType(ButtonPressType::Normal);
+    button2->setLastPressTime(mockMillisValue);
     button3->setPressType(ButtonPressType::Normal);
+    button3->setLastPressTime(mockMillisValue);
+    mockMillisValue += BUTTON_PROCESSOR_ACTION_DELAY + 1; // Update the 'current time' to be past the action processing delay so that the action will be processed.
     bp.update();
     // Largest combination should have been run.
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Action1-2-3", lastActionName.c_str(), "Button1/2/3 action was not correct.");
     button1->setPressType(ButtonPressType::Normal);
+    button1->setLastPressTime(mockMillisValue);
     button2->setPressType(ButtonPressType::Normal);
+    button2->setLastPressTime(mockMillisValue);
+    mockMillisValue += BUTTON_PROCESSOR_ACTION_DELAY + 1;
     bp.update();
     TEST_ASSERT_EQUAL_STRING_MESSAGE("Action1-2", lastActionName.c_str(), "Button1/2 action was not correct.");
 }
@@ -171,6 +197,7 @@ void combinationActionTests() {
 void unknownButtonNamesInActionsAreIgnored() {
     resetActionParameters();
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     bp.setActionProcessor(processAction);
     MockButton* button1 = new MockButton();
     MockButton* button2 = new MockButton();
@@ -186,6 +213,7 @@ void unknownButtonNamesInActionsAreIgnored() {
 void validateActionArguments() {
     resetActionParameters();
     ButtonProcessor bp;
+    bp.setElapsedMillisFunction(mockMillisMethod);
     bp.setActionProcessor(processAction);
     MockButton* button1 = new MockButton();
     MockButton* button2 = new MockButton();

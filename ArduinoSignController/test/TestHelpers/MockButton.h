@@ -21,7 +21,7 @@ class MockButton : public GenericButton
     private:
         ButtonPressType m_lastPressType{ButtonPressType::None};
         bool m_wasUpdateCalled{false};
-        unsigned long m_lastPressTime{0};
+        unsigned long m_lastPressTime{1000};
 };
 
 #endif
