@@ -11,14 +11,17 @@ class MockButton : public GenericButton
         virtual bool wasPressed() { return m_lastPressType != ButtonPressType::None; }
         virtual ButtonPressType lastPressType() { return m_lastPressType; }
         virtual void clearPress() { m_lastPressType = ButtonPressType::None; }
+        virtual unsigned long lastPressTime() { return m_lastPressTime; }
 
         void resetMock() {m_wasUpdateCalled = false; m_lastPressType = ButtonPressType::None; }
         void setPressType(ButtonPressType pressType) { m_lastPressType = pressType; }
         bool wasUpdateCalled() { return m_wasUpdateCalled; }
+        void setLastPressTime(unsigned long time) { m_lastPressTime = time; }
     
     private:
         ButtonPressType m_lastPressType{ButtonPressType::None};
         bool m_wasUpdateCalled{false};
+        unsigned long m_lastPressTime{0};
 };
 
 #endif

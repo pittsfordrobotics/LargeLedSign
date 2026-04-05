@@ -14,6 +14,7 @@ class GenericButton {
         virtual bool wasPressed() = 0;
         virtual ButtonPressType lastPressType() = 0;
         virtual void clearPress() = 0;;
+        virtual unsigned long lastPressTime() = 0;
 };
 
 #endif

@@ -23,6 +23,11 @@ ButtonPressType ArduinoPushButton::lastPressType()
     return m_lastPressType;
 }
 
+unsigned long ArduinoPushButton::lastPressTime()
+{
+    return m_lastPressTime;
+}
+
 PinStatus ArduinoPushButton::rawPinStatus()
 {
     return digitalRead(m_pinNumber);
@@ -81,6 +86,7 @@ void ArduinoPushButton::update()
                 m_wasPressed = true;
                 ulong pressTime = m_lastUpTime - m_lastDownTime;
                 setPressType(pressTime);
+                m_lastPressTime = millis();
             }
         }
     }

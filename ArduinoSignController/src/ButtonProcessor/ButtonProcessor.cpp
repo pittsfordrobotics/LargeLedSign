@@ -95,17 +95,27 @@ void ButtonProcessor::update() {
 
 bool ButtonProcessor::lookForAndExecuteAction(std::vector<ButtonAction*>& actionsToProcess, ButtonPressType pressType)
 {
+    ulong pressTimeCutoff = millis() - 100;
+
     for (ButtonAction* buttonAction : actionsToProcess) {
         bool allPressed = true;
+        bool atLeastOnePressedPriorToCutoff = false;
 
         for (String buttonName : buttonAction->getButtonNames()) {
-            if (!m_buttonMap[buttonName]->wasPressed() || m_buttonMap[buttonName]->lastPressType() != pressType) 
+            if (m_buttonMap[buttonName]->wasPressed() && m_buttonMap[buttonName]->lastPressType() == pressType)
+            {
+                if (m_buttonMap[buttonName]->lastPressTime() < pressTimeCutoff)
+                {
+                    atLeastOnePressedPriorToCutoff = true;
+                }
+            }
+            else
             {
                 allPressed = false;
             }
         }
 
-        if (allPressed)
+        if (allPressed && atLeastOnePressedPriorToCutoff)
         {
             if (m_actionProcessor)
             {
