@@ -98,7 +98,7 @@ void ButtonProcessor::update() {
     // (ex: if a button doesn't have an action but was pressed, it will stay
     //  in a "pressed" state until another action would have cleared it,
     //  causing it to be considered part of a combo if another button was pressed.)
-    ulong longDelayCutoff = millis() - 500;
+    ulong longDelayCutoff = millis() - BUTTON_PROCESSOR_PRESS_CLEAR_DELAY;
     for (auto const& mapEntry : m_buttonMap) {
         if (mapEntry.second->lastPressTime() < longDelayCutoff)
         {
@@ -109,7 +109,7 @@ void ButtonProcessor::update() {
 
 bool ButtonProcessor::lookForAndExecuteAction(std::vector<ButtonAction*>& actionsToProcess, ButtonPressType pressType)
 {
-    ulong pressTimeCutoff = millis() - 100;
+    ulong pressTimeCutoff = millis() - BUTTON_PROCESSOR_ACTION_DELAY;
 
     for (ButtonAction* buttonAction : actionsToProcess) {
         bool allPressed = true;
