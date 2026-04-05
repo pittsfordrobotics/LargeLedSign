@@ -90,6 +90,20 @@ void ButtonProcessor::update() {
         for (auto const& mapEntry : m_buttonMap) {
             mapEntry.second->clearPress();
         }
+
+        return;
+    }
+
+    // Reset any buttons that were pressed too long ago
+    // (ex: if a button doesn't have an action but was pressed, it will stay
+    //  in a "pressed" state until another action would have cleared it,
+    //  causing it to be considered part of a combo if another button was pressed.)
+    ulong longDelayCutoff = millis() - 500;
+    for (auto const& mapEntry : m_buttonMap) {
+        if (mapEntry.second->lastPressTime() < longDelayCutoff)
+        {
+            mapEntry.second->clearPress();
+        }
     }
 }
 
