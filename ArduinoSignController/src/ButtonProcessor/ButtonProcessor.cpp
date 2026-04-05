@@ -4,6 +4,17 @@ ButtonProcessor::ButtonProcessor()
 {
 }
 
+// Unit tests crash when calling the 'millis()' function, so allow it to be overridden.
+unsigned long ButtonProcessor::getMillis()
+{
+    if (m_elapsedMillisFunction)
+    {
+        return m_elapsedMillisFunction();
+    }
+    
+    return millis();
+}
+
 void ButtonProcessor::addButtonDefinition(String buttonName, GenericButton* button)
 {
     if (m_buttonMap.find(buttonName) != m_buttonMap.end())
@@ -90,22 +101,46 @@ void ButtonProcessor::update() {
         for (auto const& mapEntry : m_buttonMap) {
             mapEntry.second->clearPress();
         }
+
+        return;
+    }
+
+    // Reset any buttons that were pressed too long ago
+    // (ex: if a button doesn't have an action but was pressed, it will stay
+    //  in a "pressed" state until another action would have cleared it,
+    //  causing it to be considered part of a combo if another button was pressed.)
+    unsigned long longDelayCutoff = getMillis() - BUTTON_PROCESSOR_PRESS_CLEAR_DELAY;
+    for (auto const& mapEntry : m_buttonMap) {
+        if (mapEntry.second->lastPressTime() < longDelayCutoff)
+        {
+            mapEntry.second->clearPress();
+        }
     }
 }
 
 bool ButtonProcessor::lookForAndExecuteAction(std::vector<ButtonAction*>& actionsToProcess, ButtonPressType pressType)
 {
+    unsigned long pressTimeCutoff = getMillis() - BUTTON_PROCESSOR_ACTION_DELAY;
+
     for (ButtonAction* buttonAction : actionsToProcess) {
         bool allPressed = true;
+        bool atLeastOnePressedPriorToCutoff = false;
 
         for (String buttonName : buttonAction->getButtonNames()) {
-            if (!m_buttonMap[buttonName]->wasPressed() || m_buttonMap[buttonName]->lastPressType() != pressType) 
+            if (m_buttonMap[buttonName]->wasPressed() && m_buttonMap[buttonName]->lastPressType() == pressType)
+            {
+                if (m_buttonMap[buttonName]->lastPressTime() < pressTimeCutoff)
+                {
+                    atLeastOnePressedPriorToCutoff = true;
+                }
+            }
+            else
             {
                 allPressed = false;
             }
         }
 
-        if (allPressed)
+        if (allPressed && atLeastOnePressedPriorToCutoff)
         {
             if (m_actionProcessor)
             {

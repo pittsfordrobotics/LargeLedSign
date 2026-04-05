@@ -15,6 +15,7 @@ class ArduinoPushButton : public GenericButton {
         virtual bool wasPressed();
         virtual ButtonPressType lastPressType();
         virtual void clearPress();
+        virtual ulong lastPressTime();
         PinStatus rawPinStatus();
     
     private:
@@ -23,6 +24,7 @@ class ArduinoPushButton : public GenericButton {
         ulong m_lastDownTime{0};
         ulong m_lastUpTime{0};
         ulong m_lastTransitionTime{0};
+        ulong m_lastPressTime{0};
         bool m_inDelayInterval{false};
         bool m_wasPressed{false};
         int m_consecutiveCount{0};
