@@ -22,7 +22,8 @@ enum class DisplayPatternType : byte
     SpotLight = 16,
     SpotLightCCW = 17,
     CenterOutSquare = 18,
-    Radial = 19
+    Radial = 19,
+    Image = 20
 };
 
 class DisplayPatternTypeHelper
@@ -101,6 +102,10 @@ class DisplayPatternTypeHelper
             if (type.equalsIgnoreCase("radial") || type.equalsIgnoreCase(String((int)DisplayPatternType::Radial)))
             {
                 return DisplayPatternType::Radial;
+            }
+            if (type.equalsIgnoreCase("image") || type.equalsIgnoreCase(String((int)DisplayPatternType::Image)))
+            {
+                return DisplayPatternType::Image;
             }
             return DisplayPatternType::Solid;
         }

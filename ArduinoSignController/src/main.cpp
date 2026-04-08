@@ -573,7 +573,7 @@ void updateLedTelemetry()
     ledLoopCounter++;
     unsigned long timestamp = millis();
 
-    if (timestamp > lastLedTelemetryTimestamp + TELEMETRYINTERVAL)
+    if (timestamp > lastLedTelemetryTimestamp + LEDTELEMETRYINTERVAL)
     {
         if (neoPixelDisplays->size() == 0) {
             Serial.println("No LED displays configured.");

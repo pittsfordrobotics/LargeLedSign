@@ -1,5 +1,10 @@
 #include "FileReader.h"
 
+// Initialize static member variables
+bool FileReader::isInitialized = false;
+bool FileReader::isSdCardDetected = true;
+int FileReader::chipSelectPin = SDCARD_CHIPSELECT;
+
 FileReader::FileReader()
 {
 }
@@ -11,34 +16,13 @@ const char* FileReader::getFileContents(String filename)
         Serial.println("Reading built-in file: " + filename);
         return readBuiltInFile(filename);
     }
-
-    initialize();
-
-    if (!isSdCardDetected) {
-        Serial.println("SD card not detected. Cannot read file: " + filename);
-        return nullptr;
-    }
-
-    if (!SD.begin(chipSelectPin))
-    {
-        Serial.println("File reader was initialized but SD.begin failed. Cannot read file: " + filename);
-        return nullptr;
-    }
-
-    if (!SD.exists(filename))
-    {
-        Serial.println("File does not exist on SD card: " + filename);
-        SD.end();
-        return nullptr;
-    }
-
+    
     Serial.println("Reading file from SD card: " + filename);
-    File file = SD.open(filename);
+    File file = openFile(filename);
 
     if (!file) 
     {
         Serial.println("Failed to open file: " + filename);
-        SD.end();
         return nullptr;
     }
 
@@ -48,10 +32,65 @@ const char* FileReader::getFileContents(String filename)
     fileContents[fileSize] = '\0';  // Add null terminator
     Serial.println("File read successfully.");
 
-    file.close();
-    SD.end();
-    
+    closeFile(file);
+
     return fileContents;
+}
+
+std::vector<uint8_t> FileReader::getFileBytes(String filename)
+{
+    Serial.println("Reading file from SD card as bytes: " + filename);
+    File file = openFile(filename);
+
+    if (!file) 
+    {
+        Serial.println("Failed to open file: " + filename);
+        return std::vector<uint8_t>();
+    }
+
+    size_t fileSize = file.size();
+    std::vector<uint8_t> fileBytes(fileSize);
+    file.read(fileBytes.data(), fileSize);
+    Serial.println("File read successfully.");
+
+    closeFile(file);
+    
+    return fileBytes;
+}
+
+File FileReader::openFile(String filename)
+{
+    initialize();
+
+    if (!isSdCardDetected) {
+        Serial.println("SD card not detected. Cannot read file: " + filename);
+        return File();
+    }
+
+    if (!SD.begin(chipSelectPin))
+    {
+        Serial.println("File reader was initialized but SD.begin failed. Cannot read file: " + filename);
+        return File();
+    }
+
+    if (!SD.exists(filename))
+    {
+        Serial.println("File does not exist on SD card: " + filename);
+        SD.end();
+        return File();
+    }
+
+    return SD.open(filename);
+}
+
+void FileReader::closeFile(File file)
+{
+    if (file) 
+    {
+        file.close();
+    }
+
+    SD.end();
 }
 
 void FileReader::initialize() 
