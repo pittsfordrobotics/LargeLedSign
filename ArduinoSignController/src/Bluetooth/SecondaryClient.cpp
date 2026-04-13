@@ -117,11 +117,6 @@ String SecondaryClient::getDisplayPatternList()
     return getStringValue(BTCOMMON_DISPLAYPATTERNLIST_CHARACTERISTIC_UUID);
 }
 
-long SecondaryClient::getTimestamp()
-{
-    return getLongValue(BTCOMMON_TIMESTAMP_CHARACTERISTIC_UUID);
-}
-
 String SecondaryClient::getStringValue(String characteristicUuid)
 {
     BLECharacteristic characteristic = m_peripheral.characteristic(characteristicUuid.c_str());

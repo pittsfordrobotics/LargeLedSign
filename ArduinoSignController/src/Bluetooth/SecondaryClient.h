@@ -42,7 +42,6 @@ class SecondaryClient {
         void updateSyncData(ulong syncData);
         String getColorPatternList();
         String getDisplayPatternList();
-        long getTimestamp();
 
     private:
         BLEDevice m_peripheral;

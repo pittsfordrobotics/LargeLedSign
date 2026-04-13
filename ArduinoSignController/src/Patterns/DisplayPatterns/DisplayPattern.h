@@ -14,7 +14,7 @@ class DisplayPattern {
     public:
         // Instantiates a new DisplayPattern.
         DisplayPattern();
-        virtual ~DisplayPattern();
+        ~DisplayPattern();
 
         // The ColorPattern passed in here will be "owned" by the DisplayPattern
         // When the DisplayPattern is deleted, the ColorPattern will be deleted as well.
