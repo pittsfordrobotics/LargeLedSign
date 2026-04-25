@@ -4,6 +4,7 @@ BleProxyService::BleProxyService()
 {
     nullStatusDisplay = new NullStatusDisplay();
     statusDisplay = nullStatusDisplay;
+    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
 }
 
 BleProxyService::~BleProxyService()
@@ -25,6 +26,13 @@ void BleProxyService::setStatusDisplay(StatusDisplay* display)
 
 void BleProxyService::update()
 {
+    if (millis() < nextSecondaryConnectionCheck)
+    {
+        // Not time to check
+        return;
+    }
+
+    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
     checkSecondaryConnections();
 }
 
@@ -237,13 +245,6 @@ SecondaryClient *BleProxyService::scanForSecondaryClient()
 
 void BleProxyService::checkSecondaryConnections()
 {
-    if (millis() < nextSecondaryConnectionCheck)
-    {
-        // Not time to check
-        return;
-    }
-
-    nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
     DebugUtils::print("Number of connected secondaries: ");
     DebugUtils::println(String(allSecondaries.size()));
 
