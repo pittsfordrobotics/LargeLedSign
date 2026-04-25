@@ -34,9 +34,6 @@ ulong currentSyncData = 0;
 ulong newSyncData = 0;
 SignOffsetData currentOffsetData;
 
-//std::vector<SecondaryClient *> allSecondaries;
-//ulong nextSecondaryConnectionCheck = 0;
-
 volatile bool isInitialized = false;
 
 void setup()
@@ -89,7 +86,6 @@ void setup()
     display->setDisplay("---8");
     Serial.println("---8");
     initializeProxyService();
-    //nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
 
     display->setDisplay("---9");
     Serial.println("---9");
@@ -121,11 +117,6 @@ void loop()
 
         proxyService->update();
         proxyService->setConfiguration(newBrightness, newSpeed, newPatternData);
-        // if (bluetoothConfig.isProxyModeEnabled())
-        // {
-        //     updateAllSecondaries();
-        //     checkSecondaryConnections();
-        // }
     }
 }
 
@@ -207,6 +198,13 @@ StatusDisplay* createStatusDisplay(Tm1637DisplayConfiguration& config)
 {
     if (config.isEnabled())
     {
+        Serial.print("Initializing TM1637 status display on clock pin ");
+        Serial.print(config.getClockGpioPin());
+        Serial.print(" and data pin ");
+        Serial.print(config.getDataGpioPin());
+        Serial.print(" with brightness ");
+        Serial.println(config.getBrightness());
+
         return (StatusDisplay*)(new TM1637StatusDisplay(
             config.getClockGpioPin(),
             config.getDataGpioPin(),
@@ -747,241 +745,3 @@ void processButtonAction(int callerId, String actionName, std::vector<String> ar
         setManualStyle(styleDef);
     }
 }
-
-// void populateSecondaryClients()
-// {
-//     ulong scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
-
-//     display->setDisplay("C-0");
-//     // Continue to look for secondaries until we pass the timeout after finding at least one.
-//     while ((allSecondaries.size() < MAX_SECONDARY_COUNT) && (millis() < scanTimeout || allSecondaries.size() == 0))
-//     {
-//         SecondaryClient *secondary = scanForSecondaryClient();
-//         if (secondary->isValidClient())
-//         {
-//             allSecondaries.push_back(secondary);
-//             display->setDisplay("C-" + String(allSecondaries.size()));
-
-//             // Reset timeout and continue looking for secondaries.
-//             scanTimeout = millis() + MAX_TOTAL_SCAN_TIME;
-//         }
-//         else
-//         {
-//             // Clean up the memory from the invalid peripheral.
-//             delete secondary;
-//         }
-//     }
-
-//     // We found all we could in the time interval. Order them by position, lowest position first.
-//     std::sort(
-//             allSecondaries.begin(),
-//             allSecondaries.end(),
-//             [](SecondaryClient *&a, SecondaryClient *&b)
-//             { return a->getSignOrder() < b->getSignOrder(); });
-
-//     display->clear();
-// }
-
-// SecondaryClient *scanForSecondaryClient()
-// {
-//     ulong scanTimeout = millis() + MAX_SECONDARY_SCAN_TIME;
-
-//     Serial.print("Scanning for peripherals with uuid = ");
-//     Serial.println(BTCOMMON_SECONDARYCONTROLLER_UUID);
-//     bool allowDuplicateAdvertisements = true;
-//     BLE.scanForUuid(BTCOMMON_SECONDARYCONTROLLER_UUID, allowDuplicateAdvertisements);
-
-//     BLEDevice peripheral = BLE.available();
-//     while (!peripheral)
-//     {
-//         peripheral = BLE.available();
-
-//         if (millis() > scanTimeout)
-//         {
-//             Serial.println("Scan timed out.");
-//             BLE.stopScan();
-//             // Return a dummy client - it'll be ignored and cleaned up.
-//             return new SecondaryClient(peripheral);
-//         }
-//     }
-
-//     String localName = "unknown";
-//     if (peripheral)
-//     {
-//         Serial.println("Found peripheral.");
-//         if (peripheral.hasLocalName())
-//         {
-//             localName = peripheral.localName();
-//             Serial.print("Peripheral name: ");
-//             Serial.println(localName);
-//         }
-//     }
-
-//     BLE.stopScan();
-
-//     if (peripheral.connect())
-//     {
-//         Serial.print("Connected to ");
-//         Serial.println(localName);
-//     }
-//     else
-//     {
-//         Serial.println("Failed to connect!");
-//     }
-
-//     return new SecondaryClient(peripheral);
-// }
-
-// void updateOffsetDataForSecondaryClients()
-// {
-//     display->setDisplay("C---");
-//     uint numSecondaries = allSecondaries.size();
-//     if (numSecondaries == 0)
-//     {
-//         // Not sure how we got here with no secondary clients.
-//         display->clear();
-//         return;
-//     }
-
-//     // Stash the sign config data for each secondary so we don't retrieve it every time.
-//     std::vector<SignConfigurationData> signConfigurations;
-//     for (uint i = 0; i < numSecondaries; i++)
-//     {
-//         SignStatus status = allSecondaries[i]->getSignStatus();
-//         signConfigurations.push_back(status.signConfigurationData);
-//     }
-
-//     int numCols = 0;
-//     for (uint i = 0; i < numSecondaries; i++)
-//     {
-//         numCols += signConfigurations[i].columnCount;
-//     }
-
-//     int colsSoFar = 0;
-//     for (uint i = 0; i < numSecondaries; i++)
-//     {
-//         display->setDisplay("C--" + String(i + 1));
-//         SignOffsetData offsetData;
-//         offsetData.digitsToLeft = i;
-//         offsetData.digitsToRight = numSecondaries - i - 1;
-//         offsetData.columnsToLeft = colsSoFar;
-//         offsetData.columnsToRight = numCols - colsSoFar - signConfigurations[i].columnCount;
-//         colsSoFar += signConfigurations[i].columnCount;
-
-//         // Write the data back to the secondary
-//         allSecondaries[i]->setSignOffsetData(offsetData);
-//     }
-
-//     display->clear();
-// }
-
-// void updateAllSecondaries()
-// {
-//     // NOTE:
-//     // After calling this method, the currentXXX variables will be updated to match the newXXX variables.
-//     // It's assumed that we won't be running "proxy" and be updating NeoPixel displays at the same time.
-//     if (allSecondaries.size() == 0)
-//     {
-//         return;
-//     }
-
-//     if (currentBrightness == newBrightness &&
-//         currentSpeed == newSpeed &&
-//         currentPatternData == newPatternData)
-//     {
-//         // No changes to propagate.
-//         return;
-//     }
-    
-//     for (uint i = 0; i < allSecondaries.size(); i++)
-//     {
-//         allSecondaries[i]->setBrightness(newBrightness);
-//         allSecondaries[i]->setSpeed(newSpeed);
-//         allSecondaries[i]->setPatternData(newPatternData);
-//     }
-
-//     ulong timestamp = millis();
-//     for (uint i = 0; i < allSecondaries.size(); i++)
-//     {
-//         allSecondaries[i]->updateSyncData(timestamp);
-//     }
-
-//     currentBrightness = newBrightness;
-//     currentSpeed = newSpeed;
-//     currentPatternData = newPatternData;
-// }
-
-// void checkSecondaryConnections()
-// {
-//     if (millis() < nextSecondaryConnectionCheck || blePeripheralService->isConnected())
-//     {
-//         // Not time to check, or someone has connected to us.
-//         return;
-//     }
-
-//     nextSecondaryConnectionCheck = millis() + SECONDARY_PING_INTERVAL;
-//     Serial.print("Number of connected secondaries: ");
-//     Serial.println(allSecondaries.size());
-
-//     if (allSecondaries.size() == 0)
-//     {
-//         // No secondaries defined - if we got here it's because we lost connection with the secondaries.
-//         display->setDisplay("-NC-");
-//         return;
-//     }
-
-//     String status = " . . ." + String(allSecondaries.size());
-//     display->displayTemporary(status, 200);
-//     bool atLeastOneDisconnected = false;
-//     for (uint i = 0; i < allSecondaries.size(); i++)
-//     {
-//         Serial.print("Secondary [");
-//         Serial.print(allSecondaries.at(i)->getLocalName());
-//         Serial.print("]");
-//         if (allSecondaries.at(i)->isConnected())
-//         {
-//             Serial.println(" is connected.");
-//         }
-//         else
-//         {
-//             Serial.println(" has been disconnected.");
-//             atLeastOneDisconnected = true;
-//         }
-//     }
-
-//     if (atLeastOneDisconnected)
-//     {
-//         // Disconnect from all the secondaries.
-//         // This will also set the display to show we've disconnected.
-//         // Only attempt to reconnect when manually triggered.
-//         disconnectSecondaries();
-//     }
-// }
-
-// void disconnectSecondaries()
-// {
-//     Serial.println("Disconnecting all secondary devices.");
-
-//     for (uint i = 0; i < allSecondaries.size(); i++)
-//     {
-//         if (allSecondaries.at(i)->isConnected())
-//         {
-//             allSecondaries.at(i)->disconnect();
-//         }
-
-//         delete allSecondaries.at(i);
-//     }
-
-//     allSecondaries.clear();
-// }
-
-// void resetSecondaryConnections()
-// {
-//     // Disconnect any secondaries that we may still be connected to.
-//     disconnectSecondaries();
-
-//     // Repopulate the secondaries.
-//     populateSecondaryClients();
-//     updateOffsetDataForSecondaryClients();
-//     setManualStyle(styleConfiguration->getDefaultStyle());
-// }
