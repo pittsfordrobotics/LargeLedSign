@@ -16,6 +16,7 @@
 #include "Configuration\Configuration.h"
 #include "NeoPixelDisplay.h"
 #include "Utils\StringUtils.h"
+#include "ProxyService/ProxyService.h"
 
 #define INITIAL_DELAY 0000  // Initial delay to allow serial monitor to connect.
 #define TELEMETRYINTERVAL 3000     // Interval (msec) for updating the telemetry.
@@ -47,13 +48,13 @@ void displayBatteryVoltage();
 void checkForLowPowerState();
 void updateLEDs();
 void processButtonAction(int callerId, String actionName, std::vector<String> arguments);
-void populateSecondaryClients();
-SecondaryClient* scanForSecondaryClient();
-void updateOffsetDataForSecondaryClients();
-void updateAllSecondaries();
-void checkSecondaryConnections();
-void disconnectSecondaries();
-void resetSecondaryConnections();
+//void populateSecondaryClients();
+//SecondaryClient* scanForSecondaryClient();
+//void updateOffsetDataForSecondaryClients();
+//void updateAllSecondaries();
+//void checkSecondaryConnections();
+//void disconnectSecondaries();
+//void resetSecondaryConnections();
 
 // Default values
 std::vector<String> DefaultColorPatterns {"SingleColor","TwoColor","Rainbow", "BackgroundPlusThree"};
