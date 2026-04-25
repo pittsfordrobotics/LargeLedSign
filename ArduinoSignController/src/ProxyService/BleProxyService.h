@@ -23,6 +23,7 @@ class BleProxyService : public IProxyService
         void connectToSecondaries() override;
         void setConfiguration(byte brightness, byte speed, PatternData pattern) override;
         void displaySecondaryBatteryVoltages() override;
+        byte getCurrentBrightness() override;
 
     private:
         void populateSecondaryClients();

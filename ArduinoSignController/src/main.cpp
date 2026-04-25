@@ -67,25 +67,25 @@ void setup()
 
     display->setDisplay("---4");
     Serial.println("---4");
-    initializeDefaultStyleProperties(styleConfiguration->getDefaultStyle());
+    batteryMonitor = new BatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
 
     display->setDisplay("---5");
     Serial.println("---5");
-    batteryMonitor = new BatteryMonitor(systemConfiguration->getBatteryMonitorConfiguration());
-
-    display->setDisplay("---6");
-    Serial.println("---6");
     powerLedConfig = systemConfiguration->getPowerLedConfiguration();
     initializePowerLed();
 
-    display->setDisplay("---7");
-    Serial.println("---7");
+    display->setDisplay("---6");
+    Serial.println("---6");
     bluetoothConfig = systemConfiguration->getBluetoothConfiguration();
     startBleService();
 
+    display->setDisplay("---7");
+    Serial.println("---7");
+    initializeProxyService();
+
     display->setDisplay("---8");
     Serial.println("---8");
-    initializeProxyService();
+    initializeDefaultStyleProperties(styleConfiguration->getDefaultStyle());
 
     display->setDisplay("---9");
     Serial.println("---9");
@@ -283,6 +283,11 @@ void initializeDefaultStyleProperties(StyleDefinition& defaultStyleDefinition)
     {
         newBrightness = neoPixelDisplays->at(0)->getBrightness();
     }
+    else
+    {
+        // No displays have been configured, try getting the default brightness from the proxy service.
+        newBrightness = proxyService->getCurrentBrightness();
+    }
 
     currentBrightness = newBrightness;
 
@@ -332,16 +337,6 @@ void initializeProxyService()
     if (bluetoothConfig.isProxyModeEnabled())
     {
         proxyService = new BleProxyService();
-        // Serial.println("Populating secondary clients...");
-        // populateSecondaryClients();
-        // updateOffsetDataForSecondaryClients();
-        // // Need to grab default brightness from someplace.
-        // // Maybe move the default to be part of the system configuration?
-        // if (allSecondaries.size() > 0)
-        // {
-        //     newBrightness = allSecondaries[0]->getSignStatus().brightness;
-        //     currentBrightness = newBrightness;
-        // }
     }
     else
     {

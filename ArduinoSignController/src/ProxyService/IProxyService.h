@@ -14,6 +14,7 @@ class IProxyService
         virtual void update() = 0;
         virtual void setConfiguration(byte brightness, byte speed, PatternData pattern) = 0;
         virtual void displaySecondaryBatteryVoltages() = 0;
+        virtual byte getCurrentBrightness() = 0;
 };
 
 #endif // IPROXYSERVICE_H

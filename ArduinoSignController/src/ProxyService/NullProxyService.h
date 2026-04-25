@@ -12,4 +12,5 @@ class NullProxyService : public IProxyService
         void update() override {}
         void setConfiguration(byte brightness, byte speed, PatternData pattern) override {}
         void displaySecondaryBatteryVoltages() override {}
+        byte getCurrentBrightness() override { return 170; } // Some reasonable default brightness value.
 };

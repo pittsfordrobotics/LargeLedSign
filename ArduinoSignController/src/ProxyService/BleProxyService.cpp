@@ -61,6 +61,17 @@ void BleProxyService::connectToSecondaries()
     // Repopulate the secondaries.
     populateSecondaryClients();
     updateOffsetDataForSecondaryClients();
+
+    // Set default brightness based on the first secondary we connected to.
+    if (allSecondaries.size() > 0)
+    {
+        currentBrightness = allSecondaries[0]->getSignStatus().brightness;
+    }
+}
+
+byte BleProxyService::getCurrentBrightness()
+{
+    return currentBrightness;
 }
 
 void BleProxyService::setConfiguration(byte brightness, byte speed, PatternData pattern)
